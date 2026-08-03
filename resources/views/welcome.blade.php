@@ -2,206 +2,206 @@
 
     @section('content')
         <!-- Hero Banner Section -->
-        <style>
-            .hero-bg {
-                background: linear-gradient(to bottom, #02102e 0%, #031b4e 55%, #ffffff 85%, #ffffff 100%);
-            }
-            @media (min-width: 768px) {
-                .hero-bg {
-                    background: linear-gradient(to right, #02102e 0%, #031b4e 55%, #ffffff 90%, #ffffff 100%);
-                }
-            }
-            
-            /* Floating Animations */
-            @keyframes float {
-                0% { transform: translateY(0px) rotate(0deg); }
-                50% { transform: translateY(-20px) rotate(10deg); }
-                100% { transform: translateY(0px) rotate(0deg); }
-            }
-            @keyframes float-slow {
-                0% { transform: translateY(0px) rotate(0deg); }
-                50% { transform: translateY(-15px) rotate(-5deg); }
-                100% { transform: translateY(0px) rotate(0deg); }
-            }
-            @keyframes float-fast {
-                0% { transform: translateY(0px) rotate(0deg) scale(1); }
-                50% { transform: translateY(-25px) rotate(15deg) scale(1.05); }
-                100% { transform: translateY(0px) rotate(0deg) scale(1); }
-            }
-            .animate-float { animation: float 6s ease-in-out infinite; }
-            .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
-            .animate-float-fast { animation: float-fast 4s ease-in-out infinite; }
-        </style>
-        <section class="relative overflow-hidden flex items-center hero-bg" style="min-height: 600px;">
-            
-            <!-- Random Floating Background Patterns -->
-            <!-- Outline Circle -->
-            <div class="absolute top-20 left-10 md:left-20 w-16 h-16 rounded-full border border-white/5 animate-float z-0 pointer-events-none"></div>
-            <!-- Triangle -->
-            <svg class="absolute top-32 left-1/3 w-8 h-8 text-white/5 animate-float-slow z-0 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l9 19H3L12 2z"></path></svg>
-            <!-- Plus Sign -->
-            <div class="absolute bottom-40 left-1/4 text-white/5 text-4xl font-light animate-float z-0 pointer-events-none">+</div>
-            <!-- Small Solid Circle -->
-            <div class="absolute top-1/2 left-1/4 w-3 h-3 rounded-full bg-white/5 animate-float-fast z-0 pointer-events-none"></div>
-            <!-- Gold Outline Hexagon -->
-            <svg class="absolute bottom-24 left-12 md:left-32 w-12 h-12 text-[#dfa43a]/10 animate-float-slow z-0 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2l8.66 5v10L12 22l-8.66-5V7L12 2z"></path></svg>
-            <!-- Dotted grid (using text) -->
-            <div class="absolute top-1/4 left-1/2 text-white/5 text-xs animate-float z-0 pointer-events-none tracking-widest leading-none">
-                . . . <br>
-                . . . <br>
-                . . . 
+    <section class="relative w-full min-h-[90vh] bg-[#010614] overflow-x-hidden flex items-center">
+        <!-- Split Background -->
+        <div class="absolute inset-0 z-0">
+            <!-- Orange/Sky Base with Network Pattern -->
+            <div class="absolute inset-0 bg-[#0ea5e9]">
+                <!-- Clean Professional Network Pattern -->
+                <div class="absolute inset-0 w-full h-full opacity-100" style="background-image: url('{{ asset('images/network-pattern.svg') }}'); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
             </div>
-            
-            <!-- MORE PATTERN ADDITIONS -->
-            <!-- Large faint circle bottom-left -->
-            <div class="absolute -bottom-10 -left-10 w-40 h-40 rounded-full border-2 border-white/5 animate-float-slow z-0 pointer-events-none"></div>
-            <!-- Square Outline top-left-center -->
-            <div class="absolute top-12 left-1/4 w-10 h-10 border border-white/5 rotate-45 animate-float-fast z-0 pointer-events-none"></div>
-            <!-- Small plus signs scattered -->
-            <div class="absolute top-1/3 left-10 text-white/5 text-2xl font-light animate-float-fast z-0 pointer-events-none">+</div>
-            <div class="absolute bottom-1/4 left-1/2 text-white/5 text-xl font-light animate-float z-0 pointer-events-none">+</div>
-            <!-- Zigzag/Wave SVG -->
-            <svg class="absolute top-2/3 left-16 w-12 h-4 text-white/5 animate-float z-0 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 40 10" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M0 5l5-5 10 10 10-10 10 10 5-5"></path>
-            </svg>
-            <!-- Scattered solid dots -->
-            <div class="absolute top-10 left-1/2 w-2 h-2 rounded-full bg-white/5 animate-float-fast z-0 pointer-events-none"></div>
-            <div class="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 rounded-full bg-[#dfa43a]/20 animate-float-slow z-0 pointer-events-none"></div>
-            
-            <!-- Right side decorative shadow flag -->
-            <div class="absolute top-1/2 -translate-y-1/2 z-0 hidden md:block" style="right: 15%; width: 450px; height: 350px; background: linear-gradient(to right, rgba(1, 10, 28, 0.8), transparent); clip-path: polygon(100% 0, 100% 100%, 25% 100%, 0% 50%, 25% 0%);"></div>
-            
-            <!-- Small circular decorations -->
-            <div class="absolute rounded-full border-2 z-10 hidden md:block" style="right: 45%; bottom: 8rem; width: 30px; height: 30px; border-color: rgba(3, 27, 78, 0.8);"></div>
-            <div class="absolute text-5xl font-light z-10 hidden md:block" style="right: 38%; bottom: 4rem; color: #031b4e;">+</div>
+            <!-- Navy Sliding overlay (animates via clip-path) -->
+            <div id="bg-navy" class="absolute inset-0 bg-[#031b4e] transition-all duration-1000 ease-in-out" 
+                 style="clip-path: polygon(0 0, 60% 0, 48% 100%, 0 100%);">
+                <!-- Decorative grid overlay (flowing wave) -->
+                <div id="bg-grid" class="absolute inset-0 w-full h-full opacity-40 pointer-events-none transition-all duration-1000 ease-in-out mix-blend-screen" style="background-image: url('{{ asset('images/wave-pattern.svg') }}'); background-position: center bottom; background-size: cover; background-repeat: no-repeat;"></div>
+            </div>
+        </div>
 
-            <div class="max-w-7xl mx-auto px-6 lg:px-12 relative z-20 w-full h-full flex flex-col md:flex-row items-center justify-between pt-16 pb-40">
-                
-                <!-- Left Side: Text Content -->
-                <div class="w-full md:w-3/5 pr-0 z-20">
-                    <h2 id="hero-top-text" class="text-white/90 text-xl md:text-2xl font-light tracking-widest mb-2 uppercase">EXPERT CAREER</h2>
-                    
-                    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-2 mb-6">
-                        <h1 id="hero-heading-1" class="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight">GET THE JOB</h1>
-                        <h1 id="hero-heading-2" class="text-white/90 text-4xl md:text-5xl lg:text-6xl font-light uppercase tracking-wide">FASTER</h1>
-                    </div>
-                    
-                    <!-- Decorative Outlined Dashes -->
-                    <div class="flex gap-3 mb-8">
-                        <div class="w-16 h-2 border border-white/40 rounded-full"></div>
-                        <div class="w-16 h-2 border border-white/40 rounded-full"></div>
-                        <div class="w-16 h-2 border border-white/40 rounded-full"></div>
-                        <div class="w-16 h-2 border border-white/40 rounded-full"></div>
-                    </div>
-                    
-                    <!-- Paragraph with left border -->
-                    <div class="border-l-2 pl-6 max-w-lg mb-8" style="border-color: #dfa43a;">
-                        <p id="hero-paragraph" class="text-white/80 text-lg leading-relaxed">
-                            We provide expert career services tailored to protect your future, resolve job hurdles, and secure your career with confidence.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Right Side: Hexagon Image -->
-                <div class="w-full md:w-2/5 flex justify-center md:justify-end mt-12 md:mt-0 relative z-20">
-                    <!-- Hexagon Border Wrapper -->
-                    <div class="p-[10px] relative shadow-2xl mx-auto md:mx-0" style="width: 100%; max-width: 450px; height: 390px; background-color: #010a1c; clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);">
-                        <!-- Inner Hexagon Image -->
-                        <div class="w-full h-full relative overflow-hidden" style="clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);">
-                            <img id="hero-img" src="{{ asset('images/candidate_hero_4k.png') }}" class="w-full h-full object-cover">
-                        </div>
-                    </div>
+        <div class="max-w-7xl mx-auto px-4 lg:px-8 relative z-20 w-full h-full flex flex-col md:flex-row items-center pt-32 md:pt-40 pb-20">
+            
+            <!-- Left Side: Text Content -->
+            <div id="hero-text-container" class="w-full md:w-1/2 flex flex-col justify-center transition-all duration-1000 ease-in-out md:pr-10 z-20">
+                <div class="mb-4 inline-block self-start px-3 py-1 bg-white/10 rounded-full border border-white/20 text-white/90 text-sm font-semibold tracking-widest uppercase">
+                    #1 OUTSOURCED
                 </div>
                 
-            </div>
-
-            <!-- Bottom Left Angled Bar (Replaces Call for order with Candidate/Employer Switcher) -->
-            <div class="absolute bottom-0 left-0 bg-white z-30 flex flex-col sm:flex-row items-center justify-between pl-6 pr-12 md:pl-12 md:pr-24 py-4 md:py-6 shadow-2xl" style="width: 75%; clip-path: polygon(0 0, 92% 0, 100% 100%, 0 100%); min-width: 300px;">
+                <!-- Main Heading -->
+                <h1 id="hero-heading" class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] mb-6 tracking-tight transition-opacity duration-300">
+                    EDUCATION<br>
+                    & HIRING<br>
+                    SOLUTIONS
+                </h1>
                 
-                <div class="flex items-center gap-4 md:gap-8 mb-4 sm:mb-0">
-                    <!-- Candidate Toggle -->
-                    <button id="btn-candidate" class="flex items-center gap-3 font-bold text-left transition-colors" style="color: #031b4e;" onclick="setHeroMode('candidate')">
-                        <i class="fas fa-user-graduate text-3xl"></i>
-                        <div class="leading-tight">
-                            <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold">I am a</div>
-                            <div class="text-sm md:text-lg">CANDIDATE</div>
-                        </div>
+                <!-- Paragraph -->
+                <p id="hero-text" class="text-white/80 text-sm md:text-base leading-relaxed mb-10 max-w-md border-l-2 border-white/20 pl-4 transition-opacity duration-300">
+                    Connect with top-tier talent and premier educational institutions. We streamline your recruitment process and guide your career forward.
+                </p>
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-10">
+                    <button id="btn-candidate" onclick="switchHeroMode('candidate')" 
+                       class="group relative overflow-hidden bg-white/20 backdrop-blur-md border border-white/40 text-white font-medium py-3.5 px-8 rounded-full shadow-lg transition-all duration-300">
+                        <span class="relative z-10 flex items-center justify-center">
+                            I am a Candidate <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </span>
                     </button>
                     
-                    <!-- Separator -->
-                    <div class="w-px h-12 bg-gray-300"></div>
-                    
-                    <!-- Employer Toggle -->
-                    <button id="btn-employer" class="flex items-center gap-3 text-gray-400 font-bold text-left transition-colors" onclick="setHeroMode('employer')">
-                        <i class="fas fa-building text-3xl"></i>
-                        <div class="leading-tight">
-                            <div class="text-xs uppercase tracking-wider font-semibold">I am an</div>
-                            <div class="text-sm md:text-lg">EMPLOYER</div>
-                        </div>
+                    <button id="btn-employer" onclick="switchHeroMode('employer')" class="group bg-white hover:bg-[#0ea5e9] text-[#031b4e] hover:text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 flex items-center justify-center border-2 border-transparent hover:border-[#0ea5e9]">
+                        I am an Employer <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                     </button>
                 </div>
+            </div>
+            
+            <!-- Right Side: Circular Image with Play Button -->
+            <div id="hero-img-wrapper" class="w-full md:w-1/2 flex justify-center md:justify-end relative mt-12 md:mt-0 z-20 transition-all duration-1000 ease-in-out">
                 
-                <!-- Social Icons -->
-                <div class="flex items-center gap-4 md:gap-6 pr-4 md:pr-12">
-                    <a href="#" class="text-lg md:text-xl transition-colors hover:opacity-80" style="color: #031b4e;"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="text-lg md:text-xl transition-colors hover:opacity-80" style="color: #031b4e;"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="text-lg md:text-xl transition-colors hover:opacity-80" style="color: #031b4e;"><i class="fab fa-instagram"></i></a>
-                    <span class="font-bold text-sm hidden lg:inline-block" style="color: #031b4e;">WarriorsEducare</span>
+                <div class="relative w-[300px] h-[300px] sm:w-[350px] sm:h-[350px] lg:w-[420px] lg:h-[420px]">
+                    
+                    <!-- Main Circular Image Frame -->
+                    <div id="hero-img-container" class="w-full h-full rounded-full overflow-hidden border-8 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative z-10 transition-transform duration-1000 ease-in-out">
+                        <!-- Image of a team/meeting -->
+                        <img id="hero-img" src="{{ asset('images/candidate_hero_4k.png') }}" alt="Team Collaboration" class="w-full h-full object-cover transition-opacity duration-300">
+                        <div class="absolute inset-0 bg-[#0ea5e9] mix-blend-overlay opacity-10 pointer-events-none"></div>
+                    </div>
+
+                    <!-- Floating Play Button on the left edge of the circle -->
+                    <div id="hero-play-btn" class="absolute top-1/2 -translate-y-1/2 -left-4 md:-left-8 w-16 h-16 bg-[#0ea5e9] rounded-full flex items-center justify-center shadow-xl cursor-pointer hover:scale-110 transition-all duration-1000 z-20 border-4 border-white/20">
+                        <i class="fas fa-play text-white text-lg ml-1"></i>
+                    </div>
+                    
+                    <!-- Floating curved accent at top right -->
+                    <div id="hero-accent" class="absolute -top-6 right-10 w-24 h-24 border-t-4 border-r-4 border-white/30 rounded-tr-full z-0 pointer-events-none transition-all duration-1000"></div>
+
                 </div>
+
             </div>
 
-            <!-- Bottom Right Visit Us -->
-            <div class="absolute bottom-6 right-6 md:right-12 z-30 flex flex-col items-end">
-                <a href="{{ route('contact') }}" class="font-extrabold py-2 md:py-3 px-6 md:px-8 rounded-full flex items-center gap-3 hover:opacity-90 transition-colors shadow-lg text-sm md:text-base" style="background-color: #031b4e; color: white;">
-                    Visit Us <i class="fas fa-chevron-right rounded-full w-5 h-5 flex items-center justify-center text-xs" style="background-color: white; color: #031b4e;"></i>
-                </a>
-                <div class="text-xs md:text-sm mt-3 font-semibold tracking-wide" style="color: #031b4e;">www.warriorsportal.com</div>
-            </div>
+        </div>
+    </section>
 
-            <script>
-                function setHeroMode(mode) {
-                    const topText = document.getElementById('hero-top-text');
-                    const heading1 = document.getElementById('hero-heading-1');
-                    const heading2 = document.getElementById('hero-heading-2');
-                    const paragraph = document.getElementById('hero-paragraph');
-                    const btnCandidate = document.getElementById('btn-candidate');
-                    const btnEmployer = document.getElementById('btn-employer');
-                    const heroImg = document.getElementById('hero-img');
+    <script>
+        let currentRotation = 0;
+        function switchHeroMode(mode) {
+            const heading = document.getElementById('hero-heading');
+            const text = document.getElementById('hero-text');
+            const img = document.getElementById('hero-img');
+            const imgContainer = document.getElementById('hero-img-container');
+            const btnCandidate = document.getElementById('btn-candidate');
+            const btnEmployer = document.getElementById('btn-employer');
+            
+            // Layout Elements
+            const bgNavy = document.getElementById('bg-navy');
+            const bgGrid = document.getElementById('bg-grid');
+            const textContainer = document.getElementById('hero-text-container');
+            const imgWrapper = document.getElementById('hero-img-wrapper');
+            const playBtn = document.getElementById('hero-play-btn');
+            const accent = document.getElementById('hero-accent');
 
-                    if (mode === 'employer') {
-                        topText.innerHTML = "EXPERT HIRING";
-                        heading1.innerHTML = "FIND TOP TALENT";
-                        heading2.innerHTML = "FASTER";
-                        paragraph.innerHTML = "We provide expert hiring services tailored to find top tier professionals, streamline your recruitment, and build your dream team.";
-                        heroImg.src = "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=600&q=80"; // Employer image
-                        
-                        // Active state styling
-                        btnEmployer.style.color = "#031b4e";
-                        btnEmployer.classList.remove('text-gray-400');
-                        btnEmployer.querySelector('.text-xs').style.color = "#6b7280"; // text-gray-500
-                        
-                        btnCandidate.style.color = "";
-                        btnCandidate.classList.add('text-gray-400');
-                        btnCandidate.querySelector('.text-xs').style.color = "";
-                    } else {
-                        topText.innerHTML = "EXPERT CAREER";
-                        heading1.innerHTML = "GET THE JOB";
-                        heading2.innerHTML = "FASTER";
-                        paragraph.innerHTML = "We provide expert career services tailored to protect your future, resolve job hurdles, and secure your career with confidence.";
-                        heroImg.src = "{{ asset('images/candidate_hero_4k.png') }}"; // Candidate image
-                        
-                        // Active state styling
-                        btnCandidate.style.color = "#031b4e";
-                        btnCandidate.classList.remove('text-gray-400');
-                        btnCandidate.querySelector('.text-xs').style.color = "#6b7280";
-                        
-                        btnEmployer.style.color = "";
-                        btnEmployer.classList.add('text-gray-400');
-                        btnEmployer.querySelector('.text-xs').style.color = "";
-                    }
-                }
-            </script>
-        </section>
+            if (!heading || !imgContainer) return;
+
+            // Flip the circle in 3D
+            currentRotation += 360;
+            imgContainer.style.transform = `rotateY(${currentRotation}deg)`;
+
+            // Fade out text and image briefly
+            heading.style.opacity = '0';
+            text.style.opacity = '0';
+            img.style.opacity = '0.3';
+
+            if(mode === 'employer') {
+                // Move Navy Background to the Right
+                bgNavy.style.clipPath = 'polygon(40% 0, 100% 0, 100% 100%, 52% 100%)';
+                
+                // Swap Containers (Text goes right, Image goes left)
+                textContainer.style.transform = window.innerWidth >= 768 ? 'translateX(100%)' : 'translateX(0)';
+                textContainer.classList.remove('md:pr-10');
+                textContainer.classList.add('md:pl-10');
+                
+                imgWrapper.style.transform = window.innerWidth >= 768 ? 'translateX(-100%)' : 'translateX(0)';
+                imgWrapper.classList.remove('md:justify-end');
+                imgWrapper.classList.add('md:justify-start');
+
+                // Adjust decorations
+                playBtn.style.left = 'auto';
+                playBtn.style.right = window.innerWidth >= 768 ? '-2rem' : '-1rem';
+                accent.style.right = 'auto';
+                accent.style.left = '2.5rem';
+                accent.className = "absolute -top-6 left-10 w-24 h-24 border-t-4 border-l-4 border-white/30 rounded-tl-full z-0 pointer-events-none transition-all duration-1000";
+
+                setTimeout(() => {
+                    heading.innerHTML = 'FIND TOP<br>TALENT FOR<br>YOUR INSTITUTION';
+                    text.innerHTML = 'Discover the best educators and administrative staff. Post jobs, review applicants, and hire the perfect fit for your school.';
+                    img.src = "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1000&q=80";
+                    
+                    btnEmployer.className = "group bg-[#0ea5e9] text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.5)] transition-all duration-300 flex items-center justify-center border-2 border-[#0ea5e9] scale-105";
+                    btnCandidate.className = "group relative overflow-hidden bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-medium py-3.5 px-8 rounded-full shadow-lg transition-all duration-300 scale-100 opacity-80";
+                    
+                    heading.style.opacity = '1';
+                    text.style.opacity = '1';
+                    img.style.opacity = '1';
+                }, 350);
+
+            } else {
+                // Move Navy Background to the Left
+                bgNavy.style.clipPath = 'polygon(0 0, 60% 0, 48% 100%, 0 100%)';
+                
+                // Swap Containers Back (Text goes left, Image goes right)
+                textContainer.style.transform = 'translateX(0)';
+                textContainer.classList.remove('md:pl-10');
+                textContainer.classList.add('md:pr-10');
+                
+                imgWrapper.style.transform = 'translateX(0)';
+                imgWrapper.classList.remove('md:justify-start');
+                imgWrapper.classList.add('md:justify-end');
+
+                // Adjust decorations
+                playBtn.style.right = 'auto';
+                playBtn.style.left = window.innerWidth >= 768 ? '-2rem' : '-1rem';
+                accent.style.left = 'auto';
+                accent.style.right = '2.5rem';
+                accent.className = "absolute -top-6 right-10 w-24 h-24 border-t-4 border-r-4 border-white/30 rounded-tr-full z-0 pointer-events-none transition-all duration-1000";
+
+                setTimeout(() => {
+                    heading.innerHTML = 'EDUCATION<br>& HIRING<br>SOLUTIONS';
+                    text.innerHTML = 'Connect with top-tier talent and premier educational institutions. We streamline your recruitment process and guide your career forward.';
+                    img.src = "{{ asset('images/candidate_hero_4k.png') }}";
+                    
+                    btnCandidate.className = "group relative overflow-hidden bg-[#0ea5e9] backdrop-blur-md border border-[#0ea5e9] text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.5)] transition-all duration-300 scale-105";
+                    btnEmployer.className = "group bg-white hover:bg-[#0ea5e9] text-[#031b4e] hover:text-white font-medium py-3.5 px-8 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center border-2 border-white/20 hover:border-white/40 scale-100 opacity-80";
+                    
+                    heading.style.opacity = '1';
+                    text.style.opacity = '1';
+                    img.style.opacity = '1';
+                }, 350);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Reset to Candidate mode on load without transitions initially
+            const textContainer = document.getElementById('hero-text-container');
+            const imgWrapper = document.getElementById('hero-img-wrapper');
+            const bgNavy = document.getElementById('bg-navy');
+            
+            textContainer.style.transition = 'none';
+            imgWrapper.style.transition = 'none';
+            bgNavy.style.transition = 'none';
+            
+            textContainer.style.transform = 'translateX(0)';
+            imgWrapper.style.transform = 'translateX(0)';
+            bgNavy.style.clipPath = 'polygon(0 0, 60% 0, 48% 100%, 0 100%)';
+            
+            setTimeout(() => {
+                textContainer.style.transition = 'all 1s ease-in-out';
+                imgWrapper.style.transition = 'all 1s ease-in-out';
+                bgNavy.style.transition = 'all 1s ease-in-out';
+            }, 100);
+
+            switchHeroMode('candidate');
+            currentRotation = 0;
+            document.getElementById('hero-img-container').style.transform = `rotateY(0deg)`;
+        });
+    </script>
 
         <!-- About / Empowering Section -->
         <section class="py-20 bg-white">

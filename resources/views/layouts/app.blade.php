@@ -142,14 +142,30 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg opacity='0.1'%3E%3Cpolygon points='0,0 40,0 0,40' fill='%23dfa43a'/%3E%3Cpolygon points='0,40 40,0 40,40' fill='%23ffffff' opacity='0.5'/%3E%3Crect x='40' y='0' width='40' height='40' fill='%23dfa43a' opacity='0.7'/%3E%3Cpolygon points='80,0 120,0 120,40' fill='%23ffffff' opacity='0.3'/%3E%3Cpolygon points='80,0 120,40 80,40' fill='%23dfa43a'/%3E%3Crect x='0' y='40' width='40' height='40' fill='%23ffffff' opacity='0.4'/%3E%3Cpolygon points='40,40 80,40 40,80' fill='%23dfa43a' opacity='0.8'/%3E%3Cpolygon points='40,80 80,40 80,80' fill='%23ffffff' opacity='0.6'/%3E%3Cpolygon points='80,40 120,40 80,80' fill='%23dfa43a' opacity='0.5'/%3E%3Cpolygon points='80,80 120,40 120,80' fill='%23ffffff' opacity='0.8'/%3E%3Cpolygon points='0,80 40,80 40,120' fill='%23dfa43a' opacity='0.6'/%3E%3Cpolygon points='0,80 40,120 0,120' fill='%23ffffff' opacity='0.3'/%3E%3Crect x='40' y='80' width='40' height='40' fill='%23dfa43a' opacity='0.9'/%3E%3Cpolygon points='80,80 120,80 80,120' fill='%23ffffff' opacity='0.5'/%3E%3Cpolygon points='80,120 120,80 120,120' fill='%23dfa43a'/%3E%3C/g%3E%3C/svg%3E");
         }
 
+        .glowing-blue-bg {
+            background-color: #051024;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         /* Scrolled state text colors */
         .header-scrolled span, 
-        .header-scrolled a {
+        .header-scrolled a,
+        .header-scrolled button {
             color: #031b4e !important;
         }
         
-        .header-scrolled a:hover {
+        .header-scrolled a:hover,
+        .header-scrolled button:hover {
             color: #0052cc !important;
+        }
+
+        .header-scrolled .border-white\/30 {
+            border-color: #cbd5e1 !important;
+        }
+        
+        .header-scrolled .bg-white\/20 {
+            background-color: transparent !important;
         }
 
         /* Get Started button inverted on scroll */
@@ -162,7 +178,6 @@
         .header-scrolled a.bg-\[\#ffffff\]:hover {
             background-color: #0052cc !important;
             color: #ffffff !important;
-        }
         }
 
         .header-scrolled .logo-img {
@@ -237,21 +252,21 @@
         </marquee>
     </div>    <!-- Header -->
     <header id="main-header"
-        class="sticky top-[36px] left-0 w-full px-6 lg:px-12 py-1 flex justify-between items-center z-[100] transition-all duration-500 bg-gradient-to-r from-white from-0% via-[#031b4e] via-30% to-[#031b4e] shadow-lg border-b border-gray-100">
+        class="fixed top-[48px] left-1/2 -translate-x-1/2 w-[95%] max-w-7xl px-4 lg:px-8 py-1 flex justify-between items-center z-[100] transition-all duration-500 glowing-blue-bg rounded-full">
         <a href="#" class="flex items-center no-underline py-1 z-10">
-            <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-20 logo-img transition-all duration-300">
+            <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-12 lg:h-14 logo-img transition-all duration-300">
         </a>
-        <nav class="hidden lg:flex items-center gap-6 xl:gap-10">
-            <ul class="flex gap-4 lg:gap-6 xl:gap-8 list-none m-0 p-0">
+        <nav class="hidden lg:flex items-center gap-4 xl:gap-6">
+            <ul class="flex gap-3 lg:gap-4 xl:gap-6 list-none m-0 p-0">
                 <li><a href="{{ route('home') }}"
-                        class="{{ request()->routeIs('home') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[15px] transition-colors">Home</a>
+                        class="{{ request()->routeIs('home') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Home</a>
                 </li>
                 <li><a href="{{ route('about') }}"
-                        class="{{ request()->routeIs('about') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[15px] transition-colors">About us</a></li>
+                        class="{{ request()->routeIs('about') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">About us</a></li>
                 <li><a href="{{ route('services') }}"
-                        class="{{ request()->routeIs('services') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[15px] transition-colors">Services</a></li>
+                        class="{{ request()->routeIs('services') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Services</a></li>
                 <li><a href="{{ route('jobs') }}"
-                        class="{{ request()->routeIs('jobs') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[15px] transition-colors">Jobs</a>
+                        class="{{ request()->routeIs('jobs') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Jobs</a>
                 </li>
                 <li><a href="{{ route('resume.builder') }}"
                         class="{{ request()->routeIs('resume.builder') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[15px] transition-colors">Resume Builder <span
