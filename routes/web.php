@@ -1,0 +1,222 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+
+Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::post('/tuition/post', [App\Http\Controllers\HomeController::class, 'storeTuition'])->name('tuition.post');
+Route::get('/jobs', [\App\Http\Controllers\HomeController::class, 'jobs'])->name('jobs');
+Route::get('/jobs/{job}', [\App\Http\Controllers\JobController::class, 'show'])->name('jobs.show');
+Route::get('/category/{id}/jobs', [\App\Http\Controllers\HomeController::class, 'categoryJobs'])->name('category.jobs');
+
+// Dynamic Subjects and Specializations
+Route::get('/api/categories/{category}/subjects', [HomeController::class, 'getSubjects'])->name('api.category.subjects');
+Route::get('/api/subjects/{subject}/specializations', [HomeController::class, 'getSpecializations'])->name('api.subject.specializations');
+Route::get('/api/states/{state}/cities', function (\App\Models\State $state) {
+    return $state->cities()->where('is_active', true)->get();
+})->name('api.state.cities');
+
+Route::view('/about', 'about')->name('about');
+Route::get('/services', [\App\Http\Controllers\HomeController::class, 'services'])->name('services');
+Route::get('/services/{slug}', [\App\Http\Controllers\HomeController::class, 'serviceDetails'])->name('service.details');
+Route::view('/hiring-process', 'hiring')->name('hiring');
+Route::view('/contact', 'contact')->name('contact');
+Route::post('/contact', [\App\Http\Controllers\HomeController::class, 'storeContact'])->name('contact.store');
+Route::view('/apply', 'apply')->name('apply');
+Route::get('/post-job', [\App\Http\Controllers\JobController::class, 'showPostJobForm'])->name('post-job');
+Route::post('/post-job', [\App\Http\Controllers\JobController::class, 'storeJobQuery'])->name('post-job.store');
+Route::view('/terms', 'terms')->name('terms');
+Route::view('/privacy', 'privacy')->name('privacy');
+Route::view('/media', 'media')->name('media');
+Route::get("/refund", function () {
+    return view('refund');
+})->name("refund");
+Route::get("/pricing", function () {
+    return view('pricing');
+})->name("pricing");
+Route::get('/cookie', function () {
+    return view('cookie');
+})->name("cookie");
+Route::get('/disclaimer', function () {
+    return view('disclaimer');
+})->name('disclaimer');
+Route::get('/employer', function () {
+    return view('employer');
+})->name('employer');
+Route::get('/candidate', function () {
+    return view('candidate');
+})->name('candidate');  
+
+
+// Resume Builder (Public)
+Route::get('/resume-builder', [\App\Http\Controllers\ResumeBuilderController::class, 'index'])->name('resume.builder');
+Route::post('/resume-builder/download', [\App\Http\Controllers\ResumeBuilderController::class, 'download'])->name('resume.builder.download');
+
+// Authentication Routes
+Route::get('/login', [\App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login'])->name('login.post');
+
+// Password Reset Routes
+Route::get('/password/reset', [\App\Http\Controllers\PasswordResetController::class, 'showLinkRequestForm'])->middleware('guest')->name('password.request');
+Route::post('/password/email', [\App\Http\Controllers\PasswordResetController::class, 'sendResetLinkEmail'])->middleware('guest')->name('password.email');
+Route::get('/password/reset/{token}', [\App\Http\Controllers\PasswordResetController::class, 'showResetForm'])->middleware('guest')->name('password.reset');
+Route::post('/password/reset', [\App\Http\Controllers\PasswordResetController::class, 'reset'])->middleware('guest')->name('password.update');
+
+// OTP Login Routes
+Route::get('/login/otp', [\App\Http\Controllers\AuthController::class, 'showOtpForm'])->name('login.otp');
+Route::post('/login/otp/send', [\App\Http\Controllers\AuthController::class, 'sendOtp'])->name('login.otp.send');
+Route::post('/login/otp/verify', [\App\Http\Controllers\AuthController::class, 'verifyOtp'])->name('login.otp.verify');
+
+Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
+
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+
+// Email Verification Routes
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    if (auth()->user()->role === 'employer')
+        return redirect('/employer/dashboard');
+    return redirect('/candidate/dashboard');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+// Candidate Auth Routes
+Route::get('/register', [\App\Http\Controllers\CandidateAuthController::class, 'showRegistrationForm'])->name('candidate.register');
+Route::post('/register', [\App\Http\Controllers\CandidateAuthController::class, 'register'])->name('candidate.register.post');
+
+// Candidate Routes (Unverified but Auth Required)
+Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.')->group(function () {
+    // Registration Wizard
+    Route::get('/wizard', [\App\Http\Controllers\Candidate\RegistrationWizardController::class, 'show'])->name('wizard');
+    Route::post('/wizard/step1', [\App\Http\Controllers\Candidate\RegistrationWizardController::class, 'saveStep1'])->name('wizard.step1');
+    Route::post('/wizard/step2', [\App\Http\Controllers\Candidate\RegistrationWizardController::class, 'saveStep2'])->name('wizard.step2');
+    Route::post('/wizard/step3', [\App\Http\Controllers\Candidate\RegistrationWizardController::class, 'saveStep3'])->name('wizard.step3');
+    Route::post('/wizard/payment', [\App\Http\Controllers\Candidate\RegistrationWizardController::class, 'initiatePayment'])->name('wizard.payment');
+    Route::match(['get', 'post'], '/wizard/callback', [\App\Http\Controllers\Candidate\RegistrationWizardController::class, 'callback'])->name('wizard.callback');
+
+    Route::get('/dashboard', function () {
+        $profile = auth()->user()->profile;
+        return view('candidate.dashboard', compact('profile'));
+    })->name('dashboard');
+});
+
+// Candidate Routes (Protected & Verified)
+Route::middleware(['auth', 'verified', 'candidate'])->prefix('candidate')->name('candidate.')->group(function () {
+    Route::get('/profile', [\App\Http\Controllers\Candidate\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [\App\Http\Controllers\Candidate\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/password', [\App\Http\Controllers\Candidate\ProfileController::class, 'updatePassword'])->name('password.update');
+
+    Route::get('/agreement', [\App\Http\Controllers\Candidate\AgreementController::class, 'show'])->name('agreement.show');
+    Route::post('/agreement/sign', [\App\Http\Controllers\Candidate\AgreementController::class, 'sign'])->name('agreement.sign');
+    Route::get('/agreement/download', [\App\Http\Controllers\Candidate\AgreementController::class, 'download'])->name('agreement.download');
+
+    Route::get('/payment', [\App\Http\Controllers\Candidate\PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/process', [\App\Http\Controllers\Candidate\PaymentController::class, 'process'])->name('payment.process');
+    Route::match(['get', 'post'], '/payment/callback', [\App\Http\Controllers\Candidate\PaymentController::class, 'callback'])->name('payment.callback');
+    Route::get('/payment/invoice/{id}', [\App\Http\Controllers\Candidate\PaymentController::class, 'invoice'])->name('payment.invoice');
+
+    Route::get('/applications', [\App\Http\Controllers\Candidate\ApplicationController::class, 'index'])->name('applications.index');
+    Route::get('/applications/available', [\App\Http\Controllers\Candidate\ApplicationController::class, 'available'])->name('applications.available');
+    Route::post('/applications/{job}/apply', [\App\Http\Controllers\Candidate\ApplicationController::class, 'apply'])->name('applications.apply');
+
+    Route::get('/registration', [\App\Http\Controllers\Candidate\RegistrationController::class, 'show'])->name('registration.show');
+    Route::get('/service-charge', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'show'])->name('serviceCharge.show');
+    Route::get('/service-charge/invoice/{id}/pdf', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'downloadInvoicePdf'])->name('serviceCharge.invoicePdf');
+    Route::post('/service-charge/pay', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'process'])->name('serviceCharge.pay');
+    Route::match(['get', 'post'], '/service-charge/callback', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'callback'])->name('serviceCharge.callback');
+    Route::view('/additional-feature', 'candidate.aditionalFeature.show')->name('aditionalFeature.show');
+
+    Route::get('/tuitions', [\App\Http\Controllers\Candidate\TuitionController::class, 'index'])->name('tuitions.index');
+    Route::post('/tuitions/{id}/apply', [\App\Http\Controllers\Candidate\TuitionController::class, 'apply'])->name('tuitions.apply');
+});
+
+// Employer Auth Routes
+Route::get('/employer/register', [\App\Http\Controllers\EmployerAuthController::class, 'showRegistrationForm'])->name('employer.register');
+Route::post('/employer/register', [\App\Http\Controllers\EmployerAuthController::class, 'register'])->name('employer.register.post');
+
+// Employer Routes (Protected)
+Route::middleware(['auth', 'verified', 'employer'])->prefix('employer')->name('employer.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Employer\DashboardController::class, 'index'])->name('dashboard');
+
+    Route::resource('jobs', \App\Http\Controllers\Employer\JobController::class);
+    Route::resource('tuitions', \App\Http\Controllers\Employer\TuitionController::class);
+
+    Route::get('/profile', [\App\Http\Controllers\Employer\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [\App\Http\Controllers\Employer\ProfileController::class, 'update'])->name('profile.update');
+
+    Route::get('/applicants', [\App\Http\Controllers\Employer\ApplicantController::class, 'index'])->name('applicants.index');
+});
+
+// Global Impersonation Leave Route
+Route::middleware(['auth'])->get('/admin/impersonate/leave', [\App\Http\Controllers\Admin\UserController::class, 'leaveImpersonate'])->name('admin.impersonate.leave');
+
+// Admin Routes (Protected)
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
+    // Master Data
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+    Route::resource('subjects', \App\Http\Controllers\Admin\SubjectController::class);
+    Route::resource('qualifications', \App\Http\Controllers\Admin\QualificationController::class);
+    Route::resource('states', \App\Http\Controllers\Admin\StateController::class);
+    Route::resource('cities', \App\Http\Controllers\Admin\CityController::class);
+
+    // Job Posts
+    Route::resource('jobs', \App\Http\Controllers\Admin\JobController::class);
+    Route::resource('tuitions', \App\Http\Controllers\Admin\TuitionController::class);
+    Route::post('jobs/{job}/approve', [\App\Http\Controllers\Admin\JobController::class, 'approve'])->name('jobs.approve');
+    Route::post('jobs/{job}/reject', [\App\Http\Controllers\Admin\JobController::class, 'reject'])->name('jobs.reject');
+
+    // Candidates CRM
+    Route::get('/candidates/create', [\App\Http\Controllers\Admin\CrmController::class, 'create'])->name('crm.create');
+    Route::post('/candidates/store', [\App\Http\Controllers\Admin\CrmController::class, 'store'])->name('crm.store');
+    Route::get('/candidates/{id}/edit', [\App\Http\Controllers\Admin\CrmController::class, 'edit'])->name('crm.edit');
+    Route::put('/candidates/{id}', [\App\Http\Controllers\Admin\CrmController::class, 'update'])->name('crm.update');
+    Route::get('/candidates', [\App\Http\Controllers\Admin\CrmController::class, 'index'])->name('crm.index');
+    Route::get('/candidates/{id}', [\App\Http\Controllers\Admin\CrmController::class, 'show'])->name('crm.show');
+    Route::post('/crm/candidate/{id}/follow-up', [\App\Http\Controllers\Admin\CrmController::class, 'storeFollowUp'])->name('crm.followup.store');
+    Route::post('/crm/candidate/{id}/invoice', [\App\Http\Controllers\Admin\CrmController::class, 'storeInvoice'])->name('crm.invoice.store');
+    Route::post('/crm/candidate/{id}/assign-job', [\App\Http\Controllers\Admin\CrmController::class, 'assignJob'])->name('crm.application.assign');
+    Route::put('/crm/invoice/{id}', [\App\Http\Controllers\Admin\CrmController::class, 'updateInvoiceStatus'])->name('crm.invoice.update');
+    Route::post('/crm/invoice/{id}/adjust', [\App\Http\Controllers\Admin\CrmController::class, 'adjustInvoice'])->name('crm.invoice.adjust');
+    Route::post('/crm/candidate/{id}/toggle-verification', [\App\Http\Controllers\Admin\CrmController::class, 'toggleVerification'])->name('crm.candidate.verify');
+    Route::post('/crm/candidate/{id}/rate', [\App\Http\Controllers\Admin\CrmController::class, 'rateCandidate'])->name('crm.candidate.rate');
+    Route::get('/crm/candidate/{id}/magic-login', [\App\Http\Controllers\Admin\CrmController::class, 'magicLogin'])->name('crm.candidate.magic-login');
+    Route::post('/crm/candidate/{id}/upload-agreement', [\App\Http\Controllers\Admin\CrmController::class, 'uploadAgreement'])->name('crm.candidate.upload-agreement');
+
+    // Applications & Transactions
+    Route::get('/applications', [\App\Http\Controllers\Admin\ApplicationController::class, 'index'])->name('applications.index');
+    Route::post('/applications/{id}/status', [\App\Http\Controllers\Admin\ApplicationController::class, 'updateStatus'])->name('applications.status.update');
+    Route::get('/transactions', [\App\Http\Controllers\Admin\TransactionController::class, 'index'])->name('transactions.index');
+
+    // Contact Leads
+    Route::get('/leads', [\App\Http\Controllers\Admin\ContactLeadController::class, 'index'])->name('leads.index');
+    Route::get('/leads/{id}', [\App\Http\Controllers\Admin\ContactLeadController::class, 'show'])->name('leads.show');
+    Route::put('/leads/{id}/status', [\App\Http\Controllers\Admin\ContactLeadController::class, 'updateStatus'])->name('leads.status.update');
+    Route::post('/leads/{id}/follow-up', [\App\Http\Controllers\Admin\ContactLeadController::class, 'storeFollowUp'])->name('leads.followup.store');
+
+    // Frontend Management
+    
+    // User Management
+    Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+    Route::post('/users/{id}/toggle-status', [\App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::get('/users/{id}/impersonate', [\App\Http\Controllers\Admin\UserController::class, 'impersonate'])->name('users.impersonate');
+
+    // Notification Management
+    Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{id}/mark-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markRead'])->name('notifications.mark-read');
+    Route::get('/notifications/mark-all-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+
+    Route::resource('services', \App\Http\Controllers\Admin\ServiceController::class)->except(['create', 'show', 'edit']);
+    Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class)->except(['create', 'show', 'edit']);
+    Route::resource('clients', \App\Http\Controllers\Admin\ClientLogoController::class)->except(['create', 'show', 'edit'])->parameters(['clients' => 'clientLogo']);
+});

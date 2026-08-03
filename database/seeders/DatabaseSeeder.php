@@ -1,0 +1,43 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    use WithoutModelEvents;
+
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // User::factory(10)->create();
+
+        User::updateOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'), // Add password since factory isn't used
+                'email_verified_at' => now(),
+            ]
+        );
+
+        $this->call([
+            AdminSeeder::class,
+            StateCitySeeder::class,
+            DummyDataSeeder::class,
+            NewServicesSeeder::class,
+            UpdateServiceContentSeeder::class,
+            UpdateRecruitmentServiceSeeder::class,
+            UpdateDigitalSupportSeeder::class,
+            UpdateDigitalSupportImagesSeeder::class,
+            UpdateResumeServiceSeeder::class,
+            UpdateInterviewTrainingSeeder::class,
+            // JobPostsSeeder::class, // Jobs removed as per request
+        ]);
+    }
+}
