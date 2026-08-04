@@ -41,7 +41,7 @@
                     <tr class="bg-gray-50/50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                         <th class="px-6 py-4">Posted By</th>
                         <th class="px-6 py-4">Details</th>
-                        <th class="px-6 py-4">Location & Budget</th>
+                        <th class="px-6 py-4">Location</th>
                         <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4 text-right">Actions</th>
                     </tr>
@@ -63,7 +63,6 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-800"><i class="fas fa-map-marker-alt text-gray-400 mr-1"></i>{{ $tuition->location }}</div>
-                                <div class="text-sm font-medium text-accent-blue mt-1">₹{{ $tuition->budget }}</div>
                             </td>
                             <td class="px-6 py-4">
                                 <form action="{{ route('admin.tuitions.update', $tuition->id) }}" method="POST" class="inline-block">
@@ -115,7 +114,7 @@
                     <tr class="bg-gray-50/50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                         <th class="px-6 py-4">Posted By</th>
                         <th class="px-6 py-4">Details</th>
-                        <th class="px-6 py-4">Location & Budget</th>
+                        <th class="px-6 py-4">Location</th>
                         <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4 text-right">Actions</th>
                     </tr>
@@ -137,7 +136,6 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-800"><i class="fas fa-map-marker-alt text-gray-400 mr-1"></i>{{ $tuition->location }}</div>
-                                <div class="text-sm font-medium text-accent-blue mt-1">₹{{ $tuition->budget }}</div>
                             </td>
                             <td class="px-6 py-4">
                                 <form action="{{ route('admin.tuitions.update', $tuition->id) }}" method="POST" class="inline-block">

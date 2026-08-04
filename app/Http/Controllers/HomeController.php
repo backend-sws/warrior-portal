@@ -46,8 +46,9 @@ class HomeController extends Controller
             'board' => 'required|string|max:255',
             'subjects' => 'required|string|max:255',
             'location' => 'required|string|max:255',
-            'budget' => 'required|string|max:255',
         ]);
+
+        $validated['budget'] = 'Not Specified';
 
         $validated['status'] = 'Pending';
         if (auth()->check()) {
