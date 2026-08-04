@@ -2,19 +2,19 @@
 
     @section('content')
         <!-- Hero Banner Section -->
-    <section class="relative w-full min-h-[90vh] bg-[#010614] overflow-x-hidden flex items-center">
+    <section class="relative w-full min-h-[90vh] bg-[#010614] overflow-hidden flex items-center">
         <!-- Split Background -->
         <div class="absolute inset-0 z-0">
             <!-- Orange/Sky Base with Network Pattern -->
             <div class="absolute inset-0 bg-[#0ea5e9]">
                 <!-- Clean Professional Network Pattern -->
-                <div class="absolute inset-0 w-full h-full opacity-100" style="background-image: url('{{ asset('images/network-pattern.svg') }}'); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
+                <div class="absolute inset-0 w-full h-full opacity-100 animate-pattern-move" style="background-image: url('{{ asset('images/network-pattern.svg') }}'); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
             </div>
             <!-- Navy Sliding overlay (animates via clip-path) -->
             <div id="bg-navy" class="absolute inset-0 bg-[#031b4e] transition-all duration-1000 ease-in-out" 
                  style="clip-path: polygon(0 0, 60% 0, 48% 100%, 0 100%);">
                 <!-- Decorative grid overlay (flowing wave) -->
-                <div id="bg-grid" class="absolute inset-0 w-full h-full opacity-40 pointer-events-none transition-all duration-1000 ease-in-out mix-blend-screen" style="background-image: url('{{ asset('images/wave-pattern.svg') }}'); background-position: center bottom; background-size: cover; background-repeat: no-repeat;"></div>
+                <div id="bg-grid" class="absolute inset-0 w-full h-full opacity-40 pointer-events-none transition-all duration-1000 ease-in-out mix-blend-screen animate-pattern-move" style="background-image: url('{{ asset('images/wave-pattern.svg') }}'); background-position: center bottom; background-size: cover; background-repeat: no-repeat;"></div>
             </div>
         </div>
 
@@ -78,6 +78,9 @@
             </div>
 
         </div>
+        
+        <!-- Bottom Fade Overlay -->
+        <div class="absolute -bottom-1 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent z-30 pointer-events-none"></div>
     </section>
 
     <script>
@@ -265,14 +268,12 @@
             </div>
         </section>
 
-        <!-- Agency Highlight Section (Dark Blue Background) -->
-        <section class="py-24 bg-geometric-navy relative border-t-4 border-[#031b4e]">
+        <!-- Agency Highlight Section (Light Background) -->
+        <section class="py-24 bg-gray-50 relative border-t-4 border-gray-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Glassmorphism Card -->
-                <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-16 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] relative">
-                    
-                    <!-- ISO Badge Overlapping -->
-                    <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-xl px-6 py-3 flex items-center gap-3 border-b-4 border-accent-500">
+                <div class="relative">
+                    <!-- ISO Badge Overlapping (Moved outside of hidden overflow container) -->
+                    <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-xl px-6 py-3 flex items-center gap-3 border-b-4 border-accent-500 z-30">
                         <i class="fas fa-certificate text-[#031b4e] text-2xl"></i>
                         <div>
                             <p class="font-extrabold text-gray-900 text-lg leading-none">ISO</p>
@@ -280,27 +281,30 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col md:flex-row gap-12 mt-6">
+                    <!-- Glassmorphism Card (Light) -->
+                    <div class="metallic-blue-card rounded-3xl p-8 md:p-16 relative mt-12 md:mt-8">
+
+                    <div class="flex flex-col md:flex-row gap-12 mt-6 relative z-10">
                         <!-- Left Column: Title -->
                         <div class="w-full md:w-1/3">
-                            <span class="text-accent-500 font-bold uppercase tracking-wider text-sm mb-2 block flex items-center gap-2">
-                                <span class="w-2 h-2 bg-accent-500 rounded-full"></span> Welcome To
+                            <span class="text-white font-bold uppercase tracking-wider text-sm mb-2 block flex items-center gap-2">
+                                <span class="w-2 h-2 bg-white rounded-full"></span> Welcome To
                             </span>
                             <h2 class="text-4xl md:text-5xl font-extrabold text-white leading-tight">
                                 Warriors<br>
-                                <span class="text-royal-400">Educare</span><br>
+                                <span class="text-white/80">Educare</span><br>
                                 
                             </h2>
-                            <div class="w-16 h-1 bg-accent-500 mt-6 rounded-full"></div>
+                            <div class="w-16 h-1 bg-white mt-6 rounded-full"></div>
                         </div>
 
                         <!-- Right Column: Description -->
-                        <div class="w-full md:w-2/3 flex flex-col justify-center border-l-0 md:border-l border-royal-700 md:pl-12">
-                            <p class="text-lg text-white font-medium mb-6">
+                        <div class="w-full md:w-2/3 flex flex-col justify-center border-l-0 md:border-l border-white/30 md:pl-12">
+                            <p class="text-lg text-white font-bold mb-6">
                                 Warriors Educare is an ISO-certified and government-registered education recruitment consultancy operating at a national level across India. 
                                 We provide structured, compliance-driven, and outcome-focused hiring solutions to schools, colleges, and educational institutions.
                             </p>
-                            <p class="text-royal-100 text-sm mb-8 leading-relaxed opacity-80">
+                            <p class="text-white/80 text-sm mb-8 leading-relaxed relative z-10">
                                 About Us – An Warriors Educare
 
 At An Warriors Educare, we connect talent with opportunity in the education sector. Our platform is designed to support job seekers, educational institutions, and private tutors through a seamless recruitment experience.
@@ -311,7 +315,7 @@ We also provide dedicated support for tuition teachers and home tutors, helping 
 
 Our recruitment approach follows modern hiring practices, institutional standards, and quality-focused selection, ensuring the best outcomes for both employers and candidates.
                             </p>
-                            <div>
+                            <div class="relative z-10">
                                 <a href="#" class="inline-flex items-center gap-2 text-white font-bold hover:text-accent-500 transition-colors group">
                                     EXPLORE MORE 
                                     <span class="w-10 h-10 rounded-full bg-accent-500 flex items-center justify-center text-white group-hover:bg-white group-hover:text-accent-500 transition-all">
@@ -323,6 +327,7 @@ Our recruitment approach follows modern hiring practices, institutional standard
                     </div>
                 </div>
             </div>
+        </div>
         </section>
 
         <!-- White Gap Divider -->
@@ -378,7 +383,7 @@ Our recruitment approach follows modern hiring practices, institutional standard
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 relative z-10">
                 @foreach($categories as $category)
                 <a href="{{ route('category.jobs', $category->id) }}"
-                    class="block bg-[#031b4e] border-none rounded-xl p-8 text-center text-white transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-pointer group reveal shadow-md flex flex-col items-center justify-center no-underline">
+                    class="block metallic-blue-card border-none rounded-xl p-8 text-center text-white transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-pointer group reveal shadow-md flex flex-col items-center justify-center no-underline">
                     <i class="fas fa-briefcase text-4xl mb-4 block text-white group-hover:scale-110 transition-transform"></i>
                     <h3 class="text-sm font-semibold mb-4">{{ $category->name }}</h3>
                     <div class="bg-white text-[#031b4e] px-5 py-2 rounded-full text-xs font-bold inline-block shadow-sm mt-3">
@@ -393,7 +398,7 @@ Our recruitment approach follows modern hiring practices, institutional standard
         
 
         <!-- Services Section -->
-        <section class="py-20 px-6 lg:px-[5%] bg-[#031b4e] text-white text-center relative overflow-hidden">
+        <section class="py-20 px-6 lg:px-[5%] metallic-blue-card border-none shadow-none text-white text-center relative overflow-hidden">
             <div class="absolute top-5 right-[5%] opacity-[0.02] text-7xl md:text-[100px] font-extrabold uppercase pointer-events-none select-none tracking-wider">
                 Warriors Educare</div>
             <div class="mb-12 relative z-10 reveal">
@@ -516,42 +521,41 @@ Our recruitment approach follows modern hiring practices, institutional standard
                     <a href="{{ route('contact') }}" class="text-accent-500 hover:text-[#031b4e] font-semibold text-sm transition-colors">Apply as Tutor <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
 
-                <div class="overflow-x-auto overflow-y-auto bg-white rounded-2xl border border-slate-200 shadow-sm" style="max-height: 400px;">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 bg-slate-50 z-10 shadow-sm">
-                            <tr class="border-b border-slate-200 text-slate-600 text-sm">
+                <div class="metallic-blue-card rounded-2xl border-none shadow-2xl relative">
+                    <div class="overflow-x-auto overflow-y-auto w-full" style="max-height: 400px;">
+                        <table class="w-full text-left border-collapse relative z-10">
+                        <thead class="sticky top-0 bg-[#011233]/90 backdrop-blur-md z-20 shadow-sm">
+                            <tr class="border-b border-white/20 text-white/90 text-sm">
                                 <th class="py-4 px-6 font-semibold whitespace-nowrap">Posted By</th>
                                 <th class="py-4 px-6 font-semibold whitespace-nowrap">Subjects</th>
                                 <th class="py-4 px-6 font-semibold whitespace-nowrap">Class & Board</th>
                                 <th class="py-4 px-6 font-semibold whitespace-nowrap">Location</th>
-                                <th class="py-4 px-6 font-semibold whitespace-nowrap">Budget</th>
                                 <th class="py-4 px-6 font-semibold whitespace-nowrap">Time</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm">
                             @forelse($guestTuitions as $tuition)
-                                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
-                                    <td class="py-4 px-6 text-[#031b4e] font-medium whitespace-nowrap">
-                                        <i class="fas fa-user-circle text-slate-400 mr-2"></i>{{ $tuition->employer ? ($tuition->employer->name === 'Super Admin' ? 'Warriors Educare' : $tuition->employer->name) : $tuition->guest_name }}
+                                <tr class="border-b border-white/10 hover:bg-white/10 transition-colors">
+                                    <td class="py-4 px-6 text-white font-medium whitespace-nowrap">
+                                        <i class="fas fa-user-circle text-white/60 mr-2"></i>{{ $tuition->employer ? ($tuition->employer->name === 'Super Admin' ? 'Warriors Educare' : $tuition->employer->name) : $tuition->guest_name }}
                                     </td>
-                                    <td class="py-4 px-6 font-semibold text-[#031b4e]">{{ $tuition->subjects }}</td>
+                                    <td class="py-4 px-6 font-semibold text-white">{{ $tuition->subjects }}</td>
                                     <td class="py-4 px-6">
-                                        <span class="inline-block bg-accent-blue/10 text-accent-blue text-xs font-bold px-2 py-1 rounded mb-1">{{ $tuition->student_class }}</span><br>
-                                        <span class="text-xs text-slate-500 font-medium">{{ $tuition->board }}</span>
+                                        <span class="inline-block bg-white/20 text-white text-xs font-bold px-2 py-1 rounded mb-1">{{ $tuition->student_class }}</span><br>
+                                        <span class="text-xs text-white/70 font-medium">{{ $tuition->board }}</span>
                                     </td>
-                                    <td class="py-4 px-6 text-slate-600">{{ $tuition->location }}</td>
-                                    <td class="py-4 px-6 text-[#031b4e] font-semibold">₹{{ $tuition->budget }}</td>
-                                    <td class="py-4 px-6 text-slate-500 text-xs whitespace-nowrap">{{ $tuition->created_at->diffForHumans() }}</td>
+                                    <td class="py-4 px-6 text-white/90 max-w-xs truncate" title="{{ $tuition->location }}">{{ $tuition->location }}</td>
+                                    <td class="py-4 px-6 text-white/70 text-xs whitespace-nowrap">{{ $tuition->created_at->diffForHumans() }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-12 text-center">
-                                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 text-2xl">
+                                    <td colspan="5" class="py-12 text-center">
+                                        <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 text-white/50 text-2xl">
                                             <i class="fas fa-search"></i>
                                         </div>
-                                        <h4 class="text-lg font-bold text-[#031b4e] mb-2">No Requirements Right Now</h4>
-                                        <p class="text-slate-500 mb-6">Be the first to post a new home tuition requirement!</p>
-                                        <a href="#quick-request-form" class="inline-block bg-accent-yellow text-[#031b4e] hover:bg-accent-yellow/90 px-6 py-3 rounded-xl font-bold shadow-sm transition-transform hover:-translate-y-1">Post a Tuition Need</a>
+                                        <h4 class="text-lg font-bold text-white mb-2">No Requirements Right Now</h4>
+                                        <p class="text-white/70 mb-6">Be the first to post a new home tuition requirement!</p>
+                                        <a href="#quick-request-form" class="inline-block bg-accent-yellow text-[#031b4e] hover:bg-white px-6 py-3 rounded-xl font-bold shadow-sm transition-transform hover:-translate-y-1">Post a Tuition Need</a>
                                     </td>
                                 </tr>
                             @endforelse
@@ -559,6 +563,7 @@ Our recruitment approach follows modern hiring practices, institutional standard
                     </table>
                 </div>
             </div>
+        </div>
             
             <!-- Quick Request Form -->
             <div id="quick-request-form" class="max-w-4xl mx-auto mt-20 relative z-10 reveal bg-white rounded-3xl p-8 md:p-10 shadow-2xl border border-slate-200">
@@ -615,15 +620,9 @@ Our recruitment approach follows modern hiring practices, institutional standard
                         </div>
 
                         <!-- Subjects -->
-                        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Subjects Needed *</label>
-                                <input type="text" name="subjects" required placeholder="e.g., Math, Science" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#031b4e] focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500 transition-colors outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Monthly Budget (₹) *</label>
-                                <input type="text" name="budget" required placeholder="e.g., 3000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#031b4e] focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500 transition-colors outline-none">
-                            </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Subjects Needed *</label>
+                            <input type="text" name="subjects" required placeholder="e.g., Math, Science" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#031b4e] focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500 transition-colors outline-none">
                         </div>
 
                         <!-- Location -->

@@ -139,59 +139,49 @@
         /* Geometric pattern for header */
         .bg-geometric-navy {
             background-color: #031b4e;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg opacity='0.1'%3E%3Cpolygon points='0,0 40,0 0,40' fill='%23dfa43a'/%3E%3Cpolygon points='0,40 40,0 40,40' fill='%23ffffff' opacity='0.5'/%3E%3Crect x='40' y='0' width='40' height='40' fill='%23dfa43a' opacity='0.7'/%3E%3Cpolygon points='80,0 120,0 120,40' fill='%23ffffff' opacity='0.3'/%3E%3Cpolygon points='80,0 120,40 80,40' fill='%23dfa43a'/%3E%3Crect x='0' y='40' width='40' height='40' fill='%23ffffff' opacity='0.4'/%3E%3Cpolygon points='40,40 80,40 40,80' fill='%23dfa43a' opacity='0.8'/%3E%3Cpolygon points='40,80 80,40 80,80' fill='%23ffffff' opacity='0.6'/%3E%3Cpolygon points='80,40 120,40 80,80' fill='%23dfa43a' opacity='0.5'/%3E%3Cpolygon points='80,80 120,40 120,80' fill='%23ffffff' opacity='0.8'/%3E%3Cpolygon points='0,80 40,80 40,120' fill='%23dfa43a' opacity='0.6'/%3E%3Cpolygon points='0,80 40,120 0,120' fill='%23ffffff' opacity='0.3'/%3E%3Crect x='40' y='80' width='40' height='40' fill='%23dfa43a' opacity='0.9'/%3E%3Cpolygon points='80,80 120,80 80,120' fill='%23ffffff' opacity='0.5'/%3E%3Cpolygon points='80,120 120,80 120,120' fill='%23dfa43a'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        @keyframes patternMove {
+            0% { transform: scale(1.1) translate(0px, 0px); }
+            33% { transform: scale(1.1) translate(15px, -20px); }
+            66% { transform: scale(1.1) translate(-20px, 10px); }
+            100% { transform: scale(1.1) translate(0px, 0px); }
+        }
+        .animate-pattern-move {
+            animation: patternMove 30s ease-in-out infinite;
         }
 
         .glowing-blue-bg {
-            background-color: #051024;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(3, 27, 78, 0.85); /* Matches theme #031b4e */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        /* Scrolled state text colors */
-        .header-scrolled span, 
-        .header-scrolled a,
-        .header-scrolled button {
-            color: #031b4e !important;
+        /* Metallic Blue Shiny Cards */
+        .metallic-blue-card {
+            background: linear-gradient(145deg, #005c97, #1e3c72, #2a5298);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.4);
         }
-        
-        .header-scrolled a:hover,
-        .header-scrolled button:hover {
-            color: #0052cc !important;
+        .metallic-blue-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: shine 9s infinite;
         }
-
-        .header-scrolled .border-white\/30 {
-            border-color: #cbd5e1 !important;
-        }
-        
-        .header-scrolled .bg-white\/20 {
-            background-color: transparent !important;
-        }
-
-        /* Get Started button inverted on scroll */
-        .header-scrolled a.bg-\[\#ffffff\] {
-            background-color: #031b4e !important;
-            color: #ffffff !important;
-            box-shadow: none !important;
-        }
-
-        .header-scrolled a.bg-\[\#ffffff\]:hover {
-            background-color: #0052cc !important;
-            color: #ffffff !important;
-        }
-
-        .header-scrolled .logo-img {
-            /* New logo has its own colors, no need to invert on scroll anymore */
-            transition: all 0.3s ease;
-        }
-
-        /* Mobile Menu Button colors based on scroll state */
-        #main-header:not(.header-scrolled) #mobileMenuBtn {
-            color: #ffffff !important;
-        }
-
-        .header-scrolled #mobileMenuBtn {
-            color: #010127ff !important;
+        @keyframes shine {
+            0% { left: -100%; }
+            60% { left: 200%; }
+            100% { left: 200%; }
         }
     </style>
 </head>
@@ -252,7 +242,7 @@
         </marquee>
     </div>    <!-- Header -->
     <header id="main-header"
-        class="fixed top-[48px] left-1/2 -translate-x-1/2 w-[95%] max-w-7xl px-4 lg:px-8 py-1 flex justify-between items-center z-[100] transition-all duration-500 glowing-blue-bg rounded-full">
+        class="!fixed top-[48px] left-1/2 -translate-x-1/2 w-[95%] max-w-7xl px-4 lg:px-8 py-1 flex justify-between items-center z-[100] transition-all duration-500 metallic-blue-card rounded-full">
         <a href="#" class="flex items-center no-underline py-1 z-10">
             <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-12 lg:h-14 logo-img transition-all duration-300">
         </a>
@@ -369,7 +359,7 @@
         </div>
     </div>
 
-    <main class="min-h-screen">
+    <main class="min-h-screen" style="{{ !request()->routeIs('home') ? 'padding-top: 140px;' : '' }}">
         @yield('content')
     </main>
 
@@ -509,11 +499,9 @@
         const header = document.getElementById('main-header');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 40) {
-                header.classList.add('header-scrolled');
                 header.classList.remove('py-2');
                 header.classList.add('py-1');
             } else {
-                header.classList.remove('header-scrolled');
                 header.classList.add('py-2');
                 header.classList.remove('py-1');
             }
