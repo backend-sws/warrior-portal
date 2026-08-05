@@ -3,19 +3,19 @@
 @section('content')
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-<div class="bg-primary-bg min-h-screen pt-4 pb-12" x-data="resumeBuilder()">
+<div class="bg-slate-50 min-h-screen pt-4 pb-12" x-data="resumeBuilder()">
     <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h1 class="text-3xl font-bold text-text-main">Free Auto Resume Builder</h1>
-                <p class="text-text-dark/60 mt-1">Create a professional teaching resume in minutes. Live preview and PDF download.</p>
+                <h1 class="text-3xl font-bold text-[#031b4e]">Free Auto Resume Builder</h1>
+                <p class="text-[#031b4e]/60 mt-1">Create a professional teaching resume in minutes. Live preview and PDF download.</p>
             </div>
             <div>
                 <form action="{{ route('resume.builder.download') }}" method="POST" id="downloadForm">
                     @csrf
                     <input type="hidden" name="resume_data" x-bind:value="JSON.stringify($data.resume)">
-                    <button type="submit" class="px-6 py-3 bg-accent-yellow text-[#031b4e] font-bold rounded-xl shadow-glow-yellow hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                    <button type="submit" class="px-6 py-3 bg-[#031b4e] text-white font-bold rounded-xl shadow-lg shiny-btn hover:bg-[#021030] hover:-translate-y-0.5 transition-all flex items-center gap-2">
                         <i class="fas fa-download"></i> Download PDF
                     </button>
                 </form>
@@ -28,24 +28,24 @@
             <div class="w-full lg:w-[45%] h-[calc(100vh-200px)] overflow-y-auto pr-4 hide-scrollbar">
                 
                 {{-- Personal Details --}}
-                <div class="bg-card-bg border border-card-border rounded-2xl p-6 mb-6 shadow-sm">
-                    <h2 class="text-xl font-bold text-text-main mb-4 border-b border-card-border pb-2"><i class="fas fa-user text-accent-blue mr-2"></i> Personal Details</h2>
+                <div class="light-metallic-blue-card border-0 rounded-2xl p-6 mb-6 shadow-sm">
+                    <h2 class="text-xl font-bold text-[#031b4e] mb-4 border-b border-[#031b4e]/10 pb-2"><i class="fas fa-user text-accent-blue mr-2"></i> Personal Details</h2>
                     
                     <!-- Photo Upload Section -->
-                    <div class="flex items-center gap-4 p-4 border border-card-border rounded-xl bg-primary-bg/50 mb-4">
-                        <div class="relative w-16 h-16 rounded-xl border border-card-border bg-white overflow-hidden flex items-center justify-center flex-shrink-0 shadow-inner">
+                    <div class="flex items-center gap-4 p-4 border border-[#031b4e]/10 rounded-xl bg-white/600 mb-4">
+                        <div class="relative w-16 h-16 rounded-xl border border-[#031b4e]/10 bg-white overflow-hidden flex items-center justify-center flex-shrink-0 shadow-inner">
                             <template x-if="resume.personal.photo">
                                 <img :src="resume.personal.photo" class="w-full h-full object-cover">
                             </template>
                             <template x-if="!resume.personal.photo">
-                                <i class="fas fa-user-circle text-4xl text-text-dark/20"></i>
+                                <i class="fas fa-user-circle text-4xl text-[#031b4e]/20"></i>
                             </template>
                         </div>
                         <div class="flex-1">
-                            <label class="block text-xs font-semibold text-text-dark/70 mb-1">Profile Photo</label>
+                            <label class="block text-xs font-semibold text-[#031b4e]/70 mb-1">Profile Photo</label>
                             <div class="flex flex-wrap items-center gap-2">
                                 <input type="file" @change="uploadPhoto($event)" accept="image/jpeg,image/png,image/jpg,image/webp" class="hidden" id="photoUploadInput">
-                                <label for="photoUploadInput" class="px-3 py-1.5 bg-accent-blue text-white rounded-lg text-xs font-bold cursor-pointer hover:opacity-90 transition-opacity shadow-sm">
+                                <label for="photoUploadInput" class="px-3 py-1.5 bg-[#031b4e] text-white relative overflow-hidden group rounded-lg text-xs font-bold cursor-pointer hover:opacity-90 transition-opacity shadow-sm">
                                     <i class="fas fa-upload mr-1"></i> Choose Image
                                 </label>
                                 <template x-if="resume.personal.photo">
@@ -54,102 +54,102 @@
                                     </button>
                                 </template>
                             </div>
-                            <p class="text-[10px] text-text-dark/40 mt-1">Recommended: Square format, Max size 2MB.</p>
+                            <p class="text-[10px] text-[#031b4e]/40 mt-1">Recommended: Square format, Max size 2MB.</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="col-span-2">
-                            <label class="block text-xs font-semibold text-text-dark/70 mb-1">Full Name</label>
-                            <input type="text" x-model="resume.personal.name" class="w-full bg-primary-bg border border-card-border rounded-lg px-4 py-2.5 text-sm text-text-main focus:border-accent-blue focus:ring-1 focus:ring-accent-blue outline-none" placeholder="e.g. John Doe">
+                            <label class="block text-xs font-semibold text-[#031b4e]/70 mb-1">Full Name</label>
+                            <input type="text" x-model="resume.personal.name" class="w-full bg-white border border-[#031b4e]/10 rounded-lg px-4 py-2.5 text-sm text-[#031b4e] focus:border-accent-blue focus:ring-1 focus:ring-accent-blue outline-none" placeholder="e.g. John Doe">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-text-dark/70 mb-1">Job Title / Designation</label>
-                            <input type="text" x-model="resume.personal.title" class="w-full bg-primary-bg border border-card-border rounded-lg px-4 py-2.5 text-sm text-text-main focus:border-accent-blue outline-none" placeholder="e.g. Senior Mathematics Teacher">
+                            <label class="block text-xs font-semibold text-[#031b4e]/70 mb-1">Job Title / Designation</label>
+                            <input type="text" x-model="resume.personal.title" class="w-full bg-white border border-[#031b4e]/10 rounded-lg px-4 py-2.5 text-sm text-[#031b4e] focus:border-accent-blue outline-none" placeholder="e.g. Senior Mathematics Teacher">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-text-dark/70 mb-1">Email</label>
-                            <input type="email" x-model="resume.personal.email" class="w-full bg-primary-bg border border-card-border rounded-lg px-4 py-2.5 text-sm text-text-main focus:border-accent-blue outline-none" placeholder="john@example.com">
+                            <label class="block text-xs font-semibold text-[#031b4e]/70 mb-1">Email</label>
+                            <input type="email" x-model="resume.personal.email" class="w-full bg-white border border-[#031b4e]/10 rounded-lg px-4 py-2.5 text-sm text-[#031b4e] focus:border-accent-blue outline-none" placeholder="john@example.com">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-text-dark/70 mb-1">Phone</label>
-                            <input type="text" x-model="resume.personal.phone" class="w-full bg-primary-bg border border-card-border rounded-lg px-4 py-2.5 text-sm text-text-main focus:border-accent-blue outline-none" placeholder="+91 9876543210">
+                            <label class="block text-xs font-semibold text-[#031b4e]/70 mb-1">Phone</label>
+                            <input type="text" x-model="resume.personal.phone" class="w-full bg-white border border-[#031b4e]/10 rounded-lg px-4 py-2.5 text-sm text-[#031b4e] focus:border-accent-blue outline-none" placeholder="+91 9876543210">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-text-dark/70 mb-1">Location / Address</label>
-                            <input type="text" x-model="resume.personal.location" class="w-full bg-primary-bg border border-card-border rounded-lg px-4 py-2.5 text-sm text-text-main focus:border-accent-blue outline-none" placeholder="Patna, Bihar">
+                            <label class="block text-xs font-semibold text-[#031b4e]/70 mb-1">Location / Address</label>
+                            <input type="text" x-model="resume.personal.location" class="w-full bg-white border border-[#031b4e]/10 rounded-lg px-4 py-2.5 text-sm text-[#031b4e] focus:border-accent-blue outline-none" placeholder="Patna, Bihar">
                         </div>
                     </div>
                 </div>
 
                 {{-- Professional Summary --}}
-                <div class="bg-card-bg border border-card-border rounded-2xl p-6 mb-6 shadow-sm">
-                    <h2 class="text-xl font-bold text-text-main mb-4 border-b border-card-border pb-2"><i class="fas fa-align-left text-accent-blue mr-2"></i> Professional Summary</h2>
-                    <textarea x-model="resume.summary" rows="4" class="w-full bg-primary-bg border border-card-border rounded-lg px-4 py-3 text-sm text-text-main focus:border-accent-blue outline-none" placeholder="Write a brief summary of your teaching philosophy, experience, and goals..."></textarea>
+                <div class="light-metallic-blue-card border-0 rounded-2xl p-6 mb-6 shadow-sm">
+                    <h2 class="text-xl font-bold text-[#031b4e] mb-4 border-b border-[#031b4e]/10 pb-2"><i class="fas fa-align-left text-accent-blue mr-2"></i> Professional Summary</h2>
+                    <textarea x-model="resume.summary" rows="4" class="w-full bg-white border border-[#031b4e]/10 rounded-lg px-4 py-3 text-sm text-[#031b4e] focus:border-accent-blue outline-none" placeholder="Write a brief summary of your teaching philosophy, experience, and goals..."></textarea>
                 </div>
 
                 {{-- Experience --}}
-                <div class="bg-card-bg border border-card-border rounded-2xl p-6 mb-6 shadow-sm">
-                    <div class="flex justify-between items-center mb-4 border-b border-card-border pb-2">
-                        <h2 class="text-xl font-bold text-text-main"><i class="fas fa-briefcase text-accent-blue mr-2"></i> Experience</h2>
-                        <button type="button" @click="addExperience()" class="text-xs font-bold bg-accent-blue/10 text-accent-blue px-3 py-1.5 rounded-lg hover:bg-accent-blue hover:text-white transition-colors">+ Add</button>
+                <div class="light-metallic-blue-card border-0 rounded-2xl p-6 mb-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-4 border-b border-[#031b4e]/10 pb-2">
+                        <h2 class="text-xl font-bold text-[#031b4e]"><i class="fas fa-briefcase text-accent-blue mr-2"></i> Experience</h2>
+                        <button type="button" @click="addExperience()" class="text-xs font-bold bg-[#031b4e]/10 text-[#031b4e] hover:bg-[#031b4e] hover:text-white px-3 py-1.5 rounded-lg shiny-btn hover:bg-accent-blue hover:text-white transition-colors">+ Add</button>
                     </div>
                     
                     <template x-for="(exp, index) in resume.experience" :key="index">
-                        <div class="p-4 border border-card-border rounded-xl mb-4 bg-primary-bg/50 relative">
+                        <div class="p-4 border border-[#031b4e]/10 rounded-xl mb-4 bg-white/600 relative">
                             <button type="button" @click="removeExperience(index)" class="absolute top-3 right-3 text-red-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-1">Job Title</label>
-                                    <input type="text" x-model="exp.title" class="w-full bg-white/5 border border-card-border rounded-md px-3 py-2 text-sm text-text-main outline-none" placeholder="PGT Physics">
+                                    <label class="block text-[10px] font-bold text-[#031b4e]/50 uppercase tracking-wider mb-1">Job Title</label>
+                                    <input type="text" x-model="exp.title" class="w-full bg-white/60 border border-[#031b4e]/10 rounded-md px-3 py-2 text-sm text-[#031b4e] outline-none" placeholder="PGT Physics">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-1">School / Institution</label>
-                                    <input type="text" x-model="exp.company" class="w-full bg-white/5 border border-card-border rounded-md px-3 py-2 text-sm text-text-main outline-none" placeholder="Delhi Public School">
+                                    <label class="block text-[10px] font-bold text-[#031b4e]/50 uppercase tracking-wider mb-1">School / Institution</label>
+                                    <input type="text" x-model="exp.company" class="w-full bg-white/60 border border-[#031b4e]/10 rounded-md px-3 py-2 text-sm text-[#031b4e] outline-none" placeholder="Delhi Public School">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-1">Start Date</label>
-                                    <input type="text" x-model="exp.startDate" class="w-full bg-white/5 border border-card-border rounded-md px-3 py-2 text-sm text-text-main outline-none" placeholder="Aug 2020">
+                                    <label class="block text-[10px] font-bold text-[#031b4e]/50 uppercase tracking-wider mb-1">Start Date</label>
+                                    <input type="text" x-model="exp.startDate" class="w-full bg-white/60 border border-[#031b4e]/10 rounded-md px-3 py-2 text-sm text-[#031b4e] outline-none" placeholder="Aug 2020">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-1">End Date</label>
-                                    <input type="text" x-model="exp.endDate" class="w-full bg-white/5 border border-card-border rounded-md px-3 py-2 text-sm text-text-main outline-none" placeholder="Present">
+                                    <label class="block text-[10px] font-bold text-[#031b4e]/50 uppercase tracking-wider mb-1">End Date</label>
+                                    <input type="text" x-model="exp.endDate" class="w-full bg-white/60 border border-[#031b4e]/10 rounded-md px-3 py-2 text-sm text-[#031b4e] outline-none" placeholder="Present">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-1">Description</label>
-                                <textarea x-model="exp.description" rows="3" class="w-full bg-white/5 border border-card-border rounded-md px-3 py-2 text-sm text-text-main outline-none" placeholder="Taught classes 11th and 12th..."></textarea>
+                                <label class="block text-[10px] font-bold text-[#031b4e]/50 uppercase tracking-wider mb-1">Description</label>
+                                <textarea x-model="exp.description" rows="3" class="w-full bg-white/60 border border-[#031b4e]/10 rounded-md px-3 py-2 text-sm text-[#031b4e] outline-none" placeholder="Taught classes 11th and 12th..."></textarea>
                             </div>
                         </div>
                     </template>
                 </div>
 
                 {{-- Education --}}
-                <div class="bg-card-bg border border-card-border rounded-2xl p-6 mb-6 shadow-sm">
-                    <div class="flex justify-between items-center mb-4 border-b border-card-border pb-2">
-                        <h2 class="text-xl font-bold text-text-main"><i class="fas fa-graduation-cap text-accent-blue mr-2"></i> Education</h2>
-                        <button type="button" @click="addEducation()" class="text-xs font-bold bg-accent-blue/10 text-accent-blue px-3 py-1.5 rounded-lg hover:bg-accent-blue hover:text-white transition-colors">+ Add</button>
+                <div class="light-metallic-blue-card border-0 rounded-2xl p-6 mb-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-4 border-b border-[#031b4e]/10 pb-2">
+                        <h2 class="text-xl font-bold text-[#031b4e]"><i class="fas fa-graduation-cap text-accent-blue mr-2"></i> Education</h2>
+                        <button type="button" @click="addEducation()" class="text-xs font-bold bg-[#031b4e]/10 text-[#031b4e] hover:bg-[#031b4e] hover:text-white px-3 py-1.5 rounded-lg shiny-btn hover:bg-accent-blue hover:text-white transition-colors">+ Add</button>
                     </div>
                     
                     <template x-for="(edu, index) in resume.education" :key="index">
-                        <div class="p-4 border border-card-border rounded-xl mb-4 bg-primary-bg/50 relative">
+                        <div class="p-4 border border-[#031b4e]/10 rounded-xl mb-4 bg-white/600 relative">
                             <button type="button" @click="removeEducation(index)" class="absolute top-3 right-3 text-red-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-1">Degree / Course</label>
-                                    <input type="text" x-model="edu.degree" class="w-full bg-white/5 border border-card-border rounded-md px-3 py-2 text-sm text-text-main outline-none" placeholder="B.Ed. / M.Sc. Physics">
+                                    <label class="block text-[10px] font-bold text-[#031b4e]/50 uppercase tracking-wider mb-1">Degree / Course</label>
+                                    <input type="text" x-model="edu.degree" class="w-full bg-white/60 border border-[#031b4e]/10 rounded-md px-3 py-2 text-sm text-[#031b4e] outline-none" placeholder="B.Ed. / M.Sc. Physics">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-1">Institution</label>
-                                    <input type="text" x-model="edu.institution" class="w-full bg-white/5 border border-card-border rounded-md px-3 py-2 text-sm text-text-main outline-none" placeholder="Patna University">
+                                    <label class="block text-[10px] font-bold text-[#031b4e]/50 uppercase tracking-wider mb-1">Institution</label>
+                                    <input type="text" x-model="edu.institution" class="w-full bg-white/60 border border-[#031b4e]/10 rounded-md px-3 py-2 text-sm text-[#031b4e] outline-none" placeholder="Patna University">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-1">Year</label>
-                                    <input type="text" x-model="edu.year" class="w-full bg-white/5 border border-card-border rounded-md px-3 py-2 text-sm text-text-main outline-none" placeholder="2018 - 2020">
+                                    <label class="block text-[10px] font-bold text-[#031b4e]/50 uppercase tracking-wider mb-1">Year</label>
+                                    <input type="text" x-model="edu.year" class="w-full bg-white/60 border border-[#031b4e]/10 rounded-md px-3 py-2 text-sm text-[#031b4e] outline-none" placeholder="2018 - 2020">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-1">Grade / Percentage</label>
-                                    <input type="text" x-model="edu.grade" class="w-full bg-white/5 border border-card-border rounded-md px-3 py-2 text-sm text-text-main outline-none" placeholder="85%">
+                                    <label class="block text-[10px] font-bold text-[#031b4e]/50 uppercase tracking-wider mb-1">Grade / Percentage</label>
+                                    <input type="text" x-model="edu.grade" class="w-full bg-white/60 border border-[#031b4e]/10 rounded-md px-3 py-2 text-sm text-[#031b4e] outline-none" placeholder="85%">
                                 </div>
                             </div>
                         </div>
@@ -157,17 +157,17 @@
                 </div>
 
                 {{-- Skills --}}
-                <div class="bg-card-bg border border-card-border rounded-2xl p-6 mb-6 shadow-sm">
-                    <h2 class="text-xl font-bold text-text-main mb-4 border-b border-card-border pb-2"><i class="fas fa-star text-accent-blue mr-2"></i> Skills</h2>
+                <div class="light-metallic-blue-card border-0 rounded-2xl p-6 mb-6 shadow-sm">
+                    <h2 class="text-xl font-bold text-[#031b4e] mb-4 border-b border-[#031b4e]/10 pb-2"><i class="fas fa-star text-accent-blue mr-2"></i> Skills</h2>
                     <div class="flex gap-2 mb-4">
-                        <input type="text" x-model="newSkill" @keydown.enter.prevent="addSkill()" class="flex-1 bg-primary-bg border border-card-border rounded-lg px-4 py-2.5 text-sm text-text-main outline-none" placeholder="E.g. Lesson Planning, Smart Board...">
-                        <button type="button" @click="addSkill()" class="px-4 py-2.5 bg-accent-blue text-white rounded-lg font-bold"><i class="fas fa-plus"></i></button>
+                        <input type="text" x-model="newSkill" @keydown.enter.prevent="addSkill()" class="flex-1 bg-white border border-[#031b4e]/10 rounded-lg px-4 py-2.5 text-sm text-[#031b4e] outline-none" placeholder="E.g. Lesson Planning, Smart Board...">
+                        <button type="button" @click="addSkill()" class="px-4 py-2.5 bg-[#031b4e] text-white relative overflow-hidden group rounded-lg font-bold"><i class="fas fa-plus"></i></button>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <template x-for="(skill, index) in resume.skills" :key="index">
-                            <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary-bg border border-card-border rounded-full text-xs font-semibold text-text-main">
+                            <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary-bg border border-[#031b4e]/10 rounded-full text-xs font-semibold text-[#031b4e]">
                                 <span x-text="skill"></span>
-                                <button type="button" @click="removeSkill(index)" class="text-text-dark/50 hover:text-red-400"><i class="fas fa-times"></i></button>
+                                <button type="button" @click="removeSkill(index)" class="text-[#031b4e]/50 hover:text-red-400"><i class="fas fa-times"></i></button>
                             </span>
                         </template>
                     </div>
@@ -360,3 +360,6 @@
     }
 </script>
 @endsection
+
+
+

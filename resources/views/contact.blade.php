@@ -2,16 +2,42 @@
 @section('content')
 
 <!-- Split Hero & Form Section -->
-<div class="relative w-full bg-slate-50 min-h-screen pb-20">
-    <div class="absolute inset-x-0 top-0 h-[600px] md:h-[700px] bg-gradient-to-b from-[#70a1ff] to-[#d6e5ff] z-0"></div>
+<div class="relative w-full bg-slate-50 min-h-screen pb-20 overflow-hidden">
+    <!-- Animated Background gradient -->
+    <div class="absolute inset-x-0 top-0 h-[600px] md:h-[700px] bg-gradient-to-br from-[#031b4e] via-[#0ea5e9] to-[#7dd3fc] z-0">
+        <!-- Animated geometric patterns -->
+        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 30px 30px; animation: moveGrid 20s linear infinite;"></div>
+        
+        <!-- Floating orbs -->
+        <div class="absolute top-10 left-10 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-20 w-80 h-80 bg-cyan-300/20 rounded-full blur-3xl animate-float-slow"></div>
+        <div class="absolute top-40 right-40 w-40 h-40 border-[20px] border-white/5 rounded-full animate-[spin_10s_linear_infinite]"></div>
+    </div>
     
-    <div class="max-w-[1400px] mx-auto px-0 md:px-6 relative z-10 pt-16 md:pt-24 flex flex-col md:flex-row gap-0 md:gap-8">
+    <style>
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 60px 60px; }
+        }
+    </style>
+    
+    <div class="max-w-[1400px] mx-auto px-0 md:px-6 relative z-10 pt-8 md:pt-12 flex flex-col md:flex-row gap-0 md:gap-8">
         
         <!-- Left Side: Text and Image -->
-        <div class="w-full md:w-1/2 flex flex-col justify-between px-8 md:px-0 mb-12 md:mb-0">
-            <div class="mb-12 md:mb-20">
-                <h1 class="text-white text-5xl md:text-6xl font-light mb-4">Get in touch</h1>
-                <p class="text-white/90 text-sm md:text-base font-medium">We'd love to hear from you!</p>
+        <div class="w-full md:w-1/2 flex flex-col justify-start px-8 md:px-0 mb-12 md:mb-0">
+            <div class="mt-4 md:mt-8 mb-12 md:mb-20 min-h-[120px]">
+                <h1 class="text-white text-5xl md:text-6xl font-light mb-4 flex items-center h-[60px] md:h-[72px]" 
+                    x-data="{ text: '', fullText: 'Get in touch', i: 0 }" 
+                    x-init="setTimeout(() => { let int = setInterval(() => { text += fullText[i]; i++; if(i >= fullText.length) clearInterval(int); }, 120); }, 300)">
+                    <span x-text="text"></span><span class="w-1 md:w-[3px] h-10 md:h-14 bg-white ml-2 animate-pulse"></span>
+                </h1>
+                <p class="text-white/90 text-sm md:text-base font-medium"
+                   x-data="{ show: false }" 
+                   x-init="setTimeout(() => show = true, 2000)" 
+                   x-show="show" 
+                   x-transition.opacity.duration.1000ms>
+                   We'd love to hear from you!
+                </p>
             </div>
             
             <div class="rounded-tr-[40px] md:rounded-tr-none md:rounded-tl-[40px] md:rounded-bl-[40px] overflow-hidden shadow-2xl h-[400px] md:h-[500px]">
@@ -63,98 +89,42 @@
     <div class="max-w-6xl mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Location -->
-            <div class="bg-white border border-slate-100 p-8 rounded-2xl flex flex-col items-center text-center gap-4 hover:border-slate-300 hover:shadow-xl transition-all duration-300 group">
-                <div class="w-14 h-14 bg-slate-100 text-[#111] rounded-full flex items-center justify-center text-xl shrink-0 group-hover:scale-110 group-hover:bg-[#111] group-hover:text-white transition-all">
+            <div class="light-metallic-blue-card border-0 p-8 rounded-2xl flex flex-col items-center text-center gap-4 hover:shadow-xl transition-all duration-300 group overflow-hidden">
+                <div class="w-14 h-14 bg-[#031b4e]/10 text-[#031b4e] rounded-full flex items-center justify-center text-xl shrink-0 group-hover:scale-110 group-hover:bg-[#031b4e] group-hover:text-white transition-all">
                     <i class="fas fa-map-marker-alt"></i>
                 </div>
-                <div>
-                    <h4 class="text-slate-800 font-bold mb-2">Our Location</h4>
-                    <p class="text-sm text-slate-500 leading-relaxed">Career Point Building, 2nd floor,<br>Patna,800001, Bihar</p>
+                <div class="relative z-10">
+                    <h4 class="text-[#031b4e] font-bold mb-2">Our Location</h4>
+                    <p class="text-sm text-[#031b4e]/70 leading-relaxed">Career Point Building, 2nd floor,<br>Patna,800001, Bihar</p>
                 </div>
             </div>
 
             <!-- Email -->
-            <a href="mailto:info@warriorseducare.in" class="bg-white border border-slate-100 p-8 rounded-2xl flex flex-col items-center text-center gap-4 hover:border-slate-300 hover:shadow-xl transition-all duration-300 group block">
-                <div class="w-14 h-14 bg-slate-100 text-[#111] rounded-full flex items-center justify-center text-xl shrink-0 group-hover:scale-110 group-hover:bg-[#111] group-hover:text-white transition-all">
+            <a href="mailto:info@warriorseducare.in" class="light-metallic-blue-card border-0 p-8 rounded-2xl flex flex-col items-center text-center gap-4 hover:shadow-xl transition-all duration-300 group block overflow-hidden">
+                <div class="w-14 h-14 bg-[#031b4e]/10 text-[#031b4e] rounded-full flex items-center justify-center text-xl shrink-0 group-hover:scale-110 group-hover:bg-[#031b4e] group-hover:text-white transition-all">
                     <i class="fas fa-envelope"></i>
                 </div>
-                <div>
-                    <h4 class="text-slate-800 font-bold mb-2">Email Us</h4>
-                    <span class="text-sm text-slate-500">info@warriorseducare.in</span>
+                <div class="relative z-10">
+                    <h4 class="text-[#031b4e] font-bold mb-2">Email Us</h4>
+                    <span class="text-sm text-[#031b4e]/70">info@warriorseducare.in</span>
                 </div>
             </a>
 
             <!-- Call -->
-            <a href="tel:+917070938975" class="bg-white border border-slate-100 p-8 rounded-2xl flex flex-col items-center text-center gap-4 hover:border-slate-300 hover:shadow-xl transition-all duration-300 group block">
-                <div class="w-14 h-14 bg-slate-100 text-[#111] rounded-full flex items-center justify-center text-xl shrink-0 group-hover:scale-110 group-hover:bg-[#111] group-hover:text-white transition-all">
+            <a href="tel:+917070938975" class="light-metallic-blue-card border-0 p-8 rounded-2xl flex flex-col items-center text-center gap-4 hover:shadow-xl transition-all duration-300 group block overflow-hidden">
+                <div class="w-14 h-14 bg-[#031b4e]/10 text-[#031b4e] rounded-full flex items-center justify-center text-xl shrink-0 group-hover:scale-110 group-hover:bg-[#031b4e] group-hover:text-white transition-all">
                     <i class="fas fa-phone-alt"></i>
                 </div>
-                <div>
-                    <h4 class="text-slate-800 font-bold mb-2">Call Us</h4>
-                    <span class="text-sm text-slate-500">+91-7070938975</span>
+                <div class="relative z-10">
+                    <h4 class="text-[#031b4e] font-bold mb-2">Call Us</h4>
+                    <span class="text-sm text-[#031b4e]/70">+91-7070938975</span>
                 </div>
             </a>
         </div>
     </div>
 </div>
 
-<!-- FAQ Section (From Template) -->
-<div class="py-24 px-6 lg:px-[5%] bg-white border-t border-slate-100">
-    <div class="max-w-3xl mx-auto text-center mb-16">
-        <h4 class="text-slate-500 text-xs font-bold mb-3 uppercase tracking-[0.2em]">FAQS</h4>
-        <h2 class="text-3xl md:text-4xl font-light text-[#111] mb-4">Frequently asked questions</h2>
-        <p class="text-slate-500 text-sm">Explore our latest insights and recruitment advice.</p>
-    </div>
-    
-    <div class="max-w-3xl mx-auto space-y-4" x-data="{ activeAccordion: 1 }">
-        
-        <!-- FAQ 1 -->
-        <div class="border border-slate-200 rounded-2xl overflow-hidden transition-all duration-300">
-            <button @click="activeAccordion = activeAccordion === 1 ? null : 1" class="w-full flex items-center justify-between p-6 bg-white hover:bg-slate-50 transition-colors">
-                <span class="font-medium text-slate-800 text-left">How quickly can you fill an urgent vacancy?</span>
-                <div class="w-10 h-10 rounded-xl bg-[#111] text-white flex items-center justify-center shrink-0 transition-transform duration-300">
-                    <i class="fas" :class="activeAccordion === 1 ? 'fa-minus' : 'fa-plus'"></i>
-                </div>
-            </button>
-            <div x-show="activeAccordion === 1" x-collapse>
-                <div class="p-6 pt-0 text-slate-500 text-sm leading-relaxed border-t border-slate-100 mt-2 pt-4">
-                    Thanks to our vast pre-screened database, we can typically provide a shortlist of highly qualified candidates within 48 to 72 hours of your request. Stay tuned for updates!
-                </div>
-            </div>
-        </div>
 
-        <!-- FAQ 2 -->
-        <div class="border border-slate-200 rounded-2xl overflow-hidden transition-all duration-300">
-            <button @click="activeAccordion = activeAccordion === 2 ? null : 2" class="w-full flex items-center justify-between p-6 bg-white hover:bg-slate-50 transition-colors">
-                <span class="font-medium text-slate-800 text-left">Do you only recruit for teaching positions?</span>
-                <div class="w-10 h-10 rounded-xl bg-[#111] text-white flex items-center justify-center shrink-0 transition-transform duration-300">
-                    <i class="fas" :class="activeAccordion === 2 ? 'fa-minus' : 'fa-plus'"></i>
-                </div>
-            </button>
-            <div x-show="activeAccordion === 2" x-collapse>
-                <div class="p-6 pt-0 text-slate-500 text-sm leading-relaxed border-t border-slate-100 mt-2 pt-4">
-                    No, while teachers form a large part of our network, we also recruit for administrative roles, principals, coordinators, and specialized staff like counselors and IT administrators.
-                </div>
-            </div>
-        </div>
-
-        <!-- FAQ 3 -->
-        <div class="border border-slate-200 rounded-2xl overflow-hidden transition-all duration-300">
-            <button @click="activeAccordion = activeAccordion === 3 ? null : 3" class="w-full flex items-center justify-between p-6 bg-white hover:bg-slate-50 transition-colors">
-                <span class="font-medium text-slate-800 text-left">What kind of digital support do you offer?</span>
-                <div class="w-10 h-10 rounded-xl bg-[#111] text-white flex items-center justify-center shrink-0 transition-transform duration-300">
-                    <i class="fas" :class="activeAccordion === 3 ? 'fa-minus' : 'fa-plus'"></i>
-                </div>
-            </button>
-            <div x-show="activeAccordion === 3" x-collapse>
-                <div class="p-6 pt-0 text-slate-500 text-sm leading-relaxed border-t border-slate-100 mt-2 pt-4">
-                    We provide complete end-to-end digital infrastructure setup. This includes interactive smart boards, reliable campus Wi-Fi, School Management ERP systems, and comprehensive staff training.
-                </div>
-            </div>
-        </div>
-        
-    </div>
-</div>
 
 @endsection
 

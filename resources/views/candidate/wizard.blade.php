@@ -7,18 +7,18 @@
 <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-<div class="min-h-[85vh] bg-secondary-bg py-12 px-4 sm:px-6 lg:px-8 relative" x-data="registrationWizard()">
+<div class="min-h-[85vh] bg-[#f4f7f5] py-12 px-4 sm:px-6 lg:px-8 relative" x-data="registrationWizard()">
     <!-- Decorative background elements -->
     <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent-blue/10 rounded-full blur-[100px]"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#0ea5e9]/10 rounded-full blur-[100px]"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent-yellow/10 rounded-full blur-[100px]"></div>
     </div>
 
     <div class="max-w-4xl mx-auto relative z-10">
         <!-- Header -->
         <div class="text-center mb-10 reveal">
-            <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-3">Complete Your Registration</h1>
-            <p class="text-text-dark/60 text-sm md:text-base max-w-xl mx-auto">Follow these simple steps to complete your profile and activate your candidate account.</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-[#031b4e] mb-3">Complete Your Registration</h1>
+            <p class="text-[#031b4e]/70 text-sm md:text-base max-w-xl mx-auto">Follow these simple steps to complete your profile and activate your candidate account.</p>
         </div>
 
         <!-- Progress Bar -->
@@ -29,32 +29,32 @@
                         <div class="w-10 h-10 mx-auto rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300"
                             :class="[
                                 step > index + 1 ? 'bg-green-500 border-green-500 text-white' : '',
-                                step === index + 1 ? 'bg-accent-blue border-accent-blue text-white shadow-[0_0_15px_rgba(18,154,239,0.5)]' : '',
-                                step < index + 1 ? 'bg-card-bg border-card-border text-text-dark/40' : ''
+                                step === index + 1 ? 'bg-[#0ea5e9] border-[#0ea5e9] text-white shadow-[0_0_15px_rgba(18,154,239,0.5)]' : '',
+                                step < index + 1 ? 'bg-white border-[#031b4e]/10 text-[#031b4e]/60' : ''
                             ]">
                             <i x-show="step > index + 1" class="fas fa-check"></i>
                             <span x-show="step <= index + 1" x-text="index + 1"></span>
                         </div>
                         <div class="mt-3 text-xs font-semibold tracking-wider uppercase transition-colors duration-300"
-                            :class="step >= index + 1 ? 'text-text-main' : 'text-text-dark/40'"
+                            :class="step >= index + 1 ? 'text-[#031b4e]' : 'text-[#031b4e]/60'"
                             x-text="s"></div>
                     </div>
                 </template>
             </div>
             <!-- Connecting Line -->
             <div class="relative w-full h-1 bg-card-border rounded-full -mt-[3.25rem] z-0 mx-auto" style="width: 66%;">
-                <div class="absolute top-0 left-0 h-full bg-accent-blue rounded-full transition-all duration-500 ease-out"
+                <div class="absolute top-0 left-0 h-full bg-[#0ea5e9] rounded-full transition-all duration-500 ease-out"
                     :style="'width: ' + ((step - 1) / (steps.length - 1) * 100) + '%'"></div>
             </div>
         </div>
 
         <!-- Forms Container -->
-        <div class="bg-card-bg/80 backdrop-blur-xl border border-card-border rounded-3xl shadow-2xl overflow-hidden reveal reveal-delay-2 relative">
+        <div class="bg-white/80 backdrop-blur-xl border border-[#031b4e]/10 rounded-3xl shadow-2xl overflow-hidden reveal reveal-delay-2 relative">
             
             <!-- Loading Overlay -->
-            <div x-show="loading" class="absolute inset-0 z-50 bg-card-bg/80 backdrop-blur-sm flex flex-col items-center justify-center" x-transition>
-                <div class="w-10 h-10 border-4 border-accent-blue border-t-transparent rounded-full animate-spin"></div>
-                <p class="mt-4 text-sm font-semibold text-text-main animate-pulse" x-text="loadingMessage"></p>
+            <div x-show="loading" class="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center" x-transition>
+                <div class="w-10 h-10 border-4 border-[#0ea5e9] border-t-transparent rounded-full animate-spin"></div>
+                <p class="mt-4 text-sm font-semibold text-[#031b4e] animate-pulse" x-text="loadingMessage"></p>
             </div>
 
             <!-- Error Message -->
@@ -72,8 +72,8 @@
             <div class="p-8 md:p-10">
                 <!-- STEP 1: Profile Details -->
                 <div x-show="step === 1" x-transition.opacity.duration.500ms>
-                    <h2 class="text-2xl font-bold text-text-main mb-6 flex items-center gap-3">
-                        <i class="fas fa-user-edit text-accent-blue"></i> Profile Details
+                    <h2 class="text-2xl font-bold text-[#031b4e] mb-6 flex items-center gap-3">
+                        <i class="fas fa-user-edit text-[#0ea5e9]"></i> Profile Details
                     </h2>
                     
                     <form id="step1Form" @submit.prevent="submitStep1" novalidate>
@@ -81,14 +81,14 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Date of Birth -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Date of Birth *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Date of Birth *</label>
                                 <div class="relative">
                                     <input type="text" x-model="formData.date_of_birth" required
                                         x-init="flatpickr($el, { dateFormat: 'Y-m-d', maxDate: 'today' })"
                                         placeholder="YYYY-MM-DD"
-                                        class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                        class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.date_of_birth"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.date_of_birth[0]"></p></template>
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-text-main/50">
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-[#031b4e]/50">
                                         <i class="far fa-calendar-alt"></i>
                                     </div>
                                 </div>
@@ -96,9 +96,9 @@
 
                             <!-- Gender -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Gender *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Gender *</label>
                                 <select x-model="formData.gender" required
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -109,55 +109,55 @@
 
                             <!-- Profile Photo -->
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Profile Photo (Optional)</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Profile Photo (Optional)</label>
                                 <input type="file" accept="image/*" @change="handleProfilePhotoUpload"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent-blue file:text-white hover:file:bg-accent-blue-hover cursor-pointer">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
                                 <template x-if="fieldErrors.profile_photo"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.profile_photo[0]"></p></template>
-                                <p class="text-xs text-text-dark/40 mt-1">Format: JPG, PNG. Max size: 2MB.</p>
+                                <p class="text-xs text-[#031b4e]/60 mt-1">Format: JPG, PNG. Max size: 2MB.</p>
                                 <div x-show="profilePhotoPreview" class="mt-3">
-                                    <img :src="profilePhotoPreview" class="h-20 w-20 object-cover rounded-full border-2 border-accent-blue shadow-lg">
+                                    <img :src="profilePhotoPreview" class="h-20 w-20 object-cover rounded-full border-2 border-[#0ea5e9] shadow-lg">
                                 </div>
                             </div>
 
                             <!-- Resume Upload (Required) -->
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Resume / CV *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Resume / CV *</label>
                                 <input type="file" accept=".pdf,.doc,.docx" @change="handleResumeUpload" required
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent-blue file:text-white hover:file:bg-accent-blue-hover cursor-pointer">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
                                 <template x-if="fieldErrors.resume"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.resume[0]"></p></template>
-                                <p class="text-xs text-text-dark/40 mt-1">Format: PDF, DOC, DOCX. Max size: 2MB.</p>
+                                <p class="text-xs text-[#031b4e]/60 mt-1">Format: PDF, DOC, DOCX. Max size: 2MB.</p>
                             </div>
 
                             <!-- Salary Slip (Optional) -->
                             <div class="md:col-span-1">
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Salary Slip (Optional)</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Salary Slip (Optional)</label>
                                 <input type="file" accept=".pdf,.doc,.docx,.jpg,.png,.jpeg" @change="handleSalarySlipUpload"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent-blue file:text-white hover:file:bg-accent-blue-hover cursor-pointer">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
                                 <template x-if="fieldErrors.salary_slip"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.salary_slip[0]"></p></template>
                             </div>
 
                             <!-- Offer Letter (Optional) -->
                             <div class="md:col-span-1">
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Offer Letter (Optional)</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Offer Letter (Optional)</label>
                                 <input type="file" accept=".pdf,.doc,.docx,.jpg,.png,.jpeg" @change="handleOfferLetterUpload"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent-blue file:text-white hover:file:bg-accent-blue-hover cursor-pointer">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
                                 <template x-if="fieldErrors.offer_letter"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.offer_letter[0]"></p></template>
                             </div>
 
                             <!-- Address -->
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Full Address *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Full Address *</label>
                                 <textarea x-model="formData.address" required rows="2"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all"
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all"
                                     placeholder="Enter your complete address"></textarea>
                                 <template x-if="fieldErrors.address"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.address[0]"></p></template>
                             </div>
 
                             <!-- Category -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Position Applied For *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Position Applied For *</label>
                                 <select x-model="formData.category_id" required
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Category</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -168,9 +168,9 @@
 
                             <!-- Subject -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Subject *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Subject *</label>
                                 <select x-model="formData.subject_id" required
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Subject</option>
                                     <template x-for="subject in availableSubjects" :key="subject.id">
                                         <option :value="subject.id" x-text="subject.name" :selected="formData.subject_id == subject.id"></option>
@@ -181,9 +181,9 @@
 
                             <!-- Specialization -->
                             <div x-show="availableSpecializations.length > 0">
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Specialization *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Specialization *</label>
                                 <select x-model="formData.specialization_id" :required="availableSpecializations.length > 0"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Specialization</option>
                                     <template x-for="spec in availableSpecializations" :key="spec.id">
                                         <option :value="spec.id" x-text="spec.name" :selected="formData.specialization_id == spec.id"></option>
@@ -194,9 +194,9 @@
 
                             <!-- Qualification -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Highest Qualification *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Highest Qualification *</label>
                                 <select x-model="formData.highest_qualification_id" required
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Qualification</option>
                                     @foreach($qualifications as $qualification)
                                         <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
@@ -207,17 +207,17 @@
 
                             <!-- Experience -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Experience (Years) *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Experience (Years) *</label>
                                 <input type="number" x-model="formData.experience_years" min="0" required
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.experience_years"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.experience_years[0]"></p></template>
                             </div>
 
                             <!-- State Preference -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Preferred State *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Preferred State *</label>
                                 <select x-model="formData.preferred_state_id" @change="fetchCities(formData.preferred_state_id)" required
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select State</option>
                                     @foreach($states as $state)
                                         <option value="{{ $state->id }}">{{ $state->name }}</option>
@@ -228,9 +228,9 @@
                             
                             <!-- City Preference -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Preferred City *</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Preferred City *</label>
                                 <select x-model="formData.preferred_city_id" required
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select City</option>
                                     <template x-for="city in availableCities" :key="city.id">
                                         <option :value="city.id" x-text="city.name"></option>
@@ -241,17 +241,17 @@
 
                             <!-- Current School (Optional) -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Current School (Optional)</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Current School (Optional)</label>
                                 <input type="text" x-model="formData.current_school" placeholder="E.g., DPS Patna"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.current_school"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.current_school[0]"></p></template>
                             </div>
 
                             <!-- English Fluency -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">English Fluency (Optional)</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">English Fluency (Optional)</label>
                                 <select x-model="formData.english_fluency"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Fluency</option>
                                     <option value="beginner">Beginner</option>
                                     <option value="intermediate">Intermediate</option>
@@ -262,9 +262,9 @@
 
                             <!-- Residential Preference -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">School Type Preference (Optional)</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">School Type Preference (Optional)</label>
                                 <select x-model="formData.residential_preference"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Preference</option>
                                     <option value="day">Day School</option>
                                     <option value="residential">Residential/Boarding School</option>
@@ -275,32 +275,32 @@
 
                             <!-- Salaries (Optional) -->
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Current Salary (Optional)</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Current Salary (Optional)</label>
                                 <input type="text" x-model="formData.current_salary" placeholder="E.g., ₹25,000/month"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.current_salary"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.current_salary[0]"></p></template>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Expected Salary (Optional)</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Expected Salary (Optional)</label>
                                 <input type="text" x-model="formData.expected_salary" placeholder="E.g., ₹35,000/month"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.expected_salary"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.expected_salary[0]"></p></template>
                             </div>
                             
                             <!-- Availability -->
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-semibold text-text-main/70 mb-2 uppercase tracking-wider">Availability to Join (Optional)</label>
+                                <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Availability to Join (Optional)</label>
                                 <input type="text" x-model="formData.availability_to_join" placeholder="E.g., Immediate, 15 Days, 1 Month"
-                                    class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-3 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.availability_to_join"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.availability_to_join[0]"></p></template>
                             </div>
                         </div>
 
                         <div class="mt-8 flex justify-end gap-4">
-                            <button type="button" @click="window.location.href = '{{ route('candidate.dashboard') }}'" class="text-text-dark font-semibold hover:text-accent-blue px-4 py-3 transition-colors">
+                            <button type="button" @click="window.location.href = '{{ route('candidate.dashboard') }}'" class="text-[#031b4e]/80 font-semibold hover:text-[#0ea5e9] px-4 py-3 transition-colors">
                                 Skip for now
                             </button>
-                            <button type="submit" class="bg-accent-blue text-white px-8 py-3 rounded-xl font-semibold shadow-glow-blue hover:bg-accent-blue-hover transition-all hover:-translate-y-0.5 flex items-center gap-2">
+                            <button type="submit" class="bg-[#0ea5e9] text-white px-8 py-3 rounded-xl font-semibold shadow-glow-blue hover:bg-[#0ea5e9]-hover transition-all hover:-translate-y-0.5 flex items-center gap-2">
                                 Next Step <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
@@ -309,21 +309,21 @@
 
                 <!-- STEP 2: Agreement -->
                 <div x-show="step === 2" x-transition.opacity.duration.500ms style="display: none;">
-                    <h2 class="text-2xl font-bold text-text-main mb-6 flex items-center gap-3">
-                        <i class="fas fa-file-contract text-accent-blue"></i> Agreement
+                    <h2 class="text-2xl font-bold text-[#031b4e] mb-6 flex items-center gap-3">
+                        <i class="fas fa-file-contract text-[#0ea5e9]"></i> Agreement
                     </h2>
 
                     <!-- Terms Box -->
-                    <div class="bg-secondary-bg border border-card-border rounded-xl p-6 mb-6 h-64 overflow-y-auto text-sm text-text-dark/80 custom-scrollbar">
-                        <h4 class="font-bold text-text-main mb-4 text-center">Warriors Educare – Candidate Overview / Terms & Conditions</h4>
+                    <div class="bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl p-6 mb-6 h-64 overflow-y-auto text-sm text-[#031b4e]/80 custom-scrollbar">
+                        <h4 class="font-bold text-[#031b4e] mb-4 text-center">Warriors Educare – Candidate Overview / Terms & Conditions</h4>
                         
                         <p class="mb-4">This document sets forth the official Terms & Conditions, policies, responsibilities, and professional expectations applicable to all candidates registering with Warriors Educare.</p>
                         <p class="mb-4">By registering with the Agency and proceeding further, the candidate acknowledges and enters into a legal and professional agreement governed by these Terms & Conditions.</p>
                         
-                        <h5 class="font-bold text-text-main mb-2">Purpose of This Document</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">Purpose of This Document</h5>
                         <p class="mb-4">The objective of this document is to ensure clarity, transparency, and mutual understanding between the candidate and Warriors Educare throughout the recruitment and placement process.</p>
 
-                        <h5 class="font-bold text-text-main mb-2">TERMS & CONDITIONS (SUMMARY)</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">TERMS & CONDITIONS (SUMMARY)</h5>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
                             <li><strong>Registration:</strong> A non-refundable registration fee of ₹1,000 is payable. Registration remains valid for 3 job applications.</li>
                             <li><strong>Eligibility:</strong> Candidates must meet eligibility criteria as prescribed by the hiring institution. Documents: Submission of genuine and verifiable documents is mandatory. Any misrepresentation may result in cancellation without refund.</li>
@@ -336,7 +336,7 @@
                             <li>These terms shall be deemed legally binding and enforceable, subject to the jurisdiction of Patna, Bihar.</li>
                         </ul>
 
-                        <h5 class="font-bold text-text-main mb-2">PAYMENT, CONFIDENTIALITY & LEGAL COMPLIANCE</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">PAYMENT, CONFIDENTIALITY & LEGAL COMPLIANCE</h5>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
                             <li>The candidate agrees to remit the applicable service charge within twelve (12) hours of receipt of the first salary.</li>
                             <li>Failure to make payment within the stipulated period shall attract a late penalty of ₹300 per day until the outstanding amount is cleared in full.</li>
@@ -345,14 +345,14 @@
                             <li>These terms shall be deemed legally binding and enforceable, subject to the exclusive jurisdiction of Patna, Bihar.</li>
                         </ul>
 
-                        <h5 class="font-bold text-text-main mb-2">Candidates must:</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">Candidates must:</h5>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
                             <li>Follow the school’s internal guidelines and rules be punctual and cooperative and maintain decorum and professionalism at all times.</li>
                             <li>Candidates must not share or misuse School contact information, Job leads and agency reference letters or documents.</li>
                             <li>Approaching a school directly or through any third party after receiving the lead from the Agency will result in Immediate blacklisting and legal action under data breach or professional misconduct.</li>
                         </ul>
 
-                        <h5 class="font-bold text-text-main mb-2">Registration fee is strictly non-refundable under any condition:</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">Registration fee is strictly non-refundable under any condition:</h5>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
                             <li>Rejection by school.</li>
                             <li>Voluntary withdrawal by candidate.</li>
@@ -361,7 +361,7 @@
                             <li>Refunds will not be entertained for dissatisfaction with salary, location, or working conditions post joining.</li>
                         </ul>
 
-                        <h5 class="font-bold text-text-main mb-2">BEHAVIORAL CODE OF CONDUCT</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">BEHAVIORAL CODE OF CONDUCT</h5>
                         <p class="mb-2"><strong>Candidates must always:</strong></p>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
                             <li>Be respectful and honest in communication.</li>
@@ -371,7 +371,7 @@
                             <li>Complaints from employers regarding attitude, communication, or ethics will be taken seriously and may result in blacklisting.</li>
                         </ul>
 
-                        <h5 class="font-bold text-text-main mb-2">COMMUNICATION GUIDELINES</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">COMMUNICATION GUIDELINES</h5>
                         <p class="mb-2">All communication from the Agency will be done via: WhatsApp (only through registered numbers), Email (warriorseducare@gmail.com), Direct phone calls.</p>
                         <p class="mb-2"><strong>Candidates must:</strong></p>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
@@ -384,21 +384,21 @@
                         <p class="mt-6 font-semibold">By clicking Accept & Continue, I acknowledge and accept all these terms and conditions.</p>
                     </div>
 
-                    <div class="mb-6 flex items-center gap-3 bg-accent-blue/5 p-4 rounded-xl border border-accent-blue/20 cursor-pointer" @click="agreed = !agreed">
-                        <div class="w-6 h-6 rounded-md border-2 border-accent-blue flex items-center justify-center transition-colors"
-                            :class="agreed ? 'bg-accent-blue text-white' : 'bg-transparent text-transparent'">
+                    <div class="mb-6 flex items-center gap-3 bg-[#0ea5e9]/5 p-4 rounded-xl border border-[#0ea5e9]/20 cursor-pointer" @click="agreed = !agreed">
+                        <div class="w-6 h-6 rounded-md border-2 border-[#0ea5e9] flex items-center justify-center transition-colors"
+                            :class="agreed ? 'bg-[#0ea5e9] text-white' : 'bg-transparent text-transparent'">
                             <i class="fas fa-check text-xs"></i>
                         </div>
-                        <span class="text-sm font-semibold text-text-main select-none">I have read and agree to the Terms & Conditions of Warriors Educare.</span>
+                        <span class="text-sm font-semibold text-[#031b4e] select-none">I have read and agree to the Terms & Conditions of Warriors Educare.</span>
                     </div>
 
                     <!-- Signature Options moved to step 3 -->
 
                     <div class="mt-8 flex justify-between">
-                        <button type="button" @click="step = 1" class="px-6 py-3 rounded-xl font-semibold text-text-dark hover:bg-card-border transition-colors flex items-center gap-2">
+                        <button type="button" @click="step = 1" class="px-6 py-3 rounded-xl font-semibold text-[#031b4e]/80 hover:bg-card-border transition-colors flex items-center gap-2">
                             <i class="fas fa-arrow-left text-sm"></i> Back
                         </button>
-                        <button type="button" @click="submitStep2" class="bg-accent-blue text-white px-8 py-3 rounded-xl font-semibold shadow-glow-blue hover:bg-accent-blue-hover transition-all hover:-translate-y-0.5 flex items-center gap-2" :disabled="!agreed" :class="!agreed ? 'opacity-50 cursor-not-allowed' : ''">
+                        <button type="button" @click="submitStep2" class="bg-[#0ea5e9] text-white px-8 py-3 rounded-xl font-semibold shadow-glow-blue hover:bg-[#0ea5e9]-hover transition-all hover:-translate-y-0.5 flex items-center gap-2" :disabled="!agreed" :class="!agreed ? 'opacity-50 cursor-not-allowed' : ''">
                             Accept & Continue <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
@@ -406,28 +406,28 @@
 
                 <!-- STEP 3: Identity Verification -->
                 <div x-show="step === 3" x-transition.opacity.duration.500ms style="display: none;" x-init="$watch('step', value => { if(value === 3 && !latitude) getLocation(); })">
-                    <h2 class="text-2xl font-bold text-text-main mb-6 flex items-center gap-3">
-                        <i class="fas fa-user-check text-accent-blue"></i> Identity Verification
+                    <h2 class="text-2xl font-bold text-[#031b4e] mb-6 flex items-center gap-3">
+                        <i class="fas fa-user-check text-[#0ea5e9]"></i> Identity Verification
                     </h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <!-- Live Photo Section -->
-                        <div class="border border-card-border rounded-2xl p-6 bg-secondary-bg relative">
-                            <h3 class="font-bold text-text-main mb-4 flex items-center gap-2"><i class="fas fa-camera text-accent-blue"></i> Live Photo</h3>
+                        <div class="border border-[#031b4e]/10 rounded-2xl p-6 bg-[#f4f7f5] relative">
+                            <h3 class="font-bold text-[#031b4e] mb-4 flex items-center gap-2"><i class="fas fa-camera text-[#0ea5e9]"></i> Live Photo</h3>
                             
-                            <div x-show="!livePhotoBase64" class="w-full aspect-video bg-card-bg rounded-xl overflow-hidden relative border border-card-border">
+                            <div x-show="!livePhotoBase64" class="w-full aspect-video light-metallic-blue-card rounded-xl overflow-hidden relative border-0">
                                 <video id="cameraFeed" class="w-full h-full object-cover" autoplay playsinline muted></video>
-                                <div class="absolute inset-0 flex flex-col items-center justify-center bg-card-bg/80 gap-3" x-show="!isCameraOn">
-                                    <button @click="startCamera" class="bg-accent-blue text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-accent-blue-hover transition-colors shadow-lg"><i class="fas fa-camera"></i> Start Camera</button>
-                                    <span class="text-xs text-text-dark/50 font-medium">OR</span>
-                                    <label class="bg-secondary-bg text-text-main border border-card-border px-4 py-2 rounded-lg text-sm font-semibold hover:bg-card-border transition-colors cursor-pointer shadow-sm">
+                                <div class="absolute inset-0 flex flex-col items-center justify-center bg-white/80 gap-3" x-show="!isCameraOn">
+                                    <button @click="startCamera" class="bg-[#0ea5e9] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#0ea5e9]-hover transition-colors shadow-lg"><i class="fas fa-camera"></i> Start Camera</button>
+                                    <span class="text-xs text-[#031b4e]/60 font-medium">OR</span>
+                                    <label class="bg-[#f4f7f5] text-[#031b4e] border border-[#031b4e]/10 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-card-border transition-colors cursor-pointer shadow-sm">
                                         <i class="fas fa-upload"></i> Upload Photo
                                         <input type="file" class="hidden" accept="image/*" @change="handleLivePhotoUpload">
                                     </label>
                                 </div>
                             </div>
 
-                            <div x-show="livePhotoBase64" class="w-full aspect-video bg-card-bg rounded-xl overflow-hidden border border-card-border relative">
+                            <div x-show="livePhotoBase64" class="w-full aspect-video light-metallic-blue-card rounded-xl overflow-hidden border-0 relative">
                                 <img :src="livePhotoBase64" class="w-full h-full object-cover" />
                                 <button @click="livePhotoBase64 = null; startCamera()" class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-600 transition-colors"><i class="fas fa-redo"></i></button>
                             </div>
@@ -441,33 +441,33 @@
                         <!-- Location & Signature Section -->
                         <div class="flex flex-col gap-6">
                             <!-- Location -->
-                            <div class="border border-card-border rounded-2xl p-6 bg-secondary-bg">
-                                <h3 class="font-bold text-text-main mb-4 flex items-center gap-2"><i class="fas fa-map-marker-alt text-accent-blue"></i> Location</h3>
+                            <div class="border border-[#031b4e]/10 rounded-2xl p-6 bg-[#f4f7f5]">
+                                <h3 class="font-bold text-[#031b4e] mb-4 flex items-center gap-2"><i class="fas fa-map-marker-alt text-[#0ea5e9]"></i> Location</h3>
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-full flex items-center justify-center" :class="latitude ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'">
                                         <i class="fas" :class="latitude ? 'fa-check' : 'fa-times'"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-semibold text-text-main" x-text="latitude ? 'Location Captured' : 'Location Required'"></p>
-                                        <p class="text-xs text-text-dark/60" x-text="latitude ? latitude.toFixed(4) + ', ' + longitude.toFixed(4) : 'Please allow location access'"></p>
+                                        <p class="text-sm font-semibold text-[#031b4e]" x-text="latitude ? 'Location Captured' : 'Location Required'"></p>
+                                        <p class="text-xs text-[#031b4e]/70" x-text="latitude ? latitude.toFixed(4) + ', ' + longitude.toFixed(4) : 'Please allow location access'"></p>
                                     </div>
-                                    <button x-show="!latitude" @click="getLocation" class="ml-auto bg-card-bg border border-card-border text-xs px-3 py-1.5 rounded-lg font-semibold hover:bg-card-border transition-colors">Retry</button>
+                                    <button x-show="!latitude" @click="getLocation" class="ml-auto bg-white border border-[#031b4e]/10 text-xs px-3 py-1.5 rounded-lg font-semibold hover:bg-card-border transition-colors">Retry</button>
                                 </div>
                                 <p x-show="locationError" class="text-red-500 text-xs mt-2" x-text="locationError"></p>
                             </div>
 
                             <!-- Signature Options -->
-                            <div class="border border-card-border rounded-2xl overflow-hidden flex-1 flex flex-col">
-                                <div class="flex border-b border-card-border bg-secondary-bg">
-                                    <button type="button" @click="sigType = 'draw'; initSignaturePad()" class="flex-1 py-3 text-sm font-semibold transition-colors" :class="sigType === 'draw' ? 'text-accent-blue bg-card-bg border-b-2 border-accent-blue' : 'text-text-dark/60 hover:bg-card-bg/50'">Draw</button>
-                                    <button type="button" @click="sigType = 'type'" class="flex-1 py-3 text-sm font-semibold transition-colors" :class="sigType === 'type' ? 'text-accent-blue bg-card-bg border-b-2 border-accent-blue' : 'text-text-dark/60 hover:bg-card-bg/50'">Type</button>
-                                    <button type="button" @click="sigType = 'upload'" class="flex-1 py-3 text-sm font-semibold transition-colors" :class="sigType === 'upload' ? 'text-accent-blue bg-card-bg border-b-2 border-accent-blue' : 'text-text-dark/60 hover:bg-card-bg/50'">Upload</button>
+                            <div class="border border-[#031b4e]/10 rounded-2xl overflow-hidden flex-1 flex flex-col">
+                                <div class="flex border-b border-[#031b4e]/10 bg-[#f4f7f5]">
+                                    <button type="button" @click="sigType = 'draw'; initSignaturePad()" class="flex-1 py-3 text-sm font-semibold transition-colors" :class="sigType === 'draw' ? 'text-[#0ea5e9] bg-white border-b-2 border-[#0ea5e9]' : 'text-[#031b4e]/70 hover:bg-white/50'">Draw</button>
+                                    <button type="button" @click="sigType = 'type'" class="flex-1 py-3 text-sm font-semibold transition-colors" :class="sigType === 'type' ? 'text-[#0ea5e9] bg-white border-b-2 border-[#0ea5e9]' : 'text-[#031b4e]/70 hover:bg-white/50'">Type</button>
+                                    <button type="button" @click="sigType = 'upload'" class="flex-1 py-3 text-sm font-semibold transition-colors" :class="sigType === 'upload' ? 'text-[#0ea5e9] bg-white border-b-2 border-[#0ea5e9]' : 'text-[#031b4e]/70 hover:bg-white/50'">Upload</button>
                                 </div>
 
-                                <div class="p-4 bg-card-bg flex-1">
+                                <div class="p-4 bg-white flex-1">
                                     <!-- Draw Pad -->
                                     <div x-show="sigType === 'draw'" class="h-full flex flex-col">
-                                        <div class="border-2 border-dashed border-card-border rounded-xl bg-white relative flex-1">
+                                        <div class="border-2 border-dashed border-[#031b4e]/10 rounded-xl bg-white relative flex-1">
                                             <canvas id="signature-pad" class="w-full h-full min-h-[120px] rounded-xl cursor-crosshair touch-none"></canvas>
                                             <button type="button" @click="clearSignature" class="absolute top-2 right-2 w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500/20 transition-colors" title="Clear">
                                                 <i class="fas fa-eraser"></i>
@@ -478,16 +478,16 @@
                                     <!-- Type Name -->
                                     <div x-show="sigType === 'type'" style="display: none;" class="h-full flex items-center">
                                         <input type="text" x-model="typedSignature" placeholder="Type full name"
-                                            class="w-full bg-secondary-bg border border-card-border rounded-xl px-4 py-4 text-xl text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all"
+                                            class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-4 text-xl text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all"
                                             style="font-family: 'Playfair Display', cursive; font-style: italic;">
                                     </div>
 
                                     <!-- Upload Image -->
                                     <div x-show="sigType === 'upload'" style="display: none;" class="h-full">
-                                        <label class="w-full h-full min-h-[120px] flex flex-col items-center justify-center border-2 border-dashed border-card-border rounded-xl bg-secondary-bg hover:bg-card-border/30 transition-colors cursor-pointer relative overflow-hidden">
+                                        <label class="w-full h-full min-h-[120px] flex flex-col items-center justify-center border-2 border-dashed border-[#031b4e]/10 rounded-xl bg-[#f4f7f5] hover:bg-card-border/30 transition-colors cursor-pointer relative overflow-hidden">
                                             <div class="flex flex-col items-center justify-center py-4" x-show="!uploadedImagePreview">
-                                                <i class="fas fa-upload text-2xl text-accent-blue mb-2"></i>
-                                                <p class="text-xs text-text-dark/60">Click to upload signature</p>
+                                                <i class="fas fa-upload text-2xl text-[#0ea5e9] mb-2"></i>
+                                                <p class="text-xs text-[#031b4e]/70">Click to upload signature</p>
                                             </div>
                                             <img x-show="uploadedImagePreview" :src="uploadedImagePreview" class="absolute inset-0 w-full h-full object-contain bg-white p-2" />
                                             <input type="file" class="hidden" accept="image/png, image/jpeg, image/jpg" @change="handleFileUpload" x-ref="sigFileInput" />
@@ -499,10 +499,10 @@
                     </div>
 
                     <div class="mt-8 flex justify-between">
-                        <button type="button" @click="step = 2" class="px-6 py-3 rounded-xl font-semibold text-text-dark hover:bg-card-border transition-colors flex items-center gap-2">
+                        <button type="button" @click="step = 2" class="px-6 py-3 rounded-xl font-semibold text-[#031b4e]/80 hover:bg-card-border transition-colors flex items-center gap-2">
                             <i class="fas fa-arrow-left text-sm"></i> Back
                         </button>
-                        <button type="button" @click="submitStep3" class="bg-accent-blue text-white px-8 py-3 rounded-xl font-semibold shadow-glow-blue hover:bg-accent-blue-hover transition-all hover:-translate-y-0.5 flex items-center gap-2">
+                        <button type="button" @click="submitStep3" class="bg-[#0ea5e9] text-white px-8 py-3 rounded-xl font-semibold shadow-glow-blue hover:bg-[#0ea5e9]-hover transition-all hover:-translate-y-0.5 flex items-center gap-2">
                             Verify Identity <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
@@ -510,35 +510,35 @@
 
                 <!-- STEP 4: Plan & Payment -->
                 <div x-show="step === 4" x-transition.opacity.duration.500ms style="display: none;">
-                    <h2 class="text-2xl font-bold text-text-main mb-6 flex items-center gap-3">
-                        <i class="fas fa-credit-card text-accent-blue"></i> Choose Registration Plan
+                    <h2 class="text-2xl font-bold text-[#031b4e] mb-6 flex items-center gap-3">
+                        <i class="fas fa-credit-card text-[#0ea5e9]"></i> Choose Registration Plan
                     </h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <!-- Standard Plan -->
                         <div class="border-2 rounded-2xl p-6 cursor-pointer transition-all duration-300 relative"
-                            :class="selectedPlan === 'standard' ? 'border-accent-blue bg-accent-blue/5 shadow-glow-blue' : 'border-card-border hover:border-accent-blue/50 bg-secondary-bg'"
+                            :class="selectedPlan === 'standard' ? 'border-[#0ea5e9] bg-[#0ea5e9]/5 shadow-glow-blue' : 'border-[#031b4e]/10 hover:border-[#0ea5e9]/50 bg-[#f4f7f5]'"
                             @click="selectedPlan = 'standard'">
                             
                             <div class="absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
-                                :class="selectedPlan === 'standard' ? 'border-accent-blue' : 'border-text-dark/30'">
-                                <div class="w-2.5 h-2.5 rounded-full bg-accent-blue transition-transform" :class="selectedPlan === 'standard' ? 'scale-100' : 'scale-0'"></div>
+                                :class="selectedPlan === 'standard' ? 'border-[#0ea5e9]' : 'border-text-dark/30'">
+                                <div class="w-2.5 h-2.5 rounded-full bg-[#0ea5e9] transition-transform" :class="selectedPlan === 'standard' ? 'scale-100' : 'scale-0'"></div>
                             </div>
 
-                            <h3 class="text-xl font-bold text-text-main mb-1">Standard Plan</h3>
-                            <div class="text-2xl font-bold text-accent-blue mb-4">₹500 <span class="text-sm font-normal text-text-dark/50">Initially</span></div>
+                            <h3 class="text-xl font-bold text-[#031b4e] mb-1">Standard Plan</h3>
+                            <div class="text-2xl font-bold text-[#0ea5e9] mb-4">₹500 <span class="text-sm font-normal text-[#031b4e]/60">Initially</span></div>
                             
-                            <ul class="space-y-3 text-sm text-text-dark/80">
+                            <ul class="space-y-3 text-sm text-[#031b4e]/80">
                                 <li class="flex gap-2"><i class="fas fa-check text-green-500 mt-1"></i> Profile Activation</li>
                                 <li class="flex gap-2"><i class="fas fa-check text-green-500 mt-1"></i> Resume Verification</li>
                                 <li class="flex gap-2"><i class="fas fa-check text-green-500 mt-1"></i> Dashboard Access</li>
-                                <li class="flex gap-2 text-text-dark/50"><i class="fas fa-info-circle mt-1"></i> Final ₹500 required later</li>
+                                <li class="flex gap-2 text-[#031b4e]/60"><i class="fas fa-info-circle mt-1"></i> Final ₹500 required later</li>
                             </ul>
                         </div>
 
                         <!-- Premium Plan -->
                         <div class="border-2 rounded-2xl p-6 cursor-pointer transition-all duration-300 relative overflow-hidden"
-                            :class="selectedPlan === 'premium' ? 'border-accent-yellow bg-accent-yellow/5 shadow-glow-yellow' : 'border-card-border hover:border-accent-yellow/50 bg-secondary-bg'"
+                            :class="selectedPlan === 'premium' ? 'border-accent-yellow bg-accent-yellow/5 shadow-glow-yellow' : 'border-[#031b4e]/10 hover:border-accent-yellow/50 bg-[#f4f7f5]'"
                             @click="selectedPlan = 'premium'">
                             
                             <div class="absolute top-0 right-0 bg-accent-yellow text-[#031b4e] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-lg">Recommended</div>
@@ -548,10 +548,10 @@
                                 <div class="w-2.5 h-2.5 rounded-full bg-accent-yellow transition-transform" :class="selectedPlan === 'premium' ? 'scale-100' : 'scale-0'"></div>
                             </div>
 
-                            <h3 class="text-xl font-bold text-text-main mb-1">Premium Plan</h3>
-                            <div class="text-2xl font-bold text-accent-yellow mb-4">₹1000 <span class="text-sm font-normal text-text-dark/50">One-Time</span></div>
+                            <h3 class="text-xl font-bold text-[#031b4e] mb-1">Premium Plan</h3>
+                            <div class="text-2xl font-bold text-accent-yellow mb-4">₹1000 <span class="text-sm font-normal text-[#031b4e]/60">One-Time</span></div>
                             
-                            <ul class="space-y-3 text-sm text-text-dark/80">
+                            <ul class="space-y-3 text-sm text-[#031b4e]/80">
                                 <li class="flex gap-2 font-semibold text-accent-yellow"><i class="fas fa-star mt-1"></i> Priority Shortlisting</li>
                                 <li class="flex gap-2 font-semibold text-accent-yellow"><i class="fas fa-rocket mt-1"></i> Faster Interview Coordination</li>
                                 <li class="flex gap-2"><i class="fas fa-check text-green-500 mt-1"></i> Dedicated Support</li>
@@ -560,15 +560,15 @@
                         </div>
                     </div>
 
-                    <div class="mt-8 flex justify-between items-center pt-6 border-t border-card-border">
-                        <button type="button" @click="step = 3" class="px-6 py-3 rounded-xl font-semibold text-text-dark hover:bg-card-border transition-colors flex items-center gap-2">
+                    <div class="mt-8 flex justify-between items-center pt-6 border-t border-[#031b4e]/10">
+                        <button type="button" @click="step = 3" class="px-6 py-3 rounded-xl font-semibold text-[#031b4e]/80 hover:bg-card-border transition-colors flex items-center gap-2">
                             <i class="fas fa-arrow-left text-sm"></i> Back
                         </button>
                         
                         <div class="flex items-center gap-4">
                             <div class="text-right hidden sm:block">
-                                <p class="text-xs text-text-dark/50 uppercase tracking-wider font-semibold">Total to Pay</p>
-                                <p class="text-xl font-bold text-text-main" x-text="selectedPlan === 'premium' ? '₹1000' : '₹500'"></p>
+                                <p class="text-xs text-[#031b4e]/60 uppercase tracking-wider font-semibold">Total to Pay</p>
+                                <p class="text-xl font-bold text-[#031b4e]" x-text="selectedPlan === 'premium' ? '₹1000' : '₹500'"></p>
                             </div>
                             <button type="button" @click="submitPayment" class="bg-[#5f259f] text-white px-8 py-3.5 rounded-xl font-semibold shadow-lg hover:brightness-110 transition-all hover:-translate-y-0.5 flex items-center gap-2">
                                 Pay via PhonePe <i class="fas fa-lock text-xs opacity-70"></i>
@@ -1171,3 +1171,6 @@
     }
 </style>
 @endsection
+
+
+

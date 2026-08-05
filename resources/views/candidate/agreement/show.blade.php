@@ -7,11 +7,11 @@
 
     {{-- Page Header --}}
     <div class="text-center mb-8 reveal">
-        <div class="w-14 h-14 rounded-2xl bg-accent-blue/10 text-accent-blue flex items-center justify-center text-2xl mx-auto mb-4">
+        <div class="w-14 h-14 rounded-2xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-2xl mx-auto mb-4">
             <i class="fas fa-file-contract"></i>
         </div>
-        <h1 class="text-2xl font-bold text-text-main">Candidate Agreement</h1>
-        <p class="text-sm text-text-dark/50 mt-2 max-w-md mx-auto">Please read the terms and conditions carefully and provide your digital signature below.</p>
+        <h1 class="text-2xl font-bold text-[#031b4e]">Candidate Agreement</h1>
+        <p class="text-sm text-[#031b4e]/60 mt-2 max-w-md mx-auto">Please read the terms and conditions carefully and provide your digital signature below.</p>
     </div>
 
     @if(session('error'))
@@ -22,24 +22,24 @@
     @endif
 
     {{-- Agreement Card --}}
-    <div class="bg-card-bg rounded-2xl border border-card-border overflow-hidden shadow-xl reveal reveal-delay-1">
+    <div class="light-metallic-blue-card rounded-2xl border-0 overflow-hidden shadow-xl reveal reveal-delay-1">
 
         {{-- Terms Section --}}
-        <div class="p-6 md:p-8 border-b border-card-border">
+        <div class="p-6 md:p-8 border-b border-[#031b4e]/10">
             <div class="flex items-center gap-3 mb-5">
-                <span class="w-8 h-8 rounded-lg bg-accent-blue/10 text-accent-blue flex items-center justify-center text-xs"><i class="fas fa-scroll"></i></span>
-                <h2 class="text-lg font-bold text-text-main">Terms and Conditions</h2>
+                <span class="w-8 h-8 rounded-lg bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-xs"><i class="fas fa-scroll"></i></span>
+                <h2 class="text-lg font-bold text-[#031b4e]">Terms and Conditions</h2>
             </div>
-            <div class="h-96 overflow-y-auto pr-4 text-sm text-text-dark/80 space-y-4 custom-scrollbar bg-secondary-bg/30 rounded-xl p-6 border border-card-border">
-                <h4 class="font-bold text-text-main mb-4 text-center">Warriors Educare – Candidate Overview / Terms & Conditions</h4>
+            <div class="h-96 overflow-y-auto pr-4 text-sm text-[#031b4e]/80 space-y-4 custom-scrollbar bg-[#f4f7f5]/30 rounded-xl p-6 border border-[#031b4e]/10">
+                <h4 class="font-bold text-[#031b4e] mb-4 text-center">Warriors Educare – Candidate Overview / Terms & Conditions</h4>
                 
                 <p>This document sets forth the official Terms & Conditions, policies, responsibilities, and professional expectations applicable to all candidates registering with Warriors Educare.</p>
                 <p>By registering with the Agency and proceeding further, the candidate acknowledges and enters into a legal and professional agreement governed by these Terms & Conditions.</p>
                 
-                <h5 class="font-bold text-text-main mt-4 mb-2">Purpose of This Document</h5>
+                <h5 class="font-bold text-[#031b4e] mt-4 mb-2">Purpose of This Document</h5>
                 <p>The objective of this document is to ensure clarity, transparency, and mutual understanding between the candidate and Warriors Educare throughout the recruitment and placement process.</p>
 
-                <h5 class="font-bold text-text-main mt-4 mb-2">TERMS & CONDITIONS (SUMMARY)</h5>
+                <h5 class="font-bold text-[#031b4e] mt-4 mb-2">TERMS & CONDITIONS (SUMMARY)</h5>
                 <ul class="list-disc pl-5 space-y-2">
                     <li><strong>Registration:</strong> A non-refundable registration fee of ₹1,000 is payable. Registration remains valid for 3 job applications.</li>
                     <li><strong>Eligibility:</strong> Candidates must meet eligibility criteria as prescribed by the hiring institution. Documents: Submission of genuine and verifiable documents is mandatory. Any misrepresentation may result in cancellation without refund.</li>
@@ -52,7 +52,7 @@
                     <li>These terms shall be deemed legally binding and enforceable, subject to the jurisdiction of Patna, Bihar.</li>
                 </ul>
 
-                <h5 class="font-bold text-text-main mt-4 mb-2">PAYMENT, CONFIDENTIALITY & LEGAL COMPLIANCE</h5>
+                <h5 class="font-bold text-[#031b4e] mt-4 mb-2">PAYMENT, CONFIDENTIALITY & LEGAL COMPLIANCE</h5>
                 <ul class="list-disc pl-5 space-y-2">
                     <li>The candidate agrees to remit the applicable service charge within twelve (12) hours of receipt of the first salary.</li>
                     <li>Failure to make payment within the stipulated period shall attract a late penalty of ₹300 per day until the outstanding amount is cleared in full.</li>
@@ -61,14 +61,14 @@
                     <li>These terms shall be deemed legally binding and enforceable, subject to the exclusive jurisdiction of Patna, Bihar.</li>
                 </ul>
 
-                <h5 class="font-bold text-text-main mt-4 mb-2">Candidates must:</h5>
+                <h5 class="font-bold text-[#031b4e] mt-4 mb-2">Candidates must:</h5>
                 <ul class="list-disc pl-5 space-y-2">
                     <li>Follow the school’s internal guidelines and rules be punctual and cooperative and maintain decorum and professionalism at all times.</li>
                     <li>Candidates must not share or misuse School contact information, Job leads and agency reference letters or documents.</li>
                     <li>Approaching a school directly or through any third party after receiving the lead from the Agency will result in Immediate blacklisting and legal action under data breach or professional misconduct.</li>
                 </ul>
 
-                <h5 class="font-bold text-text-main mt-4 mb-2">Registration fee is strictly non-refundable under any condition:</h5>
+                <h5 class="font-bold text-[#031b4e] mt-4 mb-2">Registration fee is strictly non-refundable under any condition:</h5>
                 <ul class="list-disc pl-5 space-y-2">
                     <li>Rejection by school.</li>
                     <li>Voluntary withdrawal by candidate.</li>
@@ -77,7 +77,7 @@
                     <li>Refunds will not be entertained for dissatisfaction with salary, location, or working conditions post joining.</li>
                 </ul>
 
-                <h5 class="font-bold text-text-main mt-4 mb-2">BEHAVIORAL CODE OF CONDUCT</h5>
+                <h5 class="font-bold text-[#031b4e] mt-4 mb-2">BEHAVIORAL CODE OF CONDUCT</h5>
                 <p><strong>Candidates must always:</strong></p>
                 <ul class="list-disc pl-5 space-y-2">
                     <li>Be respectful and honest in communication.</li>
@@ -87,7 +87,7 @@
                     <li>Complaints from employers regarding attitude, communication, or ethics will be taken seriously and may result in blacklisting.</li>
                 </ul>
 
-                <h5 class="font-bold text-text-main mt-4 mb-2">COMMUNICATION GUIDELINES</h5>
+                <h5 class="font-bold text-[#031b4e] mt-4 mb-2">COMMUNICATION GUIDELINES</h5>
                 <p>All communication from the Agency will be done via: WhatsApp (only through registered numbers), Email (warriorseducare@gmail.com), Direct phone calls.</p>
                 <p><strong>Candidates must:</strong></p>
                 <ul class="list-disc pl-5 space-y-2">
@@ -97,10 +97,10 @@
                     <li>Failure to communicate may result in cancellation of interview or job opportunity.</li>
                 </ul>
 
-                <hr class="my-6 border-card-border">
+                <hr class="my-6 border-[#031b4e]/10">
 
-                <h4 class="font-bold text-text-main mb-4 text-center">DECLARATION & ACCEPTANCE</h4>
-                <div class="bg-card-bg p-5 rounded-lg border border-card-border space-y-3 text-sm">
+                <h4 class="font-bold text-[#031b4e] mb-4 text-center">DECLARATION & ACCEPTANCE</h4>
+                <div class="bg-white p-5 rounded-lg border border-[#031b4e]/10 space-y-3 text-sm">
                     <p>I, <strong>{{ $user->name }}</strong>, hereby solemnly declare that I have thoroughly read, understood, and willingly accepted all the terms and conditions stated in this document of Warriors Educare.</p>
                     <p>I confirm that all personal, academic, and professional details provided by me are true, accurate, and complete. I understand that any false or misleading information may result in immediate cancellation of my registration without any refund.</p>
                     <p>I hereby agree to pay a service/registration fee of <strong>₹ 1000 (Rupees One Thousand only)</strong> to Warriors Educare, as mutually agreed, for availing recruitment and placement assistance services.</p>
@@ -123,13 +123,13 @@
                         <i class="fas fa-check-double"></i>
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold text-text-main mb-1">Agreement Digitally Signed</h3>
-                        <p class="text-sm text-text-dark/60 mb-6">You have accepted the terms and conditions.</p>
+                        <h3 class="text-xl font-bold text-[#031b4e] mb-1">Agreement Digitally Signed</h3>
+                        <p class="text-sm text-[#031b4e]/70 mb-6">You have accepted the terms and conditions.</p>
                         
                         <div class="flex flex-col sm:flex-row gap-6 mb-6">
                             {{-- Digital Signature --}}
-                            <div class="bg-card-bg border border-card-border rounded-xl p-5 flex-1">
-                                <h4 class="text-xs font-semibold text-text-main/50 uppercase tracking-wider mb-3">
+                            <div class="bg-white border border-[#031b4e]/10 rounded-xl p-5 flex-1">
+                                <h4 class="text-xs font-semibold text-[#031b4e]/50 uppercase tracking-wider mb-3">
                                     {{ $profile->signature_data ? 'Your Digital Signature' : 'Agreement Status' }}
                                 </h4>
                                 
@@ -137,39 +137,39 @@
                                     @if($profile->signature_type === 'draw' || Str::startsWith($profile->signature_data, 'data:image'))
                                         <img src="{{ $profile->signature_data }}" alt="Digital Signature" class="h-20 bg-white rounded object-contain px-2 mb-3">
                                     @elseif($profile->signature_type === 'type')
-                                        <div class="font-signature text-3xl text-text-main mb-3">{{ $profile->signature_data }}</div>
+                                        <div class="font-signature text-3xl text-[#031b4e] mb-3">{{ $profile->signature_data }}</div>
                                     @elseif($profile->signature_type === 'upload')
                                         <img src="{{ asset('storage/' . $profile->signature_data) }}" alt="Uploaded Signature" class="h-20 object-contain mb-3">
                                     @else
-                                        <p class="text-lg font-medium text-text-main mb-3">{{ $profile->signature_data }}</p>
+                                        <p class="text-lg font-medium text-[#031b4e] mb-3">{{ $profile->signature_data }}</p>
                                     @endif
                                     
-                                    <div class="text-xs text-text-dark/50 mt-4 pt-4 border-t border-card-border">
-                                        <span class="block text-text-dark/30 mb-0.5">Signed On</span>
-                                        <span class="font-medium text-text-main/80">{{ $profile->signature_date_time ? \Carbon\Carbon::parse($profile->signature_date_time)->format('d M Y, h:i A') : $profile->updated_at->format('d M Y, h:i A') }}</span>
+                                    <div class="text-xs text-[#031b4e]/60 mt-4 pt-4 border-t border-[#031b4e]/10">
+                                        <span class="block text-[#031b4e]/50 mb-0.5">Signed On</span>
+                                        <span class="font-medium text-[#031b4e]/80">{{ $profile->signature_date_time ? \Carbon\Carbon::parse($profile->signature_date_time)->format('d M Y, h:i A') : $profile->updated_at->format('d M Y, h:i A') }}</span>
                                     </div>
                                 @else
-                                    <p class="text-sm font-medium text-text-main mb-3">
-                                        <i class="fas fa-file-pdf text-accent-blue mr-1"></i> Agreement manually uploaded by Admin.
+                                    <p class="text-sm font-medium text-[#031b4e] mb-3">
+                                        <i class="fas fa-file-pdf text-[#0ea5e9] mr-1"></i> Agreement manually uploaded by Admin.
                                     </p>
-                                    <div class="text-xs text-text-dark/50 mt-4 pt-4 border-t border-card-border">
-                                        <span class="block text-text-dark/30 mb-0.5">Uploaded On</span>
-                                        <span class="font-medium text-text-main/80">{{ $profile->updated_at->format('d M Y, h:i A') }}</span>
+                                    <div class="text-xs text-[#031b4e]/60 mt-4 pt-4 border-t border-[#031b4e]/10">
+                                        <span class="block text-[#031b4e]/50 mb-0.5">Uploaded On</span>
+                                        <span class="font-medium text-[#031b4e]/80">{{ $profile->updated_at->format('d M Y, h:i A') }}</span>
                                     </div>
                                 @endif
                             </div>
 
                             {{-- Live Photo --}}
                             @if($profile->live_photo_path)
-                            <div class="bg-card-bg border border-card-border rounded-xl p-5 flex-1">
-                                <h4 class="text-xs font-semibold text-text-main/50 uppercase tracking-wider mb-3">
+                            <div class="bg-white border border-[#031b4e]/10 rounded-xl p-5 flex-1">
+                                <h4 class="text-xs font-semibold text-[#031b4e]/50 uppercase tracking-wider mb-3">
                                     Identity Verification Photo
                                 </h4>
-                                <img src="{{ asset('storage/' . $profile->live_photo_path) }}" alt="Live Photo" class="h-20 w-auto rounded-lg object-cover mb-3 border border-card-border">
+                                <img src="{{ asset('storage/' . $profile->live_photo_path) }}" alt="Live Photo" class="h-20 w-auto rounded-lg object-cover mb-3 border border-[#031b4e]/10">
                                 
-                                <div class="text-xs text-text-dark/50 mt-4 pt-4 border-t border-card-border">
-                                    <span class="block text-text-dark/30 mb-0.5">Location Captured</span>
-                                    <span class="font-medium text-text-main/80">
+                                <div class="text-xs text-[#031b4e]/60 mt-4 pt-4 border-t border-[#031b4e]/10">
+                                    <span class="block text-[#031b4e]/50 mb-0.5">Location Captured</span>
+                                    <span class="font-medium text-[#031b4e]/80">
                                         @if($profile->latitude && $profile->longitude)
                                             {{ number_format($profile->latitude, 4) }}, {{ number_format($profile->longitude, 4) }}
                                         @else
@@ -182,7 +182,7 @@
                         </div>
 
                         <div class="mt-6">
-                            <a href="{{ route('candidate.agreement.download') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-accent-blue/10 text-accent-blue font-medium rounded-lg hover:bg-accent-blue/20 transition-colors text-sm">
+                            <a href="{{ route('candidate.agreement.download') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0ea5e9]/10 text-[#0ea5e9] font-medium rounded-lg hover:bg-[#0ea5e9]/20 transition-colors text-sm">
                                 <i class="fas fa-file-pdf"></i> Download PDF
                             </a>
                         </div>
@@ -199,14 +199,14 @@
                     <div class="flex items-center gap-3 mb-4">
                         <span class="w-8 h-8 rounded-lg bg-accent-yellow/10 text-accent-yellow flex items-center justify-center text-xs"><i class="fas fa-pen-fancy"></i></span>
                         <div>
-                            <h3 class="text-lg font-bold text-text-main">Digital Signature</h3>
-                            <p class="text-xs text-text-dark/40 mt-0.5">Use your mouse or touchscreen to sign inside the box below.</p>
+                            <h3 class="text-lg font-bold text-[#031b4e]">Digital Signature</h3>
+                            <p class="text-xs text-[#031b4e]/60 mt-0.5">Use your mouse or touchscreen to sign inside the box below.</p>
                         </div>
                     </div>
 
-                    <div class="border-2 border-dashed border-card-border rounded-xl bg-secondary-bg/30 relative overflow-hidden group hover:border-accent-blue/30 transition-colors" style="width: 100%; max-width: 500px;">
+                    <div class="border-2 border-dashed border-[#031b4e]/10 rounded-xl bg-[#f4f7f5]/30 relative overflow-hidden group hover:border-[#0ea5e9]/30 transition-colors" style="width: 100%; max-width: 500px;">
                         <canvas id="signature-pad" class="w-full h-48 cursor-crosshair touch-none"></canvas>
-                        <div class="absolute bottom-2 right-2 text-[10px] text-text-dark/20 pointer-events-none">Sign here</div>
+                        <div class="absolute bottom-2 right-2 text-[10px] text-[#031b4e]/80/20 pointer-events-none">Sign here</div>
                     </div>
                     <div class="mt-2.5">
                         <button type="button" id="clear-signature" class="text-xs text-red-400 hover:text-red-300 font-medium flex items-center gap-1.5 transition-colors">
@@ -215,15 +215,15 @@
                     </div>
                 </div>
 
-                <div class="mb-6 bg-accent-blue/5 border border-accent-blue/10 p-4 rounded-xl flex items-start gap-3">
-                    <input id="terms_accepted" name="terms_accepted" type="checkbox" required class="w-4 h-4 mt-0.5 rounded border-card-border text-accent-blue focus:ring-accent-blue/50 bg-secondary-bg cursor-pointer">
-                    <label for="terms_accepted" class="text-sm text-text-dark/60 cursor-pointer leading-relaxed">
+                <div class="mb-6 bg-[#0ea5e9]/5 border border-[#0ea5e9]/10 p-4 rounded-xl flex items-start gap-3">
+                    <input id="terms_accepted" name="terms_accepted" type="checkbox" required class="w-4 h-4 mt-0.5 rounded border-[#031b4e]/10 text-[#0ea5e9] focus:ring-[#0ea5e9]/50 bg-[#f4f7f5] cursor-pointer">
+                    <label for="terms_accepted" class="text-sm text-[#031b4e]/70 cursor-pointer leading-relaxed">
                         I hereby declare that I agree to all the terms and conditions mentioned above and my digital signature is legally binding.
                     </label>
                 </div>
 
                 <div class="flex justify-end">
-                    <button type="submit" id="submit-btn" class="px-8 py-3 bg-accent-blue text-white font-semibold rounded-xl hover:bg-accent-blue-hover hover:-translate-y-0.5 transition-all shadow-lg flex items-center gap-2">
+                    <button type="submit" id="submit-btn" class="px-8 py-3 bg-[#0ea5e9] text-white font-semibold rounded-xl hover:bg-[#0ea5e9]-hover hover:-translate-y-0.5 transition-all shadow-lg flex items-center gap-2">
                         <i class="fas fa-file-signature"></i> Sign Agreement
                     </button>
                 </div>
@@ -319,3 +319,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 @endpush
 @endsection
+
+
+

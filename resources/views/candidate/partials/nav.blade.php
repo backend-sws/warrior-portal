@@ -25,7 +25,7 @@
 
                         @if($item['route'] === 'candidate.profile.edit' && auth()->user()->profile?->profile_photo_path)
                             <img src="{{ asset('storage/' . auth()->user()->profile->profile_photo_path) }}" alt="Profile"
-                                class="w-5 h-5 rounded-full object-cover border border-accent-blue/30">
+                                class="w-5 h-5 rounded-full object-cover border border-[#0ea5e9]/30">
                         @else
                             <i class="fas {{ $item['icon'] }} text-xs"></i>
                         @endif
@@ -54,3 +54,6 @@
         scrollbar-width: none;
     }
 </style>
+
+
+
