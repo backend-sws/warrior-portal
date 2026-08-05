@@ -27,14 +27,14 @@
                 </div>
                 
                 <!-- Main Heading -->
-                <h1 id="hero-heading" class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] mb-6 tracking-tight transition-opacity duration-300">
+                <h1 id="hero-heading" class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] mb-6 tracking-tight typewriter-effect" data-speed="40">
                     EDUCATION<br>
                     & HIRING<br>
                     SOLUTIONS
                 </h1>
                 
                 <!-- Paragraph -->
-                <p id="hero-text" class="text-white/80 text-sm md:text-base leading-relaxed mb-10 max-w-md border-l-2 border-white/20 pl-4 transition-opacity duration-300">
+                <p id="hero-text" class="text-white/80 text-sm md:text-base leading-relaxed mb-10 max-w-md border-l-2 border-white/20 pl-4 typewriter-effect" data-speed="15">
                     Connect with top-tier talent and premier educational institutions. We streamline your recruitment process and guide your career forward.
                 </p>
                 
@@ -133,8 +133,15 @@
                 accent.className = "absolute -top-6 left-10 w-24 h-24 border-t-4 border-l-4 border-white/30 rounded-tl-full z-0 pointer-events-none transition-all duration-1000";
 
                 setTimeout(() => {
-                    heading.innerHTML = 'FIND TOP<br>TALENT FOR<br>YOUR INSTITUTION';
-                    text.innerHTML = 'Discover the best educators and administrative staff. Post jobs, review applicants, and hire the perfect fit for your school.';
+                    const newHeading = 'FIND TOP\nTALENT FOR\nYOUR INSTITUTION';
+                    const newText = 'Discover the best educators and administrative staff. Post jobs, review applicants, and hire the perfect fit for your school.';
+                    
+                    heading.setAttribute('data-original-text', newHeading);
+                    text.setAttribute('data-original-text', newText);
+                    
+                    if(heading.restartTypewriter) heading.restartTypewriter();
+                    if(text.restartTypewriter) text.restartTypewriter();
+
                     img.src = "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1000&q=80";
                     
                     btnEmployer.className = "group bg-[#0ea5e9] text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.5)] transition-all duration-300 flex items-center justify-center border-2 border-[#0ea5e9] scale-105";
@@ -166,8 +173,15 @@
                 accent.className = "absolute -top-6 right-10 w-24 h-24 border-t-4 border-r-4 border-white/30 rounded-tr-full z-0 pointer-events-none transition-all duration-1000";
 
                 setTimeout(() => {
-                    heading.innerHTML = 'EDUCATION<br>& HIRING<br>SOLUTIONS';
-                    text.innerHTML = 'Connect with top-tier talent and premier educational institutions. We streamline your recruitment process and guide your career forward.';
+                    const newHeading = 'EDUCATION\n& HIRING\nSOLUTIONS';
+                    const newText = 'Connect with top-tier talent and premier educational institutions. We streamline your recruitment process and guide your career forward.';
+                    
+                    heading.setAttribute('data-original-text', newHeading);
+                    text.setAttribute('data-original-text', newText);
+                    
+                    if(heading.restartTypewriter) heading.restartTypewriter();
+                    if(text.restartTypewriter) text.restartTypewriter();
+
                     img.src = "{{ asset('images/candidate_hero_4k.png') }}";
                     
                     btnCandidate.className = "group relative overflow-hidden bg-[#0ea5e9] backdrop-blur-md border border-[#0ea5e9] text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.5)] transition-all duration-300 scale-105";
@@ -334,7 +348,7 @@ Our recruitment approach follows modern hiring practices, institutional standard
         <div class="h-4 lg:h-6 bg-white w-full"></div>
 
         <!-- Transparent Statistics Section -->
-        <section class="py-6 bg-[#031b4e] border-t border-white/5">
+        <section class="py-6 metallic-blue-card border-t border-white/5">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                     <!-- Stat 1 -->
@@ -345,7 +359,7 @@ Our recruitment approach follows modern hiring practices, institutional standard
                     
                     <!-- Stat 2 -->
                     <div class="text-center group cursor-default">
-                        <h3 class="text-4xl lg:text-5xl font-black text-white mb-2 tracking-tight drop-shadow-md"><span class="stat-number" data-target="98">0</span><span class="text-[#031b4e]">%</span></h3>
+                        <h3 class="text-4xl lg:text-5xl font-black text-white mb-2 tracking-tight drop-shadow-md"><span class="stat-number" data-target="98">0</span><span class="text-[#dfa43a]">%</span></h3>
                         <p class="text-[10px] lg:text-[11px] font-bold text-gray-300 uppercase tracking-widest">Fulfillment Rate</p>
                     </div>
 
@@ -357,7 +371,7 @@ Our recruitment approach follows modern hiring practices, institutional standard
 
                     <!-- Stat 4 -->
                     <div class="text-center group cursor-default">
-                        <h3 class="text-4xl lg:text-5xl font-black text-white mb-2 tracking-tight drop-shadow-md"><span class="stat-number" data-target="350">0</span><span class="text-[#031b4e]">+</span></h3>
+                        <h3 class="text-4xl lg:text-5xl font-black text-white mb-2 tracking-tight drop-shadow-md"><span class="stat-number" data-target="350">0</span><span class="text-[#dfa43a]">+</span></h3>
                         <p class="text-[10px] lg:text-[11px] font-bold text-gray-300 uppercase tracking-widest">Satisfied Schools</p>
                     </div>
                 </div>
@@ -402,7 +416,7 @@ Our recruitment approach follows modern hiring practices, institutional standard
             <div class="absolute top-5 right-[5%] opacity-[0.02] text-7xl md:text-[100px] font-extrabold uppercase pointer-events-none select-none tracking-wider">
                 Warriors Educare</div>
             <div class="mb-12 relative z-10 reveal">
-                <h4 class="text-[#031b4e] text-base font-medium mb-1.5 uppercase tracking-wider">Providing Everything You
+                <h4 class="text-white/80 text-base font-medium mb-1.5 uppercase tracking-wider">Providing Everything You
                     Need</h4>
                 <h2 class="text-4xl lg:text-5xl font-bold text-white">SCHOOLS</h2>
             </div>
@@ -745,9 +759,9 @@ Our recruitment approach follows modern hiring practices, institutional standard
         </section>
 
         <!-- Latest Jobs Section -->
-        <section class="py-20 px-6 lg:px-[5%] bg-[#031b4e] text-white relative">
+        <section class="py-20 px-6 lg:px-[5%] metallic-blue-card border-none shadow-none text-white relative">
             <div class="text-center mb-12 reveal">
-                <h4 class="text-[#031b4e] text-base font-medium mb-1.5 uppercase tracking-wider">Latest Jobs</h4>
+                <h4 class="text-white/80 text-base font-medium mb-1.5 uppercase tracking-wider">Latest Jobs</h4>
                 <h2 class="text-white text-3xl lg:text-4xl font-bold mb-4">Explore Recent Opportunities</h2>
                 <div class="zigzag-divider w-16 h-2 mx-auto"></div>
             </div>
@@ -931,10 +945,13 @@ Our recruitment approach follows modern hiring practices, institutional standard
                     <h2 class="text-3xl lg:text-[38px] font-bold text-gray-900 tracking-tight">Let's Start the Conversation</h2>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.06)] p-8 lg:p-14 flex flex-col lg:flex-row gap-12 lg:gap-16">
+                <div class="bg-white rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.06)] p-8 lg:p-14 flex flex-col lg:flex-row gap-12 lg:gap-16 relative overflow-hidden group">
                     
+                    <!-- Animated Pattern Background -->
+                    <div class="absolute inset-0 z-0 opacity-10 invert pointer-events-none animate-pattern-move" style="background-image: url('{{ asset('images/network-pattern.svg') }}'); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
+
                     <!-- Left: Form -->
-                    <div class="w-full lg:w-[58%]">
+                    <div class="w-full lg:w-[58%] relative z-10">
                         <h3 class="text-[20px] font-bold text-gray-900 mb-1">Send Us A Message</h3>
                         <p class="text-[11px] text-gray-400 font-medium mb-7">Our response time is within 30 minutes during business hours</p>
                         
@@ -950,7 +967,6 @@ Our recruitment approach follows modern hiring practices, institutional standard
                             <div class="relative">
                                 <select class="w-full bg-[#f3f4f6] border-none rounded text-xs text-gray-400 font-medium px-4 py-3.5 focus:ring-1 focus:ring-[#1e3a8a] outline-none appearance-none">
                                     <option value="">Service Type</option>
-
                                 </select>
                             </div>
                             <div class="mt-4">
@@ -959,6 +975,52 @@ Our recruitment approach follows modern hiring practices, institutional standard
                                 </button>
                             </div>
                         </form>
+                    </div>
+
+                    <!-- Right: Animated Graphic -->
+                    <div class="hidden lg:flex w-full lg:w-[42%] relative items-center justify-center">
+                        <style>
+                            @keyframes float-icon {
+                                0%, 100% { transform: translateY(0px) rotate(12deg); }
+                                50% { transform: translateY(-15px) rotate(16deg); }
+                            }
+                            @keyframes float-badge-1 {
+                                0%, 100% { transform: translateY(0px) rotate(-10deg); }
+                                50% { transform: translateY(12px) rotate(-5deg); }
+                            }
+                            @keyframes float-badge-2 {
+                                0%, 100% { transform: translateY(0px) scale(1); }
+                                50% { transform: translateY(-10px) scale(1.05); }
+                            }
+                            @keyframes pulse-ring {
+                                0% { transform: scale(0.8); opacity: 0.5; }
+                                50% { transform: scale(1.2); opacity: 0.1; }
+                                100% { transform: scale(0.8); opacity: 0.5; }
+                            }
+                        </style>
+                        <div class="relative w-full aspect-square max-w-[320px] flex items-center justify-center">
+                            <!-- Background glowing blobs -->
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-[#0ea5e9]/20 to-[#1e3a8a]/10 blur-3xl rounded-full" style="animation: pulse-ring 6s ease-in-out infinite;"></div>
+                            
+                            <!-- Floating Elements -->
+                            <div class="relative z-10 w-full h-full flex items-center justify-center">
+                                <!-- Main central element -->
+                                <div class="w-44 h-44 bg-gradient-to-br from-[#1e3a8a] to-[#0ea5e9] rounded-[2rem] shadow-[0_20px_50px_rgba(30,58,138,0.4)] flex items-center justify-center relative border border-white/20" style="animation: float-icon 5s ease-in-out infinite;">
+                                    <i class="fas fa-envelope-open-text text-white text-6xl drop-shadow-md"></i>
+                                    
+                                    <!-- Smaller floating badges -->
+                                    <div class="absolute -top-4 -right-4 w-14 h-14 bg-white rounded-xl shadow-xl flex items-center justify-center border border-gray-100" style="animation: float-badge-1 4s ease-in-out infinite;">
+                                        <i class="fas fa-paper-plane text-[#0ea5e9] text-xl"></i>
+                                    </div>
+                                    <div class="absolute -bottom-6 -left-6 w-16 h-16 bg-accent-yellow rounded-full shadow-xl flex items-center justify-center border-4 border-white" style="animation: float-badge-2 4.5s ease-in-out infinite 0.5s;">
+                                        <i class="fas fa-bolt text-white text-2xl"></i>
+                                    </div>
+                                    <!-- Extra decorative dots -->
+                                    <div class="absolute top-1/2 -left-10 w-4 h-4 bg-[#0ea5e9] rounded-full opacity-60" style="animation: float-badge-1 3s ease-in-out infinite 1s;"></div>
+                                    <div class="absolute -bottom-4 right-8 w-3 h-3 bg-accent-yellow rounded-full opacity-80" style="animation: float-badge-2 3.5s ease-in-out infinite 0.2s;"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

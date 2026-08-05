@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Page Header -->
-<div class="relative bg-gradient-to-r from-[#040e2d] via-[#129aef] to-[#040e2d] py-24 px-6 lg:px-[5%] overflow-hidden border-t border-white/10">
+<div class="relative metallic-blue-card border-none shadow-none py-24 px-6 lg:px-[5%] overflow-hidden border-t border-white/10">
     <!-- Decorative background elements -->
     <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
         <div class="absolute top-[-10%] right-[-5%] w-[40%] h-[120%] bg-gradient-to-l from-[#129aef]/20 to-transparent transform -skew-x-12"></div>
@@ -49,3 +49,4 @@
     </div>
 </div>
 @endsection
+

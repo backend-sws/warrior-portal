@@ -6,7 +6,7 @@
 @section('content')
 
 <!-- 1. Hero Section -->
-<div class="relative w-full bg-[#040e2d] text-white py-24 md:py-32 overflow-hidden flex items-center justify-center">
+<div class="relative w-full metallic-blue-card border-none shadow-none text-white py-24 md:py-32 overflow-hidden flex items-center justify-center">
     <!-- Background overlay / image -->
     <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-60"></div>
     <div class="absolute inset-0 bg-black/40"></div>
@@ -251,3 +251,4 @@
     }
 </style>
 @endpush
+

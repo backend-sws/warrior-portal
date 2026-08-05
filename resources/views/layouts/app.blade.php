@@ -183,6 +183,29 @@
             60% { left: 200%; }
             100% { left: 200%; }
         }
+
+        /* Hover state for Metallic Blue */
+        .group:hover .group-hover\:metallic-blue-card {
+            background: linear-gradient(145deg, #005c97, #1e3c72, #2a5298) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.4);
+        }
+        .group-hover\:metallic-blue-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .group:hover .group-hover\:metallic-blue-card::after {
+            opacity: 1;
+            animation: shine 2s infinite;
+        }
     </style>
 </head>
 
@@ -610,7 +633,7 @@
                 const iconWrap = document.getElementById('fc-1-icon-wrap');
                 iconWrap.classList.remove('bg-accent-yellow', 'bg-accent-blue');
                 iconWrap.classList.add(data.fc1Color);
-
+                
                 document.getElementById('fc-2-title').innerText = data.fc2Title;
                 document.getElementById('fc-2-desc').innerText = data.fc2Desc;
                 document.getElementById('fc-2-avatars').innerHTML = data.fc2HTML;
@@ -726,6 +749,69 @@
     </script>
 
     @stack('scripts')
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const typeElements = document.querySelectorAll('.typewriter-effect');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (!entry.target.classList.contains('typing-done')) {
+                        entry.target.classList.add('typing-done');
+                        const text = entry.target.getAttribute('data-original-text');
+                        const speed = parseInt(entry.target.getAttribute('data-speed')) || 40;
+                        entry.target.innerHTML = '';
+                        
+                        if (entry.target.typeTimeout) clearTimeout(entry.target.typeTimeout);
+                        
+                        let i = 0;
+                        function typeWriter() {
+                            if (!entry.target.classList.contains('typing-done')) return;
+                            const currentFullText = entry.target.getAttribute('data-original-text');
+                            
+                            if (i < currentFullText.length) {
+                                let currentText = currentFullText.substring(0, i + 1);
+                                currentText = currentText.replace(/\n/g, '<br>');
+                                entry.target.innerHTML = currentText + '<span class="animate-pulse text-[#3b82f6]">|</span>';
+                                i++;
+                                entry.target.typeTimeout = setTimeout(typeWriter, speed);
+                            } else {
+                                entry.target.innerHTML = currentFullText.replace(/\n/g, '<br>');
+                                // Restart animation after 6 seconds
+                                entry.target.typeTimeout = setTimeout(() => {
+                                    i = 0;
+                                    entry.target.innerHTML = '';
+                                    typeWriter();
+                                }, 6000);
+                            }
+                        }
+                        
+                        // Expose restart capability
+                        entry.target.restartTypewriter = () => {
+                            if (entry.target.typeTimeout) clearTimeout(entry.target.typeTimeout);
+                            i = 0;
+                            entry.target.innerHTML = '';
+                            typeWriter();
+                        };
+                        
+                        entry.target.typeTimeout = setTimeout(typeWriter, 200);
+                    }
+                } else {
+                    entry.target.classList.remove('typing-done');
+                    if (entry.target.typeTimeout) clearTimeout(entry.target.typeTimeout);
+                    entry.target.innerHTML = '&nbsp;';
+                }
+            });
+        }, { threshold: 0.2 });
+
+        typeElements.forEach(el => {
+            el.setAttribute('data-original-text', el.innerText.trim());
+            el.innerHTML = '&nbsp;'; 
+            observer.observe(el);
+        });
+    });
+    </script>
 </body>
 
 </html>

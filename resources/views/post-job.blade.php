@@ -8,7 +8,7 @@
     <div class="max-w-4xl mx-auto bg-white border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden reveal">
         
         <!-- Header Sub-banner -->
-        <div class="bg-gradient-to-r from-[#040e2d] via-[#092265] to-[#040e2d] p-6 sm:p-8 text-center text-white relative overflow-hidden">
+        <div class="metallic-blue-card border-none shadow-none p-6 sm:p-8 text-center text-white relative overflow-hidden">
             <div class="absolute -top-12 -right-12 w-32 h-32 bg-[#129aef]/20 rounded-full blur-2xl pointer-events-none"></div>
             <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-[#ffb800]/15 rounded-full blur-2xl pointer-events-none"></div>
 
@@ -429,3 +429,4 @@
 </script>
 @endpush
 @endsection
+
