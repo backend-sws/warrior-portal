@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <x-page-header title="Find Your Dream Role" :breadcrumbs="['Home' => route('home'), 'Jobs' => null]" image="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" />
-<div class="py-12 px-6 lg:px-[5%] bg-gradient-to-r from-[#040e2d] via-[#129aef] to-[#040e2d] border-b border-white/10 relative overflow-hidden">
+<div class="py-12 px-6 lg:px-[5%] metallic-blue-card border-none shadow-none border-b border-white/10 relative overflow-hidden">
     <!-- Decorative Pattern -->
     <div class="absolute inset-0 z-0 opacity-10" style="background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
 
@@ -192,3 +192,4 @@
     })();
 </script>
 @endsection
+

@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('content')
 
-    <div class="pt-32 pb-12 px-6 lg:px-[5%] text-center border-b border-card-border bg-card-bg/30">
+    <div class="pt-32 pb-12 px-6 lg:px-[5%] text-center border-b border-card-border metallic-blue-card border-none shadow-none text-white">
         <h4 class="text-accent-blue text-sm font-bold mb-3 uppercase tracking-wider">Legal</h4>
-        <h1 class="text-4xl md:text-5xl font-extrabold text-text-main mb-6">Candidate Terms of Service</h1>
-        <p class="text-text-main opacity-70 max-w-2xl mx-auto">Last updated: October 2023</p>
+        <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6">Candidate Terms of Service</h1>
+        <p class="text-white opacity-70 max-w-2xl mx-auto">Last updated: October 2023</p>
     </div>
 
     <div class="py-16 px-6 lg:px-[5%] max-w-4xl mx-auto reveal">
@@ -129,3 +129,4 @@
     </div>
 
 @endsection
+

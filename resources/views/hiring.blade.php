@@ -82,7 +82,7 @@
 
 <x-page-header title="Our Hiring Process" :breadcrumbs="['Home' => route('home'), 'Hiring Process' => null]" />
 
-<div class="py-20 px-6 lg:px-[5%] bg-[#040e2d] relative font-sans overflow-hidden min-h-screen" style="background-image: url(&quot;data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%23129aef' fill-opacity='0.25'%3E%3Cpath d='M 10 20 Q 20 10 30 20 Q 20 30 10 20 Z' transform='rotate(45 20 20)'/%3E%3Cpath d='M 60 15 Q 70 5 80 15 Q 70 25 60 15 Z' transform='rotate(-30 70 15)'/%3E%3Cpath d='M 25 60 Q 35 50 45 60 Q 35 70 25 60 Z' transform='rotate(75 35 60)'/%3E%3Cpath d='M 75 70 Q 85 60 95 70 Q 85 80 75 70 Z' transform='rotate(-15 85 70)'/%3E%3Cpath d='M 45 30 Q 55 20 65 30 Q 55 40 45 30 Z' transform='rotate(10 55 30)'/%3E%3Cpath d='M 5 80 Q 15 70 25 80 Q 15 90 5 80 Z' transform='rotate(120 15 80)'/%3E%3Cpath d='M 85 35 Q 95 25 105 35 Q 95 45 85 35 Z' transform='rotate(-70 95 35)'/%3E%3Cpath d='M 40 90 Q 50 80 60 90 Q 50 100 40 90 Z' transform='rotate(40 50 90)'/%3E%3Cpath d='M -10 40 Q 0 30 10 40 Q 0 50 -10 40 Z' transform='rotate(-20 0 40)'/%3E%3Cpath d='M 30 -5 Q 40 -15 50 -5 Q 40 5 30 -5 Z' transform='rotate(35 40 -5)'/%3E%3C/g%3E%3C/svg%3E&quot;); background-size: 150px; background-repeat: repeat; opacity: 0.98;">
+<div class="py-20 px-6 lg:px-[5%] metallic-blue-card border-none shadow-none relative font-sans overflow-hidden min-h-screen" style="background-image: url(&quot;data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%23129aef' fill-opacity='0.25'%3E%3Cpath d='M 10 20 Q 20 10 30 20 Q 20 30 10 20 Z' transform='rotate(45 20 20)'/%3E%3Cpath d='M 60 15 Q 70 5 80 15 Q 70 25 60 15 Z' transform='rotate(-30 70 15)'/%3E%3Cpath d='M 25 60 Q 35 50 45 60 Q 35 70 25 60 Z' transform='rotate(75 35 60)'/%3E%3Cpath d='M 75 70 Q 85 60 95 70 Q 85 80 75 70 Z' transform='rotate(-15 85 70)'/%3E%3Cpath d='M 45 30 Q 55 20 65 30 Q 55 40 45 30 Z' transform='rotate(10 55 30)'/%3E%3Cpath d='M 5 80 Q 15 70 25 80 Q 15 90 5 80 Z' transform='rotate(120 15 80)'/%3E%3Cpath d='M 85 35 Q 95 25 105 35 Q 95 45 85 35 Z' transform='rotate(-70 95 35)'/%3E%3Cpath d='M 40 90 Q 50 80 60 90 Q 50 100 40 90 Z' transform='rotate(40 50 90)'/%3E%3Cpath d='M -10 40 Q 0 30 10 40 Q 0 50 -10 40 Z' transform='rotate(-20 0 40)'/%3E%3Cpath d='M 30 -5 Q 40 -15 50 -5 Q 40 5 30 -5 Z' transform='rotate(35 40 -5)'/%3E%3C/g%3E%3C/svg%3E&quot;); background-size: 150px; background-repeat: repeat; opacity: 0.98;">
     <!-- Animated Background Blobs -->
     <div class="absolute top-1/4 left-0 w-[500px] h-[500px] bg-accent-blue/10 rounded-full blur-[120px] blob-1 pointer-events-none z-0"></div>
     <div class="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-accent-yellow/10 rounded-full blur-[120px] blob-2 pointer-events-none z-0"></div>
@@ -97,7 +97,7 @@
 
             <!-- Step 1 -->
             <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group reveal">
-                <div class="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-[#031b4e] text-white shadow-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 step-circle">
+                <div class="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white metallic-blue-card border-none shadow-none text-white shadow-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 step-circle">
                     <span class="text-2xl font-bold">1</span>
                 </div>
                 
@@ -345,7 +345,7 @@
                     </div>
                     
                     <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-[11px] text-slate-600 flex gap-3 items-start shadow-sm">
-                        <div class="bg-[#031b4e] text-white w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-[9px]"><i class="fas fa-info"></i></div>
+                        <div class="metallic-blue-card border-none shadow-none text-white w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-[9px]"><i class="fas fa-info"></i></div>
                         <p class="font-medium leading-relaxed">Service charges are performance-based and payable only after successful employment through Warriors Educare.</p>
                     </div>
                 </div>
@@ -357,7 +357,7 @@
         <div class="mt-20 max-w-4xl mx-auto space-y-8 reveal">
             <!-- Vacancy & Application Process -->
             <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
-                <div class="bg-[#031b4e] text-white text-center py-3 font-bold uppercase tracking-wider text-[13px]">
+                <div class="metallic-blue-card border-none shadow-none text-white text-center py-3 font-bold uppercase tracking-wider text-[13px]">
                     Vacancy & Application Process
                 </div>
                 <div class="p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-2 text-center relative bg-slate-50/50">
@@ -407,7 +407,7 @@
                     
                     <!-- Step E -->
                     <div class="flex-1 flex flex-col items-center z-10">
-                        <div class="w-14 h-14 rounded-full bg-[#031b4e] border border-[#031b4e] text-white flex items-center justify-center text-xl mb-3 shadow-md hover:scale-110 transition-transform">
+                        <div class="w-14 h-14 rounded-full metallic-blue-card border-none shadow-none border border-[#031b4e] text-white flex items-center justify-center text-xl mb-3 shadow-md hover:scale-110 transition-transform">
                             <i class="fas fa-user-check"></i>
                         </div>
                         <p class="text-[11px] text-slate-800 font-bold leading-tight max-w-[120px]">Interview coordination & final selection</p>
@@ -416,7 +416,7 @@
             </div>
             
             <!-- Conclusion -->
-            <div class="bg-[#031b4e] rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row items-center p-8 gap-6 text-white relative">
+            <div class="metallic-blue-card border-none shadow-none rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row items-center p-8 gap-6 text-white relative">
                 <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 40%);"></div>
                 <div class="flex-1 relative z-10 text-center md:text-left">
                     <h4 class="text-accent-yellow font-bold uppercase tracking-wider mb-3 text-sm">Conclusion</h4>
@@ -431,7 +431,7 @@
 </div>
 
 <!-- Modal for Step Cards -->
-<div id="stepModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#040e2d]/90 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+<div id="stepModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 metallic-blue-card border-none shadow-none/90 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="absolute inset-0 cursor-pointer" id="stepModalOverlay"></div>
     <div id="stepModalContent" class="relative z-10 w-full max-w-lg transform scale-90 transition-transform duration-300">
         <button id="closeModalBtn" class="absolute -top-12 right-0 md:-right-12 text-white bg-white/10 hover:bg-white/30 w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-lg border border-white/20">
@@ -489,3 +489,4 @@
     });
 </script>
 @endsection
+
