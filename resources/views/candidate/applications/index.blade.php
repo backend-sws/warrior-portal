@@ -9,16 +9,16 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 reveal">
             <div class="flex items-center gap-3">
                 <div
-                    class="w-10 h-10 rounded-xl bg-accent-blue/10 text-accent-blue flex items-center justify-center text-lg">
+                    class="w-10 h-10 rounded-xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-lg">
                     <i class="fas fa-paper-plane"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-text-main">My Applications</h1>
-                    <p class="text-sm text-text-dark/50 mt-0.5">Track the status of jobs you've applied for.</p>
+                    <h1 class="text-2xl font-bold text-[#031b4e]">My Applications</h1>
+                    <p class="text-sm text-[#031b4e]/60 mt-0.5">Track the status of jobs you've applied for.</p>
                 </div>
             </div>
             <a href="{{ route('candidate.applications.available') }}"
-                class="px-5 py-2.5 bg-accent-blue text-white rounded-xl text-sm font-semibold hover:bg-accent-blue-hover hover:-translate-y-0.5 transition-all shadow-lg flex items-center gap-2">
+                class="px-5 py-2.5 bg-[#0ea5e9] text-white rounded-xl text-sm font-semibold hover:bg-[#0ea5e9]-hover hover:-translate-y-0.5 transition-all shadow-lg flex items-center gap-2">
                 <i class="fas fa-search text-xs"></i> Find More Jobs
             </a>
         </div>
@@ -31,23 +31,23 @@
         @endif
 
         {{-- Applications Table --}}
-        <div class="bg-card-bg rounded-2xl border border-card-border overflow-hidden shadow-xl reveal reveal-delay-1">
+        <div class="light-metallic-blue-card rounded-2xl border-0 overflow-hidden shadow-xl reveal reveal-delay-1">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-card-border">
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-dark/40">
+                        <tr class="border-b border-[#031b4e]/10">
+                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/60">
                                 Institution & Role</th>
 
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-dark/40">Applied
+                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/60">Applied
                                 Schools </th>
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-dark/40">
+                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/60">
                                 Interview Status </th>
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-dark/40">
+                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/60">
                                 Placement Status </th>
                         </tr>
                     </thead>
-                    <tbody class="text-sm divide-y divide-card-border" x-data="{ expandedId: null }">
+                    <tbody class="text-sm divide-y divide-gray-200" x-data="{ expandedId: null }">
                         @php
                             $profile = auth()->user()->profile;
                             $totalAllowed = $profile->total_allowed_applications;
@@ -55,29 +55,29 @@
                             $remaining = max(0, $profile->total_allowed_applications - $profile->used_applications);
                         @endphp
                         @forelse($applications as $app)
-                            <tr class="hover:bg-secondary-bg/30 transition-colors cursor-pointer group"
+                            <tr class="hover:bg-[#f4f7f5]/30 transition-colors cursor-pointer group"
                                 @click="expandedId === {{ $app->id }} ? expandedId = null : expandedId = {{ $app->id }}">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center text-accent-blue text-sm font-bold shrink-0 group-hover:scale-110 transition-transform">
+                                            class="w-10 h-10 bg-[#0ea5e9]/10 rounded-xl flex items-center justify-center text-[#0ea5e9] text-sm font-bold shrink-0 group-hover:scale-110 transition-transform">
                                             {{ strtoupper(substr($app->jobPost->school_name, 0, 2)) }}
                                         </div>
                                         <div>
                                             <div
-                                                class="font-semibold text-text-main flex items-center gap-2 hover:text-accent-blue transition-colors">
+                                                class="font-semibold text-[#031b4e] flex items-center gap-2 hover:text-[#0ea5e9] transition-colors">
                                                 <a href="{{ route('jobs.show', $app->jobPost->id) }}" target="_blank"
                                                     @click.stop>{{ $app->jobPost->title ?? 'Teacher' }}</a>
-                                                <i class="fas fa-chevron-down text-[10px] text-text-dark/30 transition-transform"
-                                                    :class="expandedId === {{ $app->id }} ? 'rotate-180 text-accent-blue' : ''"></i>
+                                                <i class="fas fa-chevron-down text-[10px] text-[#031b4e]/50 transition-transform"
+                                                    :class="expandedId === {{ $app->id }} ? 'rotate-180 text-[#0ea5e9]' : ''"></i>
                                             </div>
-                                            <div class="text-xs text-text-dark/40 mt-0.5">{{ $app->jobPost->school_name }}
+                                            <div class="text-xs text-[#031b4e]/60 mt-0.5">{{ $app->jobPost->school_name }}
                                                 &bull; {{ $app->jobPost->city?->name ?? 'N/A' }}</div>
                                         </div>
                                     </div>
                                 </td>
 
-                                <td class="px-6 py-4 text-text-main text-sm font-medium">
+                                <td class="px-6 py-4 text-[#031b4e] text-sm font-medium">
                                     {{ $app->jobPost->school_name }}
                                 </td>
                                 <td class="px-6 py-4">
@@ -86,7 +86,7 @@
                                             <i class="fas fa-calendar-alt mr-1 text-[9px]"></i> View Schedule
                                         </button>
                                     @else
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-card-border/50 text-text-dark/40">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-card-border/50 text-[#031b4e]/60">
                                             <i class="fas fa-clock mr-1 text-[9px]"></i> Pending
                                         </span>
                                     @endif
@@ -109,12 +109,12 @@
                             </tr>
 
                             {{-- Expanded Tracking Details --}}
-                            <tr x-show="expandedId === {{ $app->id }}" class="bg-secondary-bg/20" x-transition.opacity
+                            <tr x-show="expandedId === {{ $app->id }}" class="bg-[#f4f7f5]/20" x-transition.opacity
                                 style="display: none;">
-                                <td colspan="4" class="px-6 py-6 border-b-2 border-accent-blue/30">
-                                    <div class="p-5 border border-card-border rounded-2xl bg-card-bg shadow-inner">
-                                        <h4 class="font-bold text-text-main mb-6 flex items-center gap-2">
-                                            <i class="fas fa-route text-accent-blue"></i> Application Tracker
+                                <td colspan="4" class="px-6 py-6 border-b-2 border-[#0ea5e9]/30">
+                                    <div class="p-5 border border-[#031b4e]/10 rounded-2xl bg-white shadow-inner">
+                                        <h4 class="font-bold text-[#031b4e] mb-6 flex items-center gap-2">
+                                            <i class="fas fa-route text-[#0ea5e9]"></i> Application Tracker
                                         </h4>
 
                                         <div
@@ -122,7 +122,7 @@
                                             <!-- Connecting Line -->
                                             <div
                                                 class="absolute top-4 left-[10%] w-[80%] h-1 bg-card-border z-0 hidden md:block">
-                                                <div class="h-full bg-accent-blue transition-all duration-500"
+                                                <div class="h-full bg-[#0ea5e9] transition-all duration-500"
                                                     style="width: {{ in_array($app->status, ['shortlisted', 'hired', 'rejected']) ? (in_array($app->status, ['hired', 'rejected']) ? '100%' : '50%') : '0%' }}">
                                                 </div>
                                             </div>
@@ -133,8 +133,8 @@
                                                     class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.4)] border-2 border-card-bg z-10">
                                                     <i class="fas fa-check text-xs"></i>
                                                 </div>
-                                                <div class="mt-3 text-sm font-bold text-text-main">Applied</div>
-                                                <div class="text-[10px] text-text-dark/50">
+                                                <div class="mt-3 text-sm font-bold text-[#031b4e]">Applied</div>
+                                                <div class="text-[10px] text-[#031b4e]/60">
                                                     {{ $app->created_at->format('d M, Y h:i A') }}
                                                 </div>
                                             </div>
@@ -142,18 +142,18 @@
                                             <!-- Step 2: Forwarded -->
                                             <div class="relative z-10 flex flex-col items-center flex-1">
                                                 <div
-                                                    class="w-8 h-8 rounded-full flex items-center justify-center border-2 border-card-bg z-10 transition-colors duration-300 {{ in_array($app->status, ['shortlisted', 'hired', 'rejected']) ? 'bg-accent-yellow text-[#031b4e] shadow-[0_0_15px_rgba(255,184,0,0.4)]' : 'bg-card-border text-text-dark/40' }}">
+                                                    class="w-8 h-8 rounded-full flex items-center justify-center border-2 border-card-bg z-10 transition-colors duration-300 {{ in_array($app->status, ['shortlisted', 'hired', 'rejected']) ? 'bg-accent-yellow text-[#031b4e] shadow-[0_0_15px_rgba(255,184,0,0.4)]' : 'bg-card-border text-[#031b4e]/60' }}">
                                                     <i
                                                         class="fas {{ in_array($app->status, ['shortlisted', 'hired', 'rejected']) ? 'fa-check' : 'fa-hourglass-half' }} text-xs"></i>
                                                 </div>
                                                 <div
-                                                    class="mt-3 text-sm font-bold {{ in_array($app->status, ['shortlisted', 'hired', 'rejected']) ? 'text-text-main' : 'text-text-dark/50' }}">
+                                                    class="mt-3 text-sm font-bold {{ in_array($app->status, ['shortlisted', 'hired', 'rejected']) ? 'text-[#031b4e]' : 'text-[#031b4e]/60' }}">
                                                     Forwarded to School</div>
                                                 @if($app->is_forwarded)
-                                                    <div class="text-[10px] text-text-dark/50"><i
+                                                    <div class="text-[10px] text-[#031b4e]/60"><i
                                                             class="fas fa-share text-[8px]"></i> Profile sent to employer</div>
                                                 @else
-                                                    <div class="text-[10px] text-text-dark/40">Pending admin review</div>
+                                                    <div class="text-[10px] text-[#031b4e]/60">Pending admin review</div>
                                                 @endif
                                             </div>
 
@@ -161,7 +161,7 @@
                                             <div class="relative z-10 flex flex-col items-center flex-1">
                                                 <div
                                                     class="w-8 h-8 rounded-full flex items-center justify-center border-2 border-card-bg z-10 transition-colors duration-300 
-                                                                {{ $app->status === 'hired' ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]' : ($app->status === 'rejected' ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'bg-card-border text-text-dark/40') }}">
+                                                                {{ $app->status === 'hired' ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]' : ($app->status === 'rejected' ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'bg-card-border text-[#031b4e]/60') }}">
                                                     @if($app->status === 'hired')
                                                         <i class="fas fa-trophy text-xs"></i>
                                                     @elseif($app->status === 'rejected')
@@ -172,11 +172,11 @@
                                                 </div>
                                                 <div
                                                     class="mt-3 text-sm font-bold 
-                                                                {{ $app->status === 'hired' ? 'text-green-400' : ($app->status === 'rejected' ? 'text-red-400' : 'text-text-dark/50') }}">
+                                                                {{ $app->status === 'hired' ? 'text-green-400' : ($app->status === 'rejected' ? 'text-red-400' : 'text-[#031b4e]/60') }}">
                                                     {{ $app->status === 'hired' ? 'Selected / Hired' : ($app->status === 'rejected' ? 'Not Selected' : 'Final Decision') }}
                                                 </div>
                                                 <div
-                                                    class="text-[10px] {{ in_array($app->status, ['hired', 'rejected']) ? 'text-text-dark/50' : 'text-text-dark/40' }}">
+                                                    class="text-[10px] {{ in_array($app->status, ['hired', 'rejected']) ? 'text-[#031b4e]/60' : 'text-[#031b4e]/60' }}">
                                                     {{ in_array($app->status, ['hired', 'rejected']) ? 'Process completed' : 'Awaiting interview feedback' }}
                                                 </div>
                                             </div>
@@ -184,14 +184,14 @@
 
                                         @if($app->remarks)
                                             <div
-                                                class="mt-6 p-4 bg-accent-blue/5 border border-accent-blue/20 rounded-xl relative overflow-hidden">
-                                                <div class="absolute -right-4 -top-4 text-accent-blue/10 text-5xl"><i
+                                                class="mt-6 p-4 bg-[#0ea5e9]/5 border border-[#0ea5e9]/20 rounded-xl relative overflow-hidden">
+                                                <div class="absolute -right-4 -top-4 text-[#0ea5e9]/10 text-5xl"><i
                                                         class="fas fa-quote-right"></i></div>
                                                 <h5
-                                                    class="text-xs font-bold text-accent-blue uppercase tracking-wider mb-2 flex items-center gap-2">
+                                                    class="text-xs font-bold text-[#0ea5e9] uppercase tracking-wider mb-2 flex items-center gap-2">
                                                     <i class="fas fa-comment-dots"></i> Update / Remarks:
                                                 </h5>
-                                                <p class="text-sm text-text-main relative z-10 leading-relaxed">{{ $app->remarks }}
+                                                <p class="text-sm text-[#031b4e] relative z-10 leading-relaxed">{{ $app->remarks }}
                                                 </p>
                                             </div>
                                         @endif
@@ -201,12 +201,12 @@
                                                 <h5 class="text-xs font-bold text-accent-yellow uppercase tracking-wider mb-2 flex items-center gap-2">
                                                     <i class="fas fa-calendar-check"></i> Interview Scheduled
                                                 </h5>
-                                                <div class="text-sm text-text-main flex flex-col gap-1">
+                                                <div class="text-sm text-[#031b4e] flex flex-col gap-1">
                                                     <p><strong>Date & Time:</strong> {{ $app->interview_date->format('l, F j, Y \a\t g:i A') }}</p>
                                                     @if($app->interview_link)
                                                         <p><strong>Link / Location:</strong> 
                                                             @if(filter_var($app->interview_link, FILTER_VALIDATE_URL))
-                                                                <a href="{{ $app->interview_link }}" target="_blank" class="text-accent-blue hover:underline">{{ $app->interview_link }}</a>
+                                                                <a href="{{ $app->interview_link }}" target="_blank" class="text-[#0ea5e9] hover:underline">{{ $app->interview_link }}</a>
                                                             @else
                                                                 {{ $app->interview_link }}
                                                             @endif
@@ -216,7 +216,7 @@
                                             </div>
                                         @elseif($app->status === 'shortlisted' && !$app->remarks)
                                             <div class="mt-6 p-4 bg-accent-yellow/5 border border-accent-yellow/20 rounded-xl">
-                                                <p class="text-sm text-text-main flex items-center gap-2">
+                                                <p class="text-sm text-[#031b4e] flex items-center gap-2">
                                                     <i class="fas fa-info-circle text-accent-yellow"></i>
                                                     Your profile has been forwarded to the school. The school will contact you
                                                     directly to schedule an interview.
@@ -230,14 +230,14 @@
                             <tr>
                                 <td colspan="7" class="px-6 py-16 text-center">
                                     <div
-                                        class="w-16 h-16 bg-card-border/30 rounded-2xl flex items-center justify-center text-text-dark/20 text-2xl mx-auto mb-4">
+                                        class="w-16 h-16 bg-card-border/30 rounded-2xl flex items-center justify-center text-[#031b4e]/80/20 text-2xl mx-auto mb-4">
                                         <i class="fas fa-folder-open"></i>
                                     </div>
-                                    <h3 class="text-base font-semibold text-text-main mb-1">No Applications Yet</h3>
-                                    <p class="text-sm text-text-dark/40 mb-4">Start by browsing available jobs that match your
+                                    <h3 class="text-base font-semibold text-[#031b4e] mb-1">No Applications Yet</h3>
+                                    <p class="text-sm text-[#031b4e]/60 mb-4">Start by browsing available jobs that match your
                                         profile.</p>
                                     <a href="{{ route('candidate.applications.available') }}"
-                                        class="text-accent-blue hover:underline text-sm font-semibold">
+                                        class="text-[#0ea5e9] hover:underline text-sm font-semibold">
                                         Browse Jobs &rarr;
                                     </a>
                                 </td>
@@ -247,7 +247,7 @@
                 </table>
             </div>
             @if($applications->hasPages())
-                <div class="p-4 border-t border-card-border">
+                <div class="p-4 border-t border-[#031b4e]/10">
                     {{ $applications->links() }}
                 </div>
             @endif
@@ -261,35 +261,38 @@
          style="display: none;" 
          class="fixed inset-0 z-50 flex items-center justify-center bg-[#031b4e]/80 backdrop-blur-sm p-4">
         
-        <div @click.outside="open = false" class="bg-card-bg border border-card-border rounded-2xl w-full max-w-md shadow-2xl overflow-hidden p-6 relative"
+        <div @click.outside="open = false" class="bg-white border border-[#031b4e]/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden p-6 relative"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-90"
              x-transition:enter-end="opacity-100 scale-100"
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-90">
-            <button @click="open = false" class="absolute top-4 right-4 text-text-dark/50 hover:text-red-400">
+            <button @click="open = false" class="absolute top-4 right-4 text-[#031b4e]/60 hover:text-red-400">
                 <i class="fas fa-times"></i>
             </button>
-            <h3 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
+            <h3 class="text-lg font-bold text-[#031b4e] mb-6 flex items-center gap-2">
                 <i class="fas fa-calendar-check text-accent-yellow text-xl"></i> Interview Schedule
             </h3>
-            <div class="space-y-4 text-sm text-text-main">
-                <div class="p-3 bg-secondary-bg/50 border border-card-border rounded-xl">
-                    <p class="text-xs text-text-dark/50 mb-1 font-bold uppercase tracking-widest">Date & Time</p>
+            <div class="space-y-4 text-sm text-[#031b4e]">
+                <div class="p-3 bg-[#f4f7f5]/50 border border-[#031b4e]/10 rounded-xl">
+                    <p class="text-xs text-[#031b4e]/60 mb-1 font-bold uppercase tracking-widest">Date & Time</p>
                     <p class="font-semibold text-accent-yellow" x-text="schedule.date"></p>
                 </div>
                 <template x-if="schedule.link">
-                    <div class="p-3 bg-secondary-bg/50 border border-card-border rounded-xl">
-                        <p class="text-xs text-text-dark/50 mb-1 font-bold uppercase tracking-widest">Link / Location</p>
-                        <a :href="schedule.link" target="_blank" class="text-accent-blue font-semibold hover:underline break-all" x-text="schedule.link"></a>
+                    <div class="p-3 bg-[#f4f7f5]/50 border border-[#031b4e]/10 rounded-xl">
+                        <p class="text-xs text-[#031b4e]/60 mb-1 font-bold uppercase tracking-widest">Link / Location</p>
+                        <a :href="schedule.link" target="_blank" class="text-[#0ea5e9] font-semibold hover:underline break-all" x-text="schedule.link"></a>
                     </div>
                 </template>
             </div>
             <div class="mt-8 flex justify-end">
-                <button @click="open = false" class="px-5 py-2.5 bg-secondary-bg hover:bg-card-border text-text-main text-sm font-bold rounded-xl border border-card-border transition-colors">Close</button>
+                <button @click="open = false" class="px-5 py-2.5 bg-[#f4f7f5] hover:bg-card-border text-[#031b4e] text-sm font-bold rounded-xl border border-[#031b4e]/10 transition-colors">Close</button>
             </div>
         </div>
     </div>
 
 @endsection
+
+
+

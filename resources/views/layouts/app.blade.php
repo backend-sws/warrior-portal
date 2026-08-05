@@ -206,10 +206,46 @@
             opacity: 1;
             animation: shine 2s infinite;
         }
+
+        /* Light Metallic Blue Shiny Cards */
+        .light-metallic-blue-card {
+            background: linear-gradient(145deg, #e0f2fe, #bae6fd, #7dd3fc);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.15), inset 0 2px 3px rgba(255, 255, 255, 0.8);
+        }
+        .light-metallic-blue-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: shine 6s infinite;
+        }
+            /* Shiny Button */
+        .shiny-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        .shiny-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: shine 3s infinite;
+        }
     </style>
 </head>
 
-<body class="bg-secondary-bg text-text-dark {{ session()->has('impersonate_admin_id') ? 'pt-10' : '' }}">
+<body class="{{ request()->is('candidate*') ? 'bg-[#f4f7f5] text-gray-900' : 'bg-secondary-bg text-text-dark' }} {{ session()->has('impersonate_admin_id') ? 'pt-10' : '' }}">
 
     <!-- Preloader removed per user request -->
 
@@ -772,18 +808,33 @@
                             
                             if (i < currentFullText.length) {
                                 let currentText = currentFullText.substring(0, i + 1);
-                                currentText = currentText.replace(/\n/g, '<br>');
-                                entry.target.innerHTML = currentText + '<span class="animate-pulse text-[#3b82f6]">|</span>';
+                                let textHtml = currentText.replace(/\n/g, '<br>');
+                                
+                                const highlight = entry.target.getAttribute('data-highlight');
+                                const highlightColor = entry.target.getAttribute('data-highlight-color') || 'text-[#0ea5e9]';
+                                if (highlight && textHtml.includes(highlight)) {
+                                    textHtml = textHtml.replace(highlight, `<span class="${highlightColor}">${highlight}</span>`);
+                                }
+                                
+                                entry.target.innerHTML = textHtml + '<span class="animate-pulse text-[#3b82f6]">|</span>';
                                 i++;
                                 entry.target.typeTimeout = setTimeout(typeWriter, speed);
                             } else {
-                                entry.target.innerHTML = currentFullText.replace(/\n/g, '<br>');
-                                // Restart animation after 6 seconds
+                                let finalHtml = currentFullText.replace(/\n/g, '<br>');
+                                const highlight = entry.target.getAttribute('data-highlight');
+                                const highlightColor = entry.target.getAttribute('data-highlight-color') || 'text-[#0ea5e9]';
+                                if (highlight && finalHtml.includes(highlight)) {
+                                    finalHtml = finalHtml.replace(highlight, `<span class="${highlightColor}">${highlight}</span>`);
+                                }
+                                entry.target.innerHTML = finalHtml;
+                                
+                                const repeatTime = parseInt(entry.target.getAttribute('data-repeat')) || 6000;
+                                // Restart animation after specified seconds
                                 entry.target.typeTimeout = setTimeout(() => {
                                     i = 0;
                                     entry.target.innerHTML = '';
                                     typeWriter();
-                                }, 6000);
+                                }, repeatTime);
                             }
                         }
                         
@@ -815,3 +866,4 @@
 </body>
 
 </html>
+

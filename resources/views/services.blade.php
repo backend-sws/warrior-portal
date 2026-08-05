@@ -33,7 +33,7 @@
             <h2 class="text-4xl md:text-6xl font-black mb-6 text-white tracking-wide leading-tight">
                 Our Premium <br/>
                 <span class="text-white">Services</span>
-            </h2>
+            </h2>                                                                                                                
             
             <p class="text-white/70 text-sm md:text-base leading-relaxed mb-10 max-w-md">
                 We deliver top-tier recruitment and digital support solutions tailored for modern educational institutions.
