@@ -315,70 +315,154 @@
 
                     <!-- Terms Box -->
                     <div class="bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl p-6 mb-6 h-64 overflow-y-auto text-sm text-[#031b4e]/80 custom-scrollbar">
-                        <h4 class="font-bold text-[#031b4e] mb-4 text-center">Warriors Educare – Candidate Overview / Terms & Conditions</h4>
+                        <h4 class="font-bold text-[#031b4e] mb-4 text-center">TEACHER PLACEMENT SERVICE AGREEMENT</h4>
                         
-                        <p class="mb-4">This document sets forth the official Terms & Conditions, policies, responsibilities, and professional expectations applicable to all candidates registering with Warriors Educare.</p>
-                        <p class="mb-4">By registering with the Agency and proceeding further, the candidate acknowledges and enters into a legal and professional agreement governed by these Terms & Conditions.</p>
+                        <p class="mb-4">This Agreement is entered into voluntarily between Warriors Educare ("Agency") and the undersigned Candidate ("Teacher").</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">1. Purpose of Agreement</h5>
+                        <p class="mb-4">This Agreement confirms that the Candidate willingly authorizes Warriors Educare to begin the recruitment and placement process for suitable teaching opportunities.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">2. Candidate Declaration</h5>
+                        <p class="mb-2">The Candidate declares that:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-2">
+                            <li>All information and documents submitted are true and genuine.</li>
+                            <li>Any false information or forged document may result in immediate cancellation of registration and placement without any refund.</li>
+                            <li>The Candidate agrees to cooperate throughout the recruitment process.</li>
+                        </ul>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">3. Document Verification</h5>
+                        <p class="mb-2">The Candidate shall provide all required documents, including but not limited to:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-2">
+                            <li>Aadhaar Card</li>
+                            <li>Salary slip/Account statement</li>
+                            <li>Passport-size Photograph</li>
+                            <li>Any other document required by the school or Warriors Educare.</li>
+                        </ul>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">4. Registration Charges</h5>
+                        <p class="mb-2">The Candidate agrees to pay a non-refundable Registration Fee of ₹1,000, payable as follows:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-2">
+                            <li>₹500 at the time of registration to initiate the recruitment process.</li>
+                            <li>₹500 immediately after selection by the school and before joining.</li>
+                        </ul>
+                        <p class="mb-4">Registration fees are charged for profile verification, documentation, screening, interview coordination and placement services. These charges are non-refundable.</p>
+                        <p class="mb-4"><strong>Registration Validity:</strong> The registration shall remain valid for 8 (Eight) months from the date of registration. During this period, Warriors Educare will make reasonable efforts to arrange up to 4–5 suitable interviews, subject to the Candidate's qualifications, preferred location, salary expectations and the availability of vacancies. The registration is non-transferable and non-refundable. After the expiry of the validity period, a fresh registration and the applicable registration fee may be required to continue placement services.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">5. Placement Service Charge</h5>
+                        <p class="mb-4">After joining the school/Institution and receiving the first month's salary/payment, the Candidate agrees to pay 50% of the first month's salary (equivalent to 15 days' salary) to Warriors Educare as the Placement Service Charge.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">6. Payment Timeline & Delay Charges</h5>
+                        <ul class="list-disc pl-5 mb-4 space-y-2">
+                            <li>The Placement Service Charge must be paid within 12 hours of receiving the first salary/payment from the school/Institution.</li>
+                            <li>If payment is not made within the prescribed time, a Late Payment Penalty of ₹300 per day shall be applicable until full payment is received.</li>
+                            <li>Warriors Educare reserves the right to suspend future placement services until all dues are cleared.</li>
+                        </ul>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">7. Job Placement</h5>
+                        <p class="mb-4">Warriors Educare provides recruitment and placement assistance only. Final selection, salary, benefits, probation, working conditions and employment terms shall be decided solely by the respective school/Institution.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">8. Joining Commitment</h5>
+                        <p class="mb-4">If the Candidate accepts the offer and confirms joining, they shall not refuse or leave before joining without a genuine reason and prior written/intimated notice to Warriors Educare.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">9. Professional Conduct</h5>
+                        <p class="mb-4">The Candidate shall maintain professionalism, honesty, discipline and comply with all school policies. Any misconduct, indiscipline or fraudulent activity may result in blacklisting from Warriors Educare.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">10. Confidentiality</h5>
+                        <p class="mb-4">The Candidate shall not disclose confidential information relating to Warriors Educare, the recruiting school or students to any third party.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">11. No Job Guarantee</h5>
+                        <p class="mb-4">Registration with Warriors Educare does not guarantee job placement. Selection depends entirely on the school's/Institutions requirements, interview performance and candidate eligibility.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">12. Employment Relationship</h5>
+                        <p class="mb-4">The Candidate understands that employment shall be with the respective school only. Warriors Educare acts solely as a recruitment and placement agency and shall not be responsible for salary, PF, ESI, leave, incentives or any employment benefits unless otherwise agreed in writing.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">13. Default & Legal Action</h5>
+                        <p class="mb-4">In case the Candidate intentionally avoids payment of the agreed Placement Service Charge or violates this Agreement, Warriors Educare reserves the right to recover the outstanding amount along with applicable late charges and to initiate appropriate legal proceedings under the applicable laws of India. Any dispute arising out of this Agreement shall be subject to the jurisdiction of the competent courts.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">14. Acceptance of Terms</h5>
+                        <p class="mb-2">By signing this Agreement physically or digitally, the Candidate confirms that:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-2">
+                            <li>They have carefully read and understood all the terms and conditions.</li>
+                            <li>They voluntarily accept all clauses of this Agreement without any pressure.</li>
+                            <li>They agree to comply with all payment obligations and conditions mentioned herein.</li>
+                        </ul>
+
+                        <hr class="my-6 border-[#031b4e]/10">
+
+                        <h4 class="font-bold text-[#031b4e] mb-4 text-center mt-6">HOME TUITION – TUTOR SERVICE AGREEMENT</h4>
                         
-                        <h5 class="font-bold text-[#031b4e] mb-2">Purpose of This Document</h5>
-                        <p class="mb-4">The objective of this document is to ensure clarity, transparency, and mutual understanding between the candidate and Warriors Educare throughout the recruitment and placement process.</p>
+                        <p class="mb-4">This Agreement is entered into voluntarily between Warriors Educare ("Agency") and the undersigned Candidate ("Tutor").</p>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">TERMS & CONDITIONS (SUMMARY)</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">1. Purpose of Agreement</h5>
+                        <p class="mb-4">This Agreement confirms that the Candidate voluntarily authorizes Warriors Educare to provide home tuition opportunities and to begin the tutor placement process.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">2. Candidate Declaration</h5>
+                        <p class="mb-2">The Candidate declares that:</p>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li><strong>Registration:</strong> A non-refundable registration fee of ₹1,000 is payable. Registration remains valid for 3 job applications.</li>
-                            <li><strong>Eligibility:</strong> Candidates must meet eligibility criteria as prescribed by the hiring institution. Documents: Submission of genuine and verifiable documents is mandatory. Any misrepresentation may result in cancellation without refund.</li>
-                            <li><strong>Interviews & Demos:</strong> Attendance as scheduled is compulsory. Non-attendance may lead to removal from opportunities.</li>
-                            <li><strong>Selection & Joining:</strong> Final selection rests solely with the hiring institution. Candidates must honor joining commitments once selected.</li>
-                            <li><strong>Service Charges:</strong> The candidate agrees to pay the applicable service charge within 12 hours of receiving the first month's salary: Teaching Staff – 50% of one month's gross salary | Management/Non-Teaching Staff – 66.67% of one month's gross salary (20 days' salary).</li>
-                            <li><strong>Refund Policy:</strong> Registration fees are strictly non-refundable under any circumstances.</li>
-                            <li><strong>Payment Default:</strong> Delay or failure in payment may attract penalties, service suspension, or legal action.</li>
-                            <li><strong>Job Commitment:</strong> A minimum service period of 90 working days is required unless otherwise agreed in writing.</li>
-                            <li>These terms shall be deemed legally binding and enforceable, subject to the jurisdiction of Patna, Bihar.</li>
+                            <li>All information and documents provided are true and genuine.</li>
+                            <li>Any false information or forged documents may result in immediate cancellation of registration without any refund.</li>
+                            <li>The Candidate agrees to cooperate throughout the recruitment and placement process.</li>
+                            <li>The Candidate agrees to maintain professionalism while interacting with parents, students and Warriors Educare.</li>
                         </ul>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">PAYMENT, CONFIDENTIALITY & LEGAL COMPLIANCE</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">3. Registration Fee</h5>
+                        <p class="mb-2">The Candidate agrees to pay a Registration Fee as follows:</p>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>The candidate agrees to remit the applicable service charge within twelve (12) hours of receipt of the first salary.</li>
-                            <li>Failure to make payment within the stipulated period shall attract a late penalty of ₹300 per day until the outstanding amount is cleared in full.</li>
-                            <li>Non-payment beyond seven (7) days shall be treated as a material breach of contract under the Indian Contract Act, 1872, and may result in recovery proceedings, blacklisting, and suspension or termination of all placement services.</li>
-                            <li>The candidate shall maintain strict confidentiality and shall not misuse, disclose, or share any employer, school, or Agency information. Any such violation may attract action under applicable laws, including the Information Technology Act, 2000, wherever applicable.</li>
-                            <li>These terms shall be deemed legally binding and enforceable, subject to the exclusive jurisdiction of Patna, Bihar.</li>
+                            <li>₹500 – Junior Classes (Up to Class V)</li>
+                            <li>₹600 – Senior Classes (Up to Class XII)</li>
+                        </ul>
+                        <p class="mb-4">Registration is mandatory before receiving any tuition lead, demo class or placement opportunity.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">4. Registration Validity</h5>
+                        <ul class="list-disc pl-5 mb-4 space-y-2">
+                            <li>Registration shall remain valid for 1 (One) Year from the date of registration.</li>
+                            <li>During the validity period, Warriors Educare will make reasonable efforts to provide up to 4 confirmed tuition leads, subject to the Candidate's qualifications, preferred location, subject availability and parents' requirements.</li>
+                            <li>Registration is non-transferable.</li>
                         </ul>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">Candidates must:</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">5. Registration Refund Policy</h5>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>Follow the school’s internal guidelines and rules be punctual and cooperative and maintain decorum and professionalism at all times.</li>
-                            <li>Candidates must not share or misuse School contact information, Job leads and agency reference letters or documents.</li>
-                            <li>Approaching a school directly or through any third party after receiving the lead from the Agency will result in Immediate blacklisting and legal action under data breach or professional misconduct.</li>
+                            <li>If a parent cancels or declines a demo class and Warriors Educare is unable to provide another suitable confirmed tuition lead within 25 working days, the Candidate shall be eligible for a 100% refund of the Registration Fee.</li>
+                            <li>The refund process shall commence only after the completion of 25 working days from the date of the cancelled demo.</li>
                         </ul>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">Registration fee is strictly non-refundable under any condition:</h5>
+                        <h5 class="font-bold text-[#031b4e] mb-2">6. Registration Cancellation</h5>
+                        <p class="mb-4">If the Candidate receives three (3) consecutive demo rejections due to candidate-related reasons, Warriors Educare reserves the right to cancel the registration without any refund.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">7. Service Charge</h5>
+                        <p class="mb-4">After successfully joining the tuition and receiving the first month's tuition fee/payment, the Candidate agrees to pay 50% of the first month's tuition fee (equivalent to 15 days' tuition fee) to Warriors Educare as the Service Charge.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">8. Payment Timeline & Delay Charges</h5>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>Rejection by school.</li>
-                            <li>Voluntary withdrawal by candidate.</li>
-                            <li>Change of mind.</li>
-                            <li>The service charge is also non-refundable once the candidate has received their salary and the due period for payment has begun.</li>
-                            <li>Refunds will not be entertained for dissatisfaction with salary, location, or working conditions post joining.</li>
+                            <li>The Service Charge must be paid within 12 hours of receiving the first month's tuition fee/payment.</li>
+                            <li>Failure to make payment within the prescribed time shall attract a Late Payment Penalty of ₹200 per day until the outstanding amount is fully cleared.</li>
                         </ul>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">BEHAVIORAL CODE OF CONDUCT</h5>
-                        <p class="mb-2"><strong>Candidates must always:</strong></p>
+                        <h5 class="font-bold text-[#031b4e] mb-2">9. Tutor Responsibilities</h5>
+                        <p class="mb-2">The Candidate shall:</p>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>Be respectful and honest in communication.</li>
-                            <li>Maintain professional appearance and behavior.</li>
-                            <li>Refrain from abusive language or harassment.</li>
-                            <li>Avoid any disputes with the employer during tenure.</li>
-                            <li>Complaints from employers regarding attitude, communication, or ethics will be taken seriously and may result in blacklisting.</li>
+                            <li>Maintain honesty, discipline and professionalism.</li>
+                            <li>Reach tuition on time.</li>
+                            <li>Behave respectfully with parents and students.</li>
+                            <li>Follow all commitments made during the placement process.</li>
                         </ul>
+                        <p class="mb-4">Any misconduct or unprofessional behaviour may result in cancellation of registration and future services.</p>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">COMMUNICATION GUIDELINES</h5>
-                        <p class="mb-2">All communication from the Agency will be done via: WhatsApp (only through registered numbers), Email (warriorseducare@gmail.com), Direct phone calls.</p>
-                        <p class="mb-2"><strong>Candidates must:</strong></p>
+                        <h5 class="font-bold text-[#031b4e] mb-2">10. Confidentiality</h5>
+                        <p class="mb-4">The Candidate shall keep confidential all information relating to Warriors Educare, parents and students and shall not disclose such information to any third party without prior written permission.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">11. No Tuition Guarantee</h5>
+                        <p class="mb-4">Registration with Warriors Educare does not guarantee tuition opportunity. Selection depends entirely on the parents' requirements, the Candidate's qualifications, demo performance and overall suitability.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">12. Default & Legal Action</h5>
+                        <p class="mb-4">In case the Candidate intentionally avoids payment of the agreed Service Charge or violates any terms of this Agreement, Warriors Educare reserves the right to recover the outstanding amount along with applicable late charges and initiate appropriate legal proceedings under the applicable laws of India. Any dispute arising from this Agreement shall be subject to the jurisdiction of the competent courts.</p>
+
+                        <h5 class="font-bold text-[#031b4e] mb-2">13. Acceptance of Terms</h5>
+                        <p class="mb-2">By signing this Agreement physically or digitally, the Candidate confirms that:</p>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>Respond within 24–48 hours to all official communications</li>
-                            <li>Keep their registered mobile number and email active</li>
-                            <li>Inform the Agency of any number/email changes.</li>
-                            <li>Failure to communicate may result in cancellation of interview or job opportunity.</li>
+                            <li>They have carefully read and understood all the terms and conditions.</li>
+                            <li>They voluntarily accept all clauses of this Agreement without any pressure.</li>
+                            <li>They agree to comply with all payment obligations and conditions mentioned herein.</li>
                         </ul>
                         
                         <p class="mt-6 font-semibold">By clicking Accept & Continue, I acknowledge and accept all these terms and conditions.</p>

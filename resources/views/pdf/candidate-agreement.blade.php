@@ -7,14 +7,30 @@
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             color: #333;
-            line-height: 1.6;
-            margin: 40px;
+            line-height: 1.5;
+            margin: 30px;
+            position: relative;
         }
+        
+        /* Watermark Styles */
+        .watermark {
+            position: fixed;
+            top: 35%;
+            left: 20%;
+            width: 60%;
+            opacity: 0.1;
+            z-index: -1000;
+        }
+
         .header {
             text-align: center;
             border-bottom: 2px solid #004d99;
             padding-bottom: 20px;
             margin-bottom: 30px;
+        }
+        .header img.logo {
+            max-height: 120px;
+            margin-bottom: 10px;
         }
         .header h1 {
             color: #004d99;
@@ -51,7 +67,8 @@
             font-size: 14px;
         }
         .signature-section {
-            margin-top: 50px;
+            margin-top: 30px;
+            page-break-inside: avoid;
         }
         .signature-box {
             border-top: 1px solid #333;
@@ -72,24 +89,40 @@
     </style>
 </head>
 <body>
+    
+    <!-- Watermark Image -->
+    <img src="{{ public_path('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="watermark" alt="Watermark">
 
     <div class="header">
+        <!-- Main Logo -->
+        <img src="{{ public_path('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="logo" alt="Warriors Educare Logo">
         <h1>Warriors Educare</h1>
         <p>Candidate Placement Agreement</p>
     </div>
 
     <div class="candidate-details">
-        <table>
+        <table style="width: 100%;">
             <tr>
-                <td><strong>Candidate Name:</strong> {{ $user->name }}</td>
-                <td><strong>Date:</strong> {{ $date }}</td>
-            </tr>
-            <tr>
-                <td><strong>Email:</strong> {{ $user->email }}</td>
-                <td><strong>Phone:</strong> {{ $user->phone }}</td>
-            </tr>
-            <tr>
-                <td colspan="2"><strong>Address:</strong> {{ $profile->address }}</td>
+                <td style="width: 80%; vertical-align: top;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td><strong>Candidate Name:</strong> {{ $user->name }}</td>
+                            <td><strong>Date:</strong> {{ $date }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email:</strong> {{ $user->email }}</td>
+                            <td><strong>Phone:</strong> {{ $user->phone }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><strong>Address:</strong> {{ $profile->address }}</td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="width: 20%; text-align: right; vertical-align: top;">
+                    @if(isset($photo) && !empty($photo))
+                        <img src="{{ $photo }}" alt="Candidate Photo" style="width: 80px; max-height: 100px; border: 1px solid #ccc; object-fit: cover;">
+                    @endif
+                </td>
             </tr>
         </table>
     </div>
@@ -123,7 +156,7 @@
             <li>These terms shall be deemed legally binding and enforceable, subject to the exclusive jurisdiction of Patna, Bihar.</li>
         </ul>
 
-        <div style="page-break-before: always;"></div>
+
 
         <h3>Candidates must:</h3>
         <ul>
@@ -161,7 +194,7 @@
             <li>Failure to communicate may result in cancellation of interview or job opportunity.</li>
         </ul>
 
-        <div style="page-break-before: always;"></div>
+
 
         <h3 style="text-align: center; font-size: 18px;">DECLARATION & ACCEPTANCE</h3>
         
@@ -178,22 +211,25 @@
         </p>
     </div>
 
-    <div class="signature-section">
-        @if(isset($signature_type) && $signature_type === 'type')
-            <div style="font-size: 28px; font-style: italic; font-family: 'Times New Roman', Times, serif; color: #000; margin-bottom: 10px; height: 50px;">
-                {{ $signature }}
-            </div>
-        @else
-            <img src="{{ $signature }}" class="signature-img" alt="Digital Signature">
-        @endif
-        <div class="signature-box">
-            {{ $user->name }}<br>
-            <span style="font-size: 12px; color: #666;">(Digital Signature)</span>
-        </div>
-    </div>
-
-    <div class="date">
-        <strong>Date of Execution:</strong> {{ $date }}
+    <div class="signature-section" style="margin-top: 60px;">
+        <table style="width: 100%;">
+            <tr>
+                <td style="width: 50%; vertical-align: bottom;">
+                    <div class="date" style="margin-bottom: 20px;">
+                        <strong>Date of Execution:</strong> {{ $date }}
+                    </div>
+                </td>
+                <td style="width: 50%; text-align: left; padding-left: 35%; padding-top: 40px;">
+                    <div style="font-family: 'Times New Roman', Times, serif; font-size: 14px; color: #000; line-height: 1.2;">
+                        <i>Digitally Signed by</i><br>
+                        <i>Name : {{ $user->name }}</i><br>
+                        <i>Phone No : ******{{ substr($user->phone ?? '0000', -4) }}</i><br>
+                        <i>Reason: Agreement E-signature</i><br>
+                        <i>Date : {{ \Carbon\Carbon::parse($profile->signature_date_time ?? now())->format('D M d H:i:s T Y') }}</i>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </div>
 
 </body>

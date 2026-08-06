@@ -74,7 +74,7 @@ class AgreementController extends Controller
                 return redirect()->route('candidate.dashboard')->with('error', 'Agreement not signed yet.');
             }
 
-            if (!$profile->agreement_pdf_path || !Storage::disk('public')->exists($profile->agreement_pdf_path)) {
+            if (!$profile->agreement_pdf_path || !Storage::disk('public')->exists($profile->agreement_pdf_path) || ($request->has('regenerate') && $request->regenerate == '1')) {
                 $signatureDataRaw = $profile->signature_data;
                 if (!$signatureDataRaw) {
                     return redirect()->route('candidate.dashboard')->with('error', 'Signature data is missing. Please sign the agreement again.');
@@ -107,11 +107,6 @@ class AgreementController extends Controller
                 $profile->update(['agreement_pdf_path' => $fileName]);
             }
 
-            if ($request->has('regenerate') && $request->regenerate == '1') {
-                $fileName = $this->generateStampedPdf($user, $profile, $signatureData, $type);
-                $profile->update(['agreement_pdf_path' => $fileName]);
-            }
-
             $fullFilePath = Storage::disk('public')->path($profile->agreement_pdf_path);
             if (!file_exists($fullFilePath)) {
                 return redirect()->route('candidate.dashboard')->with('error', 'Agreement PDF file not found on server.');
@@ -126,40 +121,22 @@ class AgreementController extends Controller
 
     private function generateStampedPdf($user, $profile, $signatureData, $sigType)
     {
-        $tempSignaturePath = null;
-        $absoluteSigPath = null;
+        $signatureSrc = '';
         
-        if ($profile->signature_type !== 'type') {
-            // Save signature to temporary file for FPDI
-            $tempSignaturePath = 'temp/sig_' . $user->id . '_' . time() . '.jpg';
-            
-            // Convert any image to standard JPEG to avoid FPDF format errors (like alpha channel in PNG)
-            try {
-                $image = @imagecreatefromstring($signatureData);
-                if ($image !== false) {
-                    // Create a white background for transparent images
-                    $bg = imagecreatetruecolor(imagesx($image), imagesy($image));
-                    imagefill($bg, 0, 0, imagecolorallocate($bg, 255, 255, 255));
-                    imagealphablending($bg, TRUE);
-                    imagecopy($bg, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
-                    
-                    // Save as JPEG to a temporary buffer
-                    ob_start();
-                    imagejpeg($bg, null, 90);
-                    $signatureData = ob_get_clean();
-                    
-                    imagedestroy($image);
-                    imagedestroy($bg);
-                }
-            } catch (\Exception $e) {
-                \Log::error("Failed to convert signature to JPEG: " . $e->getMessage());
+        if ($profile->signature_type === 'type') {
+            $signatureSrc = $profile->signature_data;
+        } else {
+            // For DOMPDF, we can just pass base64 image data directly
+            if ($signatureData) {
+                // If it's not already base64, base64 encode it
+                // We know $signatureData is raw bytes here
+                $base64 = base64_encode($signatureData);
+                $mime = in_array($sigType, ['jpg', 'jpeg']) ? 'jpeg' : 'png';
+                $signatureSrc = 'data:image/' . $mime . ';base64,' . $base64;
             }
-
-            Storage::disk('local')->put($tempSignaturePath, $signatureData);
-            $absoluteSigPath = Storage::disk('local')->path($tempSignaturePath);
         }
 
-        // Find candidate photo (live_photo or profile_photo)
+        $photoSrc = null;
         $photoPath = null;
         if ($profile->live_photo_path && Storage::disk('public')->exists($profile->live_photo_path)) {
             $photoPath = Storage::disk('public')->path($profile->live_photo_path);
@@ -169,106 +146,32 @@ class AgreementController extends Controller
             $photoPath = Storage::disk('public')->path($profile->passport_photo_path);
         }
 
-        // Convert photo to JPEG if needed
-        $tempPhotoPath = null;
-        $absolutePhotoPath = null;
         if ($photoPath && file_exists($photoPath)) {
-            try {
-                $tempPhotoPath = 'temp/photo_' . $user->id . '_' . time() . '.jpg';
-                $photoData = file_get_contents($photoPath);
-                $image = @imagecreatefromstring($photoData);
-                if ($image !== false) {
-                    $bg = imagecreatetruecolor(imagesx($image), imagesy($image));
-                    imagefill($bg, 0, 0, imagecolorallocate($bg, 255, 255, 255));
-                    imagealphablending($bg, TRUE);
-                    imagecopy($bg, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
-                    
-                    ob_start();
-                    imagejpeg($bg, null, 90);
-                    $photoJpegData = ob_get_clean();
-                    
-                    imagedestroy($image);
-                    imagedestroy($bg);
-                    
-                    Storage::disk('local')->put($tempPhotoPath, $photoJpegData);
-                    $absolutePhotoPath = Storage::disk('local')->path($tempPhotoPath);
-                }
-            } catch (\Exception $e) {
-                \Log::error("Failed to convert photo to JPEG: " . $e->getMessage());
-                // Fallback to original
-                $absolutePhotoPath = $photoPath;
-            }
+            $photoData = file_get_contents($photoPath);
+            $mime = mime_content_type($photoPath);
+            $photoSrc = 'data:' . $mime . ';base64,' . base64_encode($photoData);
         }
 
-        // Load the FPDI template
-        $pdf = new Fpdi();
-        $templatePath = Storage::disk('public')->path('template/candidate_agreement.pdf');
+        $date = \Carbon\Carbon::now()->format('d F Y');
         
-        if (!file_exists($templatePath)) {
-            throw new \Exception('Agreement template PDF missing on server at: ' . $templatePath);
-        }
-
-        $pageCount = $pdf->setSourceFile($templatePath);
-
-        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-            $templateId = $pdf->importPage($pageNo);
-            $size = $pdf->getTemplateSize($templateId);
-            
-            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-            $pdf->useTemplate($templateId);
-            
-            // On the last page (e.g., page 3), add the signature and photo
-            if ($pageNo == $pageCount) {
-                // Photo on the right side
-                if ($absolutePhotoPath && file_exists($absolutePhotoPath)) {
-                    // Try to catch any exception with unsupported image types
-                    try {
-                        // X: 168, Y: 260, Width: 25, Height: 30
-                        $pdf->Image($absolutePhotoPath, 168, 260, 25, 30);
-                    } catch (\Exception $e) {
-                        \Log::error("FPDF Image Error (Photo): " . $e->getMessage());
-                    }
-                }
-
-                // Signature in the box
-                if ($profile->signature_type === 'type') {
-                    $pdf->SetAutoPageBreak(false);
-                    $pdf->SetFont('Helvetica', 'I', 18);
-                    $pdf->SetTextColor(10, 10, 100);
-                    $pdf->SetXY(78, 272);
-                    $pdf->Cell(60, 15, $profile->signature_data, 0, 0, 'C');
-                    $pdf->SetAutoPageBreak(true);
-                } else if ($absoluteSigPath && file_exists($absoluteSigPath)) {
-                    try {
-                        // X: 78, Y: 272, Width: 60, Height: 15
-                        $pdf->Image($absoluteSigPath, 78, 272, 60, 15);
-                    } catch (\Exception $e) {
-                        \Log::error("FPDF Image Error (Signature): " . $e->getMessage());
-                    }
-                }
-            }
-        }
+        // Generate PDF using DOMPDF
+        $pdf = \PDF::loadView('pdf.candidate-agreement', [
+            'user' => $user,
+            'profile' => $profile,
+            'signature' => $signatureSrc,
+            'signature_type' => $profile->signature_type,
+            'photo' => $photoSrc,
+            'date' => $date
+        ]);
         
         $tempPdfPath = 'temp/agreement_' . $user->id . '_' . time() . '.pdf';
+        Storage::disk('local')->put($tempPdfPath, $pdf->output());
         
-        // Save PDF to temp local storage first
-        Storage::disk('local')->put($tempPdfPath, $pdf->Output('S'));
-        
-        // Then use putFile to ensure the correct MIME type (application/pdf) is set, especially for S3
         $absoluteTempPdfPath = Storage::disk('local')->path($tempPdfPath);
         $file = new \Illuminate\Http\File($absoluteTempPdfPath);
         $fileName = Storage::disk('public')->putFileAs('agreements', $file, 'agreement_' . $user->id . '_' . time() . '.pdf');
         
-        // Clean up temp PDF
         Storage::disk('local')->delete($tempPdfPath);
-
-        // Clean up temp files
-        if ($tempSignaturePath) {
-            Storage::disk('local')->delete($tempSignaturePath);
-        }
-        if ($tempPhotoPath) {
-            Storage::disk('local')->delete($tempPhotoPath);
-        }
 
         return $fileName;
     }

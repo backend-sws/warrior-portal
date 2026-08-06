@@ -4,13 +4,13 @@
 @include('employer.partials.nav')
 
 <div class="pt-8 pb-20 px-6 lg:px-[5%] relative">
-    <div class="max-w-4xl mx-auto bg-card-bg border border-card-border rounded-2xl shadow-2xl relative z-10 overflow-hidden reveal">
+    <div class="max-w-4xl mx-auto light-metallic-blue-card bg-[#f4f7f5]/50 border border-[#031b4e]/10 rounded-2xl shadow-2xl relative z-10 overflow-hidden reveal">
         <!-- Job Header -->
-        <div class="bg-secondary-bg border-b border-card-border p-8 relative">
+        <div class="bg-white border-b border-[#031b4e]/10 p-8 relative">
             <div class="flex justify-between items-start">
                 <div>
-                    <h1 class="text-3xl font-bold text-text-main mb-2 relative z-10">{{ $job->title ?? 'Teacher Required' }}</h1>
-                    <div class="flex flex-wrap gap-4 text-sm font-semibold text-text-dark/70 relative z-10">
+                    <h1 class="text-3xl font-bold text-[#031b4e] mb-2 relative z-10">{{ $job->title ?? 'Teacher Required' }}</h1>
+                    <div class="flex flex-wrap gap-4 text-sm font-semibold text-[#031b4e]/70 relative z-10">
                         <span class="flex items-center gap-1.5"><i class="fas fa-university text-accent-yellow"></i> {{ $job->school_name }}</span>
                         <span class="flex items-center gap-1.5"><i class="fas fa-map-marker-alt text-accent-yellow"></i> {{ $job->city?->name ?? '' }}, {{ $job->state?->name ?? '' }}</span>
                     </div>
@@ -34,35 +34,35 @@
         </div>
 
         <!-- Job Details Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-card-border bg-secondary-bg/30">
+        <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-card-border bg-white/30">
             <div class="p-6 text-center">
                 <div class="w-10 h-10 rounded-full bg-accent-blue/10 text-accent-blue flex items-center justify-center mx-auto mb-3 text-lg"><i class="fas fa-book"></i></div>
-                <h4 class="text-xs font-bold text-text-dark/50 uppercase tracking-wider mb-1">Subject</h4>
-                <p class="font-semibold text-text-main">{{ $job->subject->name }}</p>
+                <h4 class="text-xs font-bold text-[#031b4e]/70 uppercase tracking-wider mb-1">Subject</h4>
+                <p class="font-semibold text-[#031b4e]">{{ $job->subject->name }}</p>
             </div>
             <div class="p-6 text-center">
                 <div class="w-10 h-10 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center mx-auto mb-3 text-lg"><i class="fas fa-graduation-cap"></i></div>
-                <h4 class="text-xs font-bold text-text-dark/50 uppercase tracking-wider mb-1">Qualification</h4>
-                <p class="font-semibold text-text-main">{{ $job->qualification->name }}</p>
+                <h4 class="text-xs font-bold text-[#031b4e]/70 uppercase tracking-wider mb-1">Qualification</h4>
+                <p class="font-semibold text-[#031b4e]">{{ $job->qualification->name }}</p>
             </div>
             <div class="p-6 text-center">
                 <div class="w-10 h-10 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center mx-auto mb-3 text-lg"><i class="fas fa-rupee-sign"></i></div>
-                <h4 class="text-xs font-bold text-text-dark/50 uppercase tracking-wider mb-1">Salary Range</h4>
-                <p class="font-semibold text-text-main">{{ $job->salary_range ?? 'Not specified' }}</p>
+                <h4 class="text-xs font-bold text-[#031b4e]/70 uppercase tracking-wider mb-1">Salary Range</h4>
+                <p class="font-semibold text-[#031b4e]">{{ $job->salary_range ?? 'Not specified' }}</p>
             </div>
         </div>
 
         <!-- Job Description -->
         <div class="p-8">
-            <h3 class="text-lg font-bold text-text-main mb-4 flex items-center gap-2">
+            <h3 class="text-lg font-bold text-[#031b4e] mb-4 flex items-center gap-2">
                 <i class="fas fa-info-circle text-accent-blue"></i> Job Description & Requirements
             </h3>
-            <div class="bg-secondary-bg/50 border border-card-border rounded-xl p-6 text-text-main leading-relaxed shadow-inner [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ul]:my-3 [&_li]:text-text-main [&_li]:marker:text-accent-blue [&_p]:mb-3 [&_h4]:font-extrabold [&_h4]:text-text-main [&_h4]:text-xs [&_h4]:mt-5 [&_h4]:mb-2 [&_h4]:border-b [&_h4]:border-card-border [&_h4]:pb-1.5 [&_h4]:uppercase [&_h4]:tracking-wider">
+            <div class="bg-[#031b4e]/10 border border-[#031b4e]/10 rounded-xl p-6 text-[#031b4e] leading-relaxed shadow-inner [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ul]:my-3 [&_li]:text-[#031b4e] [&_li]:marker:text-accent-blue [&_p]:mb-3 [&_h4]:font-extrabold [&_h4]:text-[#031b4e] [&_h4]:text-xs [&_h4]:mt-5 [&_h4]:mb-2 [&_h4]:border-b [&_h4]:border-[#031b4e]/10 [&_h4]:pb-1.5 [&_h4]:uppercase [&_h4]:tracking-wider">
                 @php
                     $rawDesc = $job->description ?? '';
 
                     if (empty(trim($rawDesc))) {
-                        $formattedDescription = '<p class="text-text-dark/50 italic text-sm">No detailed description provided for this job role.</p>';
+                        $formattedDescription = '<p class="text-[#031b4e]/70 italic text-sm">No detailed description provided for this job role.</p>';
                     } else {
                         $hasHtml = preg_match('/<[a-z][\s\S]*>/i', $rawDesc);
 
@@ -126,8 +126,8 @@
                 {!! $formattedDescription !!}
             </div>
 
-            <div class="mt-10 pt-6 border-t border-card-border flex justify-between items-center">
-                <div class="text-sm text-text-main opacity-50">
+            <div class="mt-10 pt-6 border-t border-[#031b4e]/10 flex justify-between items-center">
+                <div class="text-sm text-[#031b4e] opacity-50">
                     Posted on {{ $job->created_at->format('d M, Y') }}
                 </div>
                 <div>
@@ -145,7 +145,7 @@
                 <h3 class="text-xl font-bold mb-1">Interested in this role?</h3>
                 <p class="text-white/80 text-sm">Join Warriors Educare Agency and apply directly to top schools.</p>
             </div>
-            <a href="{{ route('candidate.register') }}" class="px-8 py-3 bg-white text-accent-blue font-bold rounded-xl shadow-lg hover:bg-gray-50 hover:-translate-y-0.5 transition-all whitespace-nowrap">
+            <a href="{{ route('candidate.register') }}" class="px-8 py-3 bg-white text-accent-blue font-bold rounded-xl shadow-lg hover:bg-gray-50 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 transition-all whitespace-nowrap">
                 Register as Teacher
             </a>
         </div>
