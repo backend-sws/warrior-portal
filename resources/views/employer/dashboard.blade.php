@@ -13,68 +13,68 @@
                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
             </div>
             <div>
-                <h1 class="text-2xl font-bold text-text-main">Welcome, {{ auth()->user()->name }}</h1>
-                <p class="text-sm text-text-dark/50 mt-0.5">Manage your job postings and find the best candidates.</p>
+                <h1 class="text-2xl font-bold text-[#031b4e]">Welcome, {{ auth()->user()->name }}</h1>
+                <p class="text-sm text-[#031b4e]/70 mt-0.5">Manage your job postings and find the best candidates.</p>
             </div>
         </div>
-        <a href="{{ route('employer.jobs.create') }}" class="px-5 py-2.5 bg-accent-yellow text-[#031b4e] rounded-xl text-sm font-bold hover:brightness-110 hover:-translate-y-0.5 transition-all shadow-lg hover:shadow-glow-yellow flex items-center gap-2">
+        <a href="{{ route('employer.jobs.create') }}" class="px-5 py-2.5 bg-accent-yellow text-[#031b4e] rounded-xl text-sm font-bold hover:brightness-110 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 transition-all shadow-lg hover:shadow-md flex items-center gap-2">
             <i class="fas fa-plus"></i> Post New Job
         </a>
     </div>
 
     {{-- Stats Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 reveal">
-        <div class="bg-card-bg rounded-2xl border border-card-border p-6 shadow-xl relative overflow-hidden group">
+        <div class="light-metallic-blue-card bg-[#f4f7f5]/50 rounded-2xl border border-[#031b4e]/10 p-6 shadow-xl relative overflow-hidden group">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-accent-yellow/10 rounded-full blur-xl group-hover:bg-accent-yellow/20 transition-all duration-500"></div>
             <div class="flex items-center justify-between mb-4 relative z-10">
                 <div class="w-12 h-12 rounded-xl bg-accent-yellow/10 text-accent-yellow flex items-center justify-center text-xl">
                     <i class="fas fa-briefcase"></i>
                 </div>
             </div>
-            <h3 class="text-3xl font-bold text-text-main relative z-10">{{ $stats['total_jobs'] }}</h3>
-            <p class="text-xs font-semibold text-text-dark/50 uppercase tracking-wide mt-1 relative z-10">Total Jobs Posted</p>
+            <h3 class="text-3xl font-bold text-[#031b4e] relative z-10">{{ $stats['total_jobs'] }}</h3>
+            <p class="text-xs font-semibold text-[#031b4e]/70 uppercase tracking-wide mt-1 relative z-10">Total Jobs Posted</p>
         </div>
 
-        <div class="bg-card-bg rounded-2xl border border-card-border p-6 shadow-xl relative overflow-hidden group">
+        <div class="light-metallic-blue-card bg-[#f4f7f5]/50 rounded-2xl border border-[#031b4e]/10 p-6 shadow-xl relative overflow-hidden group">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-green-500/10 rounded-full blur-xl group-hover:bg-green-500/20 transition-all duration-500"></div>
             <div class="flex items-center justify-between mb-4 relative z-10">
                 <div class="w-12 h-12 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center text-xl">
                     <i class="fas fa-check-circle"></i>
                 </div>
             </div>
-            <h3 class="text-3xl font-bold text-text-main relative z-10">{{ $stats['active_jobs'] }}</h3>
-            <p class="text-xs font-semibold text-text-dark/50 uppercase tracking-wide mt-1 relative z-10">Active Jobs</p>
+            <h3 class="text-3xl font-bold text-[#031b4e] relative z-10">{{ $stats['active_jobs'] }}</h3>
+            <p class="text-xs font-semibold text-[#031b4e]/70 uppercase tracking-wide mt-1 relative z-10">Active Jobs</p>
         </div>
 
-        <div class="bg-card-bg rounded-2xl border border-card-border p-6 shadow-xl relative overflow-hidden group">
+        <div class="light-metallic-blue-card bg-[#f4f7f5]/50 rounded-2xl border border-[#031b4e]/10 p-6 shadow-xl relative overflow-hidden group">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all duration-500"></div>
             <div class="flex items-center justify-between mb-4 relative z-10">
                 <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xl">
                     <i class="fas fa-clock"></i>
                 </div>
             </div>
-            <h3 class="text-3xl font-bold text-text-main relative z-10">{{ $stats['pending_jobs'] }}</h3>
-            <p class="text-xs font-semibold text-text-dark/50 uppercase tracking-wide mt-1 relative z-10">Pending Approval</p>
+            <h3 class="text-3xl font-bold text-[#031b4e] relative z-10">{{ $stats['pending_jobs'] }}</h3>
+            <p class="text-xs font-semibold text-[#031b4e]/70 uppercase tracking-wide mt-1 relative z-10">Pending Approval</p>
         </div>
 
-        <div class="bg-card-bg rounded-2xl border border-card-border p-6 shadow-xl relative overflow-hidden group">
+        <div class="light-metallic-blue-card bg-[#f4f7f5]/50 rounded-2xl border border-[#031b4e]/10 p-6 shadow-xl relative overflow-hidden group">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all duration-500"></div>
             <div class="flex items-center justify-between mb-4 relative z-10">
                 <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-xl">
                     <i class="fas fa-users"></i>
                 </div>
             </div>
-            <h3 class="text-3xl font-bold text-text-main relative z-10">{{ $stats['total_candidates'] }}</h3>
-            <p class="text-xs font-semibold text-text-dark/50 uppercase tracking-wide mt-1 relative z-10">Shortlisted/Hired Candidates</p>
+            <h3 class="text-3xl font-bold text-[#031b4e] relative z-10">{{ $stats['total_candidates'] }}</h3>
+            <p class="text-xs font-semibold text-[#031b4e]/70 uppercase tracking-wide mt-1 relative z-10">Shortlisted/Hired Candidates</p>
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="lg:col-span-2 space-y-8">
             @if($recentJobs->count() > 0)
-                <div class="bg-card-bg rounded-2xl border border-card-border overflow-hidden shadow-xl reveal">
-                    <div class="px-6 py-4 border-b border-card-border flex justify-between items-center bg-black/20">
-                        <h3 class="font-bold text-text-main flex items-center gap-2">
+                <div class="light-metallic-blue-card bg-[#f4f7f5]/50 rounded-2xl border border-[#031b4e]/10 overflow-hidden shadow-xl reveal">
+                    <div class="px-6 py-4 border-b border-[#031b4e]/10 flex justify-between items-center bg-black/20">
+                        <h3 class="font-bold text-[#031b4e] flex items-center gap-2">
                             <i class="fas fa-history text-accent-yellow"></i> Recent Jobs
                         </h3>
                         <a href="{{ route('employer.jobs.index') }}" class="text-xs font-semibold text-accent-yellow hover:text-white transition-colors">View All</a>
@@ -82,23 +82,23 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="border-b border-card-border/50 bg-black/10">
-                                    <th class="px-6 py-4 text-xs font-semibold text-text-dark/50 uppercase tracking-wider">Job Title</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-text-dark/50 uppercase tracking-wider">Category</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-text-dark/50 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-text-dark/50 uppercase tracking-wider">Posted On</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-text-dark/50 uppercase tracking-wider text-right">Actions</th>
+                                <tr class="border-b border-[#031b4e]/10/50 bg-black/10">
+                                    <th class="px-6 py-4 text-xs font-semibold text-[#031b4e]/70 uppercase tracking-wider">Job Title</th>
+                                    <th class="px-6 py-4 text-xs font-semibold text-[#031b4e]/70 uppercase tracking-wider">Category</th>
+                                    <th class="px-6 py-4 text-xs font-semibold text-[#031b4e]/70 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-xs font-semibold text-[#031b4e]/70 uppercase tracking-wider">Posted On</th>
+                                    <th class="px-6 py-4 text-xs font-semibold text-[#031b4e]/70 uppercase tracking-wider text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-card-border/50">
                                 @foreach($recentJobs as $job)
                                     <tr class="hover:bg-white/5 transition-colors">
                                         <td class="px-6 py-4">
-                                            <div class="font-bold text-text-main">{{ $job->title ?? 'N/A' }}</div>
-                                            <div class="text-xs text-text-dark/50 mt-1"><i class="fas fa-map-marker-alt text-accent-yellow/70 mr-1"></i> {{ $job->city?->name ?? 'N/A' }}</div>
+                                            <div class="font-bold text-[#031b4e]">{{ $job->title ?? 'N/A' }}</div>
+                                            <div class="text-xs text-[#031b4e]/70 mt-1"><i class="fas fa-map-marker-alt text-accent-yellow/70 mr-1"></i> {{ $job->city?->name ?? 'N/A' }}</div>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 text-text-main border border-white/10">
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 text-[#031b4e] border border-white/10">
                                                 {{ $job->category->name ?? '' }}
                                             </span>
                                         </td>
@@ -117,16 +117,16 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-text-dark/70">
+                                        <td class="px-6 py-4 text-sm text-[#031b4e]/70">
                                             {{ $job->created_at->format('M d, Y') }}
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex items-center justify-end gap-2">
-                                                <a href="{{ route('employer.jobs.show', $job->id) }}" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-text-dark hover:text-accent-yellow hover:bg-accent-yellow/10 transition-colors" title="View Job">
+                                                <a href="{{ route('employer.jobs.show', $job->id) }}" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#031b4e]/70 hover:text-accent-yellow hover:bg-accent-yellow/10 transition-colors" title="View Job">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 @if($job->status === 'pending')
-                                                    <a href="{{ route('employer.jobs.edit', $job->id) }}" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-text-dark hover:text-blue-400 hover:bg-blue-400/10 transition-colors" title="Edit Job">
+                                                    <a href="{{ route('employer.jobs.edit', $job->id) }}" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#031b4e]/70 hover:text-blue-400 hover:bg-blue-400/10 transition-colors" title="Edit Job">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                 @endif
@@ -140,13 +140,13 @@
                 </div>
             @else
                 {{-- Empty State --}}
-                <div class="bg-card-bg rounded-2xl border border-card-border p-12 text-center shadow-xl reveal reveal-delay-1">
+                <div class="light-metallic-blue-card bg-[#f4f7f5]/50 rounded-2xl border border-[#031b4e]/10 p-12 text-center shadow-xl reveal reveal-delay-1">
                     <div class="w-20 h-20 rounded-2xl bg-accent-yellow/10 text-accent-yellow flex items-center justify-center text-3xl mx-auto mb-5">
                         <i class="fas fa-briefcase"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-text-main mb-2">No Active Jobs</h3>
-                    <p class="text-sm text-text-dark/40 max-w-md mx-auto mb-8 leading-relaxed">You haven't posted any job requirements yet. Post a job to start receiving candidate applications from qualified teachers.</p>
-                    <a href="{{ route('employer.jobs.create') }}" class="inline-flex items-center px-8 py-3.5 bg-accent-yellow text-[#031b4e] rounded-xl font-bold hover:brightness-110 hover:-translate-y-0.5 transition-all shadow-lg hover:shadow-glow-yellow gap-2">
+                    <h3 class="text-xl font-bold text-[#031b4e] mb-2">No Active Jobs</h3>
+                    <p class="text-sm text-[#031b4e]/40 max-w-md mx-auto mb-8 leading-relaxed">You haven't posted any job requirements yet. Post a job to start receiving candidate applications from qualified teachers.</p>
+                    <a href="{{ route('employer.jobs.create') }}" class="inline-flex items-center px-8 py-3.5 bg-accent-yellow text-[#031b4e] rounded-xl font-bold hover:brightness-110 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 transition-all shadow-lg hover:shadow-md gap-2">
                         <i class="fas fa-plus-circle"></i> Post Your First Job
                     </a>
                 </div>
@@ -155,24 +155,24 @@
 
         <div class="lg:col-span-1 space-y-8">
             {{-- Recent Notifications --}}
-            <div class="bg-card-bg rounded-2xl border border-card-border overflow-hidden shadow-sm reveal">
-                <div class="px-6 py-4 border-b border-card-border flex justify-between items-center bg-secondary-bg/30">
-                    <h3 class="font-bold text-text-main flex items-center gap-2"><i class="fas fa-bell text-accent-yellow"></i> Notifications</h3>
+            <div class="light-metallic-blue-card bg-[#f4f7f5]/50 rounded-2xl border border-[#031b4e]/10 overflow-hidden shadow-sm reveal">
+                <div class="px-6 py-4 border-b border-[#031b4e]/10 flex justify-between items-center bg-white/30">
+                    <h3 class="font-bold text-[#031b4e] flex items-center gap-2"><i class="fas fa-bell text-accent-yellow"></i> Notifications</h3>
                 </div>
                 <div class="divide-y divide-card-border">
                     @forelse(auth()->user()->notifications()->take(5)->get() as $notification)
-                        <div class="p-5 flex gap-4 hover:bg-secondary-bg/30 transition-colors {{ $notification->unread() ? 'bg-secondary-bg/10' : '' }}">
+                        <div class="p-5 flex gap-4 hover:bg-white/30 transition-colors {{ $notification->unread() ? 'bg-white/10' : '' }}">
                             <div class="w-10 h-10 rounded-full bg-accent-yellow/10 text-accent-yellow flex items-center justify-center flex-shrink-0 mt-1">
                                 <i class="fas fa-bell"></i>
                             </div>
                             <div>
-                                <h4 class="text-sm font-bold text-text-main mb-1">{{ $notification->data['title'] ?? 'Notification' }}</h4>
-                                <p class="text-xs text-text-dark/70 leading-relaxed">{{ $notification->data['message'] ?? 'You have a new update.' }}</p>
-                                <span class="text-[10px] text-text-dark/40 font-medium mt-2 block">{{ $notification->created_at->diffForHumans() }}</span>
+                                <h4 class="text-sm font-bold text-[#031b4e] mb-1">{{ $notification->data['title'] ?? 'Notification' }}</h4>
+                                <p class="text-xs text-[#031b4e]/70 leading-relaxed">{{ $notification->data['message'] ?? 'You have a new update.' }}</p>
+                                <span class="text-[10px] text-[#031b4e]/40 font-medium mt-2 block">{{ $notification->created_at->diffForHumans() }}</span>
                             </div>
                         </div>
                     @empty
-                        <div class="p-5 text-center text-text-dark/50 text-sm">
+                        <div class="p-5 text-center text-[#031b4e]/70 text-sm">
                             No new notifications
                         </div>
                     @endforelse
