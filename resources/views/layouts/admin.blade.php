@@ -220,6 +220,10 @@
                     class="sidebar-link {{ request()->routeIs('admin.leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-headset w-5 text-center"></i> Support Leads
                 </a>
+                <a href="{{ route('admin.tuition-leads.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.tuition-leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Home Tuition Leads
+                </a>
 
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">CMS</div>
 

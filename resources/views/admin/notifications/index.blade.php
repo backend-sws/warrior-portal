@@ -27,10 +27,13 @@
                 <!-- Icon -->
                 <div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-sm
                     {{ str_contains($notif->type, 'LeadFollowUp') ? 'bg-purple-100 text-purple-600' :
+                      (str_contains($notif->type, 'NewHomeTuitionLead') ? 'bg-indigo-100 text-indigo-600' :
                       (str_contains($notif->type, 'LateFee') ? 'bg-orange-100 text-orange-600' :
-                      (str_contains($notif->type, 'ProfileVerified') ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600')) }}">
+                      (str_contains($notif->type, 'ProfileVerified') ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'))) }}">
                     @if(str_contains($notif->type, 'LeadFollowUp'))
                         <i class="fas fa-user-clock"></i>
+                    @elseif(str_contains($notif->type, 'NewHomeTuitionLead'))
+                        <i class="fas fa-chalkboard-teacher"></i>
                     @elseif(str_contains($notif->type, 'LateFee'))
                         <i class="fas fa-exclamation-triangle"></i>
                     @elseif(str_contains($notif->type, 'ProfileVerified'))

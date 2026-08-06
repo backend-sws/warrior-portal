@@ -204,6 +204,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/leads/{id}/status', [\App\Http\Controllers\Admin\ContactLeadController::class, 'updateStatus'])->name('leads.status.update');
     Route::post('/leads/{id}/follow-up', [\App\Http\Controllers\Admin\ContactLeadController::class, 'storeFollowUp'])->name('leads.followup.store');
 
+    // Home Tuition Leads
+    Route::get('/tuition-leads', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'index'])->name('tuition-leads.index');
+    Route::get('/tuition-leads/pending', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'pending'])->name('tuition-leads.pending');
+    Route::get('/tuition-leads/confirmed', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'confirmed'])->name('tuition-leads.confirmed');
+    Route::get('/tuition-leads/create', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'create'])->name('tuition-leads.create');
+    Route::post('/tuition-leads', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'store'])->name('tuition-leads.store');
+    Route::get('/tuition-leads/{id}', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'show'])->name('tuition-leads.show');
+    Route::get('/tuition-leads/{id}/edit', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'edit'])->name('tuition-leads.edit');
+    Route::put('/tuition-leads/{id}', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'update'])->name('tuition-leads.update');
+    Route::put('/tuition-leads/{id}/status', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'updateStatus'])->name('tuition-leads.status.update');
+    Route::post('/tuition-leads/{id}/follow-up', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'storeFollowUp'])->name('tuition-leads.followup.store');
+
     // Frontend Management
     
     // User Management
