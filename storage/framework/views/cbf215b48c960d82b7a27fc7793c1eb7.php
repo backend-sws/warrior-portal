@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Warriors Educare — The Gold Standard in Education Recruitment')</title>
+    <title><?php echo $__env->yieldContent('title', 'Warriors Educare — The Gold Standard in Education Recruitment'); ?></title>
     <meta name="description"
-        content="@yield('meta_description', 'Warriors Educare connects educators and schools across India. Find top teaching jobs or hire expert educators with us.')">
+        content="<?php echo $__env->yieldContent('meta_description', 'Warriors Educare connects educators and schools across India. Find top teaching jobs or hire expert educators with us.'); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -15,12 +15,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="icon" type="image/png" href="{{ asset('adobe.png') }}?v={{ time() }}">
+    <link rel="icon" type="image/png" href="<?php echo e(asset('adobe.png')); ?>?v=<?php echo e(time()); ?>">
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 
     <style>
         .marquee-swiper {
@@ -245,18 +245,18 @@
     </style>
 </head>
 
-<body class="{{ request()->is('candidate*') || request()->is('employer*') ? 'bg-[#f4f7f5] text-gray-900' : 'bg-secondary-bg text-text-dark' }} {{ session()->has('impersonate_admin_id') ? 'pt-10' : '' }}">
+<body class="<?php echo e(request()->is('candidate*') || request()->is('employer*') ? 'bg-[#f4f7f5] text-gray-900' : 'bg-secondary-bg text-text-dark'); ?> <?php echo e(session()->has('impersonate_admin_id') ? 'pt-10' : ''); ?>">
 
     <!-- Preloader removed per user request -->
 
-    @if(session()->has('impersonate_admin_id'))
+    <?php if(session()->has('impersonate_admin_id')): ?>
         <div class="fixed top-0 left-0 w-full z-[9999] bg-gradient-to-r from-red-600 to-red-500 text-white text-center py-2 px-4 shadow-lg flex justify-center items-center gap-4 text-sm font-semibold">
-            <span><i class="fas fa-user-secret mr-2"></i> You are currently impersonating <strong>{{ auth()->user()->name }}</strong> ({{ ucfirst(auth()->user()->role) }}).</span>
-            <a href="{{ route('admin.impersonate.leave') }}" class="bg-white text-red-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-red-50 transition-colors shadow-sm">
+            <span><i class="fas fa-user-secret mr-2"></i> You are currently impersonating <strong><?php echo e(auth()->user()->name); ?></strong> (<?php echo e(ucfirst(auth()->user()->role)); ?>).</span>
+            <a href="<?php echo e(route('admin.impersonate.leave')); ?>" class="bg-white text-red-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-red-50 transition-colors shadow-sm">
                 Return to Admin <i class="fas fa-sign-out-alt ml-1"></i>
             </a>
         </div>
-    @endif
+    <?php endif; ?>
 
             </div>
 
@@ -303,45 +303,46 @@
     <header id="main-header"
         class="!fixed top-[48px] left-1/2 -translate-x-1/2 w-[95%] max-w-7xl px-4 lg:px-8 py-1 flex justify-between items-center z-[100] transition-all duration-500 metallic-blue-card rounded-full">
         <a href="#" class="flex items-center no-underline py-1 z-10">
-            <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-12 lg:h-14 logo-img transition-all duration-300">
+            <img src="<?php echo e(asset('adobe.png')); ?>" alt="Warriors Educare Logo" class="h-12 lg:h-14 logo-img transition-all duration-300">
         </a>
         <nav class="hidden lg:flex items-center gap-4 xl:gap-6">
             <ul class="flex gap-3 lg:gap-4 xl:gap-6 list-none m-0 p-0">
-                <li><a href="{{ route('home') }}"
-                        class="{{ request()->routeIs('home') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Home</a>
+                <li><a href="<?php echo e(route('home')); ?>"
+                        class="<?php echo e(request()->routeIs('home') ? 'text-white font-bold' : 'text-gray-200 hover:text-white'); ?> whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Home</a>
                 </li>
-                <li><a href="{{ route('about') }}"
-                        class="{{ request()->routeIs('about') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">About us</a></li>
-                <li><a href="{{ route('services') }}"
-                        class="{{ request()->routeIs('services') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Services</a></li>
-                <li><a href="{{ route('jobs') }}"
-                        class="{{ request()->routeIs('jobs') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Jobs</a>
+                <li><a href="<?php echo e(route('about')); ?>"
+                        class="<?php echo e(request()->routeIs('about') ? 'text-white font-bold' : 'text-gray-200 hover:text-white'); ?> whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">About us</a></li>
+                <li><a href="<?php echo e(route('services')); ?>"
+                        class="<?php echo e(request()->routeIs('services') ? 'text-white font-bold' : 'text-gray-200 hover:text-white'); ?> whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Services</a></li>
+                <li><a href="<?php echo e(route('jobs')); ?>"
+                        class="<?php echo e(request()->routeIs('jobs') ? 'text-white font-bold' : 'text-gray-200 hover:text-white'); ?> whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Jobs</a>
                 </li>
-                <li><a href="{{ route('resume.builder') }}"
-                        class="{{ request()->routeIs('resume.builder') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[15px] transition-colors">Resume Builder <span
+                <li><a href="<?php echo e(route('resume.builder')); ?>"
+                        class="<?php echo e(request()->routeIs('resume.builder') ? 'text-white font-bold' : 'text-gray-200 hover:text-white'); ?> whitespace-nowrap font-medium text-[15px] transition-colors">Resume Builder <span
                             class="bg-accent-blue text-white text-[9px] px-1.5 py-0.5 rounded-sm uppercase font-extrabold ml-1 relative -top-1">Free</span></a>
                 </li>
-                <li><a href="{{ route('contact') }}"
-                        class="{{ request()->routeIs('contact') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[15px] transition-colors">Contact</a></li>
+                <li><a href="<?php echo e(route('contact')); ?>"
+                        class="<?php echo e(request()->routeIs('contact') ? 'text-white font-bold' : 'text-gray-200 hover:text-white'); ?> whitespace-nowrap font-medium text-[15px] transition-colors">Contact</a></li>
             </ul>
             <div class="flex gap-3 lg:gap-4 items-center">
-                @auth
-                    <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'employer' ? route('employer.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard'))) }}"
+                <?php if(auth()->guard()->check()): ?>
+                    <a href="<?php echo e(auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'employer' ? route('employer.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard')))); ?>"
                         class="px-5 py-2.5 rounded font-medium text-[14px] cursor-pointer transition-all bg-white/20 text-white hover:bg-white/30 border border-white/30 flex items-center gap-2 whitespace-nowrap">
                         <div
                             class="w-6 h-6 rounded-full bg-white text-[#031b4e] flex items-center justify-center text-[10px] font-bold">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            <?php echo e(strtoupper(substr(auth()->user()->name, 0, 1))); ?>
+
                         </div>
                         Dashboard
                     </a>
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
-                        @csrf
+                    <form action="<?php echo e(route('logout')); ?>" method="POST" class="inline">
+                        <?php echo csrf_field(); ?>
                         <button type="submit"
                             class="px-4 py-2.5 rounded font-medium text-[14px] cursor-pointer transition-all text-white hover:bg-white/10 border border-white/30 flex items-center gap-1.5">
                             <i class="fas fa-sign-out-alt text-xs"></i> Logout
                         </button>
                     </form>
-                @else
+                <?php else: ?>
                     <a href="/login"
                         class="px-4 py-2 rounded font-medium text-[14px] text-white/90 hover:text-white transition-colors whitespace-nowrap">
                         Login
@@ -350,7 +351,7 @@
                         class="px-6 py-2.5 rounded font-semibold text-[14px] bg-white text-[#031b4e] hover:bg-gray-100 transition-colors shadow-lg whitespace-nowrap">
                         Get Started
                     </a>
-                @endauth
+                <?php endif; ?>
             </div>
         </nav>
         <button id="mobileMenuBtn" class="lg:hidden text-[#031b4e] text-2xl focus:outline-none z-10">
@@ -362,64 +363,64 @@
     <div id="mobileMenu"
         class="fixed inset-0 bg-primary-bg z-[105] transform translate-x-full transition-transform duration-300 lg:hidden flex flex-col">
         <div class="flex justify-between items-center p-6 border-b border-card-border">
-            <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-10">
+            <img src="<?php echo e(asset('adobe.png')); ?>" alt="Warriors Educare Logo" class="h-10">
             <button id="closeMobileMenuBtn" class="text-text-main text-2xl focus:outline-none"><i
                     class="fas fa-times"></i></button>
         </div>
         <div class="flex-grow overflow-y-auto p-6 flex flex-col gap-6">
             <ul class="flex flex-col gap-5 text-lg font-semibold">
-                <li><a href="{{ route('home') }}"
-                        class="{{ request()->routeIs('home') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue' }} transition-colors">Home</a>
+                <li><a href="<?php echo e(route('home')); ?>"
+                        class="<?php echo e(request()->routeIs('home') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue'); ?> transition-colors">Home</a>
                 </li>
-                <li><a href="{{ route('about') }}"
-                        class="{{ request()->routeIs('about') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue' }} transition-colors">About
+                <li><a href="<?php echo e(route('about')); ?>"
+                        class="<?php echo e(request()->routeIs('about') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue'); ?> transition-colors">About
                         us</a></li>
-                <li><a href="{{ route('services') }}"
-                        class="{{ request()->routeIs('services') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue' }} transition-colors">Our
+                <li><a href="<?php echo e(route('services')); ?>"
+                        class="<?php echo e(request()->routeIs('services') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue'); ?> transition-colors">Our
                         Services</a></li>
-                <li><a href="{{ route('jobs') }}"
-                        class="{{ request()->routeIs('jobs') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue' }} transition-colors">Jobs</a>
+                <li><a href="<?php echo e(route('jobs')); ?>"
+                        class="<?php echo e(request()->routeIs('jobs') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue'); ?> transition-colors">Jobs</a>
                 </li>
-                <li><a href="{{ route('resume.builder') }}"
-                        class="{{ request()->routeIs('resume.builder') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue' }} transition-colors">Resume
+                <li><a href="<?php echo e(route('resume.builder')); ?>"
+                        class="<?php echo e(request()->routeIs('resume.builder') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue'); ?> transition-colors">Resume
                         Builder <span
                             class="bg-accent-yellow text-white text-[8px] px-1 py-0.5 rounded uppercase font-bold ml-1 relative -top-1">Free</span></a>
                 </li>
-                <li><a href="{{ route('hiring') }}"
-                        class="{{ request()->routeIs('hiring') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue' }} transition-colors">Hiring
+                <li><a href="<?php echo e(route('hiring')); ?>"
+                        class="<?php echo e(request()->routeIs('hiring') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue'); ?> transition-colors">Hiring
                         Process</a></li>
-                <li><a href="{{ route('contact') }}"
-                        class="{{ request()->routeIs('contact') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue' }} transition-colors">Contact
+                <li><a href="<?php echo e(route('contact')); ?>"
+                        class="<?php echo e(request()->routeIs('contact') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue'); ?> transition-colors">Contact
                         us</a></li>
             </ul>
 
             <div class="h-px bg-card-border w-full"></div>
 
             <div class="flex flex-col gap-3">
-                @auth
-                    <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'employer' ? route('employer.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard'))) }}"
+                <?php if(auth()->guard()->check()): ?>
+                    <a href="<?php echo e(auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'employer' ? route('employer.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard')))); ?>"
                         class="px-5 py-3.5 rounded-xl font-medium text-center bg-accent-blue text-white shadow-glow-blue flex items-center justify-center gap-2">
                         <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
+                    <form action="<?php echo e(route('logout')); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
                         <button type="submit"
                             class="w-full px-5 py-3.5 rounded-xl font-medium text-center text-red-400 border border-red-500/20 hover:bg-red-500/10 transition-colors">
                             <i class="fas fa-sign-out-alt mr-1"></i> Logout
                         </button>
                     </form>
-                @else
+                <?php else: ?>
                     <a href="/login"
                         class="px-5 py-3.5 rounded-xl font-medium text-center bg-white/10 text-text-main">Login</a>
                     <a href="/register"
                         class="px-5 py-3.5 rounded-xl font-medium text-center bg-accent-blue text-white shadow-glow-blue">Register</a>
-                @endauth
+                <?php endif; ?>
             </div>
         </div>
     </div>
 
-    <main class="min-h-screen" style="{{ !request()->routeIs('home') ? 'padding-top: 140px;' : '' }}">
-        @yield('content')
+    <main class="min-h-screen" style="<?php echo e(!request()->routeIs('home') ? 'padding-top: 140px;' : ''); ?>">
+        <?php echo $__env->yieldContent('content'); ?>
     </main>
 
                     <!-- Footer -->
@@ -438,8 +439,8 @@
         <div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-16 mb-16 relative z-10">
             <!-- Brand -->
             <div>
-                <a href="{{ route('home') }}" class="flex items-center no-underline mb-6">
-                    <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-20">
+                <a href="<?php echo e(route('home')); ?>" class="flex items-center no-underline mb-6">
+                    <img src="<?php echo e(asset('adobe.png')); ?>" alt="Warriors Educare Logo" class="h-20">
                 </a>
                 <p class="text-[13px] text-gray-600 font-medium leading-[1.8] mb-8 pr-4">
                     Our goal is to demystify the process, address your concerns, and empower you with the knowledge to embark.
@@ -572,7 +573,7 @@
                 title: "Get placed in top<br>schools across...",
                 subtitle: "step into the right opportunity with trusted schools that value your talent",
                 ctaText: "Job Seeker",
-                ctaLink: "{{ route('candidate.register') }}",
+                ctaLink: "<?php echo e(route('candidate.register')); ?>",
                 imgUrl: "images/men.jpg",
                 fc1Title: "20K +",
                 fc1Desc: "Job Vacancy",
@@ -592,7 +593,7 @@
                 title: "Hire the Minds <br> That Shape Tomorrow",
                 subtitle: "partner with us to find top-tier teaching professionals for your institution",
                 ctaText: "Employer",
-                ctaLink: "{{ route('employer.register') }}",
+                ctaLink: "<?php echo e(route('employer.register')); ?>",
                 imgUrl: "images/women.jpg",
                 fc1Title: "500+",
                 fc1Desc: "Partner Schools",
@@ -784,7 +785,7 @@
         });
     </script>
 
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -867,3 +868,4 @@
 
 </html>
 
+<?php /**PATH E:\warriors portal\warriors portal\resources\views/layouts/app.blade.php ENDPATH**/ ?>
