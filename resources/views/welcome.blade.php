@@ -47,11 +47,9 @@
                         </span>
                     </button>
                     
-                    {{-- 
                     <button id="btn-employer" onclick="switchHeroMode('employer')" class="group bg-white hover:bg-[#0ea5e9] text-[#031b4e] hover:text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 flex items-center justify-center border-2 border-transparent hover:border-[#0ea5e9]">
                         I am an Employer <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                     </button>
-                    --}}
                 </div>
             </div>
             
@@ -64,7 +62,6 @@
                     <div id="hero-img-container" class="w-full h-full rounded-full overflow-hidden border-8 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative z-10 transition-transform duration-1000 ease-in-out">
                         <!-- Image of a team/meeting -->
                         <img id="hero-img" src="{{ asset('images/candidate_hero_4k.png') }}" alt="Team Collaboration" class="w-full h-full object-cover transition-opacity duration-300">
-                        <div class="absolute inset-0 bg-[#0ea5e9] mix-blend-overlay opacity-10 pointer-events-none"></div>
                     </div>
 
                     <!-- Floating Play Button on the left edge of the circle -->
@@ -146,8 +143,8 @@
 
                     img.src = "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1000&q=80";
                     
-                    btnEmployer.className = "group bg-[#0ea5e9] text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.5)] transition-all duration-300 flex items-center justify-center border-2 border-[#0ea5e9] scale-105";
-                    btnCandidate.className = "group relative overflow-hidden bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-medium py-3.5 px-8 rounded-full shadow-lg transition-all duration-300 scale-100 opacity-80";
+                    if(btnEmployer) btnEmployer.className = "group bg-[#0ea5e9] text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.5)] transition-all duration-300 flex items-center justify-center border-2 border-[#0ea5e9] scale-105";
+                    if(btnCandidate) btnCandidate.className = "group relative overflow-hidden bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-medium py-3.5 px-8 rounded-full shadow-lg transition-all duration-300 scale-100 opacity-80";
                     
                     heading.style.opacity = '1';
                     text.style.opacity = '1';
@@ -186,8 +183,8 @@
 
                     img.src = "{{ asset('images/candidate_hero_4k.png') }}";
                     
-                    btnCandidate.className = "group relative overflow-hidden bg-[#0ea5e9] backdrop-blur-md border border-[#0ea5e9] text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.5)] transition-all duration-300 scale-105";
-                    btnEmployer.className = "group bg-white hover:bg-[#0ea5e9] text-[#031b4e] hover:text-white font-medium py-3.5 px-8 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center border-2 border-white/20 hover:border-white/40 scale-100 opacity-80";
+                    if(btnCandidate) btnCandidate.className = "group relative overflow-hidden bg-[#0ea5e9] backdrop-blur-md border border-[#0ea5e9] text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.5)] transition-all duration-300 scale-105";
+                    if(btnEmployer) btnEmployer.className = "group bg-white hover:bg-[#0ea5e9] text-[#031b4e] hover:text-white font-medium py-3.5 px-8 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center border-2 border-white/20 hover:border-white/40 scale-100 opacity-80";
                     
                     heading.style.opacity = '1';
                     text.style.opacity = '1';
