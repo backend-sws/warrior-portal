@@ -109,13 +109,14 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
     })->name('dashboard');
 });
 
-// Candidate Routes (Protected & Verified)
-Route::middleware(['auth', 'verified', 'candidate'])->prefix('candidate')->name('candidate.')->group(function () {
+// Candidate Routes (Protected)
+Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.')->group(function () {
     Route::get('/profile', [\App\Http\Controllers\Candidate\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\Candidate\ProfileController::class, 'update'])->name('profile.update');
     Route::post('/password', [\App\Http\Controllers\Candidate\ProfileController::class, 'updatePassword'])->name('password.update');
 
     Route::get('/agreement', [\App\Http\Controllers\Candidate\AgreementController::class, 'show'])->name('agreement.show');
+    Route::post('/agreement/request', [\App\Http\Controllers\Candidate\AgreementController::class, 'requestActivation'])->name('agreement.request');
     Route::post('/agreement/sign', [\App\Http\Controllers\Candidate\AgreementController::class, 'sign'])->name('agreement.sign');
     Route::get('/agreement/download', [\App\Http\Controllers\Candidate\AgreementController::class, 'download'])->name('agreement.download');
 
@@ -137,6 +138,22 @@ Route::middleware(['auth', 'verified', 'candidate'])->prefix('candidate')->name(
 
     Route::get('/tuitions', [\App\Http\Controllers\Candidate\TuitionController::class, 'index'])->name('tuitions.index');
     Route::post('/tuitions/{id}/apply', [\App\Http\Controllers\Candidate\TuitionController::class, 'apply'])->name('tuitions.apply');
+});
+
+// Parent Auth Routes
+Route::get('/parent/register', [\App\Http\Controllers\ParentAuthController::class, 'showRegistrationForm'])->name('parent.register');
+Route::post('/parent/register', [\App\Http\Controllers\ParentAuthController::class, 'register'])->name('parent.register.post');
+
+// Parent Routes (Protected)
+Route::middleware(['auth', 'parent'])->prefix('parent')->name('parent.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Parent\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [\App\Http\Controllers\Parent\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [\App\Http\Controllers\Parent\ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/tuitions', [\App\Http\Controllers\Parent\TuitionController::class, 'index'])->name('tuitions.index');
+    Route::post('/tuitions/{id}/apply', [\App\Http\Controllers\Parent\TuitionController::class, 'apply'])->name('tuitions.apply');
+    Route::get('/tutor-need', [\App\Http\Controllers\Parent\TuitionController::class, 'create'])->name('tuitions.create');
+    Route::post('/tutor-need', [\App\Http\Controllers\Parent\TuitionController::class, 'store'])->name('tuitions.store');
+    Route::get('/history', [\App\Http\Controllers\Parent\TuitionController::class, 'history'])->name('tuitions.history');
 });
 
 // Employer Auth Routes
@@ -175,6 +192,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('tuitions', \App\Http\Controllers\Admin\TuitionController::class);
     Route::post('jobs/{job}/approve', [\App\Http\Controllers\Admin\JobController::class, 'approve'])->name('jobs.approve');
     Route::post('jobs/{job}/reject', [\App\Http\Controllers\Admin\JobController::class, 'reject'])->name('jobs.reject');
+    Route::prefix('candidates')->name('candidates.')->group(function () {
+        Route::post('/{id}/verify', [\App\Http\Controllers\Admin\CandidateController::class, 'verify'])->name('verify');
+        Route::post('/{id}/upload-agreement', [\App\Http\Controllers\Admin\CandidateController::class, 'uploadAgreement'])->name('upload-agreement');
+        Route::post('/{id}/update-agreement-status', [\App\Http\Controllers\Admin\CandidateController::class, 'updateAgreementStatus'])->name('update-agreement-status');
+    });
 
     // Candidates CRM
     Route::get('/candidates/create', [\App\Http\Controllers\Admin\CrmController::class, 'create'])->name('crm.create');
@@ -192,6 +214,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/crm/candidate/{id}/rate', [\App\Http\Controllers\Admin\CrmController::class, 'rateCandidate'])->name('crm.candidate.rate');
     Route::get('/crm/candidate/{id}/magic-login', [\App\Http\Controllers\Admin\CrmController::class, 'magicLogin'])->name('crm.candidate.magic-login');
     Route::post('/crm/candidate/{id}/upload-agreement', [\App\Http\Controllers\Admin\CrmController::class, 'uploadAgreement'])->name('crm.candidate.upload-agreement');
+    Route::post('/crm/candidate/{id}/update-agreement-status', [\App\Http\Controllers\Admin\CrmController::class, 'updateAgreementStatus'])->name('crm.candidate.update-agreement-status');
 
     // Applications & Transactions
     Route::get('/applications', [\App\Http\Controllers\Admin\ApplicationController::class, 'index'])->name('applications.index');
@@ -215,6 +238,20 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/tuition-leads/{id}', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'update'])->name('tuition-leads.update');
     Route::put('/tuition-leads/{id}/status', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'updateStatus'])->name('tuition-leads.status.update');
     Route::post('/tuition-leads/{id}/follow-up', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'storeFollowUp'])->name('tuition-leads.followup.store');
+
+    // Tuition Fee Accounts (Payment Management)
+    Route::get('/tuition-fees', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'index'])->name('tuition-fees.index');
+    Route::get('/tuition-fees/create', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'create'])->name('tuition-fees.create');
+    Route::post('/tuition-fees', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'store'])->name('tuition-fees.store');
+    Route::get('/tuition-fees/{id}', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'show'])->name('tuition-fees.show');
+    Route::get('/tuition-fees/{id}/edit', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'edit'])->name('tuition-fees.edit');
+    Route::put('/tuition-fees/{id}', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'update'])->name('tuition-fees.update');
+    Route::delete('/tuition-fees/{id}', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'destroy'])->name('tuition-fees.destroy');
+    Route::post('/tuition-fees/{id}/payment', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'addPayment'])->name('tuition-fees.payment.add');
+
+    // Candidate Payment Management
+    Route::resource('candidate-payments', \App\Http\Controllers\Admin\CandidatePaymentController::class);
+    Route::post('/candidate-payments/{id}/payment', [\App\Http\Controllers\Admin\CandidatePaymentController::class, 'addPayment'])->name('candidate-payments.payment.add');
 
     // Frontend Management
     

@@ -37,14 +37,14 @@
             </div>
         </div>
 
-        <!-- Employers -->
+        <!-- Parents -->
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
             <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
-                <i class="fas fa-building"></i>
+                <i class="fas fa-users"></i>
             </div>
             <div>
-                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Employers</p>
-                <h3 class="text-2xl font-black text-gray-800">{{ $stats['employers'] }}</h3>
+                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Parents</p>
+                <h3 class="text-2xl font-black text-gray-800">{{ $stats['parents'] }}</h3>
             </div>
         </div>
     </div>
@@ -55,7 +55,7 @@
             <div class="flex gap-2 w-full sm:w-auto overflow-x-auto">
                 <a href="{{ route('admin.users.index') }}" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 {{ !request('role') ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All</a>
                 <a href="{{ route('admin.users.index', ['role' => 'candidate']) }}" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 {{ request('role') === 'candidate' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Candidates</a>
-                <a href="{{ route('admin.users.index', ['role' => 'employer']) }}" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 {{ request('role') === 'employer' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Employers</a>
+                <a href="{{ route('admin.users.index', ['role' => 'parent']) }}" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 {{ request('role') === 'parent' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Parents</a>
             </div>
             
             <form action="{{ route('admin.users.index') }}" method="GET" class="w-full sm:w-auto">
@@ -98,9 +98,9 @@
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                         Candidate
                                     </span>
-                                @elseif($user->role === 'employer')
+                                @elseif($user->role === 'parent')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                                        Employer
+                                        Parent
                                     </span>
                                 @endif
                             </td>

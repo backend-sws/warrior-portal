@@ -12,3 +12,4 @@ Schedule::command('invoices:calculate-late-fees')->daily();
 Schedule::command('reminders:abandoned-registration')->daily();
 Schedule::command('reminders:interview')->daily();
 Schedule::command('reminders:lead-follow-ups')->dailyAt('09:00');
+Schedule::command('payments:send-reminders')->dailyAt('08:00');

@@ -30,6 +30,8 @@ class AuthController extends Controller
                 return redirect()->intended('/admin/dashboard');
             } elseif ($user->role === 'employer') {
                 return redirect()->intended('/employer/dashboard');
+            } elseif ($user->role === 'parent') {
+                return redirect()->intended('/parent/dashboard');
             } else {
                 return redirect()->intended('/candidate/dashboard');
             }
@@ -114,6 +116,8 @@ class AuthController extends Controller
                 return redirect()->intended('/admin/dashboard');
             } elseif ($user->role === 'employer') {
                 return redirect()->intended('/employer/dashboard');
+            } elseif ($user->role === 'parent') {
+                return redirect()->intended('/parent/dashboard');
             } else {
                 return redirect()->intended('/candidate/dashboard');
             }

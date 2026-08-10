@@ -143,7 +143,8 @@ class HomeTuitionLeadController extends Controller
         $request->validate([
             'status' => 'required|in:New Lead,Demo Scheduled,Demo Completed,Confirmed,Pending,Cancelled',
             'follow_up_date' => 'nullable|date',
-            'teacher_contact' => 'nullable|string|max:20'
+            'teacher_contact' => 'nullable|string|max:20',
+            'teacher_name' => 'nullable|string|max:255'
         ]);
 
         $lead->status = $request->status;
@@ -153,12 +154,18 @@ class HomeTuitionLeadController extends Controller
         if ($request->has('teacher_contact') && $request->teacher_contact) {
             $lead->teacher_contact = $request->teacher_contact;
         }
+        if ($request->has('teacher_name') && $request->teacher_name) {
+            $lead->teacher_name = $request->teacher_name;
+        }
         
         $lead->save();
 
         $note = "Status updated to {$request->status}.";
         if ($request->filled('teacher_contact')) {
             $note .= " Teacher contact updated to {$request->teacher_contact}.";
+        }
+        if ($request->filled('teacher_name')) {
+            $note .= " Teacher name updated to {$request->teacher_name}.";
         }
 
         $lead->followUps()->create([

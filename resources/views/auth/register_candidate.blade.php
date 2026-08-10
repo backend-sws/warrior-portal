@@ -239,16 +239,24 @@ career with Warriors Educare
 
             <div class="mt-6 flex items-center gap-4">
                 <div class="flex-1 h-px bg-gray-200"></div>
-                <span class="text-xs text-gray-400 uppercase tracking-wider font-medium">Or</span>
+                <span class="text-xs text-gray-400 uppercase tracking-wider font-medium">Or Register As</span>
                 <div class="flex-1 h-px bg-gray-200"></div>
             </div>
 
-            <div class="mt-4 text-center space-y-2">
+            <div class="mt-4 grid grid-cols-1 gap-4 relative z-20">
+                <a href="{{ route('parent.register') }}"
+                    class="flex flex-col items-center justify-center p-4 rounded-xl text-center font-bold border border-gray-200 hover:bg-purple-600/10 hover:border-purple-600/30 transition-all group cursor-pointer pointer-events-auto">
+                    <div class="flex items-center gap-2 text-gray-800 text-sm">
+                        <i class="fas fa-user-friends text-purple-600 group-hover:scale-110 transition-transform"></i>
+                        <span>Hire a Teacher / Tutor &rarr;</span>
+                    </div>
+                    <span class="text-xs text-gray-500 font-medium mt-1">(For Parents & Schools)</span>
+                </a>
+            </div>
+
+            <div class="mt-6 text-center">
                 <p class="text-sm text-gray-600">
                     Already have an account? <a href="{{ route('login') }}" class="font-bold text-[#1e3a8a] hover:underline">Sign in</a>
-                </p>
-                <p class="text-sm text-gray-600">
-                    Want to hire? <a href="{{ route('employer.register') }}" class="font-bold text-[#0ea5e9] hover:underline">Register as Employer</a>
                 </p>
             </div>
         </div>

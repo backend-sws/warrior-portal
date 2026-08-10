@@ -93,12 +93,14 @@
                         <ul class="space-y-3 text-sm text-text-main">
                             <li class="flex items-center gap-2">
                                 <span class="text-text-dark/60 w-32">Teacher Assigned:</span> 
-                                @if($lead->teacher_contact)
+                                @if($lead->teacher_contact || $lead->teacher_name)
                                     <span class="font-semibold bg-secondary-bg px-2 py-1 rounded border border-card-border flex items-center gap-2">
-                                        {{ $lead->teacher_contact }}
+                                        {{ $lead->teacher_name ? $lead->teacher_name . ' (' . $lead->teacher_contact . ')' : $lead->teacher_contact }}
+                                        @if($lead->teacher_contact)
                                         <a href="https://wa.me/91{{ preg_replace('/[^0-9]/', '', $lead->teacher_contact) }}" target="_blank" class="text-green-500 hover:text-green-600" title="WhatsApp Teacher">
                                             <i class="fab fa-whatsapp"></i>
                                         </a>
+                                        @endif
                                     </span>
                                 @else
                                     <span class="text-text-dark/40 italic">None assigned</span>
@@ -150,12 +152,18 @@
                     </div>
 
                     <div>
+                        <label class="block text-xs font-bold text-text-dark/60 uppercase tracking-wider mb-2">Teacher Name (Optional)</label>
+                        <input type="text" name="teacher_name" value="{{ $lead->teacher_name }}" placeholder="Teacher's full name"
+                               class="w-full px-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-semibold text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all mb-4">
+                    </div>
+
+                    <div>
                         <label class="block text-xs font-bold text-text-dark/60 uppercase tracking-wider mb-2">Teacher Contact (Optional)</label>
-                        <input type="text" name="teacher_contact" value="{{ $lead->teacher_contact }}" placeholder="Assign a teacher..."
+                        <input type="text" name="teacher_contact" value="{{ $lead->teacher_contact }}" placeholder="Phone number"
                                class="w-full px-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-semibold text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
                     </div>
                     
-                    <button type="submit" class="w-full bg-accent-blue text-white rounded-xl px-4 py-2.5 text-sm font-bold shadow hover:bg-accent-blue-hover transition-colors">
+                    <button type="submit" class="w-full bg-accent-blue text-white rounded-xl px-4 py-2.5 text-sm font-bold shadow hover:bg-accent-blue-hover transition-colors mt-4">
                         Update Status
                     </button>
                 </form>

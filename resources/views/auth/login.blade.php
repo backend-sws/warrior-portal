@@ -146,6 +146,32 @@
                 <p class="mt-1.5 text-sm text-gray-500">Enter your credentials to access your account</p>
             </div>
 
+            <div class="mb-4 flex items-center gap-4">
+                <div class="flex-1 h-px bg-gray-200"></div>
+                <span class="text-xs text-gray-400 uppercase tracking-wider font-medium">New here? Register as</span>
+                <div class="flex-1 h-px bg-gray-200"></div>
+            </div>
+
+            <div class="mb-8 grid grid-cols-1 gap-4 relative z-20">
+                <a href="{{ route('parent.register') }}"
+                    class="flex flex-col items-center justify-center p-4 rounded-xl text-center font-bold border border-gray-200 hover:bg-purple-600/10 hover:border-purple-600/30 transition-all group cursor-pointer pointer-events-auto">
+                    <div class="flex items-center gap-2 text-gray-800 text-sm">
+                        <i class="fas fa-user-friends text-purple-600 group-hover:scale-110 transition-transform"></i>
+                        <span>Hire a Teacher / Tutor &rarr;</span>
+                    </div>
+                    <span class="text-xs text-gray-500 font-medium mt-1">(For Parents & Schools)</span>
+                </a>
+
+                <a href="{{ route('candidate.register') }}"
+                    class="flex flex-col items-center justify-center p-4 rounded-xl text-center font-bold border border-gray-200 hover:bg-[#1e3a8a]/10 hover:border-[#1e3a8a]/30 transition-all group cursor-pointer pointer-events-auto">
+                    <div class="flex items-center gap-2 text-gray-800 text-sm">
+                        <i class="fas fa-user-graduate text-[#1e3a8a] group-hover:scale-110 transition-transform"></i>
+                        <span>Join as a Teacher / Tutor &rarr;</span>
+                    </div>
+                    <span class="text-xs text-gray-500 font-medium mt-1">(Find School Jobs & Tuition Opportunities)</span>
+                </a>
+            </div>
+
             @if($errors->any())
                 <div class="mb-6 bg-red-500/10 border border-red-500/30 p-4 rounded-xl">
                     <div class="flex items-start gap-3">
@@ -210,24 +236,7 @@
                 </div>
             </form>
 
-            <div class="mt-8 flex items-center gap-4">
-                <div class="flex-1 h-px bg-gray-200"></div>
-                <span class="text-xs text-gray-400 uppercase tracking-wider font-medium">New here?</span>
-                <div class="flex-1 h-px bg-gray-200"></div>
-            </div>
 
-            <div class="mt-6 grid grid-cols-2 gap-3">
-                <a href="{{ route('candidate.register') }}"
-                    class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold border border-gray-200 text-gray-700 hover:bg-[#1e3a8a]/10 hover:border-[#1e3a8a]/30 transition-all group">
-                    <i class="fas fa-user-graduate text-[#1e3a8a] group-hover:scale-110 transition-transform"></i>
-                    <span>Candidate</span>
-                </a>
-                <a href="{{ route('employer.register') }}"
-                    class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold border border-gray-200 text-gray-700 hover:bg-[#0ea5e9]/10 hover:border-[#0ea5e9]/30 transition-all group">
-                    <i class="fas fa-building text-[#0ea5e9] group-hover:scale-110 transition-transform"></i>
-                    <span>Employer</span>
-                </a>
-            </div>
         </div>
     </div>
 </div>

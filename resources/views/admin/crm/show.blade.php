@@ -11,6 +11,7 @@
     <div class="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
         <a href="{{ route('admin.crm.index') }}" class="text-sm text-gray-600 hover:underline shrink-0">&larr; Back to List</a>
         
+        @if($candidate->role === 'candidate')
         <form action="{{ route('admin.crm.candidate.verify', $candidate->id) }}" method="POST" class="inline">
             @csrf
             @if($candidate->profile && $candidate->profile->is_verified)
@@ -27,9 +28,10 @@
         <a href="{{ route('admin.crm.edit', $candidate->id) }}" class="px-4 py-2 bg-blue-100 text-blue-700 text-sm font-semibold rounded-xl hover:bg-blue-200 transition-colors flex items-center shadow-sm">
             <i class="fas fa-edit mr-2"></i> Edit Profile
         </a>
+        @endif
         
         <a href="{{ route('admin.crm.candidate.magic-login', $candidate->id) }}" target="_blank" class="px-4 py-2 bg-indigo-100 text-indigo-700 text-sm font-semibold rounded-xl hover:bg-indigo-200 transition-colors flex items-center shadow-sm">
-            <i class="fas fa-sign-in-alt mr-2"></i> Login as Candidate
+            <i class="fas fa-sign-in-alt mr-2"></i> {{ $candidate->role === 'parent' ? 'Login as Parent' : 'Login as Candidate' }}
         </a>
     </div>
 @endsection
@@ -198,7 +200,7 @@
                     <div class="mt-6 pt-6 border-t border-gray-100">
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Agreement Status</h4>
-                            @if($candidate->profile && ($candidate->profile->is_agreement_signed || $candidate->profile->agreement_pdf_path || $candidate->profile->signature_date_time))
+                            @if($candidate->profile->agreement_status === 'signed' || $candidate->profile->is_agreement_signed || $candidate->profile->agreement_pdf_path || $candidate->profile->signature_date_time)
                                 @if($candidate->profile->agreement_pdf_path)
                                     <a href="{{ Storage::url($candidate->profile->agreement_pdf_path) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-200 hover:bg-green-100 transition-colors">
                                         <i class="fas fa-check-circle"></i> Signed & Valid (PDF)
@@ -208,12 +210,32 @@
                                         <i class="fas fa-check-circle"></i> Signed (Digitally)
                                     </span>
                                 @endif
+                            @elseif($candidate->profile->agreement_status === 'pending_signature')
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold border border-amber-200">
+                                    <i class="fas fa-hourglass-half"></i> Pending Signature
+                                </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold border border-yellow-200">
-                                    <i class="fas fa-clock"></i> Not Signed
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-50 text-gray-700 rounded-full text-xs font-bold border border-gray-200">
+                                    <i class="fas fa-ban"></i> Not Required
                                 </span>
                             @endif
                         </div>
+
+                        <!-- Update Agreement Status Form -->
+                        <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST" class="mb-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            @csrf
+                            <label class="block text-xs font-bold text-gray-700">Change Status:</label>
+                            <div class="flex items-center gap-2">
+                                <select name="agreement_status" class="text-xs bg-gray-50 border-gray-200 rounded-lg py-1.5 px-3 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="not_required" {{ $candidate->profile->agreement_status === 'not_required' ? 'selected' : '' }}>Not Required</option>
+                                    <option value="pending_signature" {{ $candidate->profile->agreement_status === 'pending_signature' ? 'selected' : '' }}>Pending Signature</option>
+                                    <option value="signed" {{ $candidate->profile->agreement_status === 'signed' ? 'selected' : '' }}>Signed</option>
+                                </select>
+                                <button type="submit" class="px-3 py-1.5 bg-gray-800 text-white rounded-lg text-xs font-bold hover:bg-gray-700 transition-colors">
+                                    Update
+                                </button>
+                            </div>
+                        </form>
 
                         <form action="{{ route('admin.crm.candidate.upload-agreement', $candidate->id) }}" method="POST" enctype="multipart/form-data" class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm">
                             @csrf
@@ -240,7 +262,7 @@
                             </button>
                         </form>
                     </div>
-                @else
+                @elseif($candidate->role === 'candidate')
                     <div class="py-10 flex flex-col items-center justify-center text-gray-500">
                         <i class="fas fa-user-slash text-4xl mb-3 text-gray-300"></i>
                         <p class="font-medium text-sm">No profile data available yet.</p>
@@ -251,6 +273,7 @@
         </div>
 
         <!-- Job Applications -->
+        @if($candidate->role === 'candidate')
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 border-b border-gray-200">
                 <div class="flex flex-col gap-3 mb-4">
@@ -369,6 +392,7 @@
                 </form>
             </div>
         </div>
+        @endif
     </div>
 
     <!-- Right Column: CRM Follow-ups & Invoices -->
@@ -390,8 +414,55 @@
             </div>
         @endif
 
-        <!-- Service Charge Invoices -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+        <!-- Parent Tuitions or Service Charge Invoices -->
+        @if($candidate->role === 'parent')
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Home Tuition Requirements</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm text-left">
+                            <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 font-bold">Class & Subjects</th>
+                                    <th class="px-4 py-3 font-bold">Location</th>
+                                    <th class="px-4 py-3 font-bold">Status</th>
+                                    <th class="px-4 py-3 font-bold">Date Posted</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @forelse($tuitions as $tuition)
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-4 py-3">
+                                            <div class="font-bold text-gray-900">{{ $tuition->class }}</div>
+                                            <div class="text-gray-500 text-xs">{{ $tuition->subjects }}</div>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600">{{ $tuition->location }}</td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold
+                                                {{ $tuition->status === 'Confirmed' ? 'bg-green-100 text-green-700' : '' }}
+                                                {{ in_array($tuition->status, ['New Lead', 'Pending']) ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                {{ in_array($tuition->status, ['Demo Scheduled', 'Demo Completed']) ? 'bg-blue-100 text-blue-700' : '' }}
+                                                {{ $tuition->status === 'Cancelled' ? 'bg-red-100 text-red-700' : '' }}
+                                            ">
+                                                {{ $tuition->status }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-500">{{ $tuition->created_at->format('M d, Y') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                            No tuition requirements posted yet.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @else
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
             <div class="p-6 border-b border-gray-200">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-900">Service Charge Invoices</h3>
@@ -497,6 +568,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- Follow-ups -->
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">

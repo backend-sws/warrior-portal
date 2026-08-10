@@ -146,7 +146,7 @@ class CrmController extends Controller
 
     public function edit($id)
     {
-        $user = User::where('role', 'candidate')->findOrFail($id);
+        $user = User::whereIn('role', ['candidate', 'parent'])->findOrFail($id);
         $profile = $user->profile;
 
         $categories = \App\Models\Category::all();
@@ -160,7 +160,7 @@ class CrmController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user = User::where('role', 'candidate')->findOrFail($id);
+        $user = User::whereIn('role', ['candidate', 'parent'])->findOrFail($id);
         $profile = $user->profile;
 
         $request->validate([
@@ -261,7 +261,9 @@ class CrmController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::where('role', 'candidate')
+        $role = $request->input('role', 'candidate');
+        
+        $query = User::where('role', $role)
             ->with(['profile', 'applications.jobPost', 'applications' => function($q) {
                 $q->where('status', 'hired');
             }]);
@@ -373,9 +375,14 @@ class CrmController extends Controller
 
     public function show($id)
     {
-        $candidate = User::where('role', 'candidate')
-            ->with(['profile', 'applications.jobPost'])
-            ->findOrFail($id);
+        $candidate = User::whereIn('role', ['candidate', 'parent'])->with(['profile', 'applications.jobPost', 'applications' => function($q) {
+            $q->orderBy('created_at', 'desc');
+        }])->findOrFail($id);
+
+        $tuitions = [];
+        if ($candidate->role === 'parent') {
+            $tuitions = \App\Models\HomeTuitionLead::where('user_id', $candidate->id)->latest()->get();
+        }
 
         $followUps = CrmFollowUp::where('candidate_id', $id)->with('admin')->orderBy('created_at', 'desc')->get();
         $invoices = ServiceChargeInvoice::where('candidate_id', $id)->with('jobApplication.jobPost')->orderBy('created_at', 'desc')->get();
@@ -478,16 +485,38 @@ class CrmController extends Controller
 
         $history = $history->sortByDesc('date')->values();
 
-        return view('admin.crm.show', compact('candidate', 'followUps', 'invoices', 'rating', 'history', 'availableJobs'));
+        return view('admin.crm.show', compact('candidate', 'followUps', 'invoices', 'rating', 'history', 'availableJobs', 'tuitions'));
+    }
+
+    public function updateAgreementStatus(Request $request, $id)
+    {
+        $request->validate([
+            'agreement_status' => 'required|in:not_required,pending_signature,signed',
+        ]);
+
+        $candidate = User::whereIn('role', ['candidate', 'parent'])->findOrFail($id);
+        
+        if ($candidate->profile) {
+            $updates = [
+                'agreement_status' => $request->agreement_status,
+            ];
+
+            // We only update the status. The candidate will see the form again if it's set to pending_signature.
+            // When they sign, the new PDF will overwrite the old one.
+
+            $candidate->profile->update($updates);
+        }
+
+        return back()->with('success', 'Agreement status updated successfully.');
     }
 
     public function uploadAgreement(Request $request, $id)
     {
         $request->validate([
-            'agreement_pdf' => 'required|file|mimes:pdf|max:10240', // max 10MB
+            'agreement_pdf' => 'required|mimes:pdf|max:5120',
         ]);
 
-        $candidate = User::findOrFail($id);
+        $candidate = User::whereIn('role', ['candidate', 'parent'])->findOrFail($id);
         $profile = $candidate->profile;
 
         if (!$profile) {
@@ -505,6 +534,7 @@ class CrmController extends Controller
             $profile->update([
                 'is_agreement_signed' => true,
                 'agreement_pdf_path' => $fileName,
+                'agreement_status' => 'signed'
             ]);
 
             return back()->with('success', 'Agreement PDF uploaded successfully. The candidate can now view and download it.');

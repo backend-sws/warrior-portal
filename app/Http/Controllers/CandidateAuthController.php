@@ -47,6 +47,6 @@ class CandidateAuthController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
-        return redirect()->route('candidate.wizard');
+        return redirect()->route('candidate.dashboard');
     }
 }

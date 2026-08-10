@@ -326,7 +326,7 @@
             </ul>
             <div class="flex gap-3 lg:gap-4 items-center">
                 @auth
-                    <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'employer' ? route('employer.dashboard') : route('admin.dashboard')) }}"
+                    <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'employer' ? route('employer.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard'))) }}"
                         class="px-5 py-2.5 rounded font-medium text-[14px] cursor-pointer transition-all bg-white/20 text-white hover:bg-white/30 border border-white/30 flex items-center gap-2 whitespace-nowrap">
                         <div
                             class="w-6 h-6 rounded-full bg-white text-[#031b4e] flex items-center justify-center text-[10px] font-bold">
@@ -397,7 +397,7 @@
 
             <div class="flex flex-col gap-3">
                 @auth
-                    <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'employer' ? route('employer.dashboard') : route('admin.dashboard')) }}"
+                    <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'employer' ? route('employer.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard'))) }}"
                         class="px-5 py-3.5 rounded-xl font-medium text-center bg-accent-blue text-white shadow-glow-blue flex items-center justify-center gap-2">
                         <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>

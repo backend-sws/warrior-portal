@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class HomeTuitionLead extends Model
 {
     protected $fillable = [
-        'parent_name', 'parent_mobile', 'teacher_contact', 'location', 
-        'class', 'subjects', 'fee', 'preferred_timing', 'enquiry_date', 
+        'user_id', 'parent_name', 'parent_mobile', 'teacher_name', 'teacher_contact', 'location', 
+        'class', 'board', 'subjects', 'fee', 'preferred_timing', 'enquiry_date', 
         'tutor_preference', 'dues', 'additional_notes', 'status', 'follow_up_date'
     ];
 

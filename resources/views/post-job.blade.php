@@ -63,7 +63,7 @@
                         </div>
                         <div class="text-xs sm:text-sm leading-relaxed">
                             <span class="font-bold text-slate-900">Posting as Guest:</span> You are submitting a requirement directly. To manage candidates and track applications faster, 
-                            <a href="{{ route('employer.register') }}" class="text-[#129aef] font-bold underline hover:text-[#0d85d4] transition-colors">Register as Employer</a> or 
+                            {{-- <a href="{{ route('employer.register') }}" class="text-[#129aef] font-bold underline hover:text-[#0d85d4] transition-colors">Register as Employer</a> or --}}
                             <a href="{{ route('login') }}" class="text-[#129aef] font-bold underline hover:text-[#0d85d4] transition-colors">Login</a>.
                         </div>
                     </div>

@@ -165,9 +165,9 @@
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <template x-for="(skill, index) in resume.skills" :key="index">
-                            <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary-bg border border-[#031b4e]/10 rounded-full text-xs font-semibold text-[#031b4e]">
+                            <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#031b4e] border border-[#031b4e]/10 rounded-full text-xs font-semibold text-white">
                                 <span x-text="skill"></span>
-                                <button type="button" @click="removeSkill(index)" class="text-[#031b4e]/50 hover:text-red-400"><i class="fas fa-times"></i></button>
+                                <button type="button" @click="removeSkill(index)" class="text-white/70 hover:text-red-400"><i class="fas fa-times"></i></button>
                             </span>
                         </template>
                     </div>

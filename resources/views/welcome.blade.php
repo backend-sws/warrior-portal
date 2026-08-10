@@ -47,9 +47,11 @@
                         </span>
                     </button>
                     
+                    {{-- 
                     <button id="btn-employer" onclick="switchHeroMode('employer')" class="group bg-white hover:bg-[#0ea5e9] text-[#031b4e] hover:text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 flex items-center justify-center border-2 border-transparent hover:border-[#0ea5e9]">
                         I am an Employer <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                     </button>
+                    --}}
                 </div>
             </div>
             
@@ -516,7 +518,7 @@ Our recruitment approach follows modern hiring practices, institutional standard
                                 <div class="flex justify-between items-center mt-auto relative z-20">
                                     <div class="absolute -top-3 left-0 w-full h-[1px] bg-slate-200 z-10"></div>
                                     <span class="text-[11px] font-medium text-slate-500 bg-white/60 backdrop-blur-sm border border-slate-200/50 px-2 py-1 rounded flex items-center gap-1 shadow-sm relative z-20 mt-1"><i class="far fa-clock"></i> {{ $tuition->created_at->diffForHumans() }}</span>
-                                    <a href="{{ auth()->check() ? route('candidate.tuitions.index') : route('login') }}" class="inline-flex items-center gap-2 bg-[#031b4e] text-white hover:bg-blue-900 px-5 py-2.5 rounded-lg font-bold text-sm transition-colors shadow-lg relative z-20">Apply Now <i class="fas fa-arrow-right"></i></a>
+                                    <a href="{{ auth()->check() ? route('candidate.tuitions.index') : route('parent.register') }}" class="inline-flex items-center gap-2 bg-[#031b4e] text-white hover:bg-blue-900 px-5 py-2.5 rounded-lg font-bold text-sm transition-colors shadow-lg relative z-20">Apply Now <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div>
