@@ -16,18 +16,20 @@ class AgreementController extends Controller
         $user = auth()->user();
         $profile = $user->profile;
 
-        // Redirect if profile is incomplete
-        if (!$profile->is_profile_complete) {
-            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your profile first before signing the agreement.');
-        }
+        // We no longer require the profile to be complete just to view the agreement status
 
-        // If not signed, redirect to the wizard to ensure the live photo process is followed
-        if (!$profile->is_agreement_signed) {
-            return redirect()->route('candidate.wizard')->with('info', 'Please sign the agreement here.');
-        }
+        // We no longer redirect to wizard because agreement is optional during registration
 
         // If already signed, we will just show the signed state in the view.
         return view('candidate.agreement.show', compact('user', 'profile'));
+    }
+
+    public function requestActivation()
+    {
+        $user = auth()->user();
+        // Here you would typically send an email/notification to the admin.
+        // For now we just flash a message to the user.
+        return back()->with('success', 'Your request has been sent to the admin. They will activate your agreement shortly.');
     }
 
     public function sign(Request $request)
@@ -58,7 +60,8 @@ class AgreementController extends Controller
         // Update profile
         $profile->update([
             'is_agreement_signed' => true,
-            'agreement_pdf_path' => $fileName
+            'agreement_pdf_path' => $fileName,
+            'agreement_status' => 'signed'
         ]);
 
         return redirect()->route('candidate.dashboard')->with('success', 'Agreement digitally signed successfully.');

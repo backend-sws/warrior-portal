@@ -45,6 +45,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(EmployerProfile::class);
     }
 
+    public function parentProfile()
+    {
+        return $this->hasOne(ParentProfile::class);
+    }
+
     public function tuitions()
     {
         return $this->hasMany(TuitionRequirement::class, 'employer_id');

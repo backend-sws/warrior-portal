@@ -188,7 +188,7 @@
                     </div>
                 </div>
             </div>
-        @else
+        @elseif($profile->agreement_status === 'pending_signature')
             <div class="p-6 md:p-8">
                 <form action="{{ route('candidate.agreement.sign') }}" method="POST" id="signature-form">
                 @csrf
@@ -228,6 +228,21 @@
                 </div>
             </form>
         </div>
+        @else
+            <div class="p-8 text-center bg-gray-50 border-t border-[#031b4e]/10">
+                <div class="w-16 h-16 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-[#031b4e] mb-2">Agreement Not Activated</h3>
+                <p class="text-sm text-[#031b4e]/60 mb-6 max-w-md mx-auto">Your candidate agreement does not need to be signed at this time. Admin will activate it when you are assigned a job or tuition.</p>
+                
+                <form action="{{ route('candidate.agreement.request') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="px-6 py-2.5 bg-[#031b4e] text-white font-medium rounded-lg hover:bg-blue-900 transition-colors inline-flex items-center gap-2">
+                        <i class="fas fa-paper-plane"></i> Request Activation
+                    </button>
+                </form>
+            </div>
         @endif
     </div>
 </div>

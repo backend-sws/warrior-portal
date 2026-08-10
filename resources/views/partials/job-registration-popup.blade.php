@@ -75,7 +75,7 @@
 
             <div class="mt-4 text-center border-t border-slate-200 pt-4">
                 <p class="text-xs text-slate-500">Already have an account? <a href="{{ route('login') }}" class="text-accent-blue font-bold hover:underline">Login here</a></p>
-                <p class="text-xs text-slate-400 mt-2">Looking to hire? <a href="{{ route('employer.register') }}" class="text-slate-600 hover:text-accent-yellow transition-colors underline">Register as Employer</a></p>
+                {{-- <p class="text-xs text-slate-400 mt-2">Looking to hire? <a href="{{ route('employer.register') }}" class="text-slate-600 hover:text-accent-yellow transition-colors underline">Register as Employer</a></p> --}}
             </div>
         </div>
     </div>

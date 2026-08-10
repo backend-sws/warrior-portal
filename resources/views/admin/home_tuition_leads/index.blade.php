@@ -102,13 +102,15 @@
                         {{ $lead->status }}
                     </span>
                     
-                    @if($lead->teacher_contact)
+                    @if($lead->teacher_contact || $lead->teacher_name)
                         <div class="text-xs text-text-dark/80 mt-1 flex items-center gap-1">
                             <i class="fas fa-chalkboard-teacher text-[10px]"></i> 
-                            {{ $lead->teacher_contact }}
+                            {{ $lead->teacher_name ? $lead->teacher_name . ' (' . $lead->teacher_contact . ')' : $lead->teacher_contact }}
+                            @if($lead->teacher_contact)
                             <a href="https://wa.me/91{{ preg_replace('/[^0-9]/', '', $lead->teacher_contact) }}" target="_blank" class="text-green-500 hover:text-green-600 ml-1" title="WhatsApp Teacher">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
+                            @endif
                         </div>
                     @endif
                 </td>

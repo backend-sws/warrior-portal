@@ -34,16 +34,27 @@
 
 {{-- Filter/Search Bar --}}
 <div class="bg-card-bg rounded-t-2xl border-x border-t border-card-border p-4">
-    <div class="flex justify-between items-center mb-4">
-        <div class="text-sm text-text-dark/50 font-medium">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex gap-2 w-full sm:w-auto overflow-x-auto">
+                <a href="{{ route('admin.crm.index', ['role' => 'candidate']) }}" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 {{ request('role', 'candidate') === 'candidate' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Candidates CRM</a>
+                <a href="{{ route('admin.crm.index', ['role' => 'parent']) }}" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 {{ request('role') === 'parent' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Parents CRM</a>
+            </div>
+            
+            <div class="flex justify-between items-center w-full sm:w-auto">
+                <div class="text-sm text-text-dark/50 font-medium sm:hidden">
+                    Showing {{ $candidates->firstItem() ?? 0 }} to {{ $candidates->lastItem() ?? 0 }} of {{ $candidates->total() }} entries
+                </div>
+                <button type="button" onclick="document.getElementById('advanced-filters').classList.toggle('hidden')" class="text-sm font-semibold text-accent-blue flex items-center gap-2 hover:text-accent-blue-hover transition-colors">
+                    <i class="fas fa-filter"></i> Advanced Filters
+                </button>
+            </div>
+        </div>
+        <div class="text-sm text-text-dark/50 font-medium hidden sm:block mt-2 mb-4">
             Showing {{ $candidates->firstItem() ?? 0 }} to {{ $candidates->lastItem() ?? 0 }} of {{ $candidates->total() }} entries
         </div>
-        <button type="button" onclick="document.getElementById('advanced-filters').classList.toggle('hidden')" class="text-sm font-semibold text-accent-blue flex items-center gap-2 hover:text-accent-blue-hover transition-colors">
-            <i class="fas fa-filter"></i> Advanced Filters
-        </button>
-    </div>
 
     <form action="{{ route('admin.crm.index') }}" method="GET" class="space-y-4">
+        <input type="hidden" name="role" value="{{ request('role', 'candidate') }}">
         <div class="flex items-center relative">
             <i class="fas fa-search absolute left-3 text-text-dark/40 text-sm"></i>
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, email, phone..." 

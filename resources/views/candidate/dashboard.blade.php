@@ -19,18 +19,20 @@
             </div>
         @endif
 
-        @if(!($profile->initial_fee_paid || $profile->is_fee_paid))
-            {{-- ================= PENDING REGISTRATION BANNER ================= --}}
-            <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-8 flex items-center justify-between shadow-sm reveal">
+
+
+        @if($profile->agreement_status === 'pending_signature')
+            {{-- ================= PENDING AGREEMENT BANNER ================= --}}
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 flex items-center justify-between shadow-sm reveal">
                 <div class="flex items-center gap-3">
-                    <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+                    <i class="fas fa-file-signature text-amber-500 text-xl"></i>
                     <div>
-                        <h3 class="font-bold text-red-800">Registration Incomplete</h3>
-                        <p class="text-sm text-red-700">Please complete your registration and pay the initial fee to unlock all features.</p>
+                        <h3 class="font-bold text-amber-800">Action Required: Sign Agreement</h3>
+                        <p class="text-sm text-amber-700">Admin has requested you to sign the Candidate Agreement to proceed with your tuition/job assignment.</p>
                     </div>
                 </div>
-                <a href="{{ route('candidate.registration.show') }}" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold shadow hover:bg-red-700 transition-colors">
-                    Complete Registration
+                <a href="{{ route('candidate.agreement.show') }}" class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-bold shadow hover:bg-amber-700 transition-colors">
+                    Sign Now
                 </a>
             </div>
         @endif

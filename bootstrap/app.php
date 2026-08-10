@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\IsAdmin::class,
             'employer' => \App\Http\Middleware\IsEmployer::class,
             'candidate' => \App\Http\Middleware\IsCandidate::class,
+            'parent' => \App\Http\Middleware\IsParent::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'candidate/payment/callback',

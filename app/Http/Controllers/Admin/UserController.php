@@ -11,9 +11,9 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::with('profile')->whereIn('role', ['candidate', 'employer']);
+        $query = User::with('profile')->whereIn('role', ['candidate', 'parent']);
 
-        if ($request->has('role') && in_array($request->role, ['candidate', 'employer'])) {
+        if ($request->has('role') && in_array($request->role, ['candidate', 'parent'])) {
             $query->where('role', $request->role);
         }
 
@@ -29,11 +29,11 @@ class UserController extends Controller
         $users = $query->latest()->paginate(20)->withQueryString();
 
         $stats = [
-            'total' => User::whereIn('role', ['candidate', 'employer'])->count(),
+            'total' => User::whereIn('role', ['candidate', 'parent'])->count(),
             'candidates' => User::where('role', 'candidate')->count(),
-            'employers' => User::where('role', 'employer')->count(),
-            'active' => User::whereIn('role', ['candidate', 'employer'])->where('is_active', true)->count(),
-            'inactive' => User::whereIn('role', ['candidate', 'employer'])->where('is_active', false)->count(),
+            'parents' => User::where('role', 'parent')->count(),
+            'active' => User::whereIn('role', ['candidate', 'parent'])->where('is_active', true)->count(),
+            'inactive' => User::whereIn('role', ['candidate', 'parent'])->where('is_active', false)->count(),
         ];
 
         return view('admin.users.index', compact('users', 'stats'));
@@ -76,6 +76,10 @@ class UserController extends Controller
 
         if ($user->role === 'employer') {
             return redirect()->route('employer.dashboard');
+        }
+
+        if ($user->role === 'parent') {
+            return redirect()->route('parent.dashboard');
         }
 
         return redirect()->route('candidate.dashboard');

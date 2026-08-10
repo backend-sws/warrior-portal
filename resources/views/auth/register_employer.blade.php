@@ -153,16 +153,26 @@
 
             <div class="mt-6 flex items-center gap-4">
                 <div class="flex-1 h-px bg-card-border"></div>
-                <span class="text-xs text-text-dark/40 uppercase tracking-wider font-medium">Or</span>
+                <span class="text-xs text-text-dark/40 uppercase tracking-wider font-medium">Or Register As</span>
                 <div class="flex-1 h-px bg-card-border"></div>
             </div>
 
-            <div class="mt-4 text-center space-y-2">
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 relative z-20">
+                <a href="{{ route('candidate.register') }}"
+                    class="flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold border border-card-border text-text-main hover:bg-[#1e3a8a]/10 hover:border-[#1e3a8a]/30 transition-all group cursor-pointer pointer-events-auto">
+                    <i class="fas fa-user-graduate text-[#1e3a8a] group-hover:scale-110 transition-transform"></i>
+                    <span>Candidate</span>
+                </a>
+                <a href="{{ route('parent.register') }}"
+                    class="flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold border border-card-border text-text-main hover:bg-purple-600/10 hover:border-purple-600/30 transition-all group cursor-pointer pointer-events-auto block w-full text-center">
+                    <i class="fas fa-user-friends text-purple-600 group-hover:scale-110 transition-transform"></i>
+                    <span>Parent</span>
+                </a>
+            </div>
+
+            <div class="mt-6 text-center">
                 <p class="text-sm text-text-dark/60">
                     Already registered? <a href="{{ route('login') }}" class="font-semibold text-accent-blue hover:underline">Sign in</a>
-                </p>
-                <p class="text-sm text-text-dark/60">
-                    Looking for a job? <a href="{{ route('candidate.register') }}" class="font-semibold text-accent-blue hover:underline">Register as Candidate</a>
                 </p>
             </div>
         </div>

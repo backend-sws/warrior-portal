@@ -11,10 +11,6 @@ class ApplicationController extends Controller
 {
     private function ensureRegistrationComplete()
     {
-        $profile = auth()->user()->profile;
-        if (!$profile || (!$profile->initial_fee_paid && !$profile->is_fee_paid)) {
-            return redirect()->route('candidate.dashboard')->with('error', 'Please complete your registration and fee payment to unlock job applications.');
-        }
         return null;
     }
 
