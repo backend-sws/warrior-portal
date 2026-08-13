@@ -116,6 +116,124 @@
             </div>
         </div>
 
+        <!-- Service Charge Invoice (USD $) Card -->
+        <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-card-border bg-secondary-bg/50 flex justify-between items-center">
+                <h3 class="font-bold text-text-main flex items-center gap-2">
+                    <i class="fas fa-file-invoice-dollar text-green-500 text-lg"></i> Service Charge Invoice (USD $)
+                </h3>
+                <span class="text-xs bg-green-500/10 text-green-500 border border-green-500/20 font-bold px-2.5 py-1 rounded-lg">
+                    Direct to Parent Dashboard
+                </span>
+            </div>
+            <div class="p-6 space-y-6">
+                <!-- Invoice Creation Form -->
+                <form action="{{ route('admin.tuition-leads.invoice.store', $lead->id) }}" method="POST" class="bg-secondary-bg/30 p-4 rounded-xl border border-card-border" onsubmit="this.querySelector('button[type=submit]').disabled=true; this.querySelector('button[type=submit]').innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> Sending...';">
+                    @csrf
+                    <h4 class="text-xs font-bold text-text-main uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                        <i class="fas fa-plus-circle text-accent-blue"></i> Create Service Charge Invoice
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs font-bold text-text-dark/60 mb-1">Target Parent Account</label>
+                            <select name="user_id" class="w-full px-3 py-2 bg-secondary-bg border border-card-border rounded-lg text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 font-semibold">
+                                <option value="">Auto (Match Mobile: {{ $lead->parent_mobile }})</option>
+                                @foreach($parentUsers ?? [] as $pUser)
+                                    <option value="{{ $pUser->id }}" {{ $lead->user_id == $pUser->id ? 'selected' : '' }}>
+                                        {{ $pUser->name }} ({{ $pUser->phone ?: $pUser->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-text-dark/60 mb-1">Invoice Title *</label>
+                            <input type="text" name="title" value="Home Tuition Service Charge" required
+                                   class="w-full px-3 py-2 bg-secondary-bg border border-card-border rounded-lg text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-text-dark/60 mb-1">Amount ($ USD) *</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-green-500">$</span>
+                                <input type="number" step="0.01" name="amount" placeholder="0.00" required
+                                       class="w-full pl-7 pr-3 py-2 bg-secondary-bg border border-card-border rounded-lg text-sm text-text-main font-bold focus:outline-none focus:ring-2 focus:ring-accent-blue/50">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-text-dark/60 mb-1">Due Date</label>
+                            <input type="date" name="due_date"
+                                   class="w-full px-3 py-2 bg-secondary-bg border border-card-border rounded-lg text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-text-dark/60 mb-1">Notes / Terms (Optional)</label>
+                        <input type="text" name="notes" placeholder="e.g. Service fee for teacher matching and setup"
+                               class="w-full px-3 py-2 bg-secondary-bg border border-card-border rounded-lg text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50">
+                    </div>
+
+                    <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 shadow">
+                        <i class="fas fa-paper-plane"></i> Send USD Invoice to Parent
+                    </button>
+                </form>
+
+                <!-- Existing Invoices List -->
+                <div>
+                    <h4 class="text-xs font-bold text-text-dark/60 uppercase tracking-wider mb-3">Generated Invoices</h4>
+                    @if($lead->serviceChargeInvoices && $lead->serviceChargeInvoices->count() > 0)
+                        <div class="overflow-x-auto border border-card-border rounded-xl">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-secondary-bg border-b border-card-border font-bold text-text-dark/60">
+                                    <tr>
+                                        <th class="p-3">Invoice #</th>
+                                        <th class="p-3">Title</th>
+                                        <th class="p-3">Amount ($)</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3">Date</th>
+                                        <th class="p-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-card-border text-text-main">
+                                    @foreach($lead->serviceChargeInvoices as $invoice)
+                                        <tr class="hover:bg-secondary-bg/20">
+                                            <td class="p-3 font-mono font-bold text-accent-blue">{{ $invoice->invoice_number }}</td>
+                                            <td class="p-3 font-semibold">{{ $invoice->title }}</td>
+                                            <td class="p-3 font-bold text-green-500">${{ number_format($invoice->amount, 2) }} USD</td>
+                                            <td class="p-3">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold border 
+                                                    {{ $invoice->status === 'Paid' ? 'bg-green-500/10 text-green-500 border-green-500/20' : '' }}
+                                                    {{ $invoice->status === 'Unpaid' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : '' }}
+                                                    {{ $invoice->status === 'Cancelled' ? 'bg-red-500/10 text-red-500 border-red-500/20' : '' }}
+                                                ">
+                                                    {{ $invoice->status }}
+                                                </span>
+                                            </td>
+                                            <td class="p-3 text-text-dark/60">{{ $invoice->created_at->format('M d, Y') }}</td>
+                                            <td class="p-3 text-right">
+                                                <form action="{{ route('admin.tuition-leads.invoice.status', $invoice->id) }}" method="POST" class="inline-flex items-center gap-1">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <select name="status" onchange="this.form.submit()" class="px-2 py-1 bg-secondary-bg border border-card-border rounded text-[11px] font-semibold text-text-main focus:outline-none">
+                                                        <option value="Unpaid" {{ $invoice->status === 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
+                                                        <option value="Paid" {{ $invoice->status === 'Paid' ? 'selected' : '' }}>Paid</option>
+                                                        <option value="Cancelled" {{ $invoice->status === 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                                    </select>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-6 text-xs text-text-dark/40 bg-secondary-bg/20 rounded-xl border border-dashed border-card-border">
+                            No service charge invoices created for this lead yet.
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Right Column: Status & Follow-ups -->

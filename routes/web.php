@@ -154,6 +154,14 @@ Route::middleware(['auth', 'parent'])->prefix('parent')->name('parent.')->group(
     Route::get('/tutor-need', [\App\Http\Controllers\Parent\TuitionController::class, 'create'])->name('tuitions.create');
     Route::post('/tutor-need', [\App\Http\Controllers\Parent\TuitionController::class, 'store'])->name('tuitions.store');
     Route::get('/history', [\App\Http\Controllers\Parent\TuitionController::class, 'history'])->name('tuitions.history');
+
+    // Parent Service Charge & Payment Routes
+    Route::get('/service-charge', [\App\Http\Controllers\Parent\ServiceChargeController::class, 'index'])->name('serviceCharge.index');
+    Route::post('/service-charge/pay', [\App\Http\Controllers\Parent\ServiceChargeController::class, 'processPay'])->name('serviceCharge.pay');
+    Route::get('/service-charge/checkout/{id}', [\App\Http\Controllers\Parent\ServiceChargeController::class, 'checkout'])->name('serviceCharge.checkout');
+    Route::match(['get', 'post'], '/service-charge/callback', [\App\Http\Controllers\Parent\ServiceChargeController::class, 'callback'])->name('serviceCharge.callback');
+    Route::get('/service-charge/invoice/{id}/print', [\App\Http\Controllers\Parent\ServiceChargeController::class, 'printInvoice'])->name('serviceCharge.print');
+    Route::get('/service-charge/invoice/{id}/download', [\App\Http\Controllers\Parent\ServiceChargeController::class, 'downloadInvoice'])->name('serviceCharge.download');
 });
 
 // Employer Auth Routes
@@ -193,9 +201,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('jobs/{job}/approve', [\App\Http\Controllers\Admin\JobController::class, 'approve'])->name('jobs.approve');
     Route::post('jobs/{job}/reject', [\App\Http\Controllers\Admin\JobController::class, 'reject'])->name('jobs.reject');
     Route::prefix('candidates')->name('candidates.')->group(function () {
-        Route::post('/{id}/verify', [\App\Http\Controllers\Admin\CandidateController::class, 'verify'])->name('verify');
-        Route::post('/{id}/upload-agreement', [\App\Http\Controllers\Admin\CandidateController::class, 'uploadAgreement'])->name('upload-agreement');
-        Route::post('/{id}/update-agreement-status', [\App\Http\Controllers\Admin\CandidateController::class, 'updateAgreementStatus'])->name('update-agreement-status');
+        Route::post('/{id}/verify', [\App\Http\Controllers\Admin\CrmController::class, 'verify'])->name('verify');
+        Route::post('/{id}/upload-agreement', [\App\Http\Controllers\Admin\CrmController::class, 'uploadAgreement'])->name('upload-agreement');
+        Route::post('/{id}/update-agreement-status', [\App\Http\Controllers\Admin\CrmController::class, 'updateAgreementStatus'])->name('update-agreement-status');
     });
 
     // Candidates CRM
@@ -238,6 +246,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/tuition-leads/{id}', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'update'])->name('tuition-leads.update');
     Route::put('/tuition-leads/{id}/status', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'updateStatus'])->name('tuition-leads.status.update');
     Route::post('/tuition-leads/{id}/follow-up', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'storeFollowUp'])->name('tuition-leads.followup.store');
+    Route::post('/tuition-leads/{id}/service-charge-invoice', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'storeInvoice'])->name('tuition-leads.invoice.store');
+    Route::put('/tuition-leads/service-charge-invoice/{invoiceId}/status', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'updateInvoiceStatus'])->name('tuition-leads.invoice.status');
 
     // Tuition Fee Accounts (Payment Management)
     Route::get('/tuition-fees', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'index'])->name('tuition-fees.index');

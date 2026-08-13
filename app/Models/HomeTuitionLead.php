@@ -21,4 +21,14 @@ class HomeTuitionLead extends Model
     {
         return $this->hasMany(HomeTuitionLeadFollowUp::class)->latest();
     }
+
+    public function serviceChargeInvoices()
+    {
+        return $this->hasMany(ParentServiceChargeInvoice::class, 'home_tuition_lead_id')->latest();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

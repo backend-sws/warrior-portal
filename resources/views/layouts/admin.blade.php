@@ -184,7 +184,7 @@
                     <i class="fas fa-city w-5 text-center"></i> Cities
                 </a>
 
-                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Recruitment
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Candidates & Jobs
                 </div>
 
                 <a href="{{ route('admin.jobs.index', ['status' => 'pending']) }}"
@@ -200,10 +200,6 @@
                     class="sidebar-link {{ request()->routeIs('admin.jobs.*') && request('status') !== 'pending' ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-briefcase w-5 text-center"></i> All Jobs
                 </a>
-                <a href="{{ route('admin.tuitions.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.tuitions.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Manage Tuitions
-                </a>
                 <a href="{{ route('admin.crm.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.crm.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-users-cog w-5 text-center"></i> Candidates CRM
@@ -212,13 +208,21 @@
                     class="sidebar-link {{ request()->routeIs('admin.applications.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-file-signature w-5 text-center"></i> Job Applications
                 </a>
-                <a href="{{ route('admin.transactions.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-receipt w-5 text-center"></i> Transactions
+                <a href="{{ route('admin.candidate-payments.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.candidate-payments.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-wallet w-5 text-center"></i> Candidate Payments
                 </a>
                 <a href="{{ route('admin.leads.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-headset w-5 text-center"></i> Support Leads
+                </a>
+
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Tuitions & Parents
+                </div>
+
+                <a href="{{ route('admin.tuitions.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.tuitions.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Manage Tuitions
                 </a>
                 <a href="{{ route('admin.tuition-leads.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.tuition-leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
@@ -228,9 +232,13 @@
                     class="sidebar-link {{ request()->routeIs('admin.tuition-fees.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-file-invoice-dollar w-5 text-center"></i> Parent Payments
                 </a>
-                <a href="{{ route('admin.candidate-payments.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.candidate-payments.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-wallet w-5 text-center"></i> Candidate Payments
+
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Finance
+                </div>
+
+                <a href="{{ route('admin.transactions.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-receipt w-5 text-center"></i> Transactions
                 </a>
 
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">CMS</div>
