@@ -216,14 +216,24 @@
                     class="sidebar-link {{ request()->routeIs('admin.leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-headset w-5 text-center"></i> Support Leads
                 </a>
+                <a href="{{ route('admin.candidate-tuition.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.candidate-tuition.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm text-yellow-300 hover:text-yellow-200">
+                    <i class="fas fa-chalkboard w-5 text-center"></i> Candidate Tuition
+                    @php $openLeadsCount = \App\Models\HomeTuitionLead::whereNotIn('status', ['Confirmed','Cancelled'])->count(); @endphp
+                    @if($openLeadsCount > 0)
+                        <span class="ml-auto bg-yellow-400 text-[#031b4e] text-[10px] font-black px-2 py-0.5 rounded-full">{{ $openLeadsCount }}</span>
+                    @endif
+                </a>
 
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Tuitions & Parents
                 </div>
 
+                <!-- Deprecated: Now merged into Home Tuition Leads
                 <a href="{{ route('admin.tuitions.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.tuitions.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Manage Tuitions
                 </a>
+                -->
                 <a href="{{ route('admin.tuition-leads.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.tuition-leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Home Tuition Leads
@@ -442,6 +452,19 @@
                         class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 mb-8 rounded-xl shadow-sm flex items-start gap-3 animate-[fadeIn_0.3s_ease-out]">
                         <i class="fas fa-exclamation-triangle mt-0.5 text-lg"></i>
                         <p class="font-medium text-sm">{{ session('error') }}</p>
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 mb-8 rounded-xl shadow-sm flex items-start gap-3 animate-[fadeIn_0.3s_ease-out]">
+                        <i class="fas fa-exclamation-triangle mt-0.5 text-lg"></i>
+                        <div class="font-medium text-sm">
+                            <ul class="list-disc list-inside">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 @endif
 

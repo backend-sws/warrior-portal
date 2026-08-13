@@ -216,6 +216,14 @@
                     class="sidebar-link <?php echo e(request()->routeIs('admin.leads.*') ? 'active' : ''); ?> px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-headset w-5 text-center"></i> Support Leads
                 </a>
+                <a href="<?php echo e(route('admin.candidate-tuition.index')); ?>"
+                    class="sidebar-link <?php echo e(request()->routeIs('admin.candidate-tuition.*') ? 'active' : ''); ?> px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm text-yellow-300 hover:text-yellow-200">
+                    <i class="fas fa-chalkboard w-5 text-center"></i> Candidate Tuition
+                    <?php $openLeadsCount = \App\Models\HomeTuitionLead::whereNotIn('status', ['Confirmed','Cancelled'])->count(); ?>
+                    <?php if($openLeadsCount > 0): ?>
+                        <span class="ml-auto bg-yellow-400 text-[#031b4e] text-[10px] font-black px-2 py-0.5 rounded-full"><?php echo e($openLeadsCount); ?></span>
+                    <?php endif; ?>
+                </a>
 
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Tuitions & Parents
                 </div>

@@ -10,7 +10,7 @@ class TuitionApplication extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tuition_requirement_id',
+        'home_tuition_lead_id',
         'candidate_id',
         'status',
     ];
@@ -20,8 +20,8 @@ class TuitionApplication extends Model
         return $this->belongsTo(User::class, 'candidate_id');
     }
 
-    public function tuition()
+    public function tuitionLead()
     {
-        return $this->belongsTo(TuitionRequirement::class, 'tuition_requirement_id');
+        return $this->belongsTo(HomeTuitionLead::class, 'home_tuition_lead_id');
     }
 }

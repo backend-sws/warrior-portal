@@ -275,4 +275,35 @@ class HomeTuitionLeadController extends Controller
 
         return redirect()->back()->with('success', "Invoice status updated to {$request->status}.");
     }
+
+    public function uploadTeacherDocuments(Request $request, $id)
+    {
+        $lead = HomeTuitionLead::findOrFail($id);
+
+        $request->validate([
+            'id_proof_front' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'id_proof_back' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'teacher_passport_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($request->hasFile('id_proof_front')) {
+            $lead->id_proof_front = $request->file('id_proof_front')->store('teacher_docs', 'public');
+        }
+        if ($request->hasFile('id_proof_back')) {
+            $lead->id_proof_back = $request->file('id_proof_back')->store('teacher_docs', 'public');
+        }
+        if ($request->hasFile('teacher_passport_photo')) {
+            $lead->teacher_passport_photo = $request->file('teacher_passport_photo')->store('teacher_docs', 'public');
+        }
+
+        $lead->is_finally_appointed = true;
+        $lead->save();
+
+        $lead->followUps()->create([
+            'admin_id' => auth()->id(),
+            'note' => "Teacher documents uploaded and teacher is finally appointed.",
+        ]);
+
+        return redirect()->back()->with('success', 'Teacher documents uploaded and appointment finalized successfully.');
+    }
 }
