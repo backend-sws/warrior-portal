@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TuitionFeeAccount;
 use App\Models\TuitionFeePayment;
+use App\Models\ParentServiceChargeInvoice;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -68,9 +69,21 @@ class TuitionFeeController extends Controller
         $totalPendingAmount = TuitionFeeAccount::where('status', 'active')
             ->where('next_due_date', '<', $today)->sum('monthly_fee');
 
+        // All Manual Payments History (admin recorded)
+        $allPayments = TuitionFeePayment::with('account')->orderBy('payment_date', 'desc')->paginate(20, ['*'], 'payment_page');
+        $totalPaymentsAmount = TuitionFeePayment::sum('amount');
+
+        // Parent Online Service Charge Payments (paid by parent via gateway)
+        $parentInvoicePayments = ParentServiceChargeInvoice::with(['lead', 'user'])
+            ->where('status', 'Paid')
+            ->orderBy('updated_at', 'desc')
+            ->paginate(20, ['*'], 'invoice_page');
+        $totalInvoiceAmount = ParentServiceChargeInvoice::where('status', 'Paid')->sum('amount');
+
         return view('admin.tuition_fees.index', compact(
             'accounts', 'dueToday', 'dueTomorrow', 'overdueCount', 
-            'totalCollected', 'totalPendingAmount'
+            'totalCollected', 'totalPendingAmount', 'allPayments', 'totalPaymentsAmount',
+            'parentInvoicePayments', 'totalInvoiceAmount'
         ));
     }
 

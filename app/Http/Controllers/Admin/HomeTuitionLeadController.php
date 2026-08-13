@@ -7,6 +7,10 @@ use App\Models\HomeTuitionLead;
 use App\Models\HomeTuitionLeadFollowUp;
 use Illuminate\Http\Request;
 
+use App\Models\ParentServiceChargeInvoice;
+use App\Models\User;
+use Illuminate\Support\Str;
+
 class HomeTuitionLeadController extends Controller
 {
     public function index(Request $request)
@@ -102,8 +106,9 @@ class HomeTuitionLeadController extends Controller
 
     public function show($id)
     {
-        $lead = HomeTuitionLead::with(['followUps.admin'])->findOrFail($id);
-        return view('admin.home_tuition_leads.show', compact('lead'));
+        $lead = HomeTuitionLead::with(['followUps.admin', 'serviceChargeInvoices'])->findOrFail($id);
+        $parentUsers = User::where('role', 'parent')->get(['id', 'name', 'phone', 'email']);
+        return view('admin.home_tuition_leads.show', compact('lead', 'parentUsers'));
     }
 
     public function edit($id)
@@ -197,5 +202,77 @@ class HomeTuitionLeadController extends Controller
         }
 
         return redirect()->back()->with('success', 'Follow-up note added.');
+    }
+
+    public function storeInvoice(Request $request, $id)
+    {
+        $lead = HomeTuitionLead::findOrFail($id);
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0.01',
+            'due_date' => 'nullable|date',
+            'notes' => 'nullable|string',
+            'user_id' => 'nullable|exists:users,id',
+        ]);
+
+        $userId = $request->input('user_id') ?: $lead->user_id;
+
+        if (!$userId && $lead->parent_mobile) {
+            $cleanMobile = preg_replace('/[^0-9]/', '', $lead->parent_mobile);
+            $parentUser = User::where('phone', $lead->parent_mobile)
+                ->orWhere('phone', $cleanMobile)
+                ->orWhere('phone', 'like', "%{$cleanMobile}%")
+                ->first();
+            if ($parentUser) {
+                $userId = $parentUser->id;
+            }
+        }
+
+        // Fallback: If still no specific user_id, check if there is a parent role user
+        if (!$userId) {
+            $firstParent = User::where('role', 'parent')->first();
+            if ($firstParent) {
+                $userId = $firstParent->id;
+            }
+        }
+
+        if ($userId) {
+            $lead->update(['user_id' => $userId]);
+        }
+
+        $invoiceNum = 'INV-USD-' . strtoupper(Str::random(5)) . '-' . rand(100, 999);
+
+        $invoice = ParentServiceChargeInvoice::create([
+            'home_tuition_lead_id' => $lead->id,
+            'user_id' => $userId,
+            'invoice_number' => $invoiceNum,
+            'title' => $request->title,
+            'amount' => $request->amount,
+            'currency' => 'USD',
+            'due_date' => $request->due_date,
+            'status' => 'Unpaid',
+            'notes' => $request->notes,
+        ]);
+
+        $lead->followUps()->create([
+            'admin_id' => auth()->id(),
+            'note' => "Generated USD Service Charge Invoice #{$invoiceNum} for \${$request->amount} USD.",
+        ]);
+
+        return redirect()->back()->with('success', "Service Charge Invoice ({$invoiceNum}) created in USD ($) and sent to Parent Dashboard.");
+    }
+
+    public function updateInvoiceStatus(Request $request, $invoiceId)
+    {
+        $invoice = ParentServiceChargeInvoice::findOrFail($invoiceId);
+
+        $request->validate([
+            'status' => 'required|in:Unpaid,Paid,Cancelled',
+        ]);
+
+        $invoice->update(['status' => $request->status]);
+
+        return redirect()->back()->with('success', "Invoice status updated to {$request->status}.");
     }
 }
