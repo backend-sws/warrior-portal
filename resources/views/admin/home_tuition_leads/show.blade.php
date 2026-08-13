@@ -128,7 +128,7 @@
             </div>
             <div class="p-6 space-y-6">
                 <!-- Invoice Creation Form -->
-                <form action="{{ route('admin.tuition-leads.invoice.store', $lead->id) }}" method="POST" class="bg-secondary-bg/30 p-4 rounded-xl border border-card-border" onsubmit="this.querySelector('button[type=submit]').disabled=true; this.querySelector('button[type=submit]').innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> Sending...';">
+                <form action="{{ route('admin.tuition-leads.invoice.store', $lead->id) }}" method="POST" class="bg-secondary-bg/30 p-4 rounded-xl border border-card-border" onsubmit="if(this.submitted) return false; this.submitted=true; this.querySelector('button[type=submit]').disabled=true; this.querySelector('button[type=submit]').innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> Sending...';">
                     @csrf
                     <h4 class="text-xs font-bold text-text-main uppercase tracking-wider mb-3 flex items-center gap-1.5">
                         <i class="fas fa-plus-circle text-accent-blue"></i> Create Service Charge Invoice
