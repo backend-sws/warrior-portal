@@ -12,12 +12,7 @@
             font-size: 13px;
         }
         .watermark {
-            position: absolute;
-            top: 25%;
-            left: 20%;
-            opacity: 0.05;
-            z-index: -1;
-            width: 420px;
+            display: none;
         }
         .header {
             width: 100%;
@@ -132,16 +127,16 @@
 </head>
 <body>
 
-    @if(file_exists(public_path('images/logo.png')))
-        <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-10">
+    @if(file_exists(public_path('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg')))
+        <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="watermark" alt="Watermark">
     @endif
 
     <div class="header">
         <table>
             <tr>
                 <td>
-                    @if(file_exists(public_path('images/logo.png')))
-                        <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-10">
+                    @if(file_exists(public_path('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg')))
+                        <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="logo" alt="Warriors Educare Logo">
                     @else
                         <h2 style="color: #031b4e; margin:0;">Warriors Educare</h2>
                     @endif

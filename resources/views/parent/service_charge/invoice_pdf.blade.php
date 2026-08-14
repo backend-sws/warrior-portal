@@ -16,13 +16,7 @@
         }
 
         .watermark {
-            position: fixed;
-            top: 25%;
-            left: 20%;
-            width: 420px;
-            opacity: 0.07;
-            z-index: -1000;
-            pointer-events: none;
+            display: none;
         }
 
         .header-table {
@@ -178,17 +172,14 @@
     </div>
     @endif
 
-    <!-- Logo Watermark -->
-    @if(file_exists(public_path('adobe.png')))
-        <img src="{{ !empty($isPrint) ? asset('adobe.png') : public_path('adobe.png') }}" class="watermark" alt="Watermark">
-    @endif
+    <!-- Logo Watermark Removed -->
 
     <!-- Invoice Header -->
     <table class="header-table">
         <tr>
             <td style="vertical-align: middle;">
-                @if(file_exists(public_path('adobe.png')))
-                    <img src="{{ !empty($isPrint) ? asset('adobe.png') : public_path('adobe.png') }}" class="logo-img" alt="Warriors Educare Logo">
+                @if(file_exists(public_path('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg')))
+                    <img src="{{ !empty($isPrint) ? asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') : public_path('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="logo-img" alt="Warriors Educare Logo">
                 @else
                     <h2 style="color: #1e3a8a; margin:0;">Warriors Educare</h2>
                 @endif

@@ -144,7 +144,7 @@
             </div>
 
             <!-- Navigation -->
-            <div class="flex-1 overflow-y-auto py-5 px-3 flex flex-col gap-1 no-scrollbar">
+            <div id="sidebar-scroll-container" class="flex-1 overflow-y-auto py-5 px-3 flex flex-col gap-1 no-scrollbar">
                 <a href="<?php echo e(route('admin.dashboard')); ?>"
                     class="sidebar-link <?php echo e(request()->routeIs('admin.dashboard') ? 'active' : ''); ?> px-4 py-3 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-th-large w-5 text-center text-lg"></i> Dashboard
@@ -448,6 +448,19 @@
                     </div>
                 <?php endif; ?>
 
+                <?php if($errors->any()): ?>
+                    <div class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 mb-8 rounded-xl shadow-sm flex items-start gap-3 animate-[fadeIn_0.3s_ease-out]">
+                        <i class="fas fa-exclamation-triangle mt-0.5 text-lg"></i>
+                        <div class="font-medium text-sm">
+                            <ul class="list-disc list-inside">
+                                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <li><?php echo e($error); ?></li>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </ul>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 
                 <?php echo $__env->yieldContent('content'); ?>
                 </div>
@@ -646,6 +659,21 @@
 
             mobileMenuBtn.addEventListener('click', toggleSidebar);
             mobileOverlay.addEventListener('click', toggleSidebar);
+        }
+
+        // Sidebar Scroll State Management
+        const sidebarContainer = document.getElementById('sidebar-scroll-container');
+        if (sidebarContainer) {
+            // Restore scroll position
+            const scrollPos = sessionStorage.getItem('adminSidebarScroll');
+            if (scrollPos) {
+                sidebarContainer.scrollTop = parseInt(scrollPos, 10);
+            }
+
+            // Save scroll position on scroll
+            sidebarContainer.addEventListener('scroll', function() {
+                sessionStorage.setItem('adminSidebarScroll', this.scrollTop);
+            });
         }
     </script>
 </body>

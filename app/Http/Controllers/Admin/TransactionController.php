@@ -10,6 +10,8 @@ class TransactionController extends Controller
 {
     public function index(Request $request)
     {
+        $roleFilter = $request->input('role', 'all');
+
         $query = PaymentTransaction::with('candidate');
 
         if ($search = $request->input('search')) {
@@ -28,8 +30,21 @@ class TransactionController extends Controller
             $query->where('type', $type);
         }
 
+        if ($roleFilter !== 'all') {
+            $query->whereHas('candidate', function ($q) use ($roleFilter) {
+                $q->where('role', $roleFilter);
+            });
+        }
+
         $transactions = $query->latest()->paginate(20)->withQueryString();
 
-        return view('admin.transactions.index', compact('transactions'));
+        $stats = [
+            'total_revenue' => PaymentTransaction::where('status', 'success')->sum('amount'),
+            'candidate_revenue' => PaymentTransaction::where('status', 'success')->whereHas('candidate', function($q) { $q->where('role', 'candidate'); })->sum('amount'),
+            'parent_revenue' => PaymentTransaction::where('status', 'success')->whereHas('candidate', function($q) { $q->where('role', 'parent'); })->sum('amount'),
+            'total_transactions' => PaymentTransaction::count(),
+        ];
+
+        return view('admin.transactions.index', compact('transactions', 'stats', 'roleFilter'));
     }
 }

@@ -165,7 +165,8 @@
 
             <!-- Action Buttons -->
             <div class="flex gap-2">
-                <button onclick="openAppointModal(<?php echo e($candidate->id); ?>, '<?php echo e(addslashes($candidate->name)); ?>', '<?php echo e($candidate->phone); ?>')"
+                <?php $appliedLeadIds = $candidate->tuitionApplications->pluck('home_tuition_lead_id')->toJson(); ?>
+                <button onclick="openAppointModal(<?php echo e($candidate->id); ?>, '<?php echo e(addslashes($candidate->name)); ?>', '<?php echo e($candidate->phone); ?>', <?php echo e($appliedLeadIds); ?>)"
                     class="flex-1 bg-accent-blue text-white py-2.5 px-4 rounded-xl font-bold text-sm hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-sm shadow-accent-blue/30">
                     <i class="fas fa-user-check"></i> Appoint to Parent
                 </button>
@@ -238,11 +239,15 @@
             <div id="leads-list" class="space-y-3">
                 <?php $__currentLoopData = $tuitionLeads; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lead): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="lead-card border border-card-border rounded-xl p-4 hover:border-accent-blue hover:bg-blue-50/30 transition-all cursor-pointer group"
-                     data-search="<?php echo e(strtolower($lead->parent_name . ' ' . $lead->location . ' ' . $lead->{'class'} . ' ' . $lead->subjects)); ?>">
+                     data-search="<?php echo e(strtolower($lead->parent_name . ' ' . $lead->location . ' ' . $lead->{'class'} . ' ' . $lead->subjects)); ?>"
+                     data-lead-id="<?php echo e($lead->id); ?>">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1">
                                 <h4 class="font-bold text-text-main"><?php echo e($lead->parent_name); ?></h4>
+                                <span class="applied-badge hidden bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded border border-green-200">
+                                    <i class="fas fa-check-circle mr-1"></i>Applied Here
+                                </span>
                                 <?php
                                     $statusColors = [
                                         'New Lead' => 'bg-blue-500/10 text-blue-600 border-blue-500/20',
@@ -312,7 +317,7 @@
 <script>
     var currentCandidateId = null;
 
-    function openAppointModal(candidateId, candidateName, candidatePhone) {
+    function openAppointModal(candidateId, candidateName, candidatePhone, appliedLeadIds = []) {
         currentCandidateId = candidateId;
         document.getElementById('modal-candidate-name').textContent = 
             'Appointing: ' + candidateName + (candidatePhone ? ' (' + candidatePhone + ')' : '');
@@ -321,6 +326,21 @@
         document.querySelectorAll('.appoint-form').forEach(function(form) {
             var action = form.getAttribute('action');
             form.setAttribute('action', action.replace('__CANDIDATE_ID__', candidateId));
+        });
+
+        // Highlight leads that candidate has applied for
+        document.querySelectorAll('.lead-card').forEach(function(card) {
+            var leadId = parseInt(card.getAttribute('data-lead-id'));
+            var badge = card.querySelector('.applied-badge');
+            
+            // Remove previous highlights
+            card.classList.remove('border-green-500', 'bg-green-50/50');
+            if (badge) badge.classList.add('hidden');
+            
+            if (appliedLeadIds.includes(leadId)) {
+                card.classList.add('border-green-500', 'bg-green-50/50');
+                if (badge) badge.classList.remove('hidden');
+            }
         });
 
         document.getElementById('lead-search').value = '';

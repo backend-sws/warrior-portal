@@ -203,9 +203,9 @@
                                 <div class="text-xs text-gray-500"><?php echo e($application->candidate->phone ?? 'No Phone'); ?></div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-medium text-gray-800"><?php echo e($application->tuition->subjects); ?></div>
-                                <div class="text-xs text-gray-500"><?php echo e($application->tuition->student_class); ?> • <?php echo e($application->tuition->board); ?></div>
-                                <div class="text-xs text-gray-400 mt-1 line-clamp-2" title="<?php echo e($application->tuition->location); ?>">📍 <?php echo e($application->tuition->location); ?></div>
+                                <div class="font-medium text-gray-800"><?php echo e($application->tuitionLead->subjects ?? 'N/A'); ?></div>
+                                <div class="text-xs text-gray-500"><?php echo e($application->tuitionLead->{'class'} ?? ''); ?> • <?php echo e($application->tuitionLead->board ?? ''); ?></div>
+                                <div class="text-xs text-gray-400 mt-1 line-clamp-2" title="<?php echo e($application->tuitionLead->location ?? ''); ?>">📍 <?php echo e($application->tuitionLead->location ?? 'No location specified'); ?></div>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="text-xs font-bold px-3 py-1 rounded-full 

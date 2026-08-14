@@ -244,7 +244,7 @@
                             <div class="flex items-center gap-2 mb-1">
                                 <h4 class="font-bold text-text-main">{{ $lead->parent_name }}</h4>
                                 <span class="applied-badge hidden bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded border border-green-200">
-                                    <i class="fas fa-check-circle mr-1"></i>Applied
+                                    <i class="fas fa-check-circle mr-1"></i>Applied Here
                                 </span>
                                 @php
                                     $statusColors = [
