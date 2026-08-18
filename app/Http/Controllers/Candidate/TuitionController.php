@@ -11,12 +11,12 @@ class TuitionController extends Controller
 {
     public function index()
     {
-        $tuitions = TuitionRequirement::where('status', 'Active')
+        $tuitions = \App\Models\HomeTuitionLead::whereNotIn('status', ['Confirmed', 'Cancelled', 'Closed'])
             ->latest()
             ->paginate(12);
 
         $appliedTuitionIds = TuitionApplication::where('candidate_id', auth()->id())
-            ->pluck('tuition_requirement_id')
+            ->pluck('home_tuition_lead_id')
             ->toArray();
 
         return view('candidate.tuitions.index', compact('tuitions', 'appliedTuitionIds'));
@@ -24,14 +24,14 @@ class TuitionController extends Controller
 
     public function apply(Request $request, $id)
     {
-        $tuition = TuitionRequirement::findOrFail($id);
+        $tuition = \App\Models\HomeTuitionLead::findOrFail($id);
 
-        if ($tuition->status !== 'Active') {
-            return back()->with('error', 'This tuition is no longer active.');
+        if (in_array($tuition->status, ['Confirmed', 'Cancelled', 'Closed'])) {
+            return back()->with('error', 'This tuition lead is no longer active or accepting applications.');
         }
 
         $existingApplication = TuitionApplication::where('candidate_id', auth()->id())
-            ->where('tuition_requirement_id', $id)
+            ->where('home_tuition_lead_id', $id)
             ->first();
 
         if ($existingApplication) {
@@ -40,7 +40,7 @@ class TuitionController extends Controller
 
         TuitionApplication::create([
             'candidate_id' => auth()->id(),
-            'tuition_requirement_id' => $id,
+            'home_tuition_lead_id' => $id,
             'status' => 'Applied'
         ]);
 

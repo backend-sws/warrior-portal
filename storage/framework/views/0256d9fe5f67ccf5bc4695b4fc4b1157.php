@@ -1,0 +1,258 @@
+<?php $__env->startSection('title', 'Candidate Payment Account Details'); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+        <h1 class="text-2xl font-black text-text-main">Candidate Payment Account Details</h1>
+        <p class="text-text-dark/60 text-sm mt-1">Manage fees and payments for <?php echo e($account->candidate_name); ?>.</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="<?php echo e(route('admin.candidate-payments.index')); ?>" class="bg-secondary-bg border border-card-border text-text-main px-4 py-2 rounded-xl font-bold hover:bg-gray-100 transition-colors flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+        <form action="<?php echo e(route('admin.candidate-payments.destroy', $account->id)); ?>" method="POST" onsubmit="return confirm('Are you sure you want to delete this account?');">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('DELETE'); ?>
+            <button type="submit" class="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-bold transition-colors">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left Column: Profile info -->
+    <div class="lg:col-span-1 space-y-6">
+        <!-- Candidate Profile Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-card-border overflow-hidden">
+            <div class="bg-accent-blue/10 p-6 flex flex-col items-center text-center">
+                <div class="w-20 h-20 bg-accent-blue text-white rounded-full flex items-center justify-center text-3xl font-black mb-3 shadow-lg">
+                    <?php echo e(strtoupper(substr($account->candidate_name, 0, 1))); ?>
+
+                </div>
+                <h2 class="text-xl font-black text-text-main"><?php echo e($account->candidate_name); ?></h2>
+                <p class="text-sm text-text-dark/60 mt-1"><i class="fas fa-chalkboard-teacher mr-1"></i> Tutor</p>
+                
+                <?php if($account->status === 'inactive'): ?>
+                    <span class="mt-3 bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-bold border border-gray-200">INACTIVE</span>
+                <?php endif; ?>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div>
+                    <p class="text-xs font-bold text-text-dark/50 uppercase tracking-wider mb-1">Contact Details</p>
+                    <div class="flex items-center gap-2 text-sm text-text-main">
+                        <i class="fas fa-phone-alt text-text-dark/40 w-4"></i>
+                        <?php echo e($account->mobile_number); ?>
+
+                    </div>
+                    <?php if($account->address): ?>
+                    <div class="flex items-start gap-2 text-sm text-text-main mt-2">
+                        <i class="fas fa-map-marker-alt text-text-dark/40 w-4 mt-0.5"></i>
+                        <?php echo e($account->address); ?>
+
+                    </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="pt-4 border-t border-card-border">
+                    <p class="text-xs font-bold text-text-dark/50 uppercase tracking-wider mb-2">Assignment Details</p>
+                    <div class="grid grid-cols-1 gap-y-3">
+                        <div>
+                            <p class="text-sm font-bold text-text-main"><?php echo e($account->tuition_assigned ?? 'Not Assigned'); ?></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-card-border">
+                    <p class="text-xs font-bold text-text-dark/50 uppercase tracking-wider mb-2">Financial Settings</p>
+                    <div class="bg-secondary-bg rounded-lg p-3">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-text-dark/60">Joined:</span>
+                            <span class="font-bold"><?php echo e($account->joining_date ? $account->joining_date->format('M d, Y') : 'N/A'); ?></span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs mt-1">
+                            <span class="text-text-dark/60">Monthly Amount:</span>
+                            <span class="font-bold text-blue-500 text-sm">₹<?php echo e(number_format($account->monthly_amount)); ?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Payments -->
+    <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Status & Next Due Date -->
+        <div class="bg-white rounded-xl shadow-sm border border-card-border p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <p class="text-sm font-bold text-text-dark/60 uppercase tracking-wider mb-1">Next Scheduled Date</p>
+                <?php if($account->next_due_date): ?>
+                    <?php
+                        $today = \Carbon\Carbon::today();
+                        $dueDate = \Carbon\Carbon::parse($account->next_due_date);
+                        $isPast = $dueDate->isPast() && !$dueDate->isToday();
+                    ?>
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-3xl font-black <?php echo e($isPast ? 'text-red-500' : 'text-text-main'); ?>">
+                            <?php echo e($dueDate->format('d M, Y')); ?>
+
+                        </h2>
+                        <?php if($isPast): ?>
+                            <span class="bg-red-500/10 text-red-500 px-3 py-1 rounded-full text-xs font-bold border border-red-500/20 uppercase">OVERDUE</span>
+                        <?php elseif($dueDate->isToday() || $dueDate->isBetween($today, $today->copy()->addDays(3))): ?>
+                            <span class="bg-orange-500/10 text-orange-500 px-3 py-1 rounded-full text-xs font-bold border border-orange-500/20 uppercase">DUE SOON</span>
+                        <?php endif; ?>
+                    </div>
+                <?php else: ?>
+                    <h2 class="text-xl font-bold text-text-main">Not Set</h2>
+                <?php endif; ?>
+            </div>
+
+            <button onclick="document.getElementById('record-payment-modal').classList.remove('hidden')" class="bg-blue-500 text-white px-5 py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-lg shadow-blue-500/30 whitespace-nowrap">
+                <i class="fas fa-hand-holding-usd"></i> Record Transaction
+            </button>
+        </div>
+
+        <!-- Payment History -->
+        <div class="bg-white rounded-xl shadow-sm border border-card-border overflow-hidden">
+            <div class="p-5 border-b border-card-border bg-secondary-bg flex justify-between items-center">
+                <h3 class="font-bold text-text-main">Transaction History</h3>
+                <span class="text-xs font-bold bg-accent-blue/10 text-accent-blue px-2 py-1 rounded"><?php echo e($account->payments->count()); ?> Transactions</span>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-white border-b border-card-border">
+                            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-wider font-black text-text-dark/40">Date</th>
+                            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-wider font-black text-text-dark/40">Type</th>
+                            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-wider font-black text-text-dark/40">Amount</th>
+                            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-wider font-black text-text-dark/40">Mode</th>
+                            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-wider font-black text-text-dark/40">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-card-border">
+                        <?php $__empty_1 = true; $__currentLoopData = $account->payments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $payment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <tr class="hover:bg-secondary-bg/50 transition-colors">
+                            <td class="px-5 py-3 align-middle">
+                                <span class="text-sm font-bold text-text-main"><?php echo e($payment->payment_date->format('d M, Y')); ?></span>
+                            </td>
+                            <td class="px-5 py-3 align-middle">
+                                <?php if($payment->type === 'Collected'): ?>
+                                    <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded font-bold uppercase tracking-wider">
+                                        <i class="fas fa-arrow-down mr-1"></i> Collected
+                                    </span>
+                                <?php else: ?>
+                                    <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold uppercase tracking-wider">
+                                        <i class="fas fa-arrow-up mr-1"></i> Paid Out
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-5 py-3 align-middle">
+                                <span class="text-sm font-black <?php echo e($payment->type === 'Collected' ? 'text-green-500' : 'text-blue-500'); ?>">₹<?php echo e(number_format($payment->amount)); ?></span>
+                            </td>
+                            <td class="px-5 py-3 align-middle">
+                                <span class="text-xs bg-gray-100 text-text-dark/80 px-2 py-1 rounded border border-gray-200 font-bold">
+                                    <?php echo e($payment->payment_mode); ?>
+
+                                </span>
+                            </td>
+                            <td class="px-5 py-3 align-middle">
+                                <div class="text-[10px] text-text-dark/60">
+                                    <span class="font-bold text-text-dark/80">By:</span> <?php echo e($payment->collected_by ?? 'Unknown'); ?>
+
+                                </div>
+                                <?php if($payment->remarks): ?>
+                                    <div class="text-xs mt-0.5 text-text-main italic">"<?php echo e($payment->remarks); ?>"</div>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                        <tr>
+                            <td colspan="5" class="text-center py-8">
+                                <div class="text-text-dark/40 mb-2"><i class="fas fa-receipt text-3xl"></i></div>
+                                <div class="text-sm font-bold text-text-main">No Transactions Recorded</div>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Record Payment Modal -->
+<div id="record-payment-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-card-border flex justify-between items-center bg-secondary-bg">
+            <h3 class="font-black text-text-main">Record Transaction</h3>
+            <button onclick="document.getElementById('record-payment-modal').classList.add('hidden')" class="text-text-dark/40 hover:text-red-500 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <form action="<?php echo e(route('admin.candidate-payments.payment.add', $account->id)); ?>" method="POST" class="p-6">
+            <?php echo csrf_field(); ?>
+            
+            <div class="bg-blue-50 text-accent-blue p-3 rounded-lg mb-5 text-xs">
+                <i class="fas fa-info-circle mr-1"></i> Recording a transaction will automatically advance the <strong>Next Due Date</strong> by 1 month.
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer bg-green-50 px-4 py-2 rounded-lg border border-green-200 flex-1 justify-center">
+                        <input type="radio" name="type" value="Collected" checked class="text-green-500 focus:ring-green-500">
+                        <span class="text-sm font-bold text-green-700">Money Collected</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer bg-blue-50 px-4 py-2 rounded-lg border border-blue-200 flex-1 justify-center">
+                        <input type="radio" name="type" value="Paid" class="text-blue-500 focus:ring-blue-500">
+                        <span class="text-sm font-bold text-blue-700">Money Paid Out</span>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-text-main mb-1.5">Date <span class="text-red-500">*</span></label>
+                    <input type="date" name="payment_date" value="<?php echo e(date('Y-m-d')); ?>" required
+                        class="w-full px-4 py-2 bg-white border border-card-border rounded-lg focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-text-main mb-1.5">Amount (₹) <span class="text-red-500">*</span></label>
+                    <input type="number" step="0.01" name="amount" value="<?php echo e($account->monthly_amount); ?>" required
+                        class="w-full px-4 py-2 bg-white border border-card-border rounded-lg focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-text-main mb-1.5">Payment Mode <span class="text-red-500">*</span></label>
+                    <select name="payment_mode" required class="w-full px-4 py-2 bg-white border border-card-border rounded-lg focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-colors">
+                        <option value="Cash">Cash</option>
+                        <option value="UPI">UPI / QR Code</option>
+                        <option value="Bank">Bank Transfer</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-text-main mb-1.5">Remarks (Optional)</label>
+                    <textarea name="remarks" rows="2" placeholder="Any additional notes..."
+                        class="w-full px-4 py-2 bg-white border border-card-border rounded-lg focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-colors"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-card-border flex justify-end gap-2">
+                <button type="button" onclick="document.getElementById('record-payment-modal').classList.add('hidden')" class="px-4 py-2 rounded-lg font-bold text-text-dark/60 hover:bg-secondary-bg transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">
+                    Save Transaction
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\warriors portal\warriors portal\resources\views/admin/candidate_payments/show.blade.php ENDPATH**/ ?>

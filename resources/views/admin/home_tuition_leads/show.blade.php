@@ -128,7 +128,7 @@
             </div>
             <div class="p-6 space-y-6">
                 <!-- Invoice Creation Form -->
-                <form action="{{ route('admin.tuition-leads.invoice.store', $lead->id) }}" method="POST" class="bg-secondary-bg/30 p-4 rounded-xl border border-card-border" onsubmit="this.querySelector('button[type=submit]').disabled=true; this.querySelector('button[type=submit]').innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> Sending...';">
+                <form action="{{ route('admin.tuition-leads.invoice.store', $lead->id) }}" method="POST" class="bg-secondary-bg/30 p-4 rounded-xl border border-card-border" onsubmit="if(this.submitted) return false; this.submitted=true; this.querySelector('button[type=submit]').disabled=true; this.querySelector('button[type=submit]').innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> Sending...';">
                     @csrf
                     <h4 class="text-xs font-bold text-text-main uppercase tracking-wider mb-3 flex items-center gap-1.5">
                         <i class="fas fa-plus-circle text-accent-blue"></i> Create Service Charge Invoice
@@ -231,6 +231,73 @@
                         </div>
                     @endif
                 </div>
+            </div>
+        </div>
+        
+        <!-- Teacher Documents Upload & Final Appointment -->
+        <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden mt-6">
+            <div class="px-6 py-4 border-b border-card-border bg-secondary-bg/50 flex justify-between items-center">
+                <h3 class="font-bold text-text-main flex items-center gap-2">
+                    <i class="fas fa-id-card text-accent-blue"></i> Final Appointment & Documents
+                </h3>
+                @if($lead->is_finally_appointed)
+                    <span class="bg-green-500/10 text-green-500 border border-green-500/20 px-2 py-0.5 rounded text-xs font-bold">
+                        Finally Appointed
+                    </span>
+                @endif
+            </div>
+            
+            <div class="p-6">
+                @if($lead->status === 'Confirmed' || $lead->is_finally_appointed)
+                    <form action="{{ route('admin.tuition-leads.upload-documents', $lead->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                        @csrf
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- ID Proof Front -->
+                            <div>
+                                <label class="block text-xs font-bold text-text-dark/60 mb-2">ID Proof Front</label>
+                                @if($lead->id_proof_front)
+                                    <div class="mb-2 w-full h-24 rounded-lg border border-card-border overflow-hidden">
+                                        <img src="{{ asset('storage/' . $lead->id_proof_front) }}" class="w-full h-full object-cover">
+                                    </div>
+                                @endif
+                                <input type="file" name="id_proof_front" accept="image/*" class="text-xs w-full file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-accent-blue/10 file:text-accent-blue hover:file:bg-accent-blue/20">
+                            </div>
+                            
+                            <!-- ID Proof Back -->
+                            <div>
+                                <label class="block text-xs font-bold text-text-dark/60 mb-2">ID Proof Back</label>
+                                @if($lead->id_proof_back)
+                                    <div class="mb-2 w-full h-24 rounded-lg border border-card-border overflow-hidden">
+                                        <img src="{{ asset('storage/' . $lead->id_proof_back) }}" class="w-full h-full object-cover">
+                                    </div>
+                                @endif
+                                <input type="file" name="id_proof_back" accept="image/*" class="text-xs w-full file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-accent-blue/10 file:text-accent-blue hover:file:bg-accent-blue/20">
+                            </div>
+                            
+                            <!-- Passport Size Photo -->
+                            <div>
+                                <label class="block text-xs font-bold text-text-dark/60 mb-2">Passport Photo</label>
+                                @if($lead->teacher_passport_photo)
+                                    <div class="mb-2 w-24 h-24 rounded-lg border border-card-border overflow-hidden">
+                                        <img src="{{ asset('storage/' . $lead->teacher_passport_photo) }}" class="w-full h-full object-cover">
+                                    </div>
+                                @endif
+                                <input type="file" name="teacher_passport_photo" accept="image/*" class="text-xs w-full file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-accent-blue/10 file:text-accent-blue hover:file:bg-accent-blue/20">
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-card-border flex justify-end">
+                            <button type="submit" class="bg-accent-blue hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors shadow">
+                                <i class="fas fa-upload mr-1"></i> Upload & Finalize Appointment
+                            </button>
+                        </div>
+                    </form>
+                @else
+                    <div class="text-center py-6 bg-secondary-bg rounded-xl border border-dashed border-card-border text-sm text-text-dark/50">
+                        <i class="fas fa-lock text-2xl mb-2 text-text-dark/30 block"></i>
+                        You can upload documents and finalize appointment only when the lead status is <strong>Confirmed</strong>.
+                    </div>
+                @endif
             </div>
         </div>
 

@@ -166,6 +166,11 @@
                     class="sidebar-link {{ request()->routeIs('parent.tuitions.history') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-history w-5 text-center"></i> History
                 </a>
+                
+                <a href="{{ route('parent.appointed-teachers') }}"
+                    class="sidebar-link {{ request()->routeIs('parent.appointed-teachers') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm text-accent-blue hover:text-blue-400">
+                    <i class="fas fa-user-check w-5 text-center"></i> Appointed Teachers
+                </a>
 
                 <a href="{{ route('parent.dashboard') }}#service-charge-section"
                     class="sidebar-link px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm text-emerald-400 hover:text-emerald-300">

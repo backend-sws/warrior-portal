@@ -237,12 +237,24 @@
                             </div>
                         </form>
 
-                        <form action="{{ route('admin.crm.candidate.upload-agreement', $candidate->id) }}" method="POST" enctype="multipart/form-data" class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm">
+                        <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST" class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-4">
                             @csrf
-                            <label class="block text-xs font-bold text-gray-700 mb-2">Manually Upload Agreement (PDF)</label>
+                            <input type="hidden" name="agreement_status" value="pending_signature">
+                            <label class="block text-xs font-bold text-gray-700 mb-2">Generate & Send Standard Agreement</label>
+                            <p class="text-[10px] text-gray-500 mb-3">Proceed to send the standard formatted agreement. The candidate will see it in their portal to sign.</p>
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <input type="file" name="agreement_pdf" accept="application/pdf" required class="flex-1 block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                                <button type="submit" class="shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">
+                                <button type="submit" class="shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-2">
+                                    <i class="fas fa-paper-plane"></i> Proceed & Send to Candidate
+                                </button>
+                            </div>
+                        </form>
+
+                        <form action="{{ route('admin.crm.candidate.upload-agreement', $candidate->id) }}" method="POST" enctype="multipart/form-data" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            @csrf
+                            <label class="block text-xs font-bold text-gray-700 mb-2">Or Manually Upload Custom Agreement (PDF)</label>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input type="file" name="agreement_pdf" accept="application/pdf" required class="flex-1 block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer">
+                                <button type="submit" class="shrink-0 px-4 py-2 bg-gray-800 text-white rounded-lg text-xs font-bold hover:bg-gray-900 transition-colors shadow-sm">
                                     Upload & Send
                                 </button>
                             </div>

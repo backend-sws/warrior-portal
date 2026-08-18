@@ -48,15 +48,25 @@ class HomeController extends Controller
             'location' => 'required|string|max:255',
         ]);
 
-        $validated['budget'] = 'Not Specified';
+        $validated['fee'] = 'Not Specified';
 
-        $validated['status'] = 'Pending';
+        $validated['status'] = 'New Lead';
         if (auth()->check()) {
-            $validated['employer_id'] = auth()->id();
-            $validated['status'] = 'Active';
+            $validated['user_id'] = auth()->id();
         }
 
-        \App\Models\TuitionRequirement::create($validated);
+        \App\Models\HomeTuitionLead::create([
+            'parent_name' => $validated['guest_name'],
+            'parent_mobile' => $validated['guest_phone'],
+            'class' => $validated['student_class'],
+            'board' => $validated['board'],
+            'subjects' => $validated['subjects'],
+            'location' => $validated['location'],
+            'fee' => $validated['fee'],
+            'additional_notes' => 'Guest Request: ' . ($validated['description'] ?? ''),
+            'status' => $validated['status'],
+            'user_id' => $validated['user_id'] ?? null,
+        ]);
 
         // Here we can send a notification to the admin, but for now we'll just return with a success message
         return redirect()->route('home')->with('tuition_success', 'Your tuition requirement has been posted successfully! Our team will contact you soon.');

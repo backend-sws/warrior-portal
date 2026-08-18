@@ -202,9 +202,9 @@
                                 <div class="text-xs text-gray-500">{{ $application->candidate->phone ?? 'No Phone' }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-medium text-gray-800">{{ $application->tuition->subjects }}</div>
-                                <div class="text-xs text-gray-500">{{ $application->tuition->student_class }} • {{ $application->tuition->board }}</div>
-                                <div class="text-xs text-gray-400 mt-1 line-clamp-2" title="{{ $application->tuition->location }}">📍 {{ $application->tuition->location }}</div>
+                                <div class="font-medium text-gray-800">{{ $application->tuitionLead->subjects ?? 'N/A' }}</div>
+                                <div class="text-xs text-gray-500">{{ $application->tuitionLead->{'class'} ?? '' }} • {{ $application->tuitionLead->board ?? '' }}</div>
+                                <div class="text-xs text-gray-400 mt-1 line-clamp-2" title="{{ $application->tuitionLead->location ?? '' }}">📍 {{ $application->tuitionLead->location ?? 'No location specified' }}</div>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="text-xs font-bold px-3 py-1 rounded-full 

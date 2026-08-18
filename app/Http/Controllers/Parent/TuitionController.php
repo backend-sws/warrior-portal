@@ -11,10 +11,10 @@ class TuitionController extends Controller
     public function index()
     {
         // Fetch all active tuitions posted by admin
-        $tuitions = \App\Models\TuitionRequirement::where('status', 'Active')->latest()->paginate(12);
+        $tuitions = \App\Models\HomeTuitionLead::whereNotIn('status', ['Confirmed', 'Cancelled', 'Closed'])->latest()->paginate(12);
 
         $appliedTuitionIds = \App\Models\TuitionApplication::where('candidate_id', auth()->id())
-            ->pluck('tuition_requirement_id')
+            ->pluck('home_tuition_lead_id')
             ->toArray();
 
         return view('parent.tuitions.index', compact('tuitions', 'appliedTuitionIds'));
@@ -22,14 +22,14 @@ class TuitionController extends Controller
 
     public function apply(\Illuminate\Http\Request $request, $id)
     {
-        $tuition = \App\Models\TuitionRequirement::findOrFail($id);
+        $tuition = \App\Models\HomeTuitionLead::findOrFail($id);
 
-        if ($tuition->status !== 'Active') {
+        if (in_array($tuition->status, ['Confirmed', 'Cancelled', 'Closed'])) {
             return back()->with('error', 'This tuition is no longer active.');
         }
 
         $existingApplication = \App\Models\TuitionApplication::where('candidate_id', auth()->id())
-            ->where('tuition_requirement_id', $id)
+            ->where('home_tuition_lead_id', $id)
             ->first();
 
         if ($existingApplication) {
@@ -38,7 +38,7 @@ class TuitionController extends Controller
 
         \App\Models\TuitionApplication::create([
             'candidate_id' => auth()->id(),
-            'tuition_requirement_id' => $id,
+            'home_tuition_lead_id' => $id,
             'status' => 'Applied'
         ]);
 
@@ -82,5 +82,15 @@ class TuitionController extends Controller
             ->paginate(12);
 
         return view('parent.tuitions.history', compact('leads'));
+    }
+
+    public function appointedTeachers()
+    {
+        $appointedLeads = \App\Models\HomeTuitionLead::where('user_id', auth()->id())
+            ->where('is_finally_appointed', true)
+            ->latest()
+            ->get();
+
+        return view('parent.tuitions.appointed_teachers', compact('appointedLeads'));
     }
 }

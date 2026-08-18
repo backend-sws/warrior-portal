@@ -12,7 +12,7 @@ class TuitionController extends Controller
     {
         $employerTuitions = TuitionRequirement::with('employer')->whereNotNull('employer_id')->latest()->paginate(20, ['*'], 'employer_page');
         $guestTuitions = TuitionRequirement::whereNull('employer_id')->latest()->paginate(20, ['*'], 'guest_page');
-        $appliedTuitions = \App\Models\TuitionApplication::with(['candidate', 'tuition'])->latest()->paginate(10, ['*'], 'applications_page');
+        $appliedTuitions = \App\Models\TuitionApplication::with(['candidate', 'tuitionLead'])->latest()->paginate(10, ['*'], 'applications_page');
 
         return view('admin.tuitions.index', compact('employerTuitions', 'guestTuitions', 'appliedTuitions'));
     }

@@ -5,6 +5,51 @@
 
 @section('content')
 
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-card-bg rounded-2xl p-5 border border-card-border shadow-sm flex items-center justify-between">
+        <div>
+            <p class="text-[10px] uppercase tracking-widest text-text-dark/40 font-bold mb-1">Total Revenue</p>
+            <h3 class="text-2xl font-black text-text-main">₹{{ number_format($stats['total_revenue'], 2) }}</h3>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-accent-blue/10 flex items-center justify-center text-accent-blue">
+            <i class="fas fa-rupee-sign"></i>
+        </div>
+    </div>
+    <div class="bg-card-bg rounded-2xl p-5 border border-card-border shadow-sm flex items-center justify-between">
+        <div>
+            <p class="text-[10px] uppercase tracking-widest text-text-dark/40 font-bold mb-1">Candidate Payments</p>
+            <h3 class="text-2xl font-black text-text-main">₹{{ number_format($stats['candidate_revenue'], 2) }}</h3>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+    </div>
+    <div class="bg-card-bg rounded-2xl p-5 border border-card-border shadow-sm flex items-center justify-between">
+        <div>
+            <p class="text-[10px] uppercase tracking-widest text-text-dark/40 font-bold mb-1">Parent Tuitions</p>
+            <h3 class="text-2xl font-black text-text-main">₹{{ number_format($stats['parent_revenue'], 2) }}</h3>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500">
+            <i class="fas fa-user-friends"></i>
+        </div>
+    </div>
+    <div class="bg-card-bg rounded-2xl p-5 border border-card-border shadow-sm flex items-center justify-between">
+        <div>
+            <p class="text-[10px] uppercase tracking-widest text-text-dark/40 font-bold mb-1">Total Txns</p>
+            <h3 class="text-2xl font-black text-text-main">{{ number_format($stats['total_transactions']) }}</h3>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500">
+            <i class="fas fa-chart-line"></i>
+        </div>
+    </div>
+</div>
+
+<div class="mb-6 border-b border-card-border flex gap-6 overflow-x-auto">
+    <a href="{{ route('admin.transactions.index', array_merge(request()->all(), ['role' => 'all'])) }}" class="shrink-0 pb-3 text-sm font-bold border-b-2 transition-colors {{ $roleFilter === 'all' ? 'border-accent-blue text-accent-blue' : 'border-transparent text-text-dark/50 hover:text-text-main' }}">All Transactions</a>
+    <a href="{{ route('admin.transactions.index', array_merge(request()->all(), ['role' => 'candidate'])) }}" class="shrink-0 pb-3 text-sm font-bold border-b-2 transition-colors {{ $roleFilter === 'candidate' ? 'border-accent-blue text-accent-blue' : 'border-transparent text-text-dark/50 hover:text-text-main' }}">Candidate Payments</a>
+    <a href="{{ route('admin.transactions.index', array_merge(request()->all(), ['role' => 'parent'])) }}" class="shrink-0 pb-3 text-sm font-bold border-b-2 transition-colors {{ $roleFilter === 'parent' ? 'border-accent-blue text-accent-blue' : 'border-transparent text-text-dark/50 hover:text-text-main' }}">Parent Tuitions</a>
+</div>
+
 <div class="bg-card-bg rounded-t-2xl border-x border-t border-card-border p-4">
     <form action="{{ route('admin.transactions.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
         <div class="flex-1 relative">

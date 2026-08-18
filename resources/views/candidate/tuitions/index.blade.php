@@ -268,10 +268,10 @@ function printTuitionAgreement() {
         <div class="light-metallic-blue-card rounded-2xl border-0 shadow-sm p-6 flex flex-col hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
                 <span class="bg-[#0ea5e9]/10 text-[#0ea5e9] text-xs font-bold px-3 py-1 rounded-full">
-                    {{ $tuition->student_class }}
+                    {{ $tuition->{'class'} }}
                 </span>
                 <span class="bg-green-50 text-green-700 text-sm font-bold px-3 py-1 rounded-lg border border-green-100">
-                    ₹{{ $tuition->budget }}<span class="text-xs font-normal">/mo</span>
+                    ₹{{ $tuition->fee }}<span class="text-xs font-normal">/mo</span>
                 </span>
             </div>
 
@@ -286,9 +286,9 @@ function printTuitionAgreement() {
                     <i class="fas fa-map-marker-alt w-5 text-[#031b4e]/50"></i>
                     <span class="line-clamp-1" title="{{ $tuition->location }}">{{ $tuition->location }}</span>
                 </div>
-                @if($tuition->description)
-                <div class="text-sm text-[#031b4e]/80 mt-2 line-clamp-2" title="{{ $tuition->description }}">
-                    {{ $tuition->description }}
+                @if($tuition->additional_notes)
+                <div class="text-sm text-[#031b4e]/80 mt-2 line-clamp-2" title="{{ $tuition->additional_notes }}">
+                    {{ $tuition->additional_notes }}
                 </div>
                 @endif
             </div>

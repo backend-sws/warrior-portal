@@ -144,7 +144,7 @@
             </div>
 
             <!-- Navigation -->
-            <div class="flex-1 overflow-y-auto py-5 px-3 flex flex-col gap-1 no-scrollbar">
+            <div id="sidebar-scroll-container" class="flex-1 overflow-y-auto py-5 px-3 flex flex-col gap-1 no-scrollbar">
                 <a href="<?php echo e(route('admin.dashboard')); ?>"
                     class="sidebar-link <?php echo e(request()->routeIs('admin.dashboard') ? 'active' : ''); ?> px-4 py-3 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-th-large w-5 text-center text-lg"></i> Dashboard
@@ -215,6 +215,14 @@
                 <a href="<?php echo e(route('admin.leads.index')); ?>"
                     class="sidebar-link <?php echo e(request()->routeIs('admin.leads.*') ? 'active' : ''); ?> px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-headset w-5 text-center"></i> Support Leads
+                </a>
+                <a href="<?php echo e(route('admin.candidate-tuition.index')); ?>"
+                    class="sidebar-link <?php echo e(request()->routeIs('admin.candidate-tuition.*') ? 'active' : ''); ?> px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm text-yellow-300 hover:text-yellow-200">
+                    <i class="fas fa-chalkboard w-5 text-center"></i> Candidate Tuition
+                    <?php $openLeadsCount = \App\Models\HomeTuitionLead::whereNotIn('status', ['Confirmed','Cancelled'])->count(); ?>
+                    <?php if($openLeadsCount > 0): ?>
+                        <span class="ml-auto bg-yellow-400 text-[#031b4e] text-[10px] font-black px-2 py-0.5 rounded-full"><?php echo e($openLeadsCount); ?></span>
+                    <?php endif; ?>
                 </a>
 
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Tuitions & Parents
@@ -440,6 +448,19 @@
                     </div>
                 <?php endif; ?>
 
+                <?php if($errors->any()): ?>
+                    <div class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 mb-8 rounded-xl shadow-sm flex items-start gap-3 animate-[fadeIn_0.3s_ease-out]">
+                        <i class="fas fa-exclamation-triangle mt-0.5 text-lg"></i>
+                        <div class="font-medium text-sm">
+                            <ul class="list-disc list-inside">
+                                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <li><?php echo e($error); ?></li>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </ul>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 
                 <?php echo $__env->yieldContent('content'); ?>
                 </div>
@@ -638,6 +659,21 @@
 
             mobileMenuBtn.addEventListener('click', toggleSidebar);
             mobileOverlay.addEventListener('click', toggleSidebar);
+        }
+
+        // Sidebar Scroll State Management
+        const sidebarContainer = document.getElementById('sidebar-scroll-container');
+        if (sidebarContainer) {
+            // Restore scroll position
+            const scrollPos = sessionStorage.getItem('adminSidebarScroll');
+            if (scrollPos) {
+                sidebarContainer.scrollTop = parseInt(scrollPos, 10);
+            }
+
+            // Save scroll position on scroll
+            sidebarContainer.addEventListener('scroll', function() {
+                sessionStorage.setItem('adminSidebarScroll', this.scrollTop);
+            });
         }
     </script>
 </body>

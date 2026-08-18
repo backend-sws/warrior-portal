@@ -1,0 +1,161 @@
+
+
+<?php $__env->startSection('title', 'Users Management'); ?>
+
+<?php $__env->startSection('content'); ?>
+    <div class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Total Users -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Users</p>
+                <h3 class="text-2xl font-black text-gray-800"><?php echo e($stats['total']); ?></h3>
+            </div>
+        </div>
+
+        <!-- Active Users -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Active Users</p>
+                <h3 class="text-2xl font-black text-gray-800"><?php echo e($stats['active']); ?></h3>
+            </div>
+        </div>
+
+        <!-- Candidates -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Candidates</p>
+                <h3 class="text-2xl font-black text-gray-800"><?php echo e($stats['candidates']); ?></h3>
+            </div>
+        </div>
+
+        <!-- Parents -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Parents</p>
+                <h3 class="text-2xl font-black text-gray-800"><?php echo e($stats['parents']); ?></h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters & Table -->
+    <div class="bg-white shadow-sm sm:rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex gap-2 w-full sm:w-auto overflow-x-auto">
+                <a href="<?php echo e(route('admin.users.index')); ?>" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 <?php echo e(!request('role') ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'); ?>">All</a>
+                <a href="<?php echo e(route('admin.users.index', ['role' => 'candidate'])); ?>" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 <?php echo e(request('role') === 'candidate' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'); ?>">Candidates</a>
+                <a href="<?php echo e(route('admin.users.index', ['role' => 'parent'])); ?>" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 <?php echo e(request('role') === 'parent' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'); ?>">Parents</a>
+            </div>
+            
+            <form action="<?php echo e(route('admin.users.index')); ?>" method="GET" class="w-full sm:w-auto">
+                <?php if(request('role')): ?>
+                    <input type="hidden" name="role" value="<?php echo e(request('role')); ?>">
+                <?php endif; ?>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-blue-500"></i>
+                    </div>
+                    <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Search name, email, phone..." class="block w-full sm:w-72 pr-3 py-2 border border-gray-200 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all duration-200 shadow-sm" style="padding-left: 2.5rem;">
+                </div>
+            </form>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full admin-table text-left">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                        <th>Status</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <?php $__empty_1 = true; $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <tr>
+                            <td class="font-semibold text-gray-800">
+                                <?php echo e($user->name); ?>
+
+                                <?php if($user->role === 'candidate' && $user->profile && $user->profile->is_verified): ?>
+                                    <i class="fas fa-check-circle text-blue-500 ml-1" title="Verified Candidate"></i>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-gray-500"><?php echo e($user->email); ?></td>
+                            <td>
+                                <?php if($user->role === 'candidate'): ?>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                        Candidate
+                                    </span>
+                                <?php elseif($user->role === 'parent'): ?>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                        Parent
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-gray-500"><?php echo e($user->created_at->format('d M Y')); ?></td>
+                            <td>
+                                <?php if($user->is_active): ?>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                        <i class="fas fa-circle text-[8px] mr-1.5"></i> Active
+                                    </span>
+                                <?php else: ?>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">
+                                        <i class="fas fa-circle text-[8px] mr-1.5"></i> Inactive
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-right whitespace-nowrap">
+                                <div class="flex items-center justify-end gap-2">
+                                    <?php if($user->is_active): ?>
+                                        <a href="<?php echo e(route('admin.users.impersonate', $user->id)); ?>" target="_blank" class="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors" title="Login as User">
+                                            <i class="fas fa-sign-in-alt"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <form action="<?php echo e(route('admin.users.toggle-status', $user->id)); ?>" method="POST" class="inline">
+                                        <?php echo csrf_field(); ?>
+                                        <?php if($user->is_active): ?>
+                                            <button type="submit" class="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" title="Deactivate User" onclick="return confirm('Are you sure you want to deactivate this user?')">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        <?php else: ?>
+                                            <button type="submit" class="p-2 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" title="Activate User">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                        <tr>
+                            <td colspan="6" class="text-center py-8 text-gray-500">
+                                <div class="text-4xl text-gray-200 mb-2"><i class="fas fa-users-slash"></i></div>
+                                No users found.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="p-4 border-t border-gray-100">
+            <?php echo e($users->links()); ?>
+
+        </div>
+    </div>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\warriors portal\warriors portal\resources\views/admin/users/index.blade.php ENDPATH**/ ?>
