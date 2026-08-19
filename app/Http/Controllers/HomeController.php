@@ -68,7 +68,13 @@ class HomeController extends Controller
             'user_id' => $validated['user_id'] ?? null,
         ]);
 
-        // Here we can send a notification to the admin, but for now we'll just return with a success message
+        \App\Helpers\NotificationHelper::notifyAdmin(
+            'New Tuition Enquiry',
+            $validated['guest_name'] . ' has posted a new tuition requirement.',
+            route('admin.tuition-leads.index'),
+            'fas fa-chalkboard-teacher'
+        );
+
         return redirect()->route('home')->with('tuition_success', 'Your tuition requirement has been posted successfully! Our team will contact you soon.');
     }
 
@@ -133,6 +139,15 @@ class HomeController extends Controller
         return view('jobs', compact('jobs', 'states', 'subjects', 'categories'));
     }
 
+    public function tuitions(\Illuminate\Http\Request $request)
+    {
+        $tuitions = \App\Models\HomeTuitionLead::whereNotIn('status', ['Confirmed', 'Cancelled', 'Closed'])
+            ->latest()
+            ->paginate(12);
+
+        return view('tuitions', compact('tuitions'));
+    }
+
     public function storeContact(\Illuminate\Http\Request $request)
     {
         $request->validate([
@@ -145,21 +160,12 @@ class HomeController extends Controller
         \App\Models\ContactLead::create($request->only(['name', 'email', 'phone', 'message']));
 
         // Notify Admin of new lead
-        $adminUser = \App\Models\User::where('role', 'admin')->first();
-        if ($adminUser) {
-            \Illuminate\Support\Facades\DB::table('notifications')->insert([
-                'id' => \Illuminate\Support\Str::uuid(),
-                'type' => 'App\Notifications\NewContactLead',
-                'notifiable_type' => 'App\Models\User',
-                'notifiable_id' => $adminUser->id,
-                'data' => json_encode([
-                    'title' => 'New Contact Query',
-                    'message' => $request->name . ' has submitted a new contact query.',
-                ]),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        \App\Helpers\NotificationHelper::notifyAdmin(
+            'New Contact Query',
+            $request->name . ' has submitted a new contact query.',
+            route('admin.leads.index'),
+            'fas fa-envelope'
+        );
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([

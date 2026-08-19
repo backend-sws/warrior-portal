@@ -317,6 +317,9 @@
                 <li><a href="{{ route('jobs') }}"
                         class="{{ request()->routeIs('jobs') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Jobs</a>
                 </li>
+                <li><a href="{{ route('tuitions') }}"
+                        class="{{ request()->routeIs('tuitions') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Tuitions</a>
+                </li>
                 <li><a href="{{ route('resume.builder') }}"
                         class="{{ request()->routeIs('resume.builder') ? 'text-white font-bold' : 'text-gray-200 hover:text-white' }} whitespace-nowrap font-medium text-[15px] transition-colors">Resume Builder <span
                             class="bg-accent-blue text-white text-[9px] px-1.5 py-0.5 rounded-sm uppercase font-extrabold ml-1 relative -top-1">Free</span></a>
@@ -326,7 +329,51 @@
             </ul>
             <div class="flex gap-3 lg:gap-4 items-center">
                 @auth
-                    <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'employer' ? route('employer.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard'))) }}"
+                    <!-- Notification Bell -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" class="relative p-2 text-white/90 hover:text-white transition-colors">
+                            <i class="fas fa-bell text-lg"></i>
+                            @if(auth()->user()->unreadNotifications->count() > 0)
+                                <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#031b4e]"></span>
+                            @endif
+                        </button>
+                        
+                        <!-- Dropdown -->
+                        <div x-show="open" style="display: none;" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden text-gray-800">
+                            <div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                                <h3 class="font-bold text-sm text-[#031b4e]">Notifications</h3>
+                                @if(auth()->user()->unreadNotifications->count() > 0)
+                                    <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">{{ auth()->user()->unreadNotifications->count() }} New</span>
+                                @endif
+                            </div>
+                            <div class="max-h-80 overflow-y-auto">
+                                @forelse(auth()->user()->notifications->take(5) as $notification)
+                                    <div class="p-3 border-b border-gray-50 hover:bg-gray-50 transition-colors {{ is_null($notification->read_at) ? 'bg-blue-50/30' : '' }}">
+                                        <div class="flex gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 text-[#031b4e] flex items-center justify-center shrink-0">
+                                                <i class="{{ $notification->data['icon'] ?? 'fas fa-bell' }} text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="text-sm font-semibold text-gray-900">{{ $notification->data['title'] ?? 'Notification' }}</h4>
+                                                <p class="text-xs text-gray-600 mt-0.5 line-clamp-2">{{ $notification->data['message'] ?? '' }}</p>
+                                                <span class="text-[10px] text-gray-400 mt-1 block">{{ $notification->created_at->diffForHumans() }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="p-6 text-center text-gray-500">
+                                        <i class="fas fa-bell-slash text-2xl text-gray-300 mb-2 block"></i>
+                                        <p class="text-sm">No notifications yet</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                            <div class="p-2 border-t border-gray-100 bg-gray-50 text-center">
+                                <a href="#" class="text-xs font-semibold text-[#031b4e] hover:underline">View All</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard')) }}"
                         class="px-5 py-2.5 rounded font-medium text-[14px] cursor-pointer transition-all bg-white/20 text-white hover:bg-white/30 border border-white/30 flex items-center gap-2 whitespace-nowrap">
                         <div
                             class="w-6 h-6 rounded-full bg-white text-[#031b4e] flex items-center justify-center text-[10px] font-bold">
@@ -380,6 +427,9 @@
                 <li><a href="{{ route('jobs') }}"
                         class="{{ request()->routeIs('jobs') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue' }} transition-colors">Jobs</a>
                 </li>
+                <li><a href="{{ route('tuitions') }}"
+                        class="{{ request()->routeIs('tuitions') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue' }} transition-colors">Tuitions</a>
+                </li>
                 <li><a href="{{ route('resume.builder') }}"
                         class="{{ request()->routeIs('resume.builder') ? 'text-accent-blue' : 'text-text-main hover:text-accent-blue' }} transition-colors">Resume
                         Builder <span
@@ -397,7 +447,7 @@
 
             <div class="flex flex-col gap-3">
                 @auth
-                    <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'employer' ? route('employer.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard'))) }}"
+                    <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard')) }}"
                         class="px-5 py-3.5 rounded-xl font-medium text-center bg-accent-blue text-white shadow-glow-blue flex items-center justify-center gap-2">
                         <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
@@ -592,7 +642,7 @@
                 title: "Hire the Minds <br> That Shape Tomorrow",
                 subtitle: "partner with us to find top-tier teaching professionals for your institution",
                 ctaText: "Employer",
-                ctaLink: "{{ route('employer.register') }}",
+                ctaLink: "#",
                 imgUrl: "images/women.jpg",
                 fc1Title: "500+",
                 fc1Desc: "Partner Schools",
@@ -857,7 +907,9 @@
         }, { threshold: 0.2 });
 
         typeElements.forEach(el => {
-            el.setAttribute('data-original-text', el.innerText.trim());
+            if (!el.hasAttribute('data-original-text')) {
+                el.setAttribute('data-original-text', el.innerText.trim());
+            }
             el.innerHTML = '&nbsp;'; 
             observer.observe(el);
         });

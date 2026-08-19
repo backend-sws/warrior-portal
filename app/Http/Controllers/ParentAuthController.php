@@ -37,6 +37,24 @@ class ParentAuthController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
+        // Notify Admin
+        \App\Helpers\NotificationHelper::notifyAdmin(
+            'New Parent Registered',
+            $user->name . ' has registered as a parent/tuition seeker.',
+            route('admin.users.index'),
+            'fas fa-user-friends'
+        );
+
+        // Notify User
+        \App\Helpers\NotificationHelper::notifyUser(
+            $user->id,
+            'Welcome to Warriors Educare',
+            'Your account has been created successfully.',
+            route('parent.dashboard'),
+            'fas fa-user',
+            true
+        );
+
         return redirect()->route('parent.dashboard');
     }
 }
