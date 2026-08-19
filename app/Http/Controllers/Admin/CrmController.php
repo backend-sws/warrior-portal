@@ -665,18 +665,13 @@ class CrmController extends Controller
 
         if ($profile->is_verified) {
             // DB Notification
-            \Illuminate\Support\Facades\DB::table('notifications')->insert([
-                'id' => \Illuminate\Support\Str::uuid(),
-                'type' => 'App\Notifications\ProfileVerified',
-                'notifiable_type' => 'App\Models\User',
-                'notifiable_id' => $candidate->id,
-                'data' => json_encode([
-                    'title' => 'Profile Verified!',
-                    'message' => 'Congratulations! Your profile has been officially verified by our team. You now have the Verified Badge.',
-                ]),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            \App\Helpers\NotificationHelper::notifyUser(
+                $candidate->id,
+                'Profile Verified!',
+                'Congratulations! Your profile has been officially verified by our team. You now have the Verified Badge.',
+                null,
+                'fas fa-check-circle'
+            );
 
             // Email Notification
             \Illuminate\Support\Facades\Mail::to($candidate->email)->send(new \App\Mail\ProfileApprovedMail($candidate));
@@ -733,6 +728,14 @@ class CrmController extends Controller
                 'remarks' => $request->remarks,
                 'rated_by' => auth()->id()
             ]
+        );
+
+        \App\Helpers\NotificationHelper::notifyUser(
+            $id,
+            'Profile Rating Updated',
+            'Your profile rating has been updated by the admin team. Keep up the good work!',
+            route('candidate.dashboard'),
+            'fas fa-star'
         );
 
         return back()->with('success', 'Candidate rating updated successfully.');

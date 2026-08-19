@@ -47,6 +47,24 @@ class CandidateAuthController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
+        // Notify Admin
+        \App\Helpers\NotificationHelper::notifyAdmin(
+            'New Candidate Registered',
+            $user->name . ' has registered as a new candidate.',
+            route('admin.users.index'),
+            'fas fa-user-plus'
+        );
+
+        // Notify User
+        \App\Helpers\NotificationHelper::notifyUser(
+            $user->id,
+            'Welcome to Warriors Educare',
+            'Thank you for registering. Please complete your profile to start applying for jobs.',
+            route('candidate.dashboard'),
+            'fas fa-handshake',
+            true // Send Email
+        );
+
         return redirect()->route('candidate.dashboard');
     }
 }

@@ -2,220 +2,93 @@
 
     @section('content')
         <!-- Hero Banner Section -->
-    <section class="relative w-full min-h-[90vh] bg-[#010614] overflow-hidden flex items-center">
-        <!-- Split Background -->
-        <div class="absolute inset-0 z-0">
-            <!-- Orange/Sky Base with Network Pattern -->
-            <div class="absolute inset-0 bg-[#0ea5e9]">
-                <!-- Clean Professional Network Pattern -->
-                <div class="absolute inset-0 w-full h-full opacity-100 animate-pattern-move" style="background-image: url('{{ asset('images/network-pattern.svg') }}'); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
-            </div>
-            <!-- Navy Sliding overlay (animates via clip-path) -->
-            <div id="bg-navy" class="absolute inset-0 bg-[#031b4e] transition-all duration-1000 ease-in-out" 
-                 style="clip-path: polygon(0 0, 60% 0, 48% 100%, 0 100%);">
-                <!-- Decorative grid overlay (flowing wave) -->
-                <div id="bg-grid" class="absolute inset-0 w-full h-full opacity-40 pointer-events-none transition-all duration-1000 ease-in-out mix-blend-screen animate-pattern-move" style="background-image: url('{{ asset('images/wave-pattern.svg') }}'); background-position: center bottom; background-size: cover; background-repeat: no-repeat;"></div>
-            </div>
+    <section class="relative w-full min-h-[500px] md:min-h-[70vh] bg-[#031b4e] overflow-hidden flex items-center justify-center mt-[70px]">
+        <!-- Live Pattern Background -->
+        <div class="absolute inset-0 z-0 bg-[#031b4e]">
+            <!-- Decorative grid overlay (network pattern) -->
+            <div class="absolute inset-0 w-full h-full opacity-40 pointer-events-none mix-blend-screen animate-pattern-move" style="background-image: url('{{ asset('images/network-pattern.svg') }}'); background-position: center bottom; background-size: cover; background-repeat: no-repeat;"></div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 lg:px-8 relative z-20 w-full h-full flex flex-col md:flex-row items-center pt-32 md:pt-40 pb-20">
+        <!-- Content Container -->
+        <div class="max-w-7xl mx-auto px-4 w-full h-full relative z-20 flex flex-col md:flex-row items-center justify-between py-16 md:py-24 gap-8 md:gap-4">
             
-            <!-- Left Side: Text Content -->
-            <div id="hero-text-container" class="w-full md:w-1/2 flex flex-col justify-center transition-all duration-1000 ease-in-out md:pr-10 z-20">
-                <div class="mb-4 inline-block self-start px-3 py-1 bg-white/10 rounded-full border border-white/20 text-white/90 text-sm font-semibold tracking-widest uppercase">
-                    #1 OUTSOURCED
+            <!-- Left Side: Circle Image Element -->
+            <div class="w-full md:w-1/4 flex justify-center md:justify-start">
+                <div class="w-40 h-40 md:w-56 md:h-56 rounded-full bg-[#0ea5e9]/20 backdrop-blur-md flex items-center justify-center p-2 shadow-[0_0_40px_rgba(14,165,233,0.3)] border-4 md:border-8 border-[#0ea5e9] relative overflow-hidden group">
+                    <img src="{{ asset('images/student.png') }}" alt="Student" class="w-full h-full object-cover rounded-full relative z-10 transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-[#0ea5e9]/10 group-hover:bg-transparent transition-colors duration-500 z-20"></div>
                 </div>
-                
-                <!-- Main Heading -->
-                <h1 id="hero-heading" class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] mb-6 tracking-tight typewriter-effect" data-speed="40">
-                    EDUCATION<br>
-                    & HIRING<br>
-                    SOLUTIONS
+            </div>
+
+            <!-- Center: Text & Socials -->
+            <div class="w-full md:w-5/12 flex flex-col items-center text-center px-2">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-medium text-white tracking-wide mb-1">
+                    GET THE BEST <span class="font-black">EDUCATIONAL</span>
                 </h1>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-[#0ea5e9] tracking-wider mb-6 drop-shadow-lg">
+                    HIRING SOLUTIONS
+                </h2>
                 
-                <!-- Paragraph -->
-                <p id="hero-text" class="text-white/80 text-sm md:text-base leading-relaxed mb-10 max-w-md border-l-2 border-white/20 pl-4 typewriter-effect" data-speed="15">
-                    Connect with top-tier talent and premier educational institutions. We streamline your recruitment process and guide your career forward.
-                </p>
+                <div class="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-white/90 text-[10px] md:text-xs font-semibold">
+                    <a href="#" class="flex items-center gap-2 hover:text-[#0ea5e9] transition-colors group">
+                        <div class="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#0ea5e9] flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0ea5e9] transition-colors shadow-md"><i class="fab fa-facebook-f text-[10px]"></i></div>
+                        Warriors Educare
+                    </a>
+                    <a href="#" class="flex items-center gap-2 hover:text-[#0ea5e9] transition-colors group">
+                        <div class="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#0ea5e9] flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0ea5e9] transition-colors shadow-md"><i class="fab fa-instagram text-[10px]"></i></div>
+                        @warriorseducare
+                    </a>
+                    <a href="#" class="flex items-center gap-2 hover:text-[#0ea5e9] transition-colors group">
+                        <div class="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#0ea5e9] flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0ea5e9] transition-colors shadow-md"><i class="fab fa-twitter text-[10px]"></i></div>
+                        @warriors_educare
+                    </a>
+                </div>
                 
-                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4 mb-10">
-                    <button id="btn-candidate" onclick="switchHeroMode('candidate')" 
-                       class="group relative overflow-hidden bg-white/20 backdrop-blur-md border border-white/40 text-white font-medium py-3.5 px-8 rounded-full shadow-lg transition-all duration-300">
-                        <span class="relative z-10 flex items-center justify-center">
-                            I am a Candidate <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                        </span>
-                    </button>
-                    
-                    <button id="btn-employer" onclick="switchHeroMode('employer')" class="group bg-white hover:bg-[#0ea5e9] text-[#031b4e] hover:text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 flex items-center justify-center border-2 border-transparent hover:border-[#0ea5e9]">
-                        I am an Employer <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                    </button>
+                <div class="mt-8">
+                    <a href="{{ route('candidate.register') }}" class="inline-flex items-center gap-2 bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-bold py-3.5 px-8 rounded-full shadow-lg shadow-[#0ea5e9]/30 transition-all hover:-translate-y-1 hover:shadow-[#0ea5e9]/50 tracking-wide text-sm border border-[#0ea5e9] hover:border-[#0284c7]">
+                        Register as Candidate <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
             </div>
-            
-            <!-- Right Side: Circular Image with Play Button -->
-            <div id="hero-img-wrapper" class="w-full md:w-1/2 flex justify-center md:justify-end relative mt-12 md:mt-0 z-20 transition-all duration-1000 ease-in-out">
-                
-                <div class="relative w-[300px] h-[300px] sm:w-[350px] sm:h-[350px] lg:w-[420px] lg:h-[420px]">
-                    
-                    <!-- Main Circular Image Frame -->
-                    <div id="hero-img-container" class="w-full h-full rounded-full overflow-hidden border-8 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative z-10 transition-transform duration-1000 ease-in-out">
-                        <!-- Image of a team/meeting -->
-                        <img id="hero-img" src="{{ asset('images/candidate_hero_4k.png') }}" alt="Team Collaboration" class="w-full h-full object-cover transition-opacity duration-300">
-                    </div>
 
-                    <!-- Floating Play Button on the left edge of the circle -->
-                    <div id="hero-play-btn" class="absolute top-1/2 -translate-y-1/2 -left-4 md:-left-8 w-16 h-16 bg-[#0ea5e9] rounded-full flex items-center justify-center shadow-xl cursor-pointer hover:scale-110 transition-all duration-1000 z-20 border-4 border-white/20">
-                        <i class="fas fa-play text-white text-lg ml-1"></i>
+            <!-- Right Side: Diamond Collage -->
+            <div class="w-full md:w-1/3 flex justify-center md:justify-end mt-12 md:mt-0">
+                <div class="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+                    <!-- Background Glow -->
+                    <div class="absolute inset-0 bg-[#0ea5e9]/20 rounded-full blur-3xl z-0 pointer-events-none"></div>
+                    
+                    <!-- Top Diamond -->
+                    <div class="absolute top-[5%] left-[25%] w-28 h-28 md:w-36 md:h-36 border-[4px] md:border-[6px] border-[#0ea5e9] rounded-[20px] md:rounded-[28px] rotate-45 overflow-hidden shadow-2xl z-10 hover:scale-110 transition-transform duration-500 cursor-pointer">
+                        <img src="{{ asset('images/women.jpg') }}" alt="Professional 1" class="absolute w-[150%] h-[150%] max-w-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 object-cover hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-[#0ea5e9]/10 -rotate-45 hover:bg-transparent transition-colors duration-500"></div>
                     </div>
                     
-                    <!-- Floating curved accent at top right -->
-                    <div id="hero-accent" class="absolute -top-6 right-10 w-24 h-24 border-t-4 border-r-4 border-white/30 rounded-tr-full z-0 pointer-events-none transition-all duration-1000"></div>
-
+                    <!-- Bottom Left Diamond -->
+                    <div class="absolute top-[45%] left-[5%] w-24 h-24 md:w-32 md:h-32 border-[4px] md:border-[6px] border-[#0ea5e9] rounded-[16px] md:rounded-[24px] rotate-45 overflow-hidden shadow-2xl z-20 hover:scale-110 transition-transform duration-500 cursor-pointer">
+                        <img src="{{ asset('images/men.jpg') }}" alt="Professional 2" class="absolute w-[150%] h-[150%] max-w-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 object-cover hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-[#0ea5e9]/10 -rotate-45 hover:bg-transparent transition-colors duration-500"></div>
+                    </div>
+                    
+                    <!-- Bottom Right Diamond -->
+                    <div class="absolute top-[40%] right-[5%] w-32 h-32 md:w-40 md:h-40 border-[4px] md:border-[6px] border-[#0ea5e9] rounded-[20px] md:rounded-[28px] rotate-45 overflow-hidden shadow-2xl z-10 hover:scale-110 transition-transform duration-500 cursor-pointer">
+                        <img src="{{ asset('images/candidate_hero_4k.png') }}" alt="Professional 3" class="absolute w-[150%] h-[150%] max-w-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 object-cover hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-[#0ea5e9]/10 -rotate-45 hover:bg-transparent transition-colors duration-500"></div>
+                    </div>
                 </div>
-
             </div>
-
         </div>
-        
-        <!-- Bottom Fade Overlay -->
-        <div class="absolute -bottom-1 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent z-30 pointer-events-none"></div>
     </section>
 
     <script>
-        let currentRotation = 0;
-        function switchHeroMode(mode) {
-            const heading = document.getElementById('hero-heading');
-            const text = document.getElementById('hero-text');
-            const img = document.getElementById('hero-img');
-            const imgContainer = document.getElementById('hero-img-container');
-            const btnCandidate = document.getElementById('btn-candidate');
-            const btnEmployer = document.getElementById('btn-employer');
-            
-            // Layout Elements
-            const bgNavy = document.getElementById('bg-navy');
-            const bgGrid = document.getElementById('bg-grid');
-            const textContainer = document.getElementById('hero-text-container');
-            const imgWrapper = document.getElementById('hero-img-wrapper');
-            const playBtn = document.getElementById('hero-play-btn');
-            const accent = document.getElementById('hero-accent');
-
-            if (!heading || !imgContainer) return;
-
-            // Flip the circle in 3D
-            currentRotation += 360;
-            imgContainer.style.transform = `rotateY(${currentRotation}deg)`;
-
-            // Fade out text and image briefly
-            heading.style.opacity = '0';
-            text.style.opacity = '0';
-            img.style.opacity = '0.3';
-
-            if(mode === 'employer') {
-                // Move Navy Background to the Right
-                bgNavy.style.clipPath = 'polygon(40% 0, 100% 0, 100% 100%, 52% 100%)';
-                
-                // Swap Containers (Text goes right, Image goes left)
-                textContainer.style.transform = window.innerWidth >= 768 ? 'translateX(100%)' : 'translateX(0)';
-                textContainer.classList.remove('md:pr-10');
-                textContainer.classList.add('md:pl-10');
-                
-                imgWrapper.style.transform = window.innerWidth >= 768 ? 'translateX(-100%)' : 'translateX(0)';
-                imgWrapper.classList.remove('md:justify-end');
-                imgWrapper.classList.add('md:justify-start');
-
-                // Adjust decorations
-                playBtn.style.left = 'auto';
-                playBtn.style.right = window.innerWidth >= 768 ? '-2rem' : '-1rem';
-                accent.style.right = 'auto';
-                accent.style.left = '2.5rem';
-                accent.className = "absolute -top-6 left-10 w-24 h-24 border-t-4 border-l-4 border-white/30 rounded-tl-full z-0 pointer-events-none transition-all duration-1000";
-
-                setTimeout(() => {
-                    const newHeading = 'FIND TOP\nTALENT FOR\nYOUR INSTITUTION';
-                    const newText = 'Discover the best educators and administrative staff. Post jobs, review applicants, and hire the perfect fit for your school.';
-                    
-                    heading.setAttribute('data-original-text', newHeading);
-                    text.setAttribute('data-original-text', newText);
-                    
-                    if(heading.restartTypewriter) heading.restartTypewriter();
-                    if(text.restartTypewriter) text.restartTypewriter();
-
-                    img.src = "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1000&q=80";
-                    
-                    if(btnEmployer) btnEmployer.className = "group bg-[#0ea5e9] text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.5)] transition-all duration-300 flex items-center justify-center border-2 border-[#0ea5e9] scale-105";
-                    if(btnCandidate) btnCandidate.className = "group relative overflow-hidden bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-medium py-3.5 px-8 rounded-full shadow-lg transition-all duration-300 scale-100 opacity-80";
-                    
-                    heading.style.opacity = '1';
-                    text.style.opacity = '1';
-                    img.style.opacity = '1';
-                }, 350);
-
-            } else {
-                // Move Navy Background to the Left
-                bgNavy.style.clipPath = 'polygon(0 0, 60% 0, 48% 100%, 0 100%)';
-                
-                // Swap Containers Back (Text goes left, Image goes right)
-                textContainer.style.transform = 'translateX(0)';
-                textContainer.classList.remove('md:pl-10');
-                textContainer.classList.add('md:pr-10');
-                
-                imgWrapper.style.transform = 'translateX(0)';
-                imgWrapper.classList.remove('md:justify-start');
-                imgWrapper.classList.add('md:justify-end');
-
-                // Adjust decorations
-                playBtn.style.right = 'auto';
-                playBtn.style.left = window.innerWidth >= 768 ? '-2rem' : '-1rem';
-                accent.style.left = 'auto';
-                accent.style.right = '2.5rem';
-                accent.className = "absolute -top-6 right-10 w-24 h-24 border-t-4 border-r-4 border-white/30 rounded-tr-full z-0 pointer-events-none transition-all duration-1000";
-
-                setTimeout(() => {
-                    const newHeading = 'EDUCATION\n& HIRING\nSOLUTIONS';
-                    const newText = 'Connect with top-tier talent and premier educational institutions. We streamline your recruitment process and guide your career forward.';
-                    
-                    heading.setAttribute('data-original-text', newHeading);
-                    text.setAttribute('data-original-text', newText);
-                    
-                    if(heading.restartTypewriter) heading.restartTypewriter();
-                    if(text.restartTypewriter) text.restartTypewriter();
-
-                    img.src = "{{ asset('images/candidate_hero_4k.png') }}";
-                    
-                    if(btnCandidate) btnCandidate.className = "group relative overflow-hidden bg-[#0ea5e9] backdrop-blur-md border border-[#0ea5e9] text-white font-medium py-3.5 px-8 rounded-full shadow-[0_8px_30px_rgba(14,165,233,0.5)] transition-all duration-300 scale-105";
-                    if(btnEmployer) btnEmployer.className = "group bg-white hover:bg-[#0ea5e9] text-[#031b4e] hover:text-white font-medium py-3.5 px-8 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center border-2 border-white/20 hover:border-white/40 scale-100 opacity-80";
-                    
-                    heading.style.opacity = '1';
-                    text.style.opacity = '1';
-                    img.style.opacity = '1';
-                }, 350);
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            // Reset to Candidate mode on load without transitions initially
-            const textContainer = document.getElementById('hero-text-container');
-            const imgWrapper = document.getElementById('hero-img-wrapper');
-            const bgNavy = document.getElementById('bg-navy');
+            // No mode switching needed anymore since Employer role is removed.
+            // Typewriter effect will automatically be handled by app.blade.php
             
-            textContainer.style.transition = 'none';
-            imgWrapper.style.transition = 'none';
-            bgNavy.style.transition = 'none';
-            
-            textContainer.style.transform = 'translateX(0)';
-            imgWrapper.style.transform = 'translateX(0)';
-            bgNavy.style.clipPath = 'polygon(0 0, 60% 0, 48% 100%, 0 100%)';
-            
-            setTimeout(() => {
-                textContainer.style.transition = 'all 1s ease-in-out';
-                imgWrapper.style.transition = 'all 1s ease-in-out';
-                bgNavy.style.transition = 'all 1s ease-in-out';
-            }, 100);
-
-            switchHeroMode('candidate');
-            currentRotation = 0;
-            document.getElementById('hero-img-container').style.transform = `rotateY(0deg)`;
+            // Just ensure initial transforms are set correctly
+            const imgContainer = document.getElementById('hero-img-container');
+            if(imgContainer) {
+                imgContainer.style.transform = `rotateY(0deg)`;
+            }
         });
     </script>
 

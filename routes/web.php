@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::post('/tuition/post', [App\Http\Controllers\HomeController::class, 'storeTuition'])->name('tuition.post');
 Route::get('/jobs', [\App\Http\Controllers\HomeController::class, 'jobs'])->name('jobs');
+Route::get('/tuitions', [\App\Http\Controllers\HomeController::class, 'tuitions'])->name('tuitions');
 Route::get('/jobs/{job}', [\App\Http\Controllers\JobController::class, 'show'])->name('jobs.show');
 Route::get('/category/{id}/jobs', [\App\Http\Controllers\HomeController::class, 'categoryJobs'])->name('category.jobs');
 
@@ -165,11 +166,12 @@ Route::middleware(['auth', 'parent'])->prefix('parent')->name('parent.')->group(
     Route::get('/service-charge/invoice/{id}/download', [\App\Http\Controllers\Parent\ServiceChargeController::class, 'downloadInvoice'])->name('serviceCharge.download');
 });
 
-// Employer Auth Routes
-Route::get('/employer/register', [\App\Http\Controllers\EmployerAuthController::class, 'showRegistrationForm'])->name('employer.register');
-Route::post('/employer/register', [\App\Http\Controllers\EmployerAuthController::class, 'register'])->name('employer.register.post');
+// Employer Auth Routes (Commented out)
+// Route::get('/employer/register', [\App\Http\Controllers\EmployerAuthController::class, 'showRegistrationForm'])->name('employer.register');
+// Route::post('/employer/register', [\App\Http\Controllers\EmployerAuthController::class, 'register'])->name('employer.register.post');
 
-// Employer Routes (Protected)
+// Employer Routes (Protected) - Commented out
+/*
 Route::middleware(['auth', 'verified', 'employer'])->prefix('employer')->name('employer.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Employer\DashboardController::class, 'index'])->name('dashboard');
 
@@ -181,6 +183,7 @@ Route::middleware(['auth', 'verified', 'employer'])->prefix('employer')->name('e
 
     Route::get('/applicants', [\App\Http\Controllers\Employer\ApplicantController::class, 'index'])->name('applicants.index');
 });
+*/
 
 // Global Impersonation Leave Route
 Route::middleware(['auth'])->get('/admin/impersonate/leave', [\App\Http\Controllers\Admin\UserController::class, 'leaveImpersonate'])->name('admin.impersonate.leave');

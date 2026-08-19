@@ -46,6 +46,24 @@ class EmployerAuthController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
+        // Notify Admin
+        \App\Helpers\NotificationHelper::notifyAdmin(
+            'New Employer Registered',
+            $request->school_name . ' (' . $user->name . ') has registered as an employer.',
+            route('admin.users.index'),
+            'fas fa-building'
+        );
+
+        // Notify User
+        \App\Helpers\NotificationHelper::notifyUser(
+            $user->id,
+            'Welcome to Warriors Educare',
+            'Your employer account has been created. Please complete your profile to post jobs.',
+            route('employer.dashboard'),
+            'fas fa-building',
+            true
+        );
+
         return redirect()->route('verification.notice');
     }
 }
