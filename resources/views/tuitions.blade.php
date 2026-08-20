@@ -53,7 +53,7 @@
     </div>
 
     <div class="w-full lg:w-1/3 relative z-10">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 sticky top-24">
+        <div class="bg-gradient-to-br from-[#f0f7ff] to-blue-50 rounded-2xl shadow-lg border border-blue-200 p-8 sticky top-24">
             <div class="text-center mb-8">
                 <h3 class="text-2xl font-bold text-[#031b4e] mb-2">Need a Tutor for Your Child?</h3>
                 <p class="text-sm text-slate-500">Fill this quick form and we'll match you with the best verified tutor.</p>
@@ -67,36 +67,36 @@
 
             <form action="{{ route('tuition.post') }}" method="POST" class="flex flex-col gap-5">
                 @csrf
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="grid grid-cols-1 gap-5">
                     <div>
                         <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Your Name *</label>
-                        <input type="text" name="guest_name" placeholder="Enter your full name" required class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-slate-50/50">
+                        <input type="text" name="guest_name" placeholder="Enter your full name" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Your Phone Number *</label>
-                        <input type="text" name="guest_phone" placeholder="Enter your phone number" required class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-slate-50/50">
+                        <input type="text" name="guest_phone" placeholder="Enter your phone number" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="grid grid-cols-1 gap-5">
                     <div>
                         <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Student's Class *</label>
-                        <input type="text" name="student_class" placeholder="Select Class" required class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-slate-50/50">
+                        <input type="text" name="student_class" placeholder="e.g. Class 10" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Board *</label>
-                        <input type="text" name="board" placeholder="Select Board" required class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-slate-50/50">
+                        <input type="text" name="board" placeholder="Select Board" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Subjects Needed *</label>
-                    <input type="text" name="subjects" placeholder="e.g., Math, Science" required class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-slate-50/50">
+                    <input type="text" name="subjects" placeholder="e.g., Math, Science" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Complete Location/Address *</label>
-                    <input type="text" name="location" placeholder="Enter full address or area" required class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-slate-50/50">
+                    <input type="text" name="location" placeholder="Enter full address or area" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                 </div>
                 
                 <div class="mt-4 flex justify-center">

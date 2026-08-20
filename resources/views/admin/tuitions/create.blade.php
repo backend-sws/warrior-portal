@@ -18,15 +18,7 @@
             <!-- Class -->
             <div>
                 <label for="student_class" class="block text-sm font-medium text-gray-700 mb-2">Student's Class/Grade <span class="text-red-500">*</span></label>
-                <select name="student_class" id="student_class" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-colors outline-none">
-                    <option value="">Select Class</option>
-                    <option value="Pre-Primary">Pre-Primary</option>
-                    <option value="Class 1-5">Class 1 to 5</option>
-                    <option value="Class 6-8">Class 6 to 8</option>
-                    <option value="Class 9-10">Class 9 to 10</option>
-                    <option value="Class 11-12">Class 11 to 12</option>
-                    <option value="College/University">College/University</option>
-                </select>
+                <input type="text" name="student_class" id="student_class" placeholder="e.g. Class 10" required value="{{ old('student_class') }}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-colors outline-none">
                 @error('student_class')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror

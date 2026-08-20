@@ -31,7 +31,7 @@ class HomeController extends Controller
         $totalJobs = JobPost::where('status', 'approved')->count();
         $totalApplications = \App\Models\JobApplication::count();
         $totalEmployers = \App\Models\User::where('role', 'employer')->count();
-        $employerTuitions = \App\Models\TuitionRequirement::where('status', 'Active')->whereNotNull('employer_id')->latest()->take(6)->get();
+        $employerTuitions = \App\Models\TuitionRequirement::where('status', 'Pending')->whereNotNull('employer_id')->latest()->take(6)->get();
         $guestTuitions = \App\Models\TuitionRequirement::where('status', 'Pending')->whereNull('employer_id')->latest()->take(6)->get();
 
         return view('welcome', compact('recentJobs', 'categories', 'services', 'testimonials', 'clients', 'totalJobs', 'totalApplications', 'totalEmployers', 'employerTuitions', 'guestTuitions'));
