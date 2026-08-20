@@ -1,6 +1,6 @@
-    @extends('layouts.app')
+    
 
-    @section('content')
+    <?php $__env->startSection('content'); ?>
         <!-- Hero Banner Section -->
     <style>
         .metallic-bubble {
@@ -80,7 +80,7 @@
         }
         
         section.bg-white, section.bg-slate-50, section.bg-gray-50, section.bg-\[\#f4f7f5\], section.bg-\[\#f4f7f9\] {
-            background-image: linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.75)), url('{{ asset('images/enhanced_building.jpg') }}') !important;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.75)), url('<?php echo e(asset('images/enhanced_building.jpg')); ?>') !important;
             background-size: cover !important;
             background-attachment: fixed !important;
             background-position: center !important;
@@ -136,8 +136,8 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="{{ route('parent.register') }}" id="btn-hire" class="bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] transition shadow-lg flex items-center justify-center">Hire a Teacher / Tutor</a>
-                    <a href="{{ route('candidate.register') }}" id="btn-join" class="bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 transition border border-gray-200 shadow-sm flex items-center justify-center gap-2">Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i></a>
+                    <a href="<?php echo e(route('parent.register')); ?>" id="btn-hire" class="bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] transition shadow-lg flex items-center justify-center">Hire a Teacher / Tutor</a>
+                    <a href="<?php echo e(route('candidate.register')); ?>" id="btn-join" class="bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 transition border border-gray-200 shadow-sm flex items-center justify-center gap-2">Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
 
@@ -145,7 +145,7 @@
             <div class="w-full lg:w-[30%] relative mt-16 lg:mt-0 flex justify-center items-center z-10">
                 
                 <div class="relative w-full max-w-[420px] h-[500px] lg:h-[580px] bg-white rounded-[2.5rem] lg:rounded-[3rem] overflow-hidden shadow-2xl">
-                    <img id="main-img" src="{{ asset('images/women.jpg') }}" alt="Main Image" class="w-full h-full object-cover">
+                    <img id="main-img" src="<?php echo e(asset('images/women.jpg')); ?>" alt="Main Image" class="w-full h-full object-cover">
                     
 
 
@@ -164,7 +164,7 @@
                 </div>
 
                 <div class="relative w-full max-w-[220px] h-[280px] rounded-[2rem] overflow-hidden shadow-xl border-4 border-white">
-                    <img id="sub-img" src="{{ asset('images/student.png') }}" alt="Secondary Image" class="w-full h-full object-cover">
+                    <img id="sub-img" src="<?php echo e(asset('images/student.png')); ?>" alt="Secondary Image" class="w-full h-full object-cover">
                     
 
                 </div>
@@ -470,16 +470,16 @@
             </style>
             
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 relative z-10">
-                @foreach($categories as $category)
-                <a href="{{ route('category.jobs', $category->id) }}"
+                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <a href="<?php echo e(route('category.jobs', $category->id)); ?>"
                     class="block category-card p-6 pb-12 text-center text-white transition-transform duration-300 hover:-translate-y-2 cursor-pointer group reveal no-underline overflow-hidden">
                     
                     <!-- Inner content wrapper to keep away from cutout -->
                     <div class="relative z-10 flex flex-col items-center justify-center h-full">
                         <i class="fas fa-briefcase text-4xl mb-4 text-white/90 group-hover:scale-110 transition-transform"></i>
-                        <h3 class="text-sm md:text-base font-bold mb-4">{{ $category->name }}</h3>
+                        <h3 class="text-sm md:text-base font-bold mb-4"><?php echo e($category->name); ?></h3>
                         <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-1.5 rounded-full text-[10px] md:text-xs font-bold inline-block">
-                            {{ $category->jobs_count }} Active Jobs
+                            <?php echo e($category->jobs_count); ?> Active Jobs
                         </div>
                     </div>
                     
@@ -491,7 +491,7 @@
                         <i class="fas fa-arrow-right"></i>
                     </div>
                 </a>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </section>
 
@@ -509,8 +509,8 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-                @forelse($services->where('title', '!=', 'Home Tutors') as $index => $service)
-                <div class="relative bg-white rounded-2xl overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.08)] border border-gray-100 flex flex-col group hover:-translate-y-2 transition-transform duration-300 w-full text-left reveal z-10 reveal-delay-{{ ($index % 4) + 1 }}">
+                <?php $__empty_1 = true; $__currentLoopData = $services->where('title', '!=', 'Home Tutors'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <div class="relative bg-white rounded-2xl overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.08)] border border-gray-100 flex flex-col group hover:-translate-y-2 transition-transform duration-300 w-full text-left reveal z-10 reveal-delay-<?php echo e(($index % 4) + 1); ?>">
                     
                     <!-- Top Right Dark Blue Background -->
                     <div class="absolute top-0 right-0 w-[55%] h-[150px] bg-[#031b4e] rounded-bl-[2.5rem] z-0 pointer-events-none transition-all duration-500 group-hover:scale-105 origin-top-right"></div>
@@ -522,12 +522,12 @@
                                 SERVICE
                             </div>
                             <div class="bg-white text-[#031b4e] px-4 py-1.5 rounded-full text-[11px] font-extrabold shadow-md flex items-center justify-center gap-2">
-                                <i class="{{ $service->icon }} text-[#fbc043]"></i> FEATURED
+                                <i class="<?php echo e($service->icon); ?> text-[#fbc043]"></i> FEATURED
                             </div>
                         </div>
 
                         <!-- Title -->
-                        <h3 class="text-[#031b4e] font-black text-xl mb-4 pr-12">{{ $service->title }}</h3>
+                        <h3 class="text-[#031b4e] font-black text-xl mb-4 pr-12"><?php echo e($service->title); ?></h3>
 
                         <!-- Elevated Box -->
                         <div class="bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] p-5 mb-2 mt-auto border border-gray-50 relative group-hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)] transition-shadow duration-300">
@@ -557,16 +557,16 @@
                         <div class="w-[45%] bg-[#3b82f6] text-white/90 flex items-center justify-center gap-2 text-[11px] font-bold">
                             <i class="fas fa-info-circle opacity-60"></i> Details
                         </div>
-                        <a href="{{ route('service.details', $service->slug) }}" class="w-[55%] bg-[#031b4e] text-white flex items-center justify-center gap-2 text-[12px] font-bold hover:bg-[#021030] transition-colors">
+                        <a href="<?php echo e(route('service.details', $service->slug)); ?>" class="w-[55%] bg-[#031b4e] text-white flex items-center justify-center gap-2 text-[12px] font-bold hover:bg-[#021030] transition-colors">
                             Explore Now <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <div class="col-span-full text-center py-10 opacity-60">
                     <p>No services currently available.</p>
                 </div>
-                @endforelse
+                <?php endif; ?>
             </div>
         </section>
 
@@ -604,7 +604,7 @@
                   </style>
                   
                   <div id="tuitionCardsSlider" class="flex overflow-x-auto gap-6 pb-8 pt-2 px-4 xl:px-0 snap-x snap-mandatory hide-scrollbar cursor-grab active:cursor-grabbing">
-                    @forelse($employerTuitions as $tuition)
+                    <?php $__empty_1 = true; $__currentLoopData = $employerTuitions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tuition): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <div class="min-w-[85vw] md:min-w-[350px] bg-white rounded-2xl border border-blue-50 flex-shrink-0 snap-center relative overflow-hidden flex flex-col shadow-sm">
                             <!-- Top Right Dark Blue Background -->
                             <div class="absolute top-0 right-0 w-[45%] h-[45%] bg-[#031b4e] z-0"></div>
@@ -614,27 +614,27 @@
                             <div class="p-5 relative z-10 flex flex-col h-full">
                                 <!-- Top row (badges) -->
                                 <div class="flex justify-between items-start mb-6">
-                                    <div class="bg-[#031b4e] text-white px-4 py-1.5 rounded-full text-xs font-bold">{{ $tuition->student_class }}</div>
-                                    <div class="bg-white text-emerald-600 px-4 py-1.5 rounded-lg text-sm font-bold border border-emerald-50 shadow-md">₹{{ $tuition->budget }}<span class="text-xs font-medium">/mo</span></div>
+                                    <div class="bg-[#031b4e] text-white px-4 py-1.5 rounded-full text-xs font-bold"><?php echo e($tuition->student_class); ?></div>
+                                    <div class="bg-white text-emerald-600 px-4 py-1.5 rounded-lg text-sm font-bold border border-emerald-50 shadow-md">₹<?php echo e($tuition->budget); ?><span class="text-xs font-medium">/mo</span></div>
                                 </div>
                                 
                                 <!-- Subject -->
-                                <h4 class="text-xl font-extrabold text-[#031b4e] mb-4">{{ $tuition->subjects }}</h4>
+                                <h4 class="text-xl font-extrabold text-[#031b4e] mb-4"><?php echo e($tuition->subjects); ?></h4>
                                 
                                 <!-- Inner white box -->
                                 <div class="bg-white rounded-xl border border-[#031b4e] p-4 mb-6 relative z-20 shadow-[0_0_20px_rgba(0,0,0,0.25)]">
                                     <div class="space-y-4">
                                         <p class="text-sm text-slate-700 flex items-center gap-3">
                                             <span class="w-8 h-8 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-red-500 flex items-center justify-center shrink-0 border border-gray-50"><i class="fas fa-map-marker-alt"></i></span> 
-                                            <span class="truncate font-medium">{{ $tuition->location }}</span>
+                                            <span class="truncate font-medium"><?php echo e($tuition->location); ?></span>
                                         </p>
                                         <p class="text-sm text-slate-700 flex items-center gap-3">
                                             <span class="w-8 h-8 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-purple-600 flex items-center justify-center shrink-0 border border-gray-50"><i class="fas fa-book"></i></span> 
-                                            <span class="truncate font-medium">{{ $tuition->board }}</span>
+                                            <span class="truncate font-medium"><?php echo e($tuition->board); ?></span>
                                         </p>
                                         <p class="text-sm text-slate-700 flex items-center gap-3">
                                             <span class="w-8 h-8 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-amber-500 flex items-center justify-center shrink-0 border border-gray-50"><i class="fas fa-user-circle"></i></span> 
-                                            <span class="truncate font-medium">{{ $tuition->employer ? ($tuition->employer->name === 'Super Admin' ? 'Warriors Educare' : $tuition->employer->name) : $tuition->guest_name }}</span>
+                                            <span class="truncate font-medium"><?php echo e($tuition->employer ? ($tuition->employer->name === 'Super Admin' ? 'Warriors Educare' : $tuition->employer->name) : $tuition->guest_name); ?></span>
                                         </p>
                                     </div>
                                 </div>
@@ -642,16 +642,16 @@
                                 <!-- Footer row -->
                                 <div class="flex justify-between items-center mt-auto relative z-20">
                                     <div class="absolute -top-3 left-0 w-full h-[1px] bg-slate-200 z-10"></div>
-                                    <span class="text-[11px] font-medium text-slate-500 bg-white/60 backdrop-blur-sm border border-slate-200/50 px-2 py-1 rounded flex items-center gap-1 shadow-sm relative z-20 mt-1"><i class="far fa-clock"></i> {{ $tuition->created_at->diffForHumans() }}</span>
-                                    <a href="{{ auth()->check() ? route('candidate.tuitions.index') : route('parent.register') }}" class="inline-flex items-center gap-2 bg-[#031b4e] text-white hover:bg-blue-900 px-5 py-2.5 rounded-lg font-bold text-sm transition-colors shadow-lg relative z-20">Apply Now <i class="fas fa-arrow-right"></i></a>
+                                    <span class="text-[11px] font-medium text-slate-500 bg-white/60 backdrop-blur-sm border border-slate-200/50 px-2 py-1 rounded flex items-center gap-1 shadow-sm relative z-20 mt-1"><i class="far fa-clock"></i> <?php echo e($tuition->created_at->diffForHumans()); ?></span>
+                                    <a href="<?php echo e(auth()->check() ? route('candidate.tuitions.index') : route('parent.register')); ?>" class="inline-flex items-center gap-2 bg-[#031b4e] text-white hover:bg-blue-900 px-5 py-2.5 rounded-lg font-bold text-sm transition-colors shadow-lg relative z-20">Apply Now <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <div class="w-full text-center py-12 bg-white/40 backdrop-blur-sm rounded-2xl shadow-sm border border-white/20">
                             <p class="text-slate-500 font-semibold">No recent tuition posts available.</p>
                         </div>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -659,7 +659,7 @@
             <div class="max-w-7xl mx-auto relative z-10 reveal">
                 <div class="flex justify-between items-end mb-8">
                     <h3 class="text-2xl font-bold text-[#031b4e]">Latest Tuition Requirements</h3>
-                    <a href="{{ route('contact') }}" class="text-accent-500 hover:text-[#031b4e] font-semibold text-sm transition-colors">Apply as Tutor <i class="fas fa-arrow-right ml-1"></i></a>
+                    <a href="<?php echo e(route('contact')); ?>" class="text-accent-500 hover:text-[#031b4e] font-semibold text-sm transition-colors">Apply as Tutor <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
 
                 <div class="metallic-blue-card rounded-2xl border-none shadow-2xl relative">
@@ -675,20 +675,21 @@
                             </tr>
                         </thead>
                         <tbody class="text-sm">
-                            @forelse($guestTuitions as $tuition)
+                            <?php $__empty_1 = true; $__currentLoopData = $guestTuitions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tuition): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr class="border-b border-white/10 hover:bg-white/10 transition-colors">
                                     <td class="py-4 px-6 text-white font-medium whitespace-nowrap">
-                                        <i class="fas fa-user-circle text-white/60 mr-2"></i>{{ $tuition->employer ? ($tuition->employer->name === 'Super Admin' ? 'Warriors Educare' : $tuition->employer->name) : $tuition->guest_name }}
+                                        <i class="fas fa-user-circle text-white/60 mr-2"></i><?php echo e($tuition->employer ? ($tuition->employer->name === 'Super Admin' ? 'Warriors Educare' : $tuition->employer->name) : $tuition->guest_name); ?>
+
                                     </td>
-                                    <td class="py-4 px-6 font-semibold text-white">{{ $tuition->subjects }}</td>
+                                    <td class="py-4 px-6 font-semibold text-white"><?php echo e($tuition->subjects); ?></td>
                                     <td class="py-4 px-6">
-                                        <span class="inline-block bg-white/20 text-white text-xs font-bold px-2 py-1 rounded mb-1">{{ $tuition->student_class }}</span><br>
-                                        <span class="text-xs text-white/70 font-medium">{{ $tuition->board }}</span>
+                                        <span class="inline-block bg-white/20 text-white text-xs font-bold px-2 py-1 rounded mb-1"><?php echo e($tuition->student_class); ?></span><br>
+                                        <span class="text-xs text-white/70 font-medium"><?php echo e($tuition->board); ?></span>
                                     </td>
-                                    <td class="py-4 px-6 text-white/90 max-w-xs truncate" title="{{ $tuition->location }}">{{ $tuition->location }}</td>
-                                    <td class="py-4 px-6 text-white/70 text-xs whitespace-nowrap">{{ $tuition->created_at->diffForHumans() }}</td>
+                                    <td class="py-4 px-6 text-white/90 max-w-xs truncate" title="<?php echo e($tuition->location); ?>"><?php echo e($tuition->location); ?></td>
+                                    <td class="py-4 px-6 text-white/70 text-xs whitespace-nowrap"><?php echo e($tuition->created_at->diffForHumans()); ?></td>
                                 </tr>
-                            @empty
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <tr>
                                     <td colspan="5" class="py-12 text-center">
                                         <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 text-white/50 text-2xl">
@@ -699,7 +700,7 @@
                                         <a href="#quick-request-form" class="inline-block bg-accent-yellow text-[#031b4e] hover:bg-white px-6 py-3 rounded-xl font-bold shadow-sm transition-transform hover:-translate-y-1">Post a Tuition Need</a>
                                     </td>
                                 </tr>
-                            @endforelse
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -712,15 +713,16 @@
                     <p class="text-slate-500">Fill this quick form and we'll match you with the best verified tutor.</p>
                 </div>
 
-                @if(session('tuition_success'))
+                <?php if(session('tuition_success')): ?>
                     <div class="mb-6 bg-green-500/10 border border-green-500 text-green-600 px-4 py-3 rounded-xl flex items-center justify-center font-medium">
                         <i class="fas fa-check-circle mr-2"></i>
-                        {{ session('tuition_success') }}
-                    </div>
-                @endif
+                        <?php echo e(session('tuition_success')); ?>
 
-                <form action="{{ route('tuition.post') }}" method="POST" class="space-y-6">
-                    @csrf
+                    </div>
+                <?php endif; ?>
+
+                <form action="<?php echo e(route('tuition.post')); ?>" method="POST" class="space-y-6">
+                    <?php echo csrf_field(); ?>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Guest Name -->
                         <div>
@@ -780,17 +782,17 @@
             </div>
             <div class="swiper marquee-swiper reveal">
                 <div class="swiper-wrapper items-center">
-                    @forelse($clients as $client)
+                    <?php $__empty_1 = true; $__currentLoopData = $clients; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $client): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <div class="swiper-slide w-auto">
                         <div class="bg-white border border-slate-200 px-6 py-3 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.2)] flex items-center justify-center min-w-[180px] h-20 transition-all duration-300 hover:-translate-y-1.5 hover:bg-white/60 hover:border-[#031b4e]/50 hover:shadow-[0_8px_32px_rgba(64,186,115,0.2)] cursor-grab active:cursor-grabbing group overflow-hidden">
-                            <img src="{{ Storage::url($client->logo_path) }}" alt="{{ $client->name }}" class="max-h-12 max-w-full object-contain transition-all duration-300">
+                            <img src="<?php echo e(Storage::url($client->logo_path)); ?>" alt="<?php echo e($client->name); ?>" class="max-h-12 max-w-full object-contain transition-all duration-300">
                         </div>
                     </div>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <div class="w-full text-center text-slate-500 py-4 italic">
                         Our trusted clients will appear here.
                     </div>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
 
                 </div>
@@ -828,7 +830,7 @@
 
             <div class="overflow-hidden w-full relative z-10 fade-edges-available reveal">
                 <div class="animate-marquee-available flex gap-6 px-3">
-                    @for($i = 0; $i < 3; $i++)
+                    <?php for($i = 0; $i < 3; $i++): ?>
                     <div class="flex gap-6">
                         <!-- Card 1: Naukri -->
                         <div class="available-card bg-white border border-slate-200 rounded-xl px-8 py-5 flex items-center justify-center min-w-[180px] shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
@@ -871,7 +873,7 @@
                             <span class="text-2xl tracking-tighter font-black font-sans"><span style="color: #1e293b;">Teacher</span><span style="color: #f15a29;">On</span></span>
                         </div>
                     </div>
-                    @endfor
+                    <?php endfor; ?>
                 </div>
             </div>
         </section>
@@ -885,27 +887,31 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                @forelse($recentJobs as $job)
-                <a href="{{ route('jobs.show', $job->id) }}"
+                <?php $__empty_1 = true; $__currentLoopData = $recentJobs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $job): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <a href="<?php echo e(route('jobs.show', $job->id)); ?>"
                     class="block bg-white border border-slate-200 rounded-2xl p-7 text-slate-800 transition-all duration-300 hover:-translate-y-2 shadow-lg hover:shadow-[0_20px_40px_rgba(64,186,115,0.15)] hover:border-[#031b4e]/30 flex flex-col group reveal cursor-pointer">
-                    <h3 class="text-xl font-bold mb-3 text-slate-900 group-hover:text-[#031b4e] transition-colors">{{ $job->title ?? 'Job Requirement' }}</h3>
+                    <h3 class="text-xl font-bold mb-3 text-slate-900 group-hover:text-[#031b4e] transition-colors"><?php echo e($job->title ?? 'Job Requirement'); ?></h3>
                     <p class="text-xs text-slate-500 mb-4 flex items-center gap-3">
-                        <span class="text-red-400"><i class="fas fa-map-marker-alt mr-0.5"></i> {{ $job->city?->name ?? 'N/A' }}, {{ $job->state?->name ?? 'N/A' }}</span>
-                        <span><i class="far fa-calendar-alt mr-0.5"></i> {{ $job->created_at->format('d M Y') }}</span>
+                        <span class="text-red-400"><i class="fas fa-map-marker-alt mr-0.5"></i> <?php echo e($job->city?->name ?? 'N/A'); ?>, <?php echo e($job->state?->name ?? 'N/A'); ?></span>
+                        <span><i class="far fa-calendar-alt mr-0.5"></i> <?php echo e($job->created_at->format('d M Y')); ?></span>
                     </p>
                     <div class="flex flex-wrap gap-2 mb-4">
                         <span class="bg-[#031b4e]/8 text-[#031b4e] px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1.5">
-                            <i class="fas fa-folder-open text-[9px]"></i> {{ $job->category?->name ?? 'N/A' }}
+                            <i class="fas fa-folder-open text-[9px]"></i> <?php echo e($job->category?->name ?? 'N/A'); ?>
+
                         </span>
                         <span class="bg-[#031b4e]/8 text-[#031b4e] px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1.5">
-                            <i class="fas fa-book text-[9px]"></i> {{ $job->subject?->name ?? 'N/A' }}
+                            <i class="fas fa-book text-[9px]"></i> <?php echo e($job->subject?->name ?? 'N/A'); ?>
+
                         </span>
                         <span class="bg-[#031b4e]/8 text-[#031b4e] px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1.5">
-                            <i class="fas fa-graduation-cap text-[9px]"></i> {{ $job->qualification?->name ?? 'N/A' }}
+                            <i class="fas fa-graduation-cap text-[9px]"></i> <?php echo e($job->qualification?->name ?? 'N/A'); ?>
+
                         </span>
                     </div>
                     <p class="text-[13px] text-slate-600 leading-relaxed mb-6 flex-grow">
-                        {{ Str::limit(strip_tags($job->description), 100) }}
+                        <?php echo e(Str::limit(strip_tags($job->description), 100)); ?>
+
                     </p>
                     <div class="text-[#031b4e] font-semibold text-[13px] inline-flex items-center gap-2 self-start group-hover:gap-3 transition-all mt-auto">
                         View Details 
@@ -914,15 +920,15 @@
                         </span>
                     </div>
                 </a>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <div class="col-span-full text-center py-10 opacity-60">
                     <p>No recent job openings available at the moment.</p>
                 </div>
-                @endforelse
+                <?php endif; ?>
             </div>
 
             <div class="text-center mt-12 reveal">
-                <a href="{{ route('jobs') }}" class="inline-flex items-center justify-center gap-3 bg-[#031b4e] text-white font-bold text-[15px] px-8 py-3.5 rounded-full hover:bg-[#1e3a8a] hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-xl group">
+                <a href="<?php echo e(route('jobs')); ?>" class="inline-flex items-center justify-center gap-3 bg-[#031b4e] text-white font-bold text-[15px] px-8 py-3.5 rounded-full hover:bg-[#1e3a8a] hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-xl group">
                     View All Jobs 
                     <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
                 </a>
@@ -944,7 +950,7 @@
                 </p>
             </div>
 
-            @if(isset($testimonials) && count($testimonials) > 0)
+            <?php if(isset($testimonials) && count($testimonials) > 0): ?>
             <style>
                 @keyframes marqueeLeft {
                     0% { transform: translateX(0); }
@@ -981,65 +987,65 @@
             <!-- Marquee Row 1 (Right to Left) -->
             <div class="overflow-hidden w-full relative z-10 mt-8 mb-4 fade-edges reveal">
                 <div class="animate-marquee-left flex" style="padding-top: 35px; padding-bottom: 10px;">
-                    @for($i = 0; $i < 2; $i++)
+                    <?php for($i = 0; $i < 2; $i++): ?>
                     <div class="flex gap-6 px-3">
-                        @foreach($testimonials as $testimonial)
+                        <?php $__currentLoopData = $testimonials; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $testimonial): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="testimonial-card-w border border-green-100 rounded-2xl p-8 pt-6 relative shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(64,186,115,0.15)] transition-all duration-300" style="background-color: #f4f7f5;">
                             <div class="absolute top-6 right-6 text-[#031b4e]/10 text-4xl"><i class="fas fa-quote-right"></i></div>
                             <div class="w-16 h-16 rounded-full -mt-[60px] mx-auto mb-4 border-4 border-white relative overflow-hidden shadow-md flex items-center justify-center" style="background-color: #031b4e;">
-                                @if($testimonial->image_path)
-                                    <img src="{{ Storage::url($testimonial->image_path) }}" alt="{{ $testimonial->name }}" class="w-full h-full object-cover bg-white">
-                                @else
-                                    <span class="text-xl font-bold text-white">{{ substr($testimonial->name, 0, 1) }}</span>
-                                @endif
+                                <?php if($testimonial->image_path): ?>
+                                    <img src="<?php echo e(Storage::url($testimonial->image_path)); ?>" alt="<?php echo e($testimonial->name); ?>" class="w-full h-full object-cover bg-white">
+                                <?php else: ?>
+                                    <span class="text-xl font-bold text-white"><?php echo e(substr($testimonial->name, 0, 1)); ?></span>
+                                <?php endif; ?>
                             </div>
-                            <p class="text-[13px] text-slate-600 leading-relaxed mb-5 italic line-clamp-4 relative z-10">"{{ $testimonial->message }}"</p>
+                            <p class="text-[13px] text-slate-600 leading-relaxed mb-5 italic line-clamp-4 relative z-10">"<?php echo e($testimonial->message); ?>"</p>
                             <div class="flex justify-center gap-1 text-accent-yellow text-[12px] mb-3 relative z-10">
-                                @for($stars=0; $stars<$testimonial->rating; $stars++) <i class="fas fa-star"></i> @endfor
-                                @for($stars=0; $stars<(5-$testimonial->rating); $stars++) <i class="far fa-star text-slate-300"></i> @endfor
+                                <?php for($stars=0; $stars<$testimonial->rating; $stars++): ?> <i class="fas fa-star"></i> <?php endfor; ?>
+                                <?php for($stars=0; $stars<(5-$testimonial->rating); $stars++): ?> <i class="far fa-star text-slate-300"></i> <?php endfor; ?>
                             </div>
-                            <h4 class="text-slate-800 text-base font-extrabold mb-0.5 text-center relative z-10">{{ $testimonial->name }}</h4>
-                            <p class="text-[10px] text-slate-400 uppercase tracking-wider font-bold text-center relative z-10">{{ $testimonial->role }}</p>
+                            <h4 class="text-slate-800 text-base font-extrabold mb-0.5 text-center relative z-10"><?php echo e($testimonial->name); ?></h4>
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider font-bold text-center relative z-10"><?php echo e($testimonial->role); ?></p>
                         </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
-                    @endfor
+                    <?php endfor; ?>
                 </div>
             </div>
 
             <!-- Marquee Row 2 (Left to Right) -->
             <div class="overflow-hidden w-full relative z-10 mb-8 fade-edges reveal reveal-delay-1">
                 <div class="animate-marquee-right flex" style="padding-top: 35px; padding-bottom: 10px;">
-                    @for($i = 0; $i < 2; $i++)
+                    <?php for($i = 0; $i < 2; $i++): ?>
                     <div class="flex gap-6 px-3">
-                        @foreach($testimonials->reverse() as $testimonial)
+                        <?php $__currentLoopData = $testimonials->reverse(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $testimonial): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="testimonial-card-w border border-green-100 rounded-2xl p-8 pt-6 relative shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(64,186,115,0.15)] transition-all duration-300" style="background-color: #f4f7f5;">
                             <div class="absolute top-6 right-6 text-[#031b4e]/10 text-4xl"><i class="fas fa-quote-right"></i></div>
                             <div class="w-16 h-16 rounded-full -mt-[60px] mx-auto mb-4 border-4 border-white relative overflow-hidden shadow-md flex items-center justify-center" style="background-color: #031b4e;">
-                                @if($testimonial->image_path)
-                                    <img src="{{ Storage::url($testimonial->image_path) }}" alt="{{ $testimonial->name }}" class="w-full h-full object-cover bg-white">
-                                @else
-                                    <span class="text-xl font-bold text-white">{{ substr($testimonial->name, 0, 1) }}</span>
-                                @endif
+                                <?php if($testimonial->image_path): ?>
+                                    <img src="<?php echo e(Storage::url($testimonial->image_path)); ?>" alt="<?php echo e($testimonial->name); ?>" class="w-full h-full object-cover bg-white">
+                                <?php else: ?>
+                                    <span class="text-xl font-bold text-white"><?php echo e(substr($testimonial->name, 0, 1)); ?></span>
+                                <?php endif; ?>
                             </div>
-                            <p class="text-[13px] text-slate-600 leading-relaxed mb-5 italic line-clamp-4 relative z-10">"{{ $testimonial->message }}"</p>
+                            <p class="text-[13px] text-slate-600 leading-relaxed mb-5 italic line-clamp-4 relative z-10">"<?php echo e($testimonial->message); ?>"</p>
                             <div class="flex justify-center gap-1 text-accent-yellow text-[12px] mb-3 relative z-10">
-                                @for($stars=0; $stars<$testimonial->rating; $stars++) <i class="fas fa-star"></i> @endfor
-                                @for($stars=0; $stars<(5-$testimonial->rating); $stars++) <i class="far fa-star text-slate-300"></i> @endfor
+                                <?php for($stars=0; $stars<$testimonial->rating; $stars++): ?> <i class="fas fa-star"></i> <?php endfor; ?>
+                                <?php for($stars=0; $stars<(5-$testimonial->rating); $stars++): ?> <i class="far fa-star text-slate-300"></i> <?php endfor; ?>
                             </div>
-                            <h4 class="text-slate-800 text-base font-extrabold mb-0.5 text-center relative z-10">{{ $testimonial->name }}</h4>
-                            <p class="text-[10px] text-slate-400 uppercase tracking-wider font-bold text-center relative z-10">{{ $testimonial->role }}</p>
+                            <h4 class="text-slate-800 text-base font-extrabold mb-0.5 text-center relative z-10"><?php echo e($testimonial->name); ?></h4>
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider font-bold text-center relative z-10"><?php echo e($testimonial->role); ?></p>
                         </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
-                    @endfor
+                    <?php endfor; ?>
                 </div>
             </div>
-            @else
+            <?php else: ?>
             <div class="text-center py-10 opacity-60 text-slate-800 relative z-10">
                 <p>No testimonials available.</p>
             </div>
-            @endif
+            <?php endif; ?>
         </section>
 
                 <!-- New Contact Us Section -->
@@ -1066,7 +1072,7 @@
                 <div class="bg-white rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.06)] p-8 lg:p-14 flex flex-col lg:flex-row gap-12 lg:gap-16 relative overflow-hidden group">
                     
                     <!-- Animated Pattern Background -->
-                    <div class="absolute inset-0 z-0 opacity-10 invert pointer-events-none animate-pattern-move" style="background-image: url('{{ asset('images/network-pattern.svg') }}'); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
+                    <div class="absolute inset-0 z-0 opacity-10 invert pointer-events-none animate-pattern-move" style="background-image: url('<?php echo e(asset('images/network-pattern.svg')); ?>'); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
 
                     <!-- Left: Form -->
                     <div class="w-full lg:w-[58%] relative z-10">
@@ -1144,9 +1150,9 @@
             </div>
         </section>
 
-    @endsection
+    <?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         // --- Hero Section Image & Text Swap Animation ---
@@ -1291,5 +1297,7 @@
         }
     });
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\warrior-portal\resources\views/welcome.blade.php ENDPATH**/ ?>
