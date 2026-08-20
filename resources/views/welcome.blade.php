@@ -2,78 +2,158 @@
 
     @section('content')
         <!-- Hero Banner Section -->
-    <section class="relative w-full min-h-[500px] md:min-h-[70vh] bg-[#031b4e] overflow-hidden flex items-center justify-center mt-[70px]">
-        <!-- Live Pattern Background -->
-        <div class="absolute inset-0 z-0 bg-[#031b4e]">
-            <!-- Decorative grid overlay (network pattern) -->
-            <div class="absolute inset-0 w-full h-full opacity-40 pointer-events-none mix-blend-screen animate-pattern-move" style="background-image: url('{{ asset('images/network-pattern.svg') }}'); background-position: center bottom; background-size: cover; background-repeat: no-repeat;"></div>
-        </div>
+    <style>
+        .metallic-bubble {
+            border-radius: 50%;
+            background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.9) 0%, rgba(0, 191, 255, 0.8) 15%, rgba(0, 92, 197, 0.9) 45%, rgba(1, 24, 74, 1) 85%);
+            box-shadow: 
+                inset -15px -15px 30px rgba(0, 0, 0, 0.7), 
+                inset 10px 10px 30px rgba(255, 255, 255, 0.5), 
+                0 15px 35px rgba(0, 0, 0, 0.4);
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bubble-float-1 { animation: float1 15s infinite ease-in-out; }
+        .bubble-float-2 { animation: float2 18s infinite ease-in-out reverse; }
+        .bubble-float-3 { animation: float3 22s infinite ease-in-out; }
+        
+        @keyframes float1 { 
+            0%, 100% { transform: translateY(0) scale(1); } 
+            50% { transform: translateY(-40px) scale(1.05); } 
+        }
+        @keyframes float2 { 
+            0%, 100% { transform: translateY(0) translateX(0); } 
+            50% { transform: translateY(-50px) translateX(25px); } 
+        }
+        @keyframes float3 { 
+            0%, 100% { transform: translateY(0) scale(1); } 
+            50% { transform: translateY(-30px) scale(0.95); } 
+        }
+        @keyframes circleGlow {
+            0%, 100% { 
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.4); 
+                border-color: rgba(255, 255, 255, 0.7); 
+            }
+            50% { 
+                box-shadow: 0 0 45px rgba(255, 255, 255, 1), inset 0 0 25px rgba(255, 255, 255, 0.9); 
+                border-color: rgba(255, 255, 255, 1); 
+            }
+        }
+        .circle-glow {
+            border-style: solid;
+            border-width: 2.5px;
+            border-radius: 50%;
+            animation: circleGlow 4s infinite ease-in-out;
+        }
+        
+        .smoky-metallic-text {
+            background: linear-gradient(to right, #ffffff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            transition: all 0.5s ease;
+        }
+        .smoky-metallic-text:hover {
+            background: linear-gradient(
+                90deg, 
+                #ffffff 0%, 
+                #89b4f8 20%, 
+                #005c97 40%, 
+                #1e3c72 50%, 
+                #2a5298 60%, 
+                #89b4f8 80%, 
+                #ffffff 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            animation: smokeMove 3s linear infinite;
+        }
+        @keyframes smokeMove {
+            to {
+                background-position: 200% center;
+            }
+        }
+        
+        section.bg-white, section.bg-slate-50, section.bg-gray-50, section.bg-\[\#f4f7f5\] {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.75)), url('{{ asset('images/enhanced_building.jpg') }}') !important;
+            background-size: cover !important;
+            background-attachment: fixed !important;
+            background-position: center !important;
+        }
+    </style>
 
+    <section class="relative w-full bg-gradient-to-br from-[#005c97] via-[#1e3c72] to-[#2a5298] overflow-hidden flex items-center justify-center pt-[140px] lg:pt-[90px] font-sans">
+        
+        <!-- 3D Metallic Bubbles Background -->
+        <div class="metallic-bubble bubble-float-1 w-[80px] h-[80px] md:w-[120px] md:h-[120px] top-[10%] left-[5%] opacity-80 blur-[1px]"></div>
+        <div class="metallic-bubble bubble-float-2 w-[180px] h-[180px] md:w-[350px] md:h-[350px] top-[40%] left-[10%] opacity-40 blur-[2px]"></div>
+        <div class="metallic-bubble bubble-float-3 w-[60px] h-[60px] md:w-[90px] md:h-[90px] bottom-[15%] left-[45%] opacity-90 blur-[1px]"></div>
+        <div class="metallic-bubble bubble-float-1 w-[120px] h-[120px] md:w-[220px] md:h-[220px] top-[5%] right-[2%] opacity-60 blur-[3px]"></div>
+        <div class="metallic-bubble bubble-float-2 w-[100px] h-[100px] md:w-[160px] md:h-[160px] bottom-[10%] right-[35%] opacity-70 blur-[1px]"></div>
+        
         <!-- Content Container -->
-        <div class="max-w-7xl mx-auto px-4 w-full h-full relative z-20 flex flex-col md:flex-row items-center justify-between py-16 md:py-24 gap-8 md:gap-4">
+        <div class="max-w-7xl mx-auto px-6 w-full h-full relative z-20 flex flex-col lg:flex-row items-center justify-between pt-0 pb-0 gap-0 lg:gap-12">
             
-            <!-- Left Side: Circle Image Element -->
-            <div class="w-full md:w-1/4 flex justify-center md:justify-start">
-                <div class="w-40 h-40 md:w-56 md:h-56 rounded-full bg-[#0ea5e9]/20 backdrop-blur-md flex items-center justify-center p-2 shadow-[0_0_40px_rgba(14,165,233,0.3)] border-4 md:border-8 border-[#0ea5e9] relative overflow-hidden group">
-                    <img src="{{ asset('images/student.png') }}" alt="Student" class="w-full h-full object-cover rounded-full relative z-10 transition-transform duration-500 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-[#0ea5e9]/10 group-hover:bg-transparent transition-colors duration-500 z-20"></div>
-                </div>
-            </div>
-
-            <!-- Center: Text & Socials -->
-            <div class="w-full md:w-5/12 flex flex-col items-center text-center px-2">
-                <h1 class="text-3xl md:text-4xl lg:text-5xl font-medium text-white tracking-wide mb-1">
-                    GET THE BEST <span class="font-black">EDUCATIONAL</span>
+            <!-- Left Side: Text & CTA -->
+            <div class="w-full lg:w-[55%] flex flex-col items-start text-left relative z-20 pb-8 lg:pb-24">
+                
+                <h1 id="hero-title" class="text-5xl md:text-6xl lg:text-[60px] xl:text-[65px] font-bold text-white leading-[1.15] mb-6 tracking-tight transition-opacity duration-300">
+                    <span class="smoky-metallic-text">Find the best teachers and private</span> <span class="bg-[#fbc043] text-[#1d2542] px-6 py-1 md:py-2 rounded-full inline-block whitespace-nowrap align-middle">tutors</span>
                 </h1>
-                <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-[#0ea5e9] tracking-wider mb-6 drop-shadow-lg">
-                    HIRING SOLUTIONS
-                </h2>
                 
-                <div class="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-white/90 text-[10px] md:text-xs font-semibold">
-                    <a href="#" class="flex items-center gap-2 hover:text-[#0ea5e9] transition-colors group">
-                        <div class="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#0ea5e9] flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0ea5e9] transition-colors shadow-md"><i class="fab fa-facebook-f text-[10px]"></i></div>
-                        Warriors Educare
+                <p id="hero-desc" class="text-white/60 text-base md:text-[17px] max-w-[500px] mb-10 leading-relaxed font-normal transition-opacity duration-300">
+                    We help you connect with expert teachers and dedicated tutors to ensure the best learning experience for a bright future.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 w-full">
+                    <!-- Hire Button -->
+                    <a href="{{ route('parent.register') }}" id="btn-hire" class="border border-[#fbc043] text-[#fbc043] font-medium py-3.5 px-8 rounded-full hover:bg-[#fbc043] hover:text-[#1d2542] transition-all text-[15px] tracking-wide bg-transparent inline-flex items-center justify-center">
+                        Hire a Teacher / Tutor
                     </a>
-                    <a href="#" class="flex items-center gap-2 hover:text-[#0ea5e9] transition-colors group">
-                        <div class="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#0ea5e9] flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0ea5e9] transition-colors shadow-md"><i class="fab fa-instagram text-[10px]"></i></div>
-                        @warriorseducare
-                    </a>
-                    <a href="#" class="flex items-center gap-2 hover:text-[#0ea5e9] transition-colors group">
-                        <div class="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#0ea5e9] flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0ea5e9] transition-colors shadow-md"><i class="fab fa-twitter text-[10px]"></i></div>
-                        @warriors_educare
+
+                    <!-- Join Button -->
+                    <a href="{{ route('candidate.register') }}" id="btn-join" class="text-[#fbc043] font-medium text-[15px] flex items-center justify-center gap-3 hover:opacity-80 transition-opacity tracking-wide py-3.5 px-4 sm:px-8">
+                        Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
-                
-                <div class="mt-8">
-                    <a href="{{ route('candidate.register') }}" class="inline-flex items-center gap-2 bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-bold py-3.5 px-8 rounded-full shadow-lg shadow-[#0ea5e9]/30 transition-all hover:-translate-y-1 hover:shadow-[#0ea5e9]/50 tracking-wide text-sm border border-[#0ea5e9] hover:border-[#0284c7]">
-                        Register as Candidate <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
+
+
             </div>
 
-            <!-- Right Side: Diamond Collage -->
-            <div class="w-full md:w-1/3 flex justify-center md:justify-end mt-12 md:mt-0">
-                <div class="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
-                    <!-- Background Glow -->
-                    <div class="absolute inset-0 bg-[#0ea5e9]/20 rounded-full blur-3xl z-0 pointer-events-none"></div>
-                    
-                    <!-- Top Diamond -->
-                    <div class="absolute top-[5%] left-[25%] w-28 h-28 md:w-36 md:h-36 border-[4px] md:border-[6px] border-[#0ea5e9] rounded-[20px] md:rounded-[28px] rotate-45 overflow-hidden shadow-2xl z-10 hover:scale-110 transition-transform duration-500 cursor-pointer">
-                        <img src="{{ asset('images/women.jpg') }}" alt="Professional 1" class="absolute w-[150%] h-[150%] max-w-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 object-cover hover:scale-110 transition-transform duration-700">
-                        <div class="absolute inset-0 bg-[#0ea5e9]/10 -rotate-45 hover:bg-transparent transition-colors duration-500"></div>
-                    </div>
-                    
-                    <!-- Bottom Left Diamond -->
-                    <div class="absolute top-[45%] left-[5%] w-24 h-24 md:w-32 md:h-32 border-[4px] md:border-[6px] border-[#0ea5e9] rounded-[16px] md:rounded-[24px] rotate-45 overflow-hidden shadow-2xl z-20 hover:scale-110 transition-transform duration-500 cursor-pointer">
-                        <img src="{{ asset('images/men.jpg') }}" alt="Professional 2" class="absolute w-[150%] h-[150%] max-w-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 object-cover hover:scale-110 transition-transform duration-700">
-                        <div class="absolute inset-0 bg-[#0ea5e9]/10 -rotate-45 hover:bg-transparent transition-colors duration-500"></div>
-                    </div>
-                    
-                    <!-- Bottom Right Diamond -->
-                    <div class="absolute top-[40%] right-[5%] w-32 h-32 md:w-40 md:h-40 border-[4px] md:border-[6px] border-[#0ea5e9] rounded-[20px] md:rounded-[28px] rotate-45 overflow-hidden shadow-2xl z-10 hover:scale-110 transition-transform duration-500 cursor-pointer">
-                        <img src="{{ asset('images/candidate_hero_4k.png') }}" alt="Professional 3" class="absolute w-[150%] h-[150%] max-w-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 object-cover hover:scale-110 transition-transform duration-700">
-                        <div class="absolute inset-0 bg-[#0ea5e9]/10 -rotate-45 hover:bg-transparent transition-colors duration-500"></div>
-                    </div>
+            <!-- Right Side: Capsule Image Layout EXACTLY like reference -->
+            <div class="w-full lg:w-[45%] relative h-[500px] lg:h-[750px] mt-12 lg:mt-0 flex justify-center items-center z-10">
+                
+                <!-- Concentric Circles exactly aligned behind the middle portrait -->
+                <div class="absolute top-[50%] lg:top-[55%] left-[50%] lg:left-[25%] -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] pointer-events-none z-0 hidden sm:block opacity-100">
+                    <div class="absolute inset-0 m-auto w-[650px] h-[650px] circle-glow" style="animation-delay: 0s;"></div>
+                    <div class="absolute inset-0 m-auto w-[500px] h-[500px] circle-glow" style="animation-delay: 0.5s;"></div>
+                    <div class="absolute inset-0 m-auto w-[350px] h-[350px] circle-glow" style="animation-delay: 1s;"></div>
+                    <div class="absolute inset-0 m-auto w-[200px] h-[200px] circle-glow" style="animation-delay: 1.5s;"></div>
+                </div>
+
+                <!-- 1. Top Left Image (Male) - Full Pill - COLUMN 1 -->
+                <div class="col-1-img transition-all duration-500 ease-in-out absolute top-0 left-[25%] lg:left-[25%] -translate-x-1/2 w-[130px] h-[190px] lg:w-[170px] lg:h-[260px] rounded-full overflow-hidden shadow-2xl z-10">
+                    <img id="hero-img-1" src="{{ asset('images/men.jpg') }}" alt="Professional 2" class="w-full h-full object-cover">
+                </div>
+
+                <!-- 2. Top Right Image (Female 2) - Full Pill - COLUMN 2 -->
+                <div class="col-2-img transition-all duration-500 ease-in-out absolute top-[10%] lg:top-[12%] left-[75%] lg:left-[80%] -translate-x-1/2 w-[140px] h-[220px] lg:w-[190px] lg:h-[300px] rounded-full overflow-hidden shadow-2xl z-10">
+                    <img id="hero-img-2" src="{{ asset('images/student.png') }}" alt="Professional 3" class="w-full h-full object-cover scale-[1.15] object-[center_10%]">
+                </div>
+
+                <!-- 3. Center Large Image (Female 1) - Full Pill - COLUMN 1 -->
+                <div class="col-1-img transition-all duration-500 ease-in-out absolute top-[40%] lg:top-[35%] left-[25%] lg:left-[25%] -translate-x-1/2 w-[180px] h-[280px] lg:w-[260px] lg:h-[420px] rounded-full overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-20">
+                    <img id="hero-img-3" src="{{ asset('images/women.jpg') }}" alt="Professional 1" class="w-full h-full object-cover object-top">
+                </div>
+
+                <!-- 4. Bottom Right Image (Male 2) - Flat Bottom - COLUMN 2 -->
+                <div class="col-2-img transition-all duration-500 ease-in-out absolute bottom-0 left-[75%] lg:left-[80%] -translate-x-1/2 w-[140px] h-[190px] lg:w-[180px] lg:h-[280px] rounded-t-full overflow-hidden shadow-2xl z-10">
+                    <img id="hero-img-4" src="{{ asset('images/candidate_hero_4k.png') }}" alt="Professional 4" class="w-full h-full object-cover object-top">
                 </div>
             </div>
         </div>
@@ -81,20 +161,115 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // No mode switching needed anymore since Employer role is removed.
-            // Typewriter effect will automatically be handled by app.blade.php
+            const btnHire = document.getElementById('btn-hire');
+            const btnJoin = document.getElementById('btn-join');
+            const heroTitle = document.getElementById('hero-title');
+            const heroDesc = document.getElementById('hero-desc');
+
+            const hireImages = [
+                "{{ asset('images/men.jpg') }}",
+                "{{ asset('images/student.png') }}",
+                "{{ asset('images/women.jpg') }}",
+                "{{ asset('images/candidate_hero_4k.png') }}"
+            ];
+
+            const joinImages = [
+                "{{ asset('images/pic2.png') }}",
+                "{{ asset('images/guy-on-beanbag.png') }}",
+                "{{ asset('images/candidate_hero_new.jpg') }}",
+                "{{ asset('images/about_us_hero.png') }}"
+            ];
             
-            // Just ensure initial transforms are set correctly
-            const imgContainer = document.getElementById('hero-img-container');
-            if(imgContainer) {
-                imgContainer.style.transform = `rotateY(0deg)`;
+            const textContent = {
+                hire: {
+                    title: `<span class="smoky-metallic-text">Find the best teachers and private</span> <span class="bg-[#fbc043] text-[#1d2542] px-6 py-1 md:py-2 rounded-full inline-block whitespace-nowrap align-middle">tutors</span>`,
+                    desc: "We help you connect with expert teachers and dedicated tutors to ensure the best learning experience for a bright future."
+                },
+                join: {
+                    title: `<span class="smoky-metallic-text">Find the best teaching and tutoring</span> <span class="bg-[#fbc043] text-[#1d2542] px-6 py-1 md:py-2 rounded-full inline-block whitespace-nowrap align-middle">jobs</span>`,
+                    desc: "Join our network of elite educators and discover rewarding teaching and tutoring opportunities to shape the future of learning."
+                }
+            };
+
+            const imgNodes = [
+                document.getElementById('hero-img-1'),
+                document.getElementById('hero-img-2'),
+                document.getElementById('hero-img-3'),
+                document.getElementById('hero-img-4')
+            ];
+
+            let activeState = 'hire';
+
+            const activeBtnClass = "border border-[#fbc043] text-[#fbc043] font-medium py-3.5 px-8 rounded-full hover:bg-[#fbc043] hover:text-[#1d2542] transition-all text-[15px] tracking-wide bg-transparent inline-flex items-center justify-center";
+            const inactiveBtnClass = "text-[#fbc043] font-medium text-[15px] flex items-center justify-center gap-3 hover:opacity-80 transition-opacity tracking-wide py-3.5 px-4 sm:px-8";
+
+            function setState(state, event) {
+                if (activeState === state) {
+                    return; // let it navigate naturally
+                }
+                
+                event.preventDefault();
+                activeState = state;
+                
+                // Fade out text
+                heroTitle.classList.add('opacity-0');
+                heroDesc.classList.add('opacity-0');
+                
+                // Swap button styles
+                if (state === 'join') {
+                    btnJoin.className = activeBtnClass;
+                    btnJoin.innerHTML = 'Join as a Teacher / Tutor';
+                    
+                    btnHire.className = inactiveBtnClass;
+                    btnHire.innerHTML = 'Hire a Teacher / Tutor <i class="fas fa-arrow-right"></i>';
+                } else {
+                    btnHire.className = activeBtnClass;
+                    btnHire.innerHTML = 'Hire a Teacher / Tutor';
+                    
+                    btnJoin.className = inactiveBtnClass;
+                    btnJoin.innerHTML = 'Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i>';
+                }
+
+                const col1 = document.querySelectorAll('.col-1-img');
+                const col2 = document.querySelectorAll('.col-2-img');
+                
+                // Slide out and fade images
+                col1.forEach(el => el.classList.add('opacity-0', 'translate-y-24'));
+                col2.forEach(el => el.classList.add('opacity-0', '-translate-y-24'));
+                
+                // Swap content and slide back in
+                setTimeout(() => {
+                    // Update Text
+                    heroTitle.innerHTML = textContent[state].title;
+                    heroDesc.innerHTML = textContent[state].desc;
+                    heroTitle.classList.remove('opacity-0');
+                    heroDesc.classList.remove('opacity-0');
+                    
+                    // Update Images
+                    const targetImages = state === 'hire' ? hireImages : joinImages;
+                    imgNodes.forEach((img, idx) => {
+                        img.src = targetImages[idx];
+                        // Reset special classes for dynamically loaded images to ensure good fit
+                        img.className = 'w-full h-full object-cover';
+                        if (idx === 2 || idx === 3) img.classList.add('object-top');
+                    });
+                    
+                    col1.forEach(el => el.classList.remove('opacity-0', 'translate-y-24'));
+                    col2.forEach(el => el.classList.remove('opacity-0', '-translate-y-24'));
+                }, 300); // 300ms matches the typical transition duration
             }
+
+            btnHire.addEventListener('click', (e) => setState('hire', e));
+            btnJoin.addEventListener('click', (e) => setState('join', e));
         });
     </script>
 
         <!-- About / Empowering Section -->
-        <section class="py-20 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section class="py-20 bg-white relative">
+            <!-- Smoky Fade from Hero -->
+            <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-[#204484] to-transparent z-0 pointer-events-none"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="flex flex-col md:flex-row items-center gap-16">
                     
                     <!-- Left Images Grid -->
@@ -187,20 +362,20 @@
                         <!-- Right Column: Description -->
                         <div class="w-full md:w-2/3 flex flex-col justify-center border-l-0 md:border-l border-white/30 md:pl-12">
                             <p class="text-lg text-white font-bold mb-6">
-                                Warriors Educare is an ISO-certified and government-registered education recruitment consultancy operating at a national level across India. 
-                                We provide structured, compliance-driven, and outcome-focused hiring solutions to schools, colleges, and educational institutions.
+                                <strong>Warriors Educare</strong> is an education-focused recruitment and teaching platform that connects <strong>teachers, tutors, schools, educational institutions, students, and parents</strong> through a simple and reliable hiring process.
                             </p>
-                            <p class="text-white/80 text-sm mb-8 leading-relaxed relative z-10">
-                                About Us – An Warriors Educare
+                            <div class="text-white/80 text-sm mb-8 leading-relaxed relative z-10 space-y-4">
+                                <p>Our platform is designed for teachers and education professionals who are looking for the right opportunities. Whether you want to <strong>apply for a teaching job in a school, college, or educational institution</strong>, or you are looking for opportunities as a <strong>tuition teacher or home tutor</strong>, Warriors Educare helps you discover suitable opportunities based on your skills, qualifications, experience, and preferred location.</p>
+                                
+                                <p>At the same time, <strong>schools and educational institutions can use our platform to find and hire qualified teachers and administrative staff</strong> for their academic requirements. We help institutions connect with suitable candidates and make their recruitment process more organized and efficient.</p>
+                                
+                                <p>We also support <strong>tuition and home tutoring requirements</strong>, helping students and parents connect with suitable tutors for different subjects, classes, and learning needs. Tutors can create their profiles, showcase their qualifications and teaching experience, and explore relevant tuition opportunities.</p>
 
-At An Warriors Educare, we connect talent with opportunity in the education sector. Our platform is designed to support job seekers, educational institutions, and private tutors through a seamless recruitment experience.
-
-With a strong network across multiple states, we help schools and institutes hire qualified teachers and administrative staff, while enabling candidates to find the right job opportunities that match their skills and career goals.
-
-We also provide dedicated support for tuition teachers and home tutors, helping them connect with students and expand their reach.
-
-Our recruitment approach follows modern hiring practices, institutional standards, and quality-focused selection, ensuring the best outcomes for both employers and candidates.
-                            </p>
+                                <h3 class="text-white font-bold text-lg mt-6 mb-2">Our Purpose</h3>
+                                <p>Our goal is to create a trusted platform where <strong>teachers can find better career and teaching opportunities, schools can find the right teaching talent, and students can connect with suitable tutors</strong>.</p>
+                                
+                                <p>Whether you are a <strong>teacher looking for a school job, a tutor looking for tuition students, a school looking to hire teachers, or a parent/student looking for a tutor</strong>, Warriors Educare brings these opportunities together on one platform.</p>
+                            </div>
                             <div class="relative z-10">
                                 <a href="#" class="inline-flex items-center gap-2 text-white font-bold hover:text-accent-500 transition-colors group">
                                     EXPLORE MORE 
@@ -339,16 +514,25 @@ Our recruitment approach follows modern hiring practices, institutional standard
 
             <!-- Recent Tuition Cards Slider -->
             <div class="max-w-7xl mx-auto mb-20 relative z-10 reveal">
-                <div class="flex justify-between items-end mb-6 px-4 xl:px-0">
-                    <h3 class="text-2xl font-bold text-[#031b4e]">Recent Tuition Posts</h3>
-                </div>
-                
-                <style>
-                    .hide-scrollbar::-webkit-scrollbar { display: none; }
-                    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-                </style>
-                
-                <div class="flex overflow-x-auto gap-6 pb-8 pt-2 px-4 xl:px-0 snap-x snap-mandatory hide-scrollbar cursor-grab active:cursor-grabbing">
+                    <div class="flex justify-between items-center mb-6 px-4 xl:px-0">
+                      <h3 class="text-2xl font-bold text-[#031b4e]">Recent Tuition Posts</h3>
+                      <!-- Navigation Buttons -->
+                      <div class="flex gap-2">
+                          <button id="tuitionSliderPrev" class="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-[#031b4e] hover:border-[#031b4e] hover:bg-slate-50 flex items-center justify-center transition-all shadow-sm">
+                              <i class="fas fa-chevron-left"></i>
+                          </button>
+                          <button id="tuitionSliderNext" class="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-[#031b4e] hover:border-[#031b4e] hover:bg-slate-50 flex items-center justify-center transition-all shadow-sm">
+                              <i class="fas fa-chevron-right"></i>
+                          </button>
+                      </div>
+                  </div>
+                  
+                  <style>
+                      .hide-scrollbar::-webkit-scrollbar { display: none; }
+                      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+                  </style>
+                  
+                  <div id="tuitionCardsSlider" class="flex overflow-x-auto gap-6 pb-8 pt-2 px-4 xl:px-0 snap-x snap-mandatory hide-scrollbar cursor-grab active:cursor-grabbing">
                     @forelse($employerTuitions as $tuition)
                         <div class="min-w-[85vw] md:min-w-[350px] bg-white rounded-2xl border border-blue-50 flex-shrink-0 snap-center relative overflow-hidden flex flex-col shadow-sm">
                             <!-- Top Right Dark Blue Background -->
@@ -393,8 +577,8 @@ Our recruitment approach follows modern hiring practices, institutional standard
                             </div>
                         </div>
                     @empty
-                        <div class="w-full text-center py-12 bg-white rounded-2xl shadow-sm border border-slate-100">
-                            <p class="text-slate-500">No recent tuition posts available.</p>
+                        <div class="w-full text-center py-12 bg-white/40 backdrop-blur-sm rounded-2xl shadow-sm border border-white/20">
+                            <p class="text-slate-500 font-semibold">No recent tuition posts available.</p>
                         </div>
                     @endforelse
                 </div>
@@ -451,8 +635,7 @@ Our recruitment approach follows modern hiring practices, institutional standard
             </div>
         </div>
             
-            <!-- Quick Request Form -->
-            <div id="quick-request-form" class="max-w-4xl mx-auto mt-20 relative z-10 reveal bg-white rounded-3xl p-8 md:p-10 shadow-2xl border border-slate-200">
+            <div id="quick-request-form" class="max-w-4xl mx-auto mt-20 relative z-10 reveal bg-gradient-to-br from-[#f0f7ff] to-blue-50 rounded-3xl p-8 md:p-10 shadow-2xl border border-blue-200">
                 <div class="text-center mb-8">
                     <h3 class="text-2xl md:text-3xl font-bold text-[#031b4e] mb-2">Need a Tutor for Your Child?</h3>
                     <p class="text-slate-500">Fill this quick form and we'll match you with the best verified tutor.</p>
@@ -471,26 +654,18 @@ Our recruitment approach follows modern hiring practices, institutional standard
                         <!-- Guest Name -->
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Your Name *</label>
-                            <input type="text" name="guest_name" required placeholder="Enter your full name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#031b4e] focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500 transition-colors outline-none">
+                            <input type="text" name="guest_name" required placeholder="Enter your full name" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
                         </div>
                         <!-- Guest Phone -->
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Your Phone Number *</label>
-                            <input type="text" name="guest_phone" required placeholder="Enter your phone number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#031b4e] focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500 transition-colors outline-none">
+                            <input type="text" name="guest_phone" required placeholder="Enter your phone number" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
                         </div>
                         
                         <!-- Class -->
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Student's Class *</label>
-                            <select name="student_class" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#031b4e] focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500 transition-colors outline-none appearance-none">
-                                <option value="">Select Class</option>
-                                <option value="Pre-Primary">Pre-Primary</option>
-                                <option value="Class 1-5">Class 1 to 5</option>
-                                <option value="Class 6-8">Class 6 to 8</option>
-                                <option value="Class 9-10">Class 9 to 10</option>
-                                <option value="Class 11-12">Class 11 to 12</option>
-                                <option value="College/University">College/University</option>
-                            </select>
+                            <input type="text" name="student_class" placeholder="e.g. Class 10" required class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
                         </div>
                         
                         <!-- Board -->
@@ -508,13 +683,13 @@ Our recruitment approach follows modern hiring practices, institutional standard
                         <!-- Subjects -->
                         <div class="md:col-span-2">
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Subjects Needed *</label>
-                            <input type="text" name="subjects" required placeholder="e.g., Math, Science" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#031b4e] focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500 transition-colors outline-none">
+                            <input type="text" name="subjects" required placeholder="e.g., Math, Science" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
                         </div>
 
                         <!-- Location -->
                         <div class="md:col-span-2">
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Complete Location/Address *</label>
-                            <input type="text" name="location" required placeholder="Enter full address or area" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#031b4e] focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500 transition-colors outline-none">
+                            <input type="text" name="location" required placeholder="Enter full address or area" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
                         </div>
                     </div>
 
@@ -930,6 +1105,20 @@ Our recruitment approach follows modern hiring practices, institutional standard
         }, { threshold: 0.5 });
         
         stats.forEach(stat => observer.observe(stat));
+
+        // Tuition Slider Navigation
+        const tuitionSlider = document.getElementById('tuitionCardsSlider');
+        const tuitionPrevBtn = document.getElementById('tuitionSliderPrev');
+        const tuitionNextBtn = document.getElementById('tuitionSliderNext');
+
+        if (tuitionSlider && tuitionPrevBtn && tuitionNextBtn) {
+            tuitionPrevBtn.addEventListener('click', () => {
+                tuitionSlider.scrollBy({ left: -350, behavior: 'smooth' });
+            });
+            tuitionNextBtn.addEventListener('click', () => {
+                tuitionSlider.scrollBy({ left: 350, behavior: 'smooth' });
+            });
+        }
     });
 </script>
 @endpush

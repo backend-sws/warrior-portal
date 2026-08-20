@@ -44,13 +44,8 @@
                 <!-- Class -->
                 <div>
                     <label class="block text-sm font-bold text-[#031b4e] mb-2">Student's Class <span class="text-red-500">*</span></label>
-                    <select name="class" required
+                    <input type="text" name="class" placeholder="e.g. Class 10" required value="{{ old('class') }}"
                         class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#0ea5e9] focus:ring-2 focus:ring-[#0ea5e9]/20 transition-all outline-none bg-white text-gray-700">
-                        <option value="">Select Class</option>
-                        @foreach(['Pre-Nursery', 'Nursery', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12', 'Other'] as $cls)
-                            <option value="{{ $cls }}" {{ old('class') == $cls ? 'selected' : '' }}>{{ $cls }}</option>
-                        @endforeach
-                    </select>
                     @error('class') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                 </div>
 
