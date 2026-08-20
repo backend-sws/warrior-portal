@@ -79,7 +79,7 @@
             }
         }
         
-        section.bg-white, section.bg-slate-50, section.bg-gray-50, section.bg-\[\#f4f7f5\] {
+        section.bg-white, section.bg-slate-50, section.bg-gray-50, section.bg-\[\#f4f7f5\], section.bg-\[\#f4f7f9\] {
             background-image: linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.75)), url('{{ asset('images/enhanced_building.jpg') }}') !important;
             background-size: cover !important;
             background-attachment: fixed !important;
@@ -87,203 +87,184 @@
         }
     </style>
 
-    <section class="relative w-full bg-gradient-to-br from-[#005c97] via-[#1e3c72] to-[#2a5298] overflow-hidden flex items-center justify-center pt-[140px] lg:pt-[90px] font-sans">
+    <section class="relative w-full bg-[#f4f7f9] pt-[140px] pb-16 lg:pt-[160px] lg:pb-24 overflow-hidden font-sans">
         
-        <!-- 3D Metallic Bubbles Background -->
-        <div class="metallic-bubble bubble-float-1 w-[80px] h-[80px] md:w-[120px] md:h-[120px] top-[10%] left-[5%] opacity-80 blur-[1px]"></div>
-        <div class="metallic-bubble bubble-float-2 w-[180px] h-[180px] md:w-[350px] md:h-[350px] top-[40%] left-[10%] opacity-40 blur-[2px]"></div>
-        <div class="metallic-bubble bubble-float-3 w-[60px] h-[60px] md:w-[90px] md:h-[90px] bottom-[15%] left-[45%] opacity-90 blur-[1px]"></div>
-        <div class="metallic-bubble bubble-float-1 w-[120px] h-[120px] md:w-[220px] md:h-[220px] top-[5%] right-[2%] opacity-60 blur-[3px]"></div>
-        <div class="metallic-bubble bubble-float-2 w-[100px] h-[100px] md:w-[160px] md:h-[160px] bottom-[10%] right-[35%] opacity-70 blur-[1px]"></div>
-        
-        <!-- Content Container -->
-        <div class="max-w-7xl mx-auto px-6 w-full h-full relative z-20 flex flex-col lg:flex-row items-center justify-between pt-0 pb-0 gap-0 lg:gap-12">
+        <!-- Blurred Background Pattern -->
+        <div class="absolute inset-0 z-0 pointer-events-none">
             
-            <!-- Left Side: Text & CTA -->
-            <div class="w-full lg:w-[55%] flex flex-col items-start text-left relative z-20 pb-8 lg:pb-24">
+            <!-- Blurred Gradient Orbs -->
+            <div class="absolute -top-[15%] -left-[10%] w-[50%] h-[70%] rounded-full bg-gradient-to-br from-blue-400/20 to-indigo-500/10 blur-[100px]"></div>
+            <div class="absolute top-[10%] -right-[15%] w-[45%] h-[80%] rounded-full bg-gradient-to-tl from-[#fbc043]/20 to-orange-400/10 blur-[120px]"></div>
+            <div class="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] rounded-full bg-gradient-to-tr from-cyan-400/15 to-blue-600/10 blur-[120px]"></div>
+        </div>
+
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 relative z-20 flex flex-col lg:flex-row items-center lg:items-stretch justify-between">
+            
+            <!-- Left Column: Typography & CTAs -->
+            <div class="w-full lg:w-[42%] flex flex-col justify-center text-[#071520] relative z-20">
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-sm w-max mb-8">
+                    <div class="w-2 h-2 rounded-full bg-[#031b4e]"></div>
+                    <span class="text-[10px] font-extrabold text-gray-800 tracking-wider uppercase">Tutors & Mentors</span>
+                </div>
                 
-                <h1 id="hero-title" class="text-5xl md:text-6xl lg:text-[60px] xl:text-[65px] font-bold text-white leading-[1.15] mb-6 tracking-tight transition-opacity duration-300">
-                    <span class="smoky-metallic-text">Find the best teachers and private</span> <span class="bg-[#fbc043] text-[#1d2542] px-6 py-1 md:py-2 rounded-full inline-block whitespace-nowrap align-middle">tutors</span>
+                <h1 id="hero-title" class="text-5xl lg:text-[4.5rem] xl:text-[5rem] leading-[1.1] font-extrabold tracking-tight text-[#0a1922] mb-8 relative z-20">
+                    Find the best teachers and private <br>
+                    <div class="relative w-max mt-4 mb-2">
+                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">tutors</span>
+                    </div>
                 </h1>
-                
-                <p id="hero-desc" class="text-white/60 text-base md:text-[17px] max-w-[500px] mb-10 leading-relaxed font-normal transition-opacity duration-300">
-                    We help you connect with expert teachers and dedicated tutors to ensure the best learning experience for a bright future.
-                </p>
-                
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 w-full">
-                    <!-- Hire Button -->
-                    <a href="{{ route('parent.register') }}" id="btn-hire" class="border border-[#fbc043] text-[#fbc043] font-medium py-3.5 px-8 rounded-full hover:bg-[#fbc043] hover:text-[#1d2542] transition-all text-[15px] tracking-wide bg-transparent inline-flex items-center justify-center">
-                        Hire a Teacher / Tutor
-                    </a>
 
-                    <!-- Join Button -->
-                    <a href="{{ route('candidate.register') }}" id="btn-join" class="text-[#fbc043] font-medium text-[15px] flex items-center justify-center gap-3 hover:opacity-80 transition-opacity tracking-wide py-3.5 px-4 sm:px-8">
-                        Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i>
-                    </a>
+                <!-- Icon badges -->
+                <div class="flex gap-5 mb-8">
+                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm text-[#031b4e] text-lg hover:scale-110 transition-transform cursor-pointer">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm text-[#031b4e] text-lg hover:scale-110 transition-transform cursor-pointer">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm text-[#031b4e] text-lg hover:scale-110 transition-transform cursor-pointer">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
                 </div>
 
+                <div class="flex gap-6 items-start mb-10 mt-2">
+                    <div class="w-16 h-[2px] bg-[#a0aec0] mt-3 hidden md:block opacity-50"></div>
+                    <p id="hero-desc" class="text-gray-500 text-[14px] md:text-[15px] max-w-[350px] leading-relaxed font-medium">
+                        We help you connect with expert teachers and dedicated tutors to ensure the best learning experience for a bright future.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{{ route('parent.register') }}" id="btn-hire" class="bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] transition shadow-lg flex items-center justify-center">Hire a Teacher / Tutor</a>
+                    <a href="{{ route('candidate.register') }}" id="btn-join" class="bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 transition border border-gray-200 shadow-sm flex items-center justify-center gap-2">Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Center Column: Main Image -->
+            <div class="w-full lg:w-[30%] relative mt-16 lg:mt-0 flex justify-center items-center z-10">
+                
+                <div class="relative w-full max-w-[420px] h-[500px] lg:h-[580px] bg-white rounded-[2.5rem] lg:rounded-[3rem] overflow-hidden shadow-2xl">
+                    <img id="main-img" src="{{ asset('images/women.jpg') }}" alt="Main Image" class="w-full h-full object-cover">
+                    
+
+
+
+                </div>
+            </div>
+
+            <!-- Far Right Column: Explore Offerings & Second Image -->
+            <div class="w-full lg:w-[18%] flex flex-col justify-center mt-16 lg:mt-0 gap-10">
+                
+                <div class="text-[#071520] pt-4">
+                    <h3 class="text-3xl font-bold mb-4 leading-tight tracking-tight">Explore Our <br>Offerings</h3>
+                    <p class="text-gray-500 text-[12px] leading-relaxed max-w-[200px]">
+                        Whether you're a beginner or looking for advanced tutoring, our community is here to support your journey.
+                    </p>
+                </div>
+
+                <div class="relative w-full max-w-[220px] h-[280px] rounded-[2rem] overflow-hidden shadow-xl border-4 border-white">
+                    <img id="sub-img" src="{{ asset('images/student.png') }}" alt="Secondary Image" class="w-full h-full object-cover">
+                    
+
+                </div>
 
             </div>
 
-            <!-- Right Side: Capsule Image Layout EXACTLY like reference -->
-            <div class="w-full lg:w-[45%] relative h-[500px] lg:h-[750px] mt-12 lg:mt-0 flex justify-center items-center z-10">
-                
-                <!-- Concentric Circles exactly aligned behind the middle portrait -->
-                <div class="absolute top-[50%] lg:top-[55%] left-[50%] lg:left-[25%] -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] pointer-events-none z-0 hidden sm:block opacity-100">
-                    <div class="absolute inset-0 m-auto w-[650px] h-[650px] circle-glow" style="animation-delay: 0s;"></div>
-                    <div class="absolute inset-0 m-auto w-[500px] h-[500px] circle-glow" style="animation-delay: 0.5s;"></div>
-                    <div class="absolute inset-0 m-auto w-[350px] h-[350px] circle-glow" style="animation-delay: 1s;"></div>
-                    <div class="absolute inset-0 m-auto w-[200px] h-[200px] circle-glow" style="animation-delay: 1.5s;"></div>
-                </div>
-
-                <!-- 1. Top Left Image (Male) - Full Pill - COLUMN 1 -->
-                <div class="col-1-img transition-all duration-500 ease-in-out absolute top-0 left-[25%] lg:left-[25%] -translate-x-1/2 w-[130px] h-[190px] lg:w-[170px] lg:h-[260px] rounded-full overflow-hidden shadow-2xl z-10">
-                    <img id="hero-img-1" src="{{ asset('images/men.jpg') }}" alt="Professional 2" class="w-full h-full object-cover">
-                </div>
-
-                <!-- 2. Top Right Image (Female 2) - Full Pill - COLUMN 2 -->
-                <div class="col-2-img transition-all duration-500 ease-in-out absolute top-[10%] lg:top-[12%] left-[75%] lg:left-[80%] -translate-x-1/2 w-[140px] h-[220px] lg:w-[190px] lg:h-[300px] rounded-full overflow-hidden shadow-2xl z-10">
-                    <img id="hero-img-2" src="{{ asset('images/student.png') }}" alt="Professional 3" class="w-full h-full object-cover scale-[1.15] object-[center_10%]">
-                </div>
-
-                <!-- 3. Center Large Image (Female 1) - Full Pill - COLUMN 1 -->
-                <div class="col-1-img transition-all duration-500 ease-in-out absolute top-[40%] lg:top-[35%] left-[25%] lg:left-[25%] -translate-x-1/2 w-[180px] h-[280px] lg:w-[260px] lg:h-[420px] rounded-full overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-20">
-                    <img id="hero-img-3" src="{{ asset('images/women.jpg') }}" alt="Professional 1" class="w-full h-full object-cover object-top">
-                </div>
-
-                <!-- 4. Bottom Right Image (Male 2) - Flat Bottom - COLUMN 2 -->
-                <div class="col-2-img transition-all duration-500 ease-in-out absolute bottom-0 left-[75%] lg:left-[80%] -translate-x-1/2 w-[140px] h-[190px] lg:w-[180px] lg:h-[280px] rounded-t-full overflow-hidden shadow-2xl z-10">
-                    <img id="hero-img-4" src="{{ asset('images/candidate_hero_4k.png') }}" alt="Professional 4" class="w-full h-full object-cover object-top">
-                </div>
-            </div>
         </div>
     </section>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const btnHire = document.getElementById('btn-hire');
-            const btnJoin = document.getElementById('btn-join');
-            const heroTitle = document.getElementById('hero-title');
-            const heroDesc = document.getElementById('hero-desc');
+    <!-- Lifestyle and Wellness Section -->
+    <section class="relative w-full bg-[#031b4e] text-white">
+        <!-- The S-Curve Light Overlay on the Right -->
+        <div class="absolute top-[-1px] right-0 w-[55%] lg:w-[45%] h-[80px] lg:h-[120px] bg-[#f4f7f9] rounded-bl-[3rem] lg:rounded-bl-[5rem] z-10">
+            <!-- Inverted Corner to blend with the dark left side -->
+            <div class="absolute bottom-0 left-[-40px] lg:left-[-60px] w-[40px] lg:w-[60px] h-[40px] lg:h-[60px] bg-transparent rounded-br-[2rem] lg:rounded-br-[3rem]" style="box-shadow: 20px 20px 0 20px #f4f7f9;"></div>
+        </div>
 
-            const hireImages = [
-                "{{ asset('images/men.jpg') }}",
-                "{{ asset('images/student.png') }}",
-                "{{ asset('images/women.jpg') }}",
-                "{{ asset('images/candidate_hero_4k.png') }}"
-            ];
-
-            const joinImages = [
-                "{{ asset('images/pic2.png') }}",
-                "{{ asset('images/guy-on-beanbag.png') }}",
-                "{{ asset('images/candidate_hero_new.jpg') }}",
-                "{{ asset('images/about_us_hero.png') }}"
-            ];
-            
-            const textContent = {
-                hire: {
-                    title: `<span class="smoky-metallic-text">Find the best teachers and private</span> <span class="bg-[#fbc043] text-[#1d2542] px-6 py-1 md:py-2 rounded-full inline-block whitespace-nowrap align-middle">tutors</span>`,
-                    desc: "We help you connect with expert teachers and dedicated tutors to ensure the best learning experience for a bright future."
-                },
-                join: {
-                    title: `<span class="smoky-metallic-text">Find the best teaching and tutoring</span> <span class="bg-[#fbc043] text-[#1d2542] px-6 py-1 md:py-2 rounded-full inline-block whitespace-nowrap align-middle">jobs</span>`,
-                    desc: "Join our network of elite educators and discover rewarding teaching and tutoring opportunities to shape the future of learning."
-                }
-            };
-
-            const imgNodes = [
-                document.getElementById('hero-img-1'),
-                document.getElementById('hero-img-2'),
-                document.getElementById('hero-img-3'),
-                document.getElementById('hero-img-4')
-            ];
-
-            let activeState = 'hire';
-
-            const activeBtnClass = "border border-[#fbc043] text-[#fbc043] font-medium py-3.5 px-8 rounded-full hover:bg-[#fbc043] hover:text-[#1d2542] transition-all text-[15px] tracking-wide bg-transparent inline-flex items-center justify-center";
-            const inactiveBtnClass = "text-[#fbc043] font-medium text-[15px] flex items-center justify-center gap-3 hover:opacity-80 transition-opacity tracking-wide py-3.5 px-4 sm:px-8";
-
-            function setState(state, event) {
-                if (activeState === state) {
-                    return; // let it navigate naturally
-                }
+        <!-- Main Content of the Dark Section (Statistics) -->
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-12 relative z-20 pt-20 lg:pt-28 pb-16 lg:pb-24">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 w-full">
+                <!-- Stat 1 -->
+                <div class="text-center group cursor-default">
+                    <h3 class="text-5xl lg:text-[4.5rem] font-black text-white mb-3 tracking-tight drop-shadow-md leading-none"><span class="stat-number" data-target="500">0</span><span class="text-[#dfa43a]">+</span></h3>
+                    <p class="text-[11px] lg:text-[13px] font-bold text-gray-300 uppercase tracking-widest mt-4">Current Openings</p>
+                </div>
                 
-                event.preventDefault();
-                activeState = state;
-                
-                // Fade out text
-                heroTitle.classList.add('opacity-0');
-                heroDesc.classList.add('opacity-0');
-                
-                // Swap button styles
-                if (state === 'join') {
-                    btnJoin.className = activeBtnClass;
-                    btnJoin.innerHTML = 'Join as a Teacher / Tutor';
-                    
-                    btnHire.className = inactiveBtnClass;
-                    btnHire.innerHTML = 'Hire a Teacher / Tutor <i class="fas fa-arrow-right"></i>';
-                } else {
-                    btnHire.className = activeBtnClass;
-                    btnHire.innerHTML = 'Hire a Teacher / Tutor';
-                    
-                    btnJoin.className = inactiveBtnClass;
-                    btnJoin.innerHTML = 'Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i>';
-                }
+                <!-- Stat 2 -->
+                <div class="text-center group cursor-default">
+                    <h3 class="text-5xl lg:text-[4.5rem] font-black text-white mb-3 tracking-tight drop-shadow-md leading-none"><span class="stat-number" data-target="98">0</span><span class="text-[#dfa43a]">%</span></h3>
+                    <p class="text-[11px] lg:text-[13px] font-bold text-gray-300 uppercase tracking-widest mt-4">Fulfillment Rate</p>
+                </div>
 
-                const col1 = document.querySelectorAll('.col-1-img');
-                const col2 = document.querySelectorAll('.col-2-img');
-                
-                // Slide out and fade images
-                col1.forEach(el => el.classList.add('opacity-0', 'translate-y-24'));
-                col2.forEach(el => el.classList.add('opacity-0', '-translate-y-24'));
-                
-                // Swap content and slide back in
-                setTimeout(() => {
-                    // Update Text
-                    heroTitle.innerHTML = textContent[state].title;
-                    heroDesc.innerHTML = textContent[state].desc;
-                    heroTitle.classList.remove('opacity-0');
-                    heroDesc.classList.remove('opacity-0');
-                    
-                    // Update Images
-                    const targetImages = state === 'hire' ? hireImages : joinImages;
-                    imgNodes.forEach((img, idx) => {
-                        img.src = targetImages[idx];
-                        // Reset special classes for dynamically loaded images to ensure good fit
-                        img.className = 'w-full h-full object-cover';
-                        if (idx === 2 || idx === 3) img.classList.add('object-top');
-                    });
-                    
-                    col1.forEach(el => el.classList.remove('opacity-0', 'translate-y-24'));
-                    col2.forEach(el => el.classList.remove('opacity-0', '-translate-y-24'));
-                }, 300); // 300ms matches the typical transition duration
-            }
+                <!-- Stat 3 -->
+                <div class="text-center group cursor-default">
+                    <h3 class="text-5xl lg:text-[4.5rem] font-black text-white mb-3 tracking-tight drop-shadow-md leading-none"><span class="stat-number" data-target="10">0</span>k<span class="text-[#dfa43a]">+</span></h3>
+                    <p class="text-[11px] lg:text-[13px] font-bold text-gray-300 uppercase tracking-widest mt-4">Jobs Applied</p>
+                </div>
 
-            btnHire.addEventListener('click', (e) => setState('hire', e));
-            btnJoin.addEventListener('click', (e) => setState('join', e));
-        });
-    </script>
+                <!-- Stat 4 -->
+                <div class="text-center group cursor-default">
+                    <h3 class="text-5xl lg:text-[4.5rem] font-black text-white mb-3 tracking-tight drop-shadow-md leading-none"><span class="stat-number" data-target="350">0</span><span class="text-[#dfa43a]">+</span></h3>
+                    <p class="text-[11px] lg:text-[13px] font-bold text-gray-300 uppercase tracking-widest mt-4">Satisfied Schools</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dripping Liquid Effect -->
+        <div class="absolute -bottom-[50px] md:-bottom-[80px] left-0 w-full h-[50px] md:h-[80px] z-[50] pointer-events-none" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 50' preserveAspectRatio='none'%3E%3Cpath fill='%23031b4e' d='M0,0 h300 v10 c-10,0 -15,20 -25,20 c-10,0 -15,-20 -25,-20 c-15,0 -20,40 -35,40 c-15,0 -20,-40 -35,-40 c-10,0 -12,15 -20,15 c-8,0 -10,-15 -20,-15 c-12,0 -18,30 -30,30 c-12,0 -18,-30 -30,-30 c-10,0 -15,25 -25,25 c-10,0 -15,-25 -25,-25 c-5,0 -10,15 -15,15 c-5,0 -10,-15 -15,-15 V0 Z' /%3E%3C/svg%3E&quot;); background-repeat: repeat-x; background-size: 300px 100%;"></div>
+    </section>
 
         <!-- About / Empowering Section -->
         <section class="py-20 bg-white relative">
-            <!-- Smoky Fade from Hero -->
-            <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-[#204484] to-transparent z-0 pointer-events-none"></div>
             
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="flex flex-col md:flex-row items-center gap-16">
                     
-                    <!-- Left Images Grid -->
-                    <div class="w-full md:w-1/2 relative">
-                        <div class="grid grid-cols-2 gap-4">
-                            <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Team high five" class="w-full h-64 object-cover rounded-tl-3xl rounded-br-3xl shadow-md">
-                            <div class="flex flex-col gap-4">
-                                <img src="https://images.unsplash.com/photo-1544717302-de2939b7ef71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Professional Student" class="w-full h-32 object-cover rounded-tr-3xl shadow-md">
-                                <div class="bg-royal-50 rounded-bl-3xl p-6 flex flex-col justify-center items-center text-center shadow-inner h-full">
-                                    <h3 class="text-3xl font-extrabold text-[#031b4e]">12+</h3>
-                                    <p class="text-sm font-semibold text-gray-600">Years of Experience</p>
+                    <!-- Left Images Grid (Redesigned Premium UI) -->
+                    <div class="w-full md:w-1/2 relative flex justify-center items-center py-12 pl-4 lg:pl-12 min-h-[400px]">
+                        
+                        <!-- Background Container (Horizontal Dark Panel) -->
+                        <div class="absolute right-0 top-1/2 -translate-y-1/2 w-[90%] md:w-[85%] h-[260px] bg-[#021438] rounded-[2rem] shadow-2xl flex justify-end items-center pr-8 z-0 overflow-visible border-[6px] border-[#021438]">
+                            <!-- Inner decorative border line -->
+                            <div class="absolute inset-2 border-2 border-gray-400/20 rounded-[1.5rem] pointer-events-none"></div>
+                            
+                            <!-- Inner Box (Stats) -->
+                            <div class="bg-gradient-to-r from-gray-100 to-gray-300 rounded-[1.5rem] p-6 lg:p-8 shadow-xl relative z-10 mr-6 w-[200px] lg:w-[240px]">
+                                <h3 class="text-[#031b4e] text-3xl lg:text-4xl font-black mb-1">12+</h3>
+                                <p class="text-[11px] lg:text-xs font-extrabold text-gray-700 uppercase tracking-widest">Years of<br>Experience</p>
+                                
+                                <!-- Overlapping Arrow Button -->
+                                <div id="about-arrow-btn" class="absolute -right-5 lg:-right-6 top-1/2 -translate-y-1/2 bg-[#021438] border-4 border-gray-300 text-white w-12 h-12 lg:w-14 lg:h-14 rounded-xl flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer z-20">
+                                    <i class="fas fa-arrow-right"></i>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Left Large Vertical Image Frame -->
+                        <div class="relative z-10 w-[240px] lg:w-[280px] h-[320px] lg:h-[380px] bg-gradient-to-br from-gray-200 to-gray-400 p-3 lg:p-4 rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.5)] mr-auto lg:-ml-8">
+                            <div class="w-full h-full rounded-[1.2rem] overflow-hidden relative border border-gray-400/50 bg-gray-200">
+                                <img id="about-main-img" src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Teaching Experience" class="w-full h-full object-cover transition-opacity duration-300">
+                                <!-- Subtle dark overlay to match the premium vibe -->
+                                <div class="absolute inset-0 bg-[#031b4e]/10 mix-blend-multiply pointer-events-none"></div>
+                            </div>
+
+                        </div>
+
+                        <!-- Floating Circular Buttons (Bottom overlapping) -->
+                        <div class="absolute bottom-2 lg:bottom-4 right-[25%] lg:right-[30%] z-20 flex gap-4">
+                            <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-gradient-to-br from-gray-200 to-gray-400 p-1.5 shadow-xl hover:-translate-y-1 transition-transform cursor-pointer">
+                                <div class="w-full h-full rounded-full bg-[#021438] flex items-center justify-center text-gray-300">
+                                    <i class="fas fa-heart text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-gradient-to-br from-gray-200 to-gray-400 p-1.5 shadow-xl hover:-translate-y-1 transition-transform cursor-pointer">
+                                <div class="w-full h-full rounded-full bg-[#021438] flex items-center justify-center text-gray-300">
+                                    <i class="fas fa-bookmark text-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <!-- Right Text Content -->
@@ -333,56 +314,71 @@
         <section class="py-24 bg-gray-50 relative border-t-4 border-gray-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="relative">
-                    <!-- ISO Badge Overlapping (Moved outside of hidden overflow container) -->
-                    <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-xl px-6 py-3 flex items-center gap-3 border-b-4 border-accent-500 z-30">
+                    <!-- ISO Badge Overlapping -->
+                    <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] px-8 py-3 flex items-center gap-3 border-b-4 border-[#fbc043] z-30">
                         <i class="fas fa-certificate text-[#031b4e] text-2xl"></i>
                         <div>
-                            <p class="font-extrabold text-gray-900 text-lg leading-none">ISO</p>
+                            <p class="font-extrabold text-[#031b4e] text-xl leading-none">ISO</p>
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Certified Agency</p>
                         </div>
                     </div>
 
-                    <!-- Glassmorphism Card (Light) -->
-                    <div class="metallic-blue-card rounded-3xl p-8 md:p-16 relative mt-12 md:mt-8">
+                    <!-- Main Blue Container -->
+                    <div class="bg-[#031b4e] rounded-[2.5rem] lg:rounded-[4rem] p-8 md:p-12 lg:p-16 relative mt-12 md:mt-8 shadow-2xl border border-white/10">
 
-                    <div class="flex flex-col md:flex-row gap-12 mt-6 relative z-10">
-                        <!-- Left Column: Title -->
-                        <div class="w-full md:w-1/3">
-                            <span class="text-white font-bold uppercase tracking-wider text-sm mb-2 block flex items-center gap-2">
-                                <span class="w-2 h-2 bg-white rounded-full"></span> Welcome To
-                            </span>
-                            <h2 class="text-4xl md:text-5xl font-extrabold text-white leading-tight">
-                                Warriors<br>
-                                <span class="text-white/80">Educare</span><br>
-                                
-                            </h2>
-                            <div class="w-16 h-1 bg-white mt-6 rounded-full"></div>
-                        </div>
+                        <div class="flex flex-col lg:flex-row gap-12 relative z-10">
+                            <!-- Left Column: Title -->
+                            <div class="w-full lg:w-5/12 flex flex-col justify-center relative">
+                                <span class="text-white/70 font-bold uppercase tracking-[0.2em] text-xs mb-6 flex items-center gap-3">
+                                    <span class="w-2 h-2 bg-[#fbc043] rounded-full shadow-[0_0_8px_#fbc043]"></span> Welcome To
+                                </span>
+                                <h2 class="text-5xl md:text-[4rem] lg:text-[4.5rem] font-black text-white leading-[1.05] tracking-tight uppercase" style="font-family: 'Arial Black', sans-serif;">
+                                    Warriors<br>
+                                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">Educare</span>
+                                </h2>
+                                <div class="w-24 h-1.5 bg-gradient-to-r from-[#fbc043] to-[#fbc043]/20 mt-8 rounded-full"></div>
 
-                        <!-- Right Column: Description -->
-                        <div class="w-full md:w-2/3 flex flex-col justify-center border-l-0 md:border-l border-white/30 md:pl-12">
-                            <p class="text-lg text-white font-bold mb-6">
-                                <strong>Warriors Educare</strong> is an education-focused recruitment and teaching platform that connects <strong>teachers, tutors, schools, educational institutions, students, and parents</strong> through a simple and reliable hiring process.
-                            </p>
-                            <div class="text-white/80 text-sm mb-8 leading-relaxed relative z-10 space-y-4">
-                                <p>Our platform is designed for teachers and education professionals who are looking for the right opportunities. Whether you want to <strong>apply for a teaching job in a school, college, or educational institution</strong>, or you are looking for opportunities as a <strong>tuition teacher or home tutor</strong>, Warriors Educare helps you discover suitable opportunities based on your skills, qualifications, experience, and preferred location.</p>
-                                
-                                <p>At the same time, <strong>schools and educational institutions can use our platform to find and hire qualified teachers and administrative staff</strong> for their academic requirements. We help institutions connect with suitable candidates and make their recruitment process more organized and efficient.</p>
-                                
-                                <p>We also support <strong>tuition and home tutoring requirements</strong>, helping students and parents connect with suitable tutors for different subjects, classes, and learning needs. Tutors can create their profiles, showcase their qualifications and teaching experience, and explore relevant tuition opportunities.</p>
-
-                                <h3 class="text-white font-bold text-lg mt-6 mb-2">Our Purpose</h3>
-                                <p>Our goal is to create a trusted platform where <strong>teachers can find better career and teaching opportunities, schools can find the right teaching talent, and students can connect with suitable tutors</strong>.</p>
-                                
-                                <p>Whether you are a <strong>teacher looking for a school job, a tutor looking for tuition students, a school looking to hire teachers, or a parent/student looking for a tutor</strong>, Warriors Educare brings these opportunities together on one platform.</p>
-                            </div>
-                            <div class="relative z-10">
-                                <a href="#" class="inline-flex items-center gap-2 text-white font-bold hover:text-accent-500 transition-colors group">
-                                    EXPLORE MORE 
-                                    <span class="w-10 h-10 rounded-full bg-accent-500 flex items-center justify-center text-white group-hover:bg-white group-hover:text-accent-500 transition-all">
+                                <!-- "EXPLORE MORE" button styled as a bottom tab like in Image 1 -->
+                                <div class="mt-12 hidden lg:flex items-center gap-4">
+                                    <a href="#" class="inline-flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg border border-white/10">
+                                        EXPLORE MORE
+                                    </a>
+                                    <a href="#" class="w-14 h-14 bg-[#fbc043] hover:bg-[#e5ae3c] rounded-2xl flex items-center justify-center text-[#031b4e] text-xl shadow-lg transition-transform hover:scale-105">
                                         <i class="fas fa-arrow-right"></i>
-                                    </span>
-                                </a>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Overlapping Glass Card -->
+                            <div class="w-full lg:w-7/12">
+                                <!-- This card overlaps the top and right slightly on desktop -->
+                                <div class="bg-gradient-to-br from-white/95 to-gray-50/90 backdrop-blur-2xl rounded-[2rem] lg:rounded-[3rem] p-8 md:p-10 lg:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.3)] border-2 border-white relative z-20 lg:-my-8 lg:-mr-8">
+                                    <h3 class="text-3xl text-[#031b4e] font-black mb-6 tracking-tight">Who we are?</h3>
+                                    <p class="text-lg text-gray-800 font-bold mb-6 leading-relaxed">
+                                        Warriors Educare is an education-focused recruitment and teaching platform that connects teachers, tutors, schools, educational institutions, students, and parents through a simple and reliable hiring process.
+                                    </p>
+                                    <div class="text-gray-600 text-[13px] md:text-[14px] mb-8 leading-relaxed space-y-4">
+                                        <p>Our platform is designed for teachers and education professionals who are looking for the right opportunities. Whether you want to <strong class="text-gray-800">apply for a teaching job in a school, college, or educational institution</strong>, or you are looking for opportunities as a <strong class="text-gray-800">tuition teacher or home tutor</strong>, Warriors Educare helps you discover suitable opportunities based on your skills, qualifications, experience, and preferred location.</p>
+                                        
+                                        <p>At the same time, <strong class="text-gray-800">schools and educational institutions can use our platform to find and hire qualified teachers and administrative staff</strong> for their academic requirements. We help institutions connect with suitable candidates and make their recruitment process more organized and efficient.</p>
+                                        
+                                        <p>We also support <strong class="text-gray-800">tuition and home tutoring requirements</strong>, helping students and parents connect with suitable tutors for different subjects, classes, and learning needs. Tutors can create their profiles, showcase their qualifications and teaching experience, and explore relevant tuition opportunities.</p>
+
+                                        <div class="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 mt-6">
+                                            <h4 class="text-[#031b4e] font-extrabold text-base mb-2">Our Purpose</h4>
+                                            <p class="mb-3">Our goal is to create a trusted platform where <strong class="text-[#031b4e]">teachers can find better career and teaching opportunities, schools can find the right teaching talent, and students can connect with suitable tutors</strong>.</p>
+                                            
+                                            <p>Whether you are a <strong class="text-[#031b4e]">teacher looking for a school job, a tutor looking for tuition students, a school looking to hire teachers, or a parent/student looking for a tutor</strong>, Warriors Educare brings these opportunities together on one platform.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Mobile explore button -->
+                                    <div class="mt-8 flex lg:hidden items-center gap-4">
+                                        <a href="#" class="inline-flex items-center gap-3 bg-[#031b4e] text-white px-6 py-3 rounded-xl font-bold">
+                                            EXPLORE MORE <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -391,39 +387,7 @@
         </div>
         </section>
 
-        <!-- White Gap Divider -->
-        <div class="h-4 lg:h-6 bg-white w-full"></div>
 
-        <!-- Transparent Statistics Section -->
-        <section class="py-6 metallic-blue-card border-t border-white/5">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                    <!-- Stat 1 -->
-                    <div class="text-center group cursor-default">
-                        <h3 class="text-4xl lg:text-5xl font-black text-white mb-2 tracking-tight drop-shadow-md"><span class="stat-number" data-target="500">0</span><span class="text-[#dfa43a]">+</span></h3>
-                        <p class="text-[10px] lg:text-[11px] font-bold text-gray-300 uppercase tracking-widest">Current Openings</p>
-                    </div>
-                    
-                    <!-- Stat 2 -->
-                    <div class="text-center group cursor-default">
-                        <h3 class="text-4xl lg:text-5xl font-black text-white mb-2 tracking-tight drop-shadow-md"><span class="stat-number" data-target="98">0</span><span class="text-[#dfa43a]">%</span></h3>
-                        <p class="text-[10px] lg:text-[11px] font-bold text-gray-300 uppercase tracking-widest">Fulfillment Rate</p>
-                    </div>
-
-                    <!-- Stat 3 -->
-                    <div class="text-center group cursor-default">
-                        <h3 class="text-4xl lg:text-5xl font-black text-white mb-2 tracking-tight drop-shadow-md"><span class="stat-number" data-target="10">0</span>k<span class="text-[#dfa43a]">+</span></h3>
-                        <p class="text-[10px] lg:text-[11px] font-bold text-gray-300 uppercase tracking-widest">Jobs Applied</p>
-                    </div>
-
-                    <!-- Stat 4 -->
-                    <div class="text-center group cursor-default">
-                        <h3 class="text-4xl lg:text-5xl font-black text-white mb-2 tracking-tight drop-shadow-md"><span class="stat-number" data-target="350">0</span><span class="text-[#dfa43a]">+</span></h3>
-                        <p class="text-[10px] lg:text-[11px] font-bold text-gray-300 uppercase tracking-widest">Satisfied Schools</p>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- Simple Footer / CTA Prep -->
         <footer class="bg-white py-12">
@@ -440,15 +404,91 @@
 
     <!-- Categories Section -->
         <section class="py-16 px-6 lg:px-[5%] relative bg-slate-50">
+            <style>
+                .category-card {
+                    background: #1e3a8a; /* Base blue color */
+                    border-radius: 2rem;
+                    position: relative;
+                    z-index: 1;
+                    /* Inner box shadow for depth */
+                    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 10px 30px -10px rgba(0,0,0,0.3);
+                }
+                .category-card::before {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    border-radius: 2rem;
+                    background: inherit;
+                    z-index: -1;
+                    /* Cutout mask for the bottom right corner */
+                    -webkit-mask-image: 
+                        linear-gradient(black, black),
+                        linear-gradient(black, black),
+                        radial-gradient(circle at top left, black 100%, transparent 100%);
+                    -webkit-mask-size: 
+                        100% calc(100% - 75px),
+                        calc(100% - 75px) 100%,
+                        100% 100%;
+                    -webkit-mask-position: 
+                        top left,
+                        top left,
+                        bottom right;
+                    -webkit-mask-repeat: no-repeat;
+                }
+                .category-card-border {
+                    position: absolute;
+                    inset: 0;
+                    border-radius: 2rem;
+                    pointer-events: none;
+                    z-index: 2;
+                    /* We use a path to draw the border tracing the cutout */
+                    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 75px), calc(100% - 75px) calc(100% - 75px), calc(100% - 75px) 100%, 0 100%);
+                    border: 1.5px solid rgba(255,255,255,0.3);
+                }
+                .category-btn {
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    width: 60px;
+                    height: 60px;
+                    background: white;
+                    border-top-left-radius: 1.5rem;
+                    border-bottom-right-radius: 2rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #031b4e;
+                    font-size: 1.25rem;
+                    box-shadow: -5px -5px 15px rgba(0,0,0,0.05);
+                    transition: all 0.3s ease;
+                    z-index: 10;
+                }
+                .category-card:hover .category-btn {
+                    background: #fbc043;
+                    color: white;
+                }
+            </style>
             
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 relative z-10">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 relative z-10">
                 @foreach($categories as $category)
                 <a href="{{ route('category.jobs', $category->id) }}"
-                    class="block metallic-blue-card border-none rounded-xl p-8 text-center text-white transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-pointer group reveal shadow-md flex flex-col items-center justify-center no-underline">
-                    <i class="fas fa-briefcase text-4xl mb-4 block text-white group-hover:scale-110 transition-transform"></i>
-                    <h3 class="text-sm font-semibold mb-4">{{ $category->name }}</h3>
-                    <div class="bg-white text-[#031b4e] px-5 py-2 rounded-full text-xs font-bold inline-block shadow-sm mt-3">
-                        {{ $category->jobs_count }} Active Jobs
+                    class="block category-card p-6 pb-12 text-center text-white transition-transform duration-300 hover:-translate-y-2 cursor-pointer group reveal no-underline overflow-hidden">
+                    
+                    <!-- Inner content wrapper to keep away from cutout -->
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full">
+                        <i class="fas fa-briefcase text-4xl mb-4 text-white/90 group-hover:scale-110 transition-transform"></i>
+                        <h3 class="text-sm md:text-base font-bold mb-4">{{ $category->name }}</h3>
+                        <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-1.5 rounded-full text-[10px] md:text-xs font-bold inline-block">
+                            {{ $category->jobs_count }} Active Jobs
+                        </div>
+                    </div>
+                    
+                    <!-- Border tracing the cutout -->
+                    <div class="category-card-border"></div>
+                    
+                    <!-- Floating Arrow Button -->
+                    <div class="category-btn">
+                        <i class="fas fa-arrow-right"></i>
                     </div>
                 </a>
                 @endforeach
@@ -468,28 +508,59 @@
                 <h2 class="text-4xl lg:text-5xl font-bold text-white">SCHOOLS</h2>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
                 @forelse($services->where('title', '!=', 'Home Tutors') as $index => $service)
-                <div class="relative bg-slate-50 border border-transparent p-8 rounded-3xl transition-all duration-300 hover:-translate-y-6 hover:scale-110 hover:shadow-xl hover:border-[#031b4e]/30 hover:z-50 group flex flex-col items-center text-center reveal overflow-hidden z-10 reveal-delay-{{ ($index % 4) + 1 }}">
+                <div class="relative bg-white rounded-2xl overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.08)] border border-gray-100 flex flex-col group hover:-translate-y-2 transition-transform duration-300 w-full text-left reveal z-10 reveal-delay-{{ ($index % 4) + 1 }}">
                     
-                    <!-- Animated Background Blob -->
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-[#031b4e] rounded-bl-full opacity-0 group-hover:opacity-10 transition-all duration-700 group-hover:scale-[2.5] origin-top-right z-0 pointer-events-none"></div>
+                    <!-- Top Right Dark Blue Background -->
+                    <div class="absolute top-0 right-0 w-[55%] h-[150px] bg-[#031b4e] rounded-bl-[2.5rem] z-0 pointer-events-none transition-all duration-500 group-hover:scale-105 origin-top-right"></div>
 
-                    <!-- Icon Box -->
-                    <div class="relative z-10 w-20 h-20 rounded-3xl bg-[#031b4e] text-white flex items-center justify-center text-3xl mb-5 transition-all duration-500 group-hover:-translate-y-4 group-hover:scale-110 group-hover:shadow-lg group-hover:rotate-12">
-                        <i class="{{ $service->icon }} transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110"></i>
-                    </div>
-                    
-                    <!-- Title -->
-                    <h3 class="relative z-10 text-slate-900 font-extrabold text-lg mb-5 transition-colors duration-300 group-hover:text-[#031b4e]">{{ $service->title }}</h3>
-                    
-                    <!-- Read More Link -->
-                    <a href="{{ route('service.details', $service->slug) }}" class="relative z-10 inline-flex items-center gap-3 text-[#031b4e] font-semibold text-[14px] mt-auto overflow-visible">
-                        <span class="transition-transform duration-500 group-hover:-translate-x-1">Read More</span>
-                        <div class="bg-yellow-500 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 group-hover:translate-x-3 group-hover:bg-[#031b4e] group-hover:text-white group-hover:shadow-lg group-hover:scale-110">
-                            <i class="fas fa-chevron-right text-[10px] transition-transform duration-500 group-hover:translate-x-0.5"></i>
+                    <div class="p-6 relative z-10 flex flex-col flex-grow">
+                        <!-- Top Badges -->
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="bg-[#031b4e] text-white px-4 py-1.5 rounded-full text-[11px] font-bold shadow-md tracking-wide">
+                                SERVICE
+                            </div>
+                            <div class="bg-white text-[#031b4e] px-4 py-1.5 rounded-full text-[11px] font-extrabold shadow-md flex items-center justify-center gap-2">
+                                <i class="{{ $service->icon }} text-[#fbc043]"></i> FEATURED
+                            </div>
                         </div>
-                    </a>
+
+                        <!-- Title -->
+                        <h3 class="text-[#031b4e] font-black text-xl mb-4 pr-12">{{ $service->title }}</h3>
+
+                        <!-- Elevated Box -->
+                        <div class="bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] p-5 mb-2 mt-auto border border-gray-50 relative group-hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)] transition-shadow duration-300">
+                            <div class="flex items-center gap-3 mb-3.5">
+                                <div class="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center text-red-500 text-[9px]">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="text-xs font-bold text-gray-600 truncate">Premium Support</span>
+                            </div>
+                            <div class="flex items-center gap-3 mb-3.5">
+                                <div class="w-5 h-5 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 text-[9px]">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="text-xs font-bold text-gray-600 truncate">Trusted Partner</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 text-[9px]">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="text-xs font-bold text-gray-600 truncate">Quality Assured</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="flex h-[52px] mt-auto">
+                        <div class="w-[45%] bg-[#3b82f6] text-white/90 flex items-center justify-center gap-2 text-[11px] font-bold">
+                            <i class="fas fa-info-circle opacity-60"></i> Details
+                        </div>
+                        <a href="{{ route('service.details', $service->slug) }}" class="w-[55%] bg-[#031b4e] text-white flex items-center justify-center gap-2 text-[12px] font-bold hover:bg-[#021030] transition-colors">
+                            Explore Now <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
                 @empty
                 <div class="col-span-full text-center py-10 opacity-60">
@@ -1078,6 +1149,82 @@
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        // --- Hero Section Image & Text Swap Animation ---
+        const btnHire = document.getElementById('btn-hire');
+        const btnJoin = document.getElementById('btn-join');
+        const mainImg = document.getElementById('main-img');
+        const subImg = document.getElementById('sub-img');
+        const heroTitle = document.getElementById('hero-title');
+        const heroDesc = document.getElementById('hero-desc');
+
+        if (btnHire && btnJoin && mainImg && subImg) {
+            let activeState = 'hire';
+
+            const textContent = {
+                hire: {
+                    title: 'Find the best teachers and private <br>\n                    <div class="relative w-max mt-4 mb-2">\n                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">tutors</span>\n                    </div>',
+                    desc: 'We help you connect with expert teachers and dedicated tutors to ensure the best learning experience for a bright future.'
+                },
+                join: {
+                    title: 'Join our team of expert <br>\n                    <div class="relative w-max mt-4 mb-2">\n                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">educators</span>\n                    </div>',
+                    desc: 'Become a part of our growing community. Teach, mentor, and shape the bright futures of students worldwide.'
+                }
+            };
+
+            const activeBtnClass = "bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] transition shadow-lg flex items-center justify-center";
+            const inactiveBtnClass = "bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 transition border border-gray-200 shadow-sm flex items-center justify-center gap-2";
+
+            heroTitle.style.transition = 'opacity 0.3s ease-in-out';
+            heroDesc.style.transition = 'opacity 0.3s ease-in-out';
+            mainImg.style.transition = 'opacity 0.3s ease-in-out';
+            subImg.style.transition = 'opacity 0.3s ease-in-out';
+
+            function setState(state, event) {
+                if (activeState === state) return;
+                event.preventDefault();
+                activeState = state;
+
+                // Fade out
+                heroTitle.style.opacity = '0';
+                heroDesc.style.opacity = '0';
+                mainImg.style.opacity = '0';
+                subImg.style.opacity = '0';
+
+                // Swap button styles
+                if (state === 'join') {
+                    btnJoin.className = activeBtnClass;
+                    btnJoin.innerHTML = 'Join as a Teacher / Tutor';
+                    
+                    btnHire.className = inactiveBtnClass;
+                    btnHire.innerHTML = 'Hire a Teacher / Tutor <i class="fas fa-arrow-right"></i>';
+                } else {
+                    btnHire.className = activeBtnClass;
+                    btnHire.innerHTML = 'Hire a Teacher / Tutor';
+                    
+                    btnJoin.className = inactiveBtnClass;
+                    btnJoin.innerHTML = 'Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i>';
+                }
+
+                setTimeout(() => {
+                    heroTitle.innerHTML = textContent[state].title;
+                    heroDesc.innerHTML = textContent[state].desc;
+                    
+                    const tempSrc = mainImg.src;
+                    mainImg.src = subImg.src;
+                    subImg.src = tempSrc;
+
+                    heroTitle.style.opacity = '1';
+                    heroDesc.style.opacity = '1';
+                    mainImg.style.opacity = '1';
+                    subImg.style.opacity = '1';
+                }, 300);
+            }
+
+            btnHire.addEventListener('click', (e) => setState('hire', e));
+            btnJoin.addEventListener('click', (e) => setState('join', e));
+        }
+
+        // --- Stats Observer ---
         const stats = document.querySelectorAll('.stat-number');
         
         const observer = new IntersectionObserver((entries) => {
@@ -1117,6 +1264,29 @@
             });
             tuitionNextBtn.addEventListener('click', () => {
                 tuitionSlider.scrollBy({ left: 350, behavior: 'smooth' });
+            });
+        }
+        
+        // About Section Image Swapper
+        const aboutArrowBtn = document.getElementById('about-arrow-btn');
+        const aboutMainImg = document.getElementById('about-main-img');
+        const aboutImages = [
+            'https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1544717302-de2939b7ef71?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
+        ];
+        let aboutImgIndex = 0;
+
+        if (aboutArrowBtn && aboutMainImg) {
+            aboutArrowBtn.addEventListener('click', function() {
+                aboutImgIndex = (aboutImgIndex + 1) % aboutImages.length;
+                aboutMainImg.style.opacity = '0';
+                
+                setTimeout(() => {
+                    aboutMainImg.src = aboutImages[aboutImgIndex];
+                    aboutMainImg.style.opacity = '1';
+                }, 300);
             });
         }
     });
