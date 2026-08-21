@@ -1096,7 +1096,7 @@
         </section>
 
                 <!-- New Contact Us Section -->
-        <section class="py-24 bg-[#f4f7f5] relative overflow-hidden font-sans">
+        <section class="py-24 bg-[#f4f7f5] relative overflow-hidden font-sans" id="contact-us-section">
             <!-- Decorative curved lines background (left) -->
             <svg class="absolute left-[-15%] top-10 w-[50%] h-[120%] z-0 text-[#e6ede8] pointer-events-none opacity-80" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M -50 300 C 50 150, 250 50, 450 -50" stroke="currentColor" stroke-width="35" stroke-linecap="round"/>
@@ -1152,9 +1152,12 @@
                     <!-- Left: Form -->
                     <div class="w-full lg:w-[58%] relative z-10 flex flex-col items-center lg:items-start text-center lg:text-left">
                         <h3 class="text-[26px] font-bold text-[#334155] mb-2">Send Us A Message</h3>
-                        <p class="text-sm text-[#64748b] font-medium mb-10">Our response time is within 30 minutes</p>
+                        <p class="text-sm text-[#64748b] font-medium mb-6">Our response time is within 30 minutes</p>
                         
-                        <form action="{{ route('contact.store') }}" method="POST" class="flex flex-col gap-6 w-full">
+                        <!-- Inline Success / Error Message Box -->
+                        <div id="homeContactMessage" class="hidden w-full mb-6 p-4 rounded-xl text-sm font-semibold transition-all"></div>
+                        
+                        <form action="{{ route('contact.store') }}" method="POST" id="homeContactForm" class="flex flex-col gap-6 w-full">
                             @csrf
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <input type="text" name="name" placeholder="Full Name" class="neu-input w-full text-sm px-6 py-4" required>
@@ -1167,8 +1170,8 @@
                                 <textarea name="message" placeholder="Your Message" class="neu-input w-full text-sm px-6 py-4 resize-none" rows="3" required></textarea>
                             </div>
                             <div class="mt-2">
-                                <button type="submit" class="neu-btn w-full font-bold py-4 text-base flex items-center justify-center gap-2">
-                                    Send Message <i class="far fa-paper-plane"></i>
+                                <button type="submit" id="homeContactBtn" class="neu-btn w-full font-bold py-4 text-base flex items-center justify-center gap-2">
+                                    <span>Send Message</span> <i class="far fa-paper-plane"></i>
                                 </button>
                             </div>
                         </form>
@@ -1366,6 +1369,67 @@
                     aboutMainImg.src = aboutImages[aboutImgIndex];
                     aboutMainImg.style.opacity = '1';
                 }, 300);
+            });
+        }
+
+        // --- Homepage Contact Form AJAX Handler ---
+        const homeContactForm = document.getElementById('homeContactForm');
+        if (homeContactForm) {
+            homeContactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = document.getElementById('homeContactBtn') || this.querySelector('button[type="submit"]');
+                const originalContent = btn.innerHTML;
+                const msgBox = document.getElementById('homeContactMessage');
+                
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> <span>Sending Message...</span>';
+                btn.disabled = true;
+                btn.style.opacity = '0.7';
+
+                if (msgBox) {
+                    msgBox.className = 'hidden w-full mb-6 p-4 rounded-xl text-sm font-semibold transition-all';
+                    msgBox.innerHTML = '';
+                }
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(async (response) => {
+                    const data = await response.json().catch(() => ({}));
+                    if (response.ok && (data.success || response.status === 200)) {
+                        if (msgBox) {
+                            msgBox.className = 'w-full mb-6 p-4 rounded-xl text-sm font-semibold bg-green-100/80 text-green-800 border border-green-300 flex items-center gap-3 shadow-sm';
+                            msgBox.innerHTML = '<i class="fas fa-check-circle text-green-600 text-lg shrink-0"></i> <div><p class="font-bold text-green-900 mb-0.5">Message Sent Successfully!</p><p class="text-xs text-green-800 mb-0">' + (data.message || 'Thank you for contacting us. Our team will get in touch with you within 30 minutes.') + '</p></div>';
+                        }
+                        homeContactForm.reset();
+                    } else {
+                        let errorText = data.message || 'Something went wrong. Please check your inputs and try again.';
+                        if (data.errors) {
+                            const firstErr = Object.values(data.errors)[0];
+                            if (Array.isArray(firstErr)) errorText = firstErr[0];
+                        }
+                        if (msgBox) {
+                            msgBox.className = 'w-full mb-6 p-4 rounded-xl text-sm font-semibold bg-red-100/80 text-red-800 border border-red-300 flex items-center gap-3 shadow-sm';
+                            msgBox.innerHTML = '<i class="fas fa-exclamation-circle text-red-600 text-lg shrink-0"></i> <div><p class="font-bold text-red-900 mb-0.5">Submission Failed</p><p class="text-xs text-red-800 mb-0">' + errorText + '</p></div>';
+                        }
+                    }
+                })
+                .catch((err) => {
+                    console.error('Contact form submission error:', err);
+                    if (msgBox) {
+                        msgBox.className = 'w-full mb-6 p-4 rounded-xl text-sm font-semibold bg-red-100/80 text-red-800 border border-red-300 flex items-center gap-3 shadow-sm';
+                        msgBox.innerHTML = '<i class="fas fa-exclamation-circle text-red-600 text-lg shrink-0"></i> <div><p class="font-bold text-red-900 mb-0.5">Network Error</p><p class="text-xs text-red-800 mb-0">Unable to send message right now. Please try again or contact us directly at +91-8210545286.</p></div>';
+                    }
+                })
+                .finally(() => {
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                });
             });
         }
     });
