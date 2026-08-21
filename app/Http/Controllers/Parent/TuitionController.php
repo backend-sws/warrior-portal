@@ -59,7 +59,13 @@ class TuitionController extends Controller
             'board' => 'required|string|max:255',
             'subjects' => 'required|string|max:255',
             'location' => 'required|string|max:255',
+            'pincode' => 'nullable|string|max:20',
         ]);
+
+        $locationWithPincode = $request->location;
+        if (!empty($request->pincode)) {
+            $locationWithPincode .= ' - Pincode: ' . $request->pincode;
+        }
 
         \App\Models\HomeTuitionLead::create([
             'parent_name' => $request->name,
@@ -67,7 +73,7 @@ class TuitionController extends Controller
             'class' => $request->class,
             'board' => $request->board,
             'subjects' => $request->subjects,
-            'location' => $request->location,
+            'location' => $locationWithPincode,
             'status' => 'New Lead',
             'user_id' => auth()->id(),
         ]);

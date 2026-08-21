@@ -59,13 +59,22 @@
             </div>
         </div>
 
-        <!-- Location -->
-        <div class="mb-6">
-            <label for="location" class="block text-sm font-medium text-gray-700 mb-2">Complete Location <span class="text-red-500">*</span></label>
-            <input type="text" name="location" id="location" placeholder="e.g., Kankarbagh, Patna, Bihar - 800020" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-colors outline-none">
-            @error('location')
-                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
+        <!-- Location and Pincode -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <label for="location" class="block text-sm font-medium text-gray-700 mb-2">Complete Location <span class="text-red-500">*</span></label>
+                <input type="text" name="location" id="location" placeholder="e.g., Kankarbagh, Patna, Bihar" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-colors outline-none">
+                @error('location')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div>
+                <label for="pincode" class="block text-sm font-medium text-gray-700 mb-2">Pincode <span class="text-red-500">*</span></label>
+                <input type="text" name="pincode" id="pincode" placeholder="e.g. 800020" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-colors outline-none">
+                @error('pincode')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
 
         <!-- Description -->

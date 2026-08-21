@@ -164,7 +164,7 @@
                     class="text-primary hover:underline">warriorseducare@gmail.com</a>
             </p>
             <p class="text-text-secondary leading-7 mb-2"> Phone:
-                <a href="tel:+917070938975" class="text-primary hover:underline">+91 7070938975</a>
+                <a href="tel:+918210545286" class="text-primary hover:underline">+91 8210545286</a>
             </p>
             <p class="text-text-secondary leading-7 mb-4"> Website:
                 <a href="https://www.warriorseducare.in" target="_blank" rel="noopener noreferrer"

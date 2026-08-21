@@ -194,8 +194,8 @@ Email:
 
 <p class="text-text-secondary leading-7">
 Phone:
-<a href="tel:+917070938975" class="text-primary hover:underline">
-    +91 7070938975
+<a href="tel:+918210545286" class="text-primary hover:underline">
+    +91 8210545286
 </a>
 </p>
 

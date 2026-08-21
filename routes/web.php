@@ -7,6 +7,8 @@ Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('h
 Route::post('/tuition/post', [App\Http\Controllers\HomeController::class, 'storeTuition'])->name('tuition.post');
 Route::get('/jobs', [\App\Http\Controllers\HomeController::class, 'jobs'])->name('jobs');
 Route::get('/tuitions', [\App\Http\Controllers\HomeController::class, 'tuitions'])->name('tuitions');
+Route::get('/tutors/search', [\App\Http\Controllers\TutorSearchController::class, 'search'])->name('tutors.search');
+Route::post('/tutors/request-demo', [\App\Http\Controllers\TutorSearchController::class, 'requestDemo'])->name('tutors.requestDemo');
 Route::get('/jobs/{job}', [\App\Http\Controllers\JobController::class, 'show'])->name('jobs.show');
 Route::get('/category/{id}/jobs', [\App\Http\Controllers\HomeController::class, 'categoryJobs'])->name('category.jobs');
 
@@ -133,6 +135,7 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
     Route::get('/registration', [\App\Http\Controllers\Candidate\RegistrationController::class, 'show'])->name('registration.show');
     Route::get('/service-charge', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'show'])->name('serviceCharge.show');
     Route::get('/service-charge/invoice/{id}/pdf', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'downloadInvoicePdf'])->name('serviceCharge.invoicePdf');
+    Route::get('/service-charge/checkout/{id}', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'checkout'])->name('serviceCharge.checkout');
     Route::post('/service-charge/pay', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'process'])->name('serviceCharge.pay');
     Route::match(['get', 'post'], '/service-charge/callback', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'callback'])->name('serviceCharge.callback');
     Route::view('/additional-feature', 'candidate.aditionalFeature.show')->name('aditionalFeature.show');
@@ -288,3 +291,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class)->except(['create', 'show', 'edit']);
     Route::resource('clients', \App\Http\Controllers\Admin\ClientLogoController::class)->except(['create', 'show', 'edit'])->parameters(['clients' => 'clientLogo']);
 });
+Route::post('/submit-tuition-request', [\App\Http\Controllers\FrontendLeadController::class, 'storeTuitionLead'])->name('submit-tuition-request');

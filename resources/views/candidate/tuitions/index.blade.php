@@ -47,7 +47,7 @@
         
         <div id="printableTuitionAgreement" class="p-8 overflow-y-auto custom-scrollbar text-[#031b4e]/80 text-sm relative">
             <!-- Watermark Image -->
-            <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="watermark-img" alt="Watermark" style="position: absolute; top: 25%; left: 20%; width: 60%; opacity: 0.1; z-index: 0; pointer-events: none;">
+            <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="watermark-img" alt="Watermark" style="position: absolute; top: 65%; left: 50%; transform: translateX(-50%); width: 60%; max-width: 500px; opacity: 0.1; z-index: 0; pointer-events: none;">
 
             <div class="text-center mb-6 relative z-10 border-b-2 border-[#031b4e] pb-4">
                 <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" alt="Warriors Educare Logo" style="max-height: 80px; margin: 0 auto 10px auto;">

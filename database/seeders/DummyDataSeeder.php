@@ -23,8 +23,29 @@ use Carbon\Carbon;
 
 class DummyDataSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
+        $subject1 = \App\Models\Subject::firstOrCreate(['name' => 'Mathematics']);
+        $subject2 = \App\Models\Subject::firstOrCreate(['name' => 'Biology']);
+        $subject3 = \App\Models\Subject::firstOrCreate(['name' => 'Science']);
+
+        // Create Tutors
+        $user1 = \App\Models\User::firstOrCreate(['email' => 'rahul@example.com'], ['name' => 'Rahul Kumar', 'role' => 'candidate', 'password' => bcrypt('password'), 'is_active' => 1]);
+        \App\Models\CandidateProfile::updateOrCreate(['user_id' => $user1->id], ['address' => 'Kumhrar Sandalpur Rd, Patna - 800001', 'experience_years' => 5, 'subject_id' => $subject1->id, 'is_profile_complete' => 1, 'is_verified' => 1]);
+
+        $user2 = \App\Models\User::firstOrCreate(['email' => 'aman@example.com'], ['name' => 'Aman Singh', 'role' => 'candidate', 'password' => bcrypt('password'), 'is_active' => 1]);
+        \App\Models\CandidateProfile::updateOrCreate(['user_id' => $user2->id], ['address' => 'Kankarbagh, Patna - 800020', 'experience_years' => 3, 'subject_id' => $subject1->id, 'is_profile_complete' => 1, 'is_verified' => 1]);
+
+        $user3 = \App\Models\User::firstOrCreate(['email' => 'priya@example.com'], ['name' => 'Priya Sharma', 'role' => 'candidate', 'password' => bcrypt('password'), 'is_active' => 1]);
+        \App\Models\CandidateProfile::updateOrCreate(['user_id' => $user3->id], ['address' => 'Boring Road, Patna - 800001', 'experience_years' => 7, 'subject_id' => $subject2->id, 'is_profile_complete' => 1, 'is_verified' => 1]);
+
+        // Update Tuition Leads
+        $leads = \App\Models\HomeTuitionLead::take(4)->get();
+        if(isset($leads[0])) $leads[0]->update(['location' => 'Patna, Bihar - Pincode: 800001', 'subjects' => 'Mathematics']);
+        if(isset($leads[1])) $leads[1]->update(['location' => 'Sardar Patel Colony, Patna - Pincode: 800020', 'subjects' => 'Biology']);
+        if(isset($leads[2])) $leads[2]->update(['location' => 'Kumhrar, Patna - Pincode: 800001', 'subjects' => 'Science, Math']);
+        if(isset($leads[3])) $leads[3]->update(['location' => 'Kankarbagh, Patna - Pincode: 800020', 'subjects' => 'All Subjects']);
+        
         // 1. Categories
         $categories = [
             'PRT',

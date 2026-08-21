@@ -303,7 +303,7 @@
     <header id="main-header"
         class="!fixed top-[48px] left-1/2 -translate-x-1/2 w-[95%] max-w-7xl px-2 lg:px-6 py-1.5 flex justify-between items-center z-[100] transition-all duration-500 bg-white/95 backdrop-blur-lg border border-gray-200 shadow-[0_4px_30px_rgba(0,0,0,0.1)] rounded-full">
         <!-- White pill background for logo -->
-        <a href="#" class="flex items-center no-underline py-1.5 px-6 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.2)] z-10 mr-4">
+        <a href="<?php echo e(route('home')); ?>" onclick="sessionStorage.removeItem('welcomeShown');" class="flex items-center no-underline py-1.5 px-6 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.2)] z-10 mr-4">
             <img src="<?php echo e(asset('adobe.png')); ?>" alt="Warriors Educare Logo" class="h-10 lg:h-12 logo-img transition-all duration-300">
         </a>
         <nav class="hidden lg:flex items-center gap-4 xl:gap-6">
@@ -523,40 +523,45 @@
                 <ul class="flex flex-col gap-5 text-[13px] text-gray-600 font-semibold mt-4">
                     <li class="flex items-start gap-3 group">
                         <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-phone-alt text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
-                        <span class="mt-1">+1 123 456 7890</span>
+                        <span class="mt-1">8210545286</span>
                     </li>
                     <li class="flex items-start gap-3 group">
                         <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-map-marker-alt text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
-                        <span class="mt-1">421 Allen, Mexico 4233</span>
+                        <span class="mt-1">patna Kumhrar sandalpur rd sardar patel colony</span>
                     </li>
                     <li class="flex items-start gap-3 group">
                         <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-envelope text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
-                        <span class="mt-1">staffingagency@com</span>
+                        <span class="mt-1">support@warriorseducare.com</span>
                     </li>
                     <li class="flex items-start gap-3 group">
                         <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-globe text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
-                        <span class="mt-1">staffingagency.com</span>
+                        <span class="mt-1">warriorseducare.com</span>
                     </li>
                 </ul>
             </div>
         </div>
 
-        <div class="max-w-[1200px] mx-auto px-6 border-t border-gray-300 pt-6 text-center text-[13px] text-gray-500 font-medium relative z-10">
-            &copy; Copyright 2024 - Warriors Educare. All Right Reserved
+        <div class="max-w-[1200px] mx-auto px-6 border-t border-gray-300 pt-6 pb-2 text-center text-[13px] text-gray-500 font-medium relative z-10">
+            <div>&copy; Copyright 2024 - Warriors Educare. All Right Reserved</div>
+            <div class="mt-1 text-xs opacity-80">Designed By: Startup Web Support</div>
         </div>
     </footer>
 
     <!-- FABs -->
-    <div class="fixed right-6 bottom-6 flex flex-col gap-3 z-[999]">
-        <a href="tel:+917070938975" title="Call Us"
-            class="w-12 h-12 rounded-full flex items-center justify-center text-text-main text-lg no-underline shadow-lg transition-all duration-300 hover:scale-110 hover:-translate-y-1 bg-accent-blue"><i
-                class="fas fa-phone-alt"></i></a>
-        <a href="https://wa.me/917070938975" target="_blank" title="WhatsApp Us"
-            class="w-12 h-12 rounded-full flex items-center justify-center text-text-main text-xl no-underline shadow-lg transition-all duration-300 hover:scale-110 hover:-translate-y-1 bg-[#25D366]"><i
-                class="fab fa-whatsapp"></i></a>
+    <div class="fixed right-6 bottom-6 flex flex-col gap-4 z-[999]">
+        <a href="tel:+918210545286" title="Call Us"
+            class="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl no-underline transition-all duration-300 hover:scale-110 active:scale-95 active:translate-y-1 bg-gradient-to-b from-blue-400 to-blue-600 shadow-[0_8px_20px_rgba(37,99,235,0.4),inset_0_-4px_0_rgba(0,0,0,0.2),inset_0_2px_0_rgba(255,255,255,0.4)] relative">
+            <i class="fas fa-phone-alt relative z-10" style="filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));"></i>
+        </a>
+        <a href="https://wa.me/918210545286" target="_blank" title="WhatsApp Us"
+            class="w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl no-underline transition-all duration-300 hover:scale-110 active:scale-95 active:translate-y-1 bg-gradient-to-b from-[#4CE476] to-[#128C7E] shadow-[0_8px_20px_rgba(37,211,102,0.4),inset_0_-4px_0_rgba(0,0,0,0.2),inset_0_2px_0_rgba(255,255,255,0.4)] relative">
+            <i class="fab fa-whatsapp relative z-10" style="filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));"></i>
+        </a>
         <a href="#" title="Scroll to Top"
-            class="w-12 h-12 rounded-full flex items-center justify-center text-text-main text-lg no-underline shadow-lg transition-all duration-300 hover:scale-110 hover:-translate-y-1 bg-accent-blue"
-            onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"><i class="fas fa-chevron-up"></i></a>
+            class="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg no-underline shadow-lg transition-all duration-300 hover:scale-110 hover:-translate-y-1 bg-slate-800 self-end mr-1"
+            onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;">
+            <i class="fas fa-chevron-up"></i>
+        </a>
     </div>
 
     <!-- Scripts -->

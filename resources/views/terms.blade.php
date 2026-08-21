@@ -409,7 +409,7 @@
             </p>
 
             <p class="text-text-secondary leading-7">
-                Phone: +91 7070938975
+                Phone: +91 8210545286
             </p>
 
             <p class="text-text-secondary leading-7">

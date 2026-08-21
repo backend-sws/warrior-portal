@@ -12,7 +12,12 @@
             font-size: 13px;
         }
         .watermark {
-            display: none;
+            position: absolute;
+            top: 30%;
+            left: 25%;
+            width: 50%;
+            opacity: 0.1;
+            z-index: -100;
         }
         .header {
             width: 100%;
@@ -126,17 +131,21 @@
     </style>
 </head>
 <body>
+    @php
+        $logoPath = public_path('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg');
+        $logoBase64 = file_exists($logoPath) ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+    @endphp
 
-    @if(file_exists(public_path('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg')))
-        <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="watermark" alt="Watermark">
+    @if($logoBase64)
+        <img src="{{ $logoBase64 }}" class="watermark" alt="Watermark">
     @endif
 
     <div class="header">
         <table>
             <tr>
                 <td>
-                    @if(file_exists(public_path('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg')))
-                        <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="logo" alt="Warriors Educare Logo">
+                    @if($logoBase64)
+                        <img src="{{ $logoBase64 }}" class="logo" alt="Warriors Educare Logo">
                     @else
                         <h2 style="color: #031b4e; margin:0;">Warriors Educare</h2>
                     @endif

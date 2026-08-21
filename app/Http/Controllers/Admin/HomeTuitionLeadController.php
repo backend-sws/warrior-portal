@@ -297,13 +297,14 @@ class HomeTuitionLeadController extends Controller
         }
 
         $lead->is_finally_appointed = true;
+        $lead->status = 'Confirmed';
         $lead->save();
 
         $lead->followUps()->create([
             'admin_id' => auth()->id(),
-            'note' => "Teacher documents uploaded and teacher is finally appointed.",
+            'note' => "Final appointment completed and documents uploaded. Lead status set to Confirmed.",
         ]);
 
-        return redirect()->back()->with('success', 'Teacher documents uploaded and appointment finalized successfully.');
+        return redirect()->back()->with('success', 'Documents uploaded and appointment finalized successfully.');
     }
 }

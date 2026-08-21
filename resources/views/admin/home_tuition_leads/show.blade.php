@@ -248,7 +248,7 @@
             </div>
             
             <div class="p-6">
-                @if($lead->status === 'Confirmed' || $lead->is_finally_appointed)
+                @if($lead->teacher_name || $lead->teacher_contact || $lead->is_finally_appointed)
                     <form action="{{ route('admin.tuition-leads.upload-documents', $lead->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -288,14 +288,14 @@
                         
                         <div class="pt-4 border-t border-card-border flex justify-end">
                             <button type="submit" class="bg-accent-blue hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors shadow">
-                                <i class="fas fa-upload mr-1"></i> Upload & Finalize Appointment
+                                <i class="fas fa-check-circle mr-1"></i> Final Appoint
                             </button>
                         </div>
                     </form>
                 @else
                     <div class="text-center py-6 bg-secondary-bg rounded-xl border border-dashed border-card-border text-sm text-text-dark/50">
                         <i class="fas fa-lock text-2xl mb-2 text-text-dark/30 block"></i>
-                        You can upload documents and finalize appointment only when the lead status is <strong>Confirmed</strong>.
+                        You can upload documents and make the final appointment only after a <strong>Teacher is Assigned</strong>.
                     </div>
                 @endif
             </div>

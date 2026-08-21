@@ -88,22 +88,22 @@
     </style>
 </head>
 <body>
-    @php
+    <?php
         $logoPath = public_path('adobe.png');
         $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
-    @endphp
+    ?>
 
-    @if($logoBase64)
+    <?php if($logoBase64): ?>
         <!-- Watermark -->
-        <img src="{{ $logoBase64 }}" alt="Watermark" class="watermark">
-    @endif
+        <img src="<?php echo e($logoBase64); ?>" alt="Watermark" class="watermark">
+    <?php endif; ?>
 
     <div class="header">
-        @if($logoBase64)
-            <img src="{{ $logoBase64 }}" alt="Warriors Educare Logo" class="logo">
-        @else
+        <?php if($logoBase64): ?>
+            <img src="<?php echo e($logoBase64); ?>" alt="Warriors Educare Logo" class="logo">
+        <?php else: ?>
             <h2>Warriors Educare</h2>
-        @endif
+        <?php endif; ?>
         <h1>PAYMENT INVOICE</h1>
         <p>Warriors Educare</p>
     </div>
@@ -112,14 +112,14 @@
         <tr>
             <td>
                 <h3>Invoice To:</h3>
-                <p><strong>Name:</strong> {{ $user->name }}</p>
-                <p><strong>Email:</strong> {{ $user->email }}</p>
-                <p><strong>Phone:</strong> {{ $user->phone ?? 'N/A' }}</p>
+                <p><strong>Name:</strong> <?php echo e($user->name); ?></p>
+                <p><strong>Email:</strong> <?php echo e($user->email); ?></p>
+                <p><strong>Phone:</strong> <?php echo e($user->phone ?? 'N/A'); ?></p>
             </td>
             <td>
                 <h3>Payment Details:</h3>
-                <p><strong>Transaction ID:</strong> {{ $transaction->transaction_id }}</p>
-                <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($transaction->created_at)->format('d F Y, h:i A') }}</p>
+                <p><strong>Transaction ID:</strong> <?php echo e($transaction->transaction_id); ?></p>
+                <p><strong>Date:</strong> <?php echo e(\Carbon\Carbon::parse($transaction->created_at)->format('d F Y, h:i A')); ?></p>
                 <p><strong>Status:</strong> Successful</p>
             </td>
         </tr>
@@ -136,12 +136,12 @@
         <tbody>
             <tr>
                 <td>Warriors Educare Platform Subscription / Service Fee</td>
-                <td>{{ ucwords(str_replace('_', ' ', $transaction->type ?? 'Registration Fee')) }}</td>
-                <td class="amount-col">Rs. {{ number_format($transaction->amount, 2) }}</td>
+                <td><?php echo e(ucwords(str_replace('_', ' ', $transaction->type ?? 'Registration Fee'))); ?></td>
+                <td class="amount-col">Rs. <?php echo e(number_format($transaction->amount, 2)); ?></td>
             </tr>
             <tr class="total-row">
                 <td colspan="2" style="text-align: right;">Total Amount Paid</td>
-                <td class="amount-col">Rs. {{ number_format($transaction->amount, 2) }}</td>
+                <td class="amount-col">Rs. <?php echo e(number_format($transaction->amount, 2)); ?></td>
             </tr>
         </tbody>
     </table>
@@ -156,3 +156,4 @@
 
 
 
+<?php /**PATH D:\warrior-portal\resources\views/candidate/payment/invoice.blade.php ENDPATH**/ ?>

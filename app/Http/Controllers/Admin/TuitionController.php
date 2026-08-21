@@ -29,9 +29,17 @@ class TuitionController extends Controller
             'board' => 'required|string|max:255',
             'subjects' => 'required|string|max:255',
             'location' => 'required|string|max:255',
+            'pincode' => 'required|string|max:20',
             'budget' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
+
+        $locationWithPincode = $validated['location'];
+        if (!empty($validated['pincode'])) {
+            $locationWithPincode .= ' - Pincode: ' . $validated['pincode'];
+        }
+        $validated['location'] = $locationWithPincode;
+        unset($validated['pincode']);
 
         // Admin posts on their own behalf or as a default employer
         $validated['employer_id'] = auth()->id();

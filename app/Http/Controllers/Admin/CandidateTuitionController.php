@@ -51,17 +51,16 @@ class CandidateTuitionController extends Controller
         $candidate = User::with('profile')->findOrFail($candidateId);
         $lead = HomeTuitionLead::findOrFail($request->lead_id);
 
-        // Update the lead with teacher info and set to Confirmed
+        // Update the lead with teacher info but do not confirm until final appointment
         $lead->update([
             'teacher_name'    => $candidate->name,
             'teacher_contact' => $candidate->phone,
-            'status'          => 'Confirmed',
         ]);
 
         // Add a follow-up note
         $lead->followUps()->create([
             'admin_id'   => auth()->id(),
-            'note'       => "Candidate \"{$candidate->name}\" (Ph: {$candidate->phone}) appointed as tutor. Status set to Confirmed. Pending final admin approval.",
+            'note'       => "Candidate \"{$candidate->name}\" (Ph: {$candidate->phone}) appointed as tutor. Pending final appointment and document upload.",
             'follow_up_date' => now()->addDays(1)->toDateString(),
         ]);
 
