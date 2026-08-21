@@ -1,4 +1,4 @@
-{{-- Candidate Dashboard Navigation --}}
+
 <div class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.03)] sticky z-30 transition-all duration-300" style="top: 112px;">
     <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 relative flex items-center">
         
@@ -13,7 +13,7 @@
 
         <!-- Scrollable Navigation Container -->
         <div id="candidateNavScroll" class="flex items-center justify-between gap-3 py-2.5 overflow-x-auto hide-scrollbar scroll-smooth w-full px-1">
-            @php
+            <?php
                 $appCount = auth()->user()->applications()->count();
                 $navItems = [
                     ['route' => 'candidate.dashboard', 'routeIs' => 'candidate.dashboard', 'icon' => 'fa-th-large', 'label' => 'Dashboard'],
@@ -26,35 +26,36 @@
                     ['route' => 'candidate.serviceCharge.show', 'routeIs' => 'candidate.servicecharge.*', 'icon' => 'fa-file-invoice-dollar', 'label' => 'Service Charge'],
                     ['route' => 'candidate.aditionalFeature.show', 'routeIs' => 'candidate.aditional.*', 'icon' => 'fa-puzzle-piece', 'label' => 'Additional Features'],
                 ];
-            @endphp
+            ?>
 
             <div class="flex items-center gap-1.5 sm:gap-2 flex-nowrap shrink-0">
-                @foreach($navItems as $item)
-                    @php $isActive = request()->routeIs($item['routeIs']); @endphp
-                    <a href="{{ route($item['route']) }}" 
-                       class="relative px-3.5 py-2 rounded-xl text-xs sm:text-[13px] font-bold flex items-center gap-2 transition-all duration-200 whitespace-nowrap group shrink-0 {{ $isActive ? 'candidate-nav-active bg-[#031b4e] text-white shadow-md shadow-[#031b4e]/20' : 'text-slate-600 hover:text-[#031b4e] hover:bg-slate-100/90' }}">
+                <?php $__currentLoopData = $navItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $isActive = request()->routeIs($item['routeIs']); ?>
+                    <a href="<?php echo e(route($item['route'])); ?>" 
+                       class="relative px-3.5 py-2 rounded-xl text-xs sm:text-[13px] font-bold flex items-center gap-2 transition-all duration-200 whitespace-nowrap group shrink-0 <?php echo e($isActive ? 'candidate-nav-active bg-[#031b4e] text-white shadow-md shadow-[#031b4e]/20' : 'text-slate-600 hover:text-[#031b4e] hover:bg-slate-100/90'); ?>">
                         
-                        @if($item['route'] === 'candidate.profile.edit' && auth()->user()->profile?->profile_photo_path)
-                            <img src="{{ asset('storage/' . auth()->user()->profile->profile_photo_path) }}" alt="Profile"
-                                class="w-4 h-4 rounded-full object-cover border {{ $isActive ? 'border-white' : 'border-slate-300' }}">
-                        @else
-                            <i class="fas {{ $item['icon'] }} text-xs {{ $isActive ? 'text-[#fbc043]' : 'text-slate-400 group-hover:text-[#031b4e]' }} transition-colors"></i>
-                        @endif
+                        <?php if($item['route'] === 'candidate.profile.edit' && auth()->user()->profile?->profile_photo_path): ?>
+                            <img src="<?php echo e(asset('storage/' . auth()->user()->profile->profile_photo_path)); ?>" alt="Profile"
+                                class="w-4 h-4 rounded-full object-cover border <?php echo e($isActive ? 'border-white' : 'border-slate-300'); ?>">
+                        <?php else: ?>
+                            <i class="fas <?php echo e($item['icon']); ?> text-xs <?php echo e($isActive ? 'text-[#fbc043]' : 'text-slate-400 group-hover:text-[#031b4e]'); ?> transition-colors"></i>
+                        <?php endif; ?>
 
-                        <span>{{ $item['label'] }}</span>
+                        <span><?php echo e($item['label']); ?></span>
 
-                        @if(isset($item['badge']))
-                            <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold {{ $isActive ? 'bg-white/20 text-white' : 'bg-blue-100 text-[#031b4e]' }}">
-                                {{ $item['badge'] }}
+                        <?php if(isset($item['badge'])): ?>
+                            <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold <?php echo e($isActive ? 'bg-white/20 text-white' : 'bg-blue-100 text-[#031b4e]'); ?>">
+                                <?php echo e($item['badge']); ?>
+
                             </span>
-                        @endif
+                        <?php endif; ?>
                     </a>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
             <div class="flex items-center gap-2 ml-auto shrink-0 pl-3 border-l border-slate-200">
-                <form action="{{ route('logout') }}" method="POST" class="shrink-0">
-                    @csrf
+                <form action="<?php echo e(route('logout')); ?>" method="POST" class="shrink-0">
+                    <?php echo csrf_field(); ?>
                     <button type="submit"
                         class="px-3 py-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all flex items-center gap-1.5 text-xs font-bold whitespace-nowrap border border-transparent hover:border-red-100">
                         <i class="fas fa-sign-out-alt text-xs"></i> 
@@ -158,3 +159,4 @@
 
 
 
+<?php /**PATH C:\Users\Employee\Desktop\warrioredu\resources\views/candidate/partials/nav.blade.php ENDPATH**/ ?>

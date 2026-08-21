@@ -1211,17 +1211,17 @@
                         <h3 class="text-[26px] font-bold text-[#334155] mb-2">Send Us A Message</h3>
                         <p class="text-sm text-[#64748b] font-medium mb-10">Our response time is within 30 minutes</p>
                         
-                        <form action="#" method="POST" class="flex flex-col gap-6 w-full">
+                        <form action="<?php echo e(route('contact.store')); ?>" method="POST" class="flex flex-col gap-6 w-full">
+                            <?php echo csrf_field(); ?>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <input type="text" placeholder="First Name" class="neu-input w-full text-sm px-6 py-4">
-                                <input type="text" placeholder="Last Name" class="neu-input w-full text-sm px-6 py-4">
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <input type="tel" placeholder="Phone Number" class="neu-input w-full text-sm px-6 py-4">
-                                <input type="email" placeholder="Email Address" class="neu-input w-full text-sm px-6 py-4">
+                                <input type="text" name="name" placeholder="Full Name" class="neu-input w-full text-sm px-6 py-4" required>
+                                <input type="email" name="email" placeholder="Email Address" class="neu-input w-full text-sm px-6 py-4">
                             </div>
                             <div class="relative">
-                                <input type="text" placeholder="Service Type" class="neu-input w-full text-sm px-6 py-4">
+                                <input type="tel" name="phone" placeholder="Phone Number" class="neu-input w-full text-sm px-6 py-4" required>
+                            </div>
+                            <div class="relative">
+                                <textarea name="message" placeholder="Your Message" class="neu-input w-full text-sm px-6 py-4 resize-none" rows="3" required></textarea>
                             </div>
                             <div class="mt-2">
                                 <button type="submit" class="neu-btn w-full font-bold py-4 text-base flex items-center justify-center gap-2">
@@ -1430,4 +1430,4 @@
 <?php $__env->stopPush(); ?>
 
 
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\warrior-portal\resources\views/welcome.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Employee\Desktop\warrioredu\resources\views/welcome.blade.php ENDPATH**/ ?>

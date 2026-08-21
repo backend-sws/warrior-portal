@@ -1,36 +1,34 @@
-@extends('layouts.app')
+<?php $__env->startSection('content'); ?>
+<?php echo $__env->make('candidate.partials.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-@section('content')
-@include('candidate.partials.nav')
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-<div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
-
-    {{-- Page Header --}}
-    <div class="text-center mb-6 sm:mb-8 reveal">
-        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-xl sm:text-2xl mx-auto mb-3 sm:mb-4">
+    
+    <div class="text-center mb-8 reveal">
+        <div class="w-14 h-14 rounded-2xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-2xl mx-auto mb-4">
             <i class="fas fa-file-contract"></i>
         </div>
-        <h1 class="text-xl sm:text-2xl font-bold text-[#031b4e]">Candidate Agreement</h1>
-        <p class="text-xs sm:text-sm text-[#031b4e]/70 mt-1.5 max-w-md mx-auto">Please read the terms and conditions carefully and provide your digital signature below.</p>
+        <h1 class="text-2xl font-bold text-[#031b4e]">Candidate Agreement</h1>
+        <p class="text-sm text-[#031b4e]/60 mt-2 max-w-md mx-auto">Please read the terms and conditions carefully and provide your digital signature below.</p>
     </div>
 
-    @if(session('error'))
-        <div class="mb-5 sm:mb-6 bg-red-500/10 border border-red-500/30 p-3.5 sm:p-4 rounded-xl flex items-center gap-3 justify-center reveal">
-            <i class="fas fa-exclamation-circle text-red-500 text-sm sm:text-base"></i>
-            <span class="text-xs sm:text-sm text-red-700 font-medium">{{ session('error') }}</span>
+    <?php if(session('error')): ?>
+        <div class="mb-6 bg-red-500/10 border border-red-500/30 p-4 rounded-xl flex items-center gap-3 justify-center reveal">
+            <i class="fas fa-exclamation-circle text-red-400"></i>
+            <span class="text-sm text-red-400 font-medium"><?php echo e(session('error')); ?></span>
         </div>
-    @endif
+    <?php endif; ?>
 
-    {{-- Agreement Card --}}
-    <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 overflow-hidden shadow-sm reveal reveal-delay-1 bg-white">
+    
+    <div class="light-metallic-blue-card rounded-2xl border-0 overflow-hidden shadow-xl reveal reveal-delay-1">
 
-        {{-- Terms Section --}}
-        <div class="p-4 sm:p-6 md:p-8 border-b border-[#031b4e]/10">
-            <div class="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-5">
+        
+        <div class="p-6 md:p-8 border-b border-[#031b4e]/10">
+            <div class="flex items-center gap-3 mb-5">
                 <span class="w-8 h-8 rounded-lg bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-xs"><i class="fas fa-scroll"></i></span>
-                <h2 class="text-base sm:text-lg font-bold text-[#031b4e]">Terms and Conditions</h2>
+                <h2 class="text-lg font-bold text-[#031b4e]">Terms and Conditions</h2>
             </div>
-            <div class="h-96 overflow-y-auto pr-2 sm:pr-4 text-xs sm:text-sm text-[#031b4e]/80 space-y-3 sm:space-y-4 custom-scrollbar bg-slate-50 rounded-xl p-4 sm:p-6 border border-slate-200">
+            <div class="h-96 overflow-y-auto pr-4 text-sm text-[#031b4e]/80 space-y-4 custom-scrollbar bg-[#f4f7f5]/30 rounded-xl p-6 border border-[#031b4e]/10">
                 <h4 class="font-bold text-[#031b4e] mb-4 text-center">TEACHER PLACEMENT SERVICE AGREEMENT</h4>
                 
                 <p class="mb-4">This Agreement is entered into voluntarily between Warriors Educare ("Agency") and the undersigned Candidate ("Teacher").</p>
@@ -107,7 +105,7 @@
 
                 <h4 class="font-bold text-[#031b4e] mb-4 text-center">DECLARATION & ACCEPTANCE</h4>
                 <div class="bg-white p-5 rounded-lg border border-[#031b4e]/10 space-y-3 text-sm">
-                    <p>I, <strong>{{ $user->name }}</strong>, hereby solemnly declare that I have thoroughly read, understood, and willingly accepted all the terms and conditions stated in this document of Warriors Educare.</p>
+                    <p>I, <strong><?php echo e($user->name); ?></strong>, hereby solemnly declare that I have thoroughly read, understood, and willingly accepted all the terms and conditions stated in this document of Warriors Educare.</p>
                     <p>I confirm that all personal, academic, and professional details provided by me are true, accurate, and complete. I understand that any false or misleading information may result in immediate cancellation of my registration without any refund.</p>
                     <p>I hereby agree to pay a service/registration fee of <strong>₹ 1000 (Rupees One Thousand only)</strong> to Warriors Educare, as mutually agreed, for availing recruitment and placement assistance services.</p>
                     <p>I clearly acknowledge and accept that the aforesaid amount is non-refundable under any circumstances once paid, irrespective of selection, joining, delay, or personal decision.</p>
@@ -121,8 +119,8 @@
             </div>
         </div>
 
-        {{-- Signature Section --}}
-        @if($profile->is_agreement_signed)
+        
+        <?php if($profile->is_agreement_signed): ?>
             <div class="p-6 md:p-8 bg-green-500/5">
                 <div class="flex items-start gap-4">
                     <div class="w-12 h-12 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xl flex-shrink-0">
@@ -133,65 +131,67 @@
                         <p class="text-sm text-[#031b4e]/70 mb-6">You have accepted the terms and conditions.</p>
                         
                         <div class="flex flex-col sm:flex-row gap-6 mb-6">
-                            {{-- Digital Signature --}}
+                            
                             <div class="bg-white border border-[#031b4e]/10 rounded-xl p-5 flex-1">
                                 <h4 class="text-xs font-semibold text-[#031b4e]/50 uppercase tracking-wider mb-3">
-                                    {{ $profile->signature_data ? 'Your Digital Signature' : 'Agreement Status' }}
+                                    <?php echo e($profile->signature_data ? 'Your Digital Signature' : 'Agreement Status'); ?>
+
                                 </h4>
                                 
-                                @if($profile->signature_data)
+                                <?php if($profile->signature_data): ?>
                                     <div class="text-left" style="font-family: 'Times New Roman', Times, serif; font-size: 14px; color: #000; line-height: 1.2;">
                                         <i>Digitally Signed by</i><br>
-                                        <i>Name : {{ auth()->user()->name }}</i><br>
-                                        <i>Phone No : ******{{ substr(auth()->user()->phone ?? '0000', -4) }}</i><br>
+                                        <i>Name : <?php echo e(auth()->user()->name); ?></i><br>
+                                        <i>Phone No : ******<?php echo e(substr(auth()->user()->phone ?? '0000', -4)); ?></i><br>
                                         <i>Reason: Agreement E-signature</i><br>
-                                        <i>Date : {{ $profile->signature_date_time ? \Carbon\Carbon::parse($profile->signature_date_time)->format('D M d H:i:s T Y') : now()->format('D M d H:i:s T Y') }}</i>
+                                        <i>Date : <?php echo e($profile->signature_date_time ? \Carbon\Carbon::parse($profile->signature_date_time)->format('D M d H:i:s T Y') : now()->format('D M d H:i:s T Y')); ?></i>
                                     </div>
-                                @else
+                                <?php else: ?>
                                     <p class="text-sm font-medium text-[#031b4e] mb-3">
                                         <i class="fas fa-file-pdf text-[#0ea5e9] mr-1"></i> Agreement manually uploaded by Admin.
                                     </p>
                                     <div class="text-xs text-[#031b4e]/60 mt-4 pt-4 border-t border-[#031b4e]/10">
                                         <span class="block text-[#031b4e]/50 mb-0.5">Uploaded On</span>
-                                        <span class="font-medium text-[#031b4e]/80">{{ $profile->updated_at->format('d M Y, h:i A') }}</span>
+                                        <span class="font-medium text-[#031b4e]/80"><?php echo e($profile->updated_at->format('d M Y, h:i A')); ?></span>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
 
-                            {{-- Live Photo --}}
-                            @if($profile->live_photo_path)
+                            
+                            <?php if($profile->live_photo_path): ?>
                             <div class="bg-white border border-[#031b4e]/10 rounded-xl p-5 flex-1">
                                 <h4 class="text-xs font-semibold text-[#031b4e]/50 uppercase tracking-wider mb-3">
                                     Identity Verification Photo
                                 </h4>
-                                <img src="{{ asset('storage/' . $profile->live_photo_path) }}" alt="Live Photo" class="h-20 w-auto rounded-lg object-cover mb-3 border border-[#031b4e]/10">
+                                <img src="<?php echo e(asset('storage/' . $profile->live_photo_path)); ?>" alt="Live Photo" class="h-20 w-auto rounded-lg object-cover mb-3 border border-[#031b4e]/10">
                                 
                                 <div class="text-xs text-[#031b4e]/60 mt-4 pt-4 border-t border-[#031b4e]/10">
                                     <span class="block text-[#031b4e]/50 mb-0.5">Location Captured</span>
                                     <span class="font-medium text-[#031b4e]/80">
-                                        @if($profile->latitude && $profile->longitude)
-                                            {{ number_format($profile->latitude, 4) }}, {{ number_format($profile->longitude, 4) }}
-                                        @else
+                                        <?php if($profile->latitude && $profile->longitude): ?>
+                                            <?php echo e(number_format($profile->latitude, 4)); ?>, <?php echo e(number_format($profile->longitude, 4)); ?>
+
+                                        <?php else: ?>
                                             Not Available
-                                        @endif
+                                        <?php endif; ?>
                                     </span>
                                 </div>
                             </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
 
                         <div class="mt-6">
-                            <a href="{{ route('candidate.agreement.download', ['regenerate' => 1]) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0ea5e9]/10 text-[#0ea5e9] font-medium rounded-lg hover:bg-[#0ea5e9]/20 transition-colors text-sm">
+                            <a href="<?php echo e(route('candidate.agreement.download', ['regenerate' => 1])); ?>" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0ea5e9]/10 text-[#0ea5e9] font-medium rounded-lg hover:bg-[#0ea5e9]/20 transition-colors text-sm">
                                 <i class="fas fa-file-pdf"></i> Download PDF
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-        @elseif($profile->agreement_status === 'pending_signature')
+        <?php elseif($profile->agreement_status === 'pending_signature'): ?>
             <div class="p-6 md:p-8">
-                <form action="{{ route('candidate.agreement.sign') }}" method="POST" id="signature-form">
-                @csrf
+                <form action="<?php echo e(route('candidate.agreement.sign')); ?>" method="POST" id="signature-form">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="signature" id="signature-data">
 
                 <div class="mb-6">
@@ -228,7 +228,7 @@
                 </div>
             </form>
         </div>
-        @else
+        <?php else: ?>
             <div class="p-8 text-center bg-gray-50 border-t border-[#031b4e]/10">
                 <div class="w-16 h-16 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
                     <i class="fas fa-lock"></i>
@@ -236,14 +236,14 @@
                 <h3 class="text-xl font-bold text-[#031b4e] mb-2">Agreement Not Activated</h3>
                 <p class="text-sm text-[#031b4e]/60 mb-6 max-w-md mx-auto">Your candidate agreement does not need to be signed at this time. Admin will activate it when you are assigned a job or tuition.</p>
                 
-                <form action="{{ route('candidate.agreement.request') }}" method="POST">
-                    @csrf
+                <form action="<?php echo e(route('candidate.agreement.request')); ?>" method="POST">
+                    <?php echo csrf_field(); ?>
                     <button type="submit" class="px-6 py-2.5 bg-[#031b4e] text-white font-medium rounded-lg hover:bg-blue-900 transition-colors inline-flex items-center gap-2">
                         <i class="fas fa-paper-plane"></i> Request Activation
                     </button>
                 </form>
             </div>
-        @endif
+        <?php endif; ?>
     </div>
 </div>
 
@@ -254,7 +254,7 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 </style>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('signature-pad');
@@ -331,8 +331,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
 
 
 
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Employee\Desktop\warrioredu\resources\views/candidate/agreement/show.blade.php ENDPATH**/ ?>
