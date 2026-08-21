@@ -50,7 +50,9 @@
         <div class="w-full md:w-1/2 flex items-center justify-center px-4 md:px-0 md:pt-10">
             <div class="w-full max-w-xl bg-white rounded-[32px] p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.1)] relative md:-ml-12 md:mt-10 z-20">
                 <h2 class="text-[#040e2d] text-2xl md:text-3xl font-medium mb-2">Contact us</h2>
-                <p class="text-slate-400 text-sm mb-10">We'd love to hear from you!</p>
+                <p class="text-slate-400 text-sm mb-6">We'd love to hear from you!</p>
+                
+                <div id="formMessage" class="hidden mb-6 p-4 rounded-xl text-sm font-medium"></div>
                 
                 <form action="{{ route('contact.store') }}" method="POST" class="space-y-6" id="contactForm">
                     @csrf
@@ -147,23 +149,20 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
+        const msgBox = document.getElementById('formMessage');
+        msgBox.classList.remove('hidden', 'bg-red-50', 'text-red-700');
+        msgBox.classList.add('bg-green-50', 'text-green-700');
+        msgBox.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ' + (data.message || 'Message sent successfully!');
+        
         if(data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: data.message,
-                confirmButtonColor: '#111'
-            });
             this.reset();
         }
     })
     .catch(error => {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Something went wrong. Please try again.',
-            confirmButtonColor: '#111'
-        });
+        const msgBox = document.getElementById('formMessage');
+        msgBox.classList.remove('hidden', 'bg-green-50', 'text-green-700');
+        msgBox.classList.add('bg-red-50', 'text-red-700');
+        msgBox.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> Something went wrong. Please try again.';
     })
     .finally(() => {
         btn.innerHTML = originalText;

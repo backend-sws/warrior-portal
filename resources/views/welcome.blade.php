@@ -209,7 +209,7 @@
 
                 <div class="flex gap-6 items-start mb-10 mt-2">
                     <div class="w-16 h-[2px] bg-[#a0aec0] mt-3 hidden md:block opacity-50"></div>
-                    <p id="hero-desc" class="text-gray-500 text-[14px] md:text-[15px] max-w-[350px] leading-relaxed font-medium">
+                    <p id="hero-desc" class="text-gray-700 text-[14px] md:text-[15px] max-w-[350px] leading-relaxed font-bold">
                         Warriors Educare helps parents find suitable home tutors and helps schools hire qualified teaching and non-teaching staff.
                     </p>
                 </div>
@@ -748,56 +748,7 @@
                 </div>
             </div>
 
-            <!-- Latest Tuition Requirements -->
-            <div class="max-w-7xl mx-auto relative z-10 reveal">
-                <div class="flex justify-between items-end mb-8">
-                    <h3 class="text-2xl font-bold text-[#031b4e]">Latest Tuition Requirements</h3>
-                    <a href="{{ route('contact') }}" class="text-accent-500 hover:text-[#031b4e] font-semibold text-sm transition-colors">Apply as Tutor <i class="fas fa-arrow-right ml-1"></i></a>
-                </div>
 
-                <div class="metallic-blue-card rounded-2xl border-none shadow-2xl relative">
-                    <div class="overflow-x-auto overflow-y-auto w-full" style="max-height: 400px;">
-                        <table class="w-full text-left border-collapse relative z-10">
-                        <thead class="sticky top-0 bg-[#011233]/90 backdrop-blur-md z-20 shadow-sm">
-                            <tr class="border-b border-white/20 text-white/90 text-sm">
-                                <th class="py-4 px-6 font-semibold whitespace-nowrap">Posted By</th>
-                                <th class="py-4 px-6 font-semibold whitespace-nowrap">Subjects</th>
-                                <th class="py-4 px-6 font-semibold whitespace-nowrap">Class & Board</th>
-                                <th class="py-4 px-6 font-semibold whitespace-nowrap">Location</th>
-                                <th class="py-4 px-6 font-semibold whitespace-nowrap">Time</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm">
-                            @forelse($guestTuitions as $tuition)
-                                <tr class="border-b border-white/10 hover:bg-white/10 transition-colors">
-                                    <td class="py-4 px-6 text-white font-medium whitespace-nowrap">
-                                        <i class="fas fa-user-circle text-white/60 mr-2"></i>{{ $tuition->employer ? ($tuition->employer->name === 'Super Admin' ? 'Warriors Educare' : $tuition->employer->name) : $tuition->guest_name }}
-                                    </td>
-                                    <td class="py-4 px-6 font-semibold text-white">{{ $tuition->subjects }}</td>
-                                    <td class="py-4 px-6">
-                                        <span class="inline-block bg-white/20 text-white text-xs font-bold px-2 py-1 rounded mb-1">{{ $tuition->student_class }}</span><br>
-                                        <span class="text-xs text-white/70 font-medium">{{ $tuition->board }}</span>
-                                    </td>
-                                    <td class="py-4 px-6 text-white/90 max-w-xs truncate" title="{{ $tuition->location }}">{{ $tuition->location }}</td>
-                                    <td class="py-4 px-6 text-white/70 text-xs whitespace-nowrap">{{ $tuition->created_at->diffForHumans() }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="py-12 text-center">
-                                        <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 text-white/50 text-2xl">
-                                            <i class="fas fa-search"></i>
-                                        </div>
-                                        <h4 class="text-lg font-bold text-white mb-2">No Requirements Right Now</h4>
-                                        <p class="text-white/70 mb-6">Be the first to post a new home tuition requirement!</p>
-                                        <a href="#quick-request-form" class="inline-block bg-accent-yellow text-[#031b4e] hover:bg-white px-6 py-3 rounded-xl font-bold shadow-sm transition-transform hover:-translate-y-1">Post a Tuition Need</a>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
             
             <div id="quick-request-form" class="max-w-4xl mx-auto mt-20 relative z-10 reveal bg-gradient-to-br from-[#f0f7ff] to-blue-50 rounded-3xl p-8 md:p-10 shadow-2xl border border-blue-200">
                 <div class="text-center mb-8">

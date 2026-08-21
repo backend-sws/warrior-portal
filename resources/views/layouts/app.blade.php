@@ -522,11 +522,11 @@
                 <ul class="flex flex-col gap-5 text-[13px] text-gray-600 font-semibold mt-4">
                     <li class="flex items-start gap-3 group">
                         <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-phone-alt text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
-                        <span class="mt-1">8210545286</span>
+                        <span class="mt-1">+91 82105 45286</span>
                     </li>
                     <li class="flex items-start gap-3 group">
                         <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-map-marker-alt text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
-                        <span class="mt-1">patna Kumhrar sandalpur rd sardar patel colony</span>
+                        <span class="mt-1 leading-relaxed">Sardar Patel Colony, Sandalpur Rd, Kumhrar, Patna</span>
                     </li>
                     <li class="flex items-start gap-3 group">
                         <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-envelope text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
