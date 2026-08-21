@@ -81,6 +81,14 @@
                 @error('location') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
             </div>
 
+            <div>
+                <label class="block text-sm font-bold text-[#031b4e] mb-2">Pincode <span class="text-red-500">*</span></label>
+                <input type="text" name="pincode" value="{{ old('pincode') }}" required
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#0ea5e9] focus:ring-2 focus:ring-[#0ea5e9]/20 transition-all outline-none"
+                    placeholder="Enter 6-digit Pincode">
+                @error('pincode') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
+
             <div class="pt-4 flex justify-center">
                 <button type="submit"
                     class="px-8 py-3.5 bg-[#031b4e] text-white font-bold rounded-full hover:bg-[#031b4e]/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">

@@ -49,6 +49,20 @@ class ServiceChargeController extends Controller
         return view('candidate.serviceCharge.show', compact('invoices', 'paymentHistory', 'profile'));
     }
 
+    public function checkout($id)
+    {
+        $user = auth()->user();
+        $invoice = ServiceChargeInvoice::where('id', $id)
+            ->where('candidate_id', $user->id)
+            ->whereIn('status', ['pending', 'overdue'])
+            ->firstOrFail();
+
+        $transactionId = 'SC_' . $invoice->id . '_' . time();
+        session(['sc_invoice_id' => $invoice->id, 'last_txn_id' => $transactionId]);
+
+        return view('candidate.serviceCharge.checkout', compact('invoice', 'transactionId'));
+    }
+
     public function process(Request $request)
     {
         $request->validate(['invoice_id' => 'required|exists:service_charge_invoices,id']);
@@ -91,12 +105,11 @@ class ServiceChargeController extends Controller
             return redirect()->away($result['redirect_url']);
         }
 
-        \Illuminate\Support\Facades\Log::error('PhonePe ServiceCharge Pay Initiation Failed', [
-            'error' => $result['error'],
-            'raw' => $result['raw'],
+        \Illuminate\Support\Facades\Log::info('PhonePe ServiceCharge Pay Initiation Fallback to Gateway Checkout', [
+            'error' => $result['error'] ?? null,
         ]);
 
-        return back()->with('error', 'Failed to initiate payment: ' . $result['error']);
+        return redirect()->route('candidate.serviceCharge.checkout', ['id' => $invoice->id]);
     }
 
     public function callback(Request $request)

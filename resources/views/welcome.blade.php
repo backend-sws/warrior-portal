@@ -1,6 +1,85 @@
     @extends('layouts.app')
 
     @section('content')
+    
+    <!-- Welcome Modal -->
+    <div x-data="{ showWelcomeModal: false }" 
+         x-init="setTimeout(() => { if(!sessionStorage.getItem('welcomeShown')) { showWelcomeModal = true; sessionStorage.setItem('welcomeShown', '1'); } }, 500);" 
+         x-show="showWelcomeModal" 
+         class="fixed inset-0 z-[100] flex items-center justify-center bg-[#071520]/80 backdrop-blur-sm"
+         style="display: none;"
+         x-transition.opacity>
+         
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-5xl w-[90%] mx-4 relative overflow-hidden" 
+             @click.away="showWelcomeModal = false"
+             x-show="showWelcomeModal"
+             x-transition:enter="transition ease-out duration-400"
+             x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-8 scale-95">
+             
+            <!-- Close Button -->
+            <button @click="showWelcomeModal = false" class="absolute top-6 right-6 w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors z-20">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            
+            <div class="text-center mb-10 relative z-10 pt-4">
+                <h2 class="text-3xl lg:text-4xl font-bold text-[#031b4e] mb-3">Welcome to Warriors Educare</h2>
+                <p class="text-slate-500 text-lg">Please select what you are looking for today</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 pb-4">
+                <!-- Card 1: Parents -->
+                <a href="{{ route('parent.register') }}" class="group relative rounded-2xl p-8 text-center transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 hover:border-[#031b4e] overflow-hidden isolate">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 z-0" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop');"></div>
+                    <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
+                            <i class="fas fa-user-graduate text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-[#031b4e] group-hover:text-white mb-3 transition-colors">Hire a Home Tutor <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
+                        <p class="text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">For Parents & students</p>
+                    </div>
+                </a>
+                
+                <!-- Card 2: Schools -->
+                <a href="{{ route('parent.register') }}" class="group relative rounded-2xl p-8 text-center transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 hover:border-[#031b4e] overflow-hidden isolate">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 z-0" style="background-image: url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=600&auto=format&fit=crop');"></div>
+                    <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
+                            <i class="fas fa-school text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-[#031b4e] group-hover:text-white mb-3 transition-colors">Hire Teachers & Staff <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
+                        <p class="text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">For Schools / Institutions</p>
+                    </div>
+                </a>
+                
+                <!-- Card 3: Candidates -->
+                <a href="{{ route('candidate.register') }}" class="group relative rounded-2xl p-8 text-center transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 hover:border-[#031b4e] overflow-hidden isolate">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 z-0" style="background-image: url('https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=600&auto=format&fit=crop');"></div>
+                    <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
+                            <i class="fas fa-chalkboard-teacher text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-[#031b4e] group-hover:text-white mb-3 transition-colors">Join as Teacher / Tutor <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
+                        <p class="text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">Find School Jobs & Tuition Opportunities</p>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Decorative elements inside modal -->
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-cyan-50 rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
+        </div>
+    </div>
+    
         <!-- Hero Banner Section -->
     <style>
         .metallic-bubble {
@@ -109,9 +188,9 @@
                 </div>
                 
                 <h1 id="hero-title" class="text-5xl lg:text-[4.5rem] xl:text-[5rem] leading-[1.1] font-extrabold tracking-tight text-[#0a1922] mb-8 relative z-20">
-                    Find the best teachers and private <br>
+                    Find the Right Tutor. Hire the Right Teacher. Build the Right <br>
                     <div class="relative w-max mt-4 mb-2">
-                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">tutors</span>
+                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">Team.</span>
                     </div>
                 </h1>
 
@@ -131,7 +210,7 @@
                 <div class="flex gap-6 items-start mb-10 mt-2">
                     <div class="w-16 h-[2px] bg-[#a0aec0] mt-3 hidden md:block opacity-50"></div>
                     <p id="hero-desc" class="text-gray-500 text-[14px] md:text-[15px] max-w-[350px] leading-relaxed font-medium">
-                        We help you connect with expert teachers and dedicated tutors to ensure the best learning experience for a bright future.
+                        Warriors Educare helps parents find suitable home tutors and helps schools hire qualified teaching and non-teaching staff.
                     </p>
                 </div>
 
@@ -406,89 +485,98 @@
         <section class="py-16 px-6 lg:px-[5%] relative bg-slate-50">
             <style>
                 .category-card {
-                    background: #1e3a8a; /* Base blue color */
-                    border-radius: 2rem;
+                    background: linear-gradient(135deg, #1e3a8a 0%, #031b4e 100%);
+                    border-radius: 1.2rem;
                     position: relative;
-                    z-index: 1;
-                    /* Inner box shadow for depth */
-                    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 10px 30px -10px rgba(0,0,0,0.3);
+                    overflow: hidden;
+                    height: 140px;
+                    box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    transform: skewX(-10deg);
+                    margin: 0 5px; /* Add slight margin so they don't stick together due to skew */
                 }
-                .category-card::before {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    border-radius: 2rem;
-                    background: inherit;
-                    z-index: -1;
-                    /* Cutout mask for the bottom right corner */
-                    -webkit-mask-image: 
-                        linear-gradient(black, black),
-                        linear-gradient(black, black),
-                        radial-gradient(circle at top left, black 100%, transparent 100%);
-                    -webkit-mask-size: 
-                        100% calc(100% - 75px),
-                        calc(100% - 75px) 100%,
-                        100% 100%;
-                    -webkit-mask-position: 
-                        top left,
-                        top left,
-                        bottom right;
-                    -webkit-mask-repeat: no-repeat;
+                .category-card:hover {
+                    transform: skewX(-10deg) translateY(-5px);
+                    box-shadow: 0 15px 25px -5px rgba(0,0,0,0.3);
                 }
-                .category-card-border {
-                    position: absolute;
-                    inset: 0;
-                    border-radius: 2rem;
-                    pointer-events: none;
-                    z-index: 2;
-                    /* We use a path to draw the border tracing the cutout */
-                    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 75px), calc(100% - 75px) calc(100% - 75px), calc(100% - 75px) 100%, 0 100%);
-                    border: 1.5px solid rgba(255,255,255,0.3);
+                .category-inner {
+                    transform: skewX(10deg);
+                    height: 100%;
+                    padding: 1.25rem;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                    text-align: left;
+                    position: relative;
+                    margin: 0 -15px; /* expand slightly to cover skewed corners properly */
+                    padding: 1.25rem 25px; /* adjust padding for the expanded margin */
                 }
-                .category-btn {
+                .category-top-right-shape {
                     position: absolute;
-                    bottom: 0;
-                    right: 0;
-                    width: 60px;
-                    height: 60px;
+                    top: -30px;
+                    right: 0px;
+                    width: 100px;
+                    height: 100px;
                     background: white;
-                    border-top-left-radius: 1.5rem;
-                    border-bottom-right-radius: 2rem;
+                    border-radius: 24px;
+                    transform: rotate(45deg);
+                    box-shadow: -5px 5px 15px rgba(0,0,0,0.15);
+                    z-index: 1;
+                }
+                .category-icon-container {
+                    position: absolute;
+                    top: 15px;
+                    right: 35px;
+                    z-index: 2;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    color: #031b4e;
-                    font-size: 1.25rem;
-                    box-shadow: -5px -5px 15px rgba(0,0,0,0.05);
-                    transition: all 0.3s ease;
-                    z-index: 10;
-                }
-                .category-card:hover .category-btn {
-                    background: #fbc043;
-                    color: white;
                 }
             </style>
             
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 relative z-10">
                 @foreach($categories as $category)
                 <a href="{{ route('category.jobs', $category->id) }}"
-                    class="block category-card p-6 pb-12 text-center text-white transition-transform duration-300 hover:-translate-y-2 cursor-pointer group reveal no-underline overflow-hidden">
+                    class="block category-card group reveal no-underline">
                     
-                    <!-- Inner content wrapper to keep away from cutout -->
-                    <div class="relative z-10 flex flex-col items-center justify-center h-full">
-                        <i class="fas fa-briefcase text-4xl mb-4 text-white/90 group-hover:scale-110 transition-transform"></i>
-                        <h3 class="text-sm md:text-base font-bold mb-4">{{ $category->name }}</h3>
-                        <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-1.5 rounded-full text-[10px] md:text-xs font-bold inline-block">
-                            {{ $category->jobs_count }} Active Jobs
+                    <div class="category-inner">
+                        <!-- Top Right White Shape -->
+                        <div class="category-top-right-shape"></div>
+                        
+                        <!-- Icon -->
+                        <div class="category-icon-container group-hover:scale-110 transition-transform">
+                            <svg width="45" height="45" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                              <!-- Users -->
+                              <g fill="#009ee3">
+                                <!-- Left -->
+                                <circle cx="28" cy="35" r="7"/>
+                                <path d="M 12 55 C 12 40, 44 40, 44 55 Z"/>
+                                <!-- Right -->
+                                <circle cx="72" cy="35" r="7"/>
+                                <path d="M 56 55 C 56 40, 88 40, 88 55 Z"/>
+                                <!-- Center -->
+                                <circle cx="50" cy="20" r="9"/>
+                                <path d="M 28 55 C 28 35, 72 35, 72 55 Z"/>
+                              </g>
+                              <!-- Grad Cap -->
+                              <g fill="#000000">
+                                <polygon points="50,44 95,54 50,65 5,54"/>
+                                <path d="M 32 60 L 32 78 Q 50 88 68 78 L 68 60 Z"/>
+                                <polygon points="30,60 70,60 68,66 32,66"/>
+                                <!-- Tassel -->
+                                <line x1="83" y1="52" x2="83" y2="72" stroke="#000000" stroke-width="2.5"/>
+                                <rect x="80" y="72" width="6" height="15" rx="2"/>
+                              </g>
+                            </svg>
                         </div>
-                    </div>
-                    
-                    <!-- Border tracing the cutout -->
-                    <div class="category-card-border"></div>
-                    
-                    <!-- Floating Arrow Button -->
-                    <div class="category-btn">
-                        <i class="fas fa-arrow-right"></i>
+                        
+                        <!-- Text Content (Bottom Left) -->
+                        <div class="relative z-10">
+                            <h3 class="text-white text-[17px] font-semibold tracking-wide mb-1 leading-tight">{{ $category->name }}</h3>
+                            <div class="text-white text-[19px] font-bold">
+                                {{ $category->jobs_count }}
+                            </div>
+                        </div>
                     </div>
                 </a>
                 @endforeach
@@ -527,7 +615,11 @@
                         </div>
 
                         <!-- Title -->
-                        <h3 class="text-[#031b4e] font-black text-xl mb-4 pr-12">{{ $service->title }}</h3>
+                        <div class="mb-4 relative z-10">
+                            <h3 class="text-[#031b4e] font-black text-xl inline-block bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl shadow-sm border border-slate-100">
+                                {{ $service->title }}
+                            </h3>
+                        </div>
 
                         <!-- Elevated Box -->
                         <div class="bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] p-5 mb-2 mt-auto border border-gray-50 relative group-hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)] transition-shadow duration-300">
@@ -582,6 +674,7 @@
                   <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#031b4e]">Tuitions & Home Tutors</h2>
                 <p class="text-slate-600 max-w-2xl mx-auto mt-4 text-sm md:text-base">Find the best home tutors near you. Get personalized learning experiences at your doorstep.</p>
             </div>
+
 
             <!-- Recent Tuition Cards Slider -->
             <div class="max-w-7xl mx-auto mb-20 relative z-10 reveal">
@@ -758,9 +851,15 @@
                         </div>
 
                         <!-- Location -->
-                        <div class="md:col-span-2">
+                        <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Complete Location/Address *</label>
                             <input type="text" name="location" required placeholder="Enter full address or area" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
+                        </div>
+
+                        <!-- Pincode -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Pincode *</label>
+                            <input type="text" name="pincode" required placeholder="Enter 6-digit Pincode" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
                         </div>
                     </div>
 
@@ -877,8 +976,11 @@
         </section>
 
         <!-- Latest Jobs Section -->
-        <section class="py-20 px-6 lg:px-[5%] metallic-blue-card border-none shadow-none text-white relative">
-            <div class="text-center mb-12 reveal">
+        <section class="py-20 px-6 lg:px-[5%] metallic-blue-card border-none shadow-none text-white relative overflow-hidden">
+            <!-- Background Dot Pattern -->
+            <div class="absolute inset-0 z-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px); background-size: 30px 30px;"></div>
+            
+            <div class="text-center mb-12 relative z-10 reveal">
                 <h4 class="text-white/80 text-base font-medium mb-1.5 uppercase tracking-wider">Latest Jobs</h4>
                 <h2 class="text-white text-3xl lg:text-4xl font-bold mb-4">Explore Recent Opportunities</h2>
                 <div class="zigzag-divider w-16 h-2 mx-auto"></div>
@@ -1063,33 +1165,59 @@
                     <h2 class="text-3xl lg:text-[38px] font-bold text-gray-900 tracking-tight">Let's Start the Conversation</h2>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.06)] p-8 lg:p-14 flex flex-col lg:flex-row gap-12 lg:gap-16 relative overflow-hidden group">
+                <style>
+                    .neu-card {
+                        background-color: #e6e9f0;
+                        border-radius: 32px;
+                        box-shadow: 12px 12px 24px #c4c6cc, -12px -12px 24px #ffffff;
+                    }
+                    .neu-input {
+                        background-color: #e6e9f0;
+                        border-radius: 12px;
+                        box-shadow: inset 4px 4px 8px #c4c6cc, inset -4px -4px 8px #ffffff;
+                        border: none;
+                        outline: none;
+                        color: #475569;
+                    }
+                    .neu-input::placeholder {
+                        color: #94a3b8;
+                    }
+                    .neu-btn {
+                        background-color: #e6e9f0;
+                        border-radius: 12px;
+                        box-shadow: 4px 4px 8px #c4c6cc, -4px -4px 8px #ffffff;
+                        color: #2563eb;
+                        transition: all 0.2s ease-in-out;
+                    }
+                    .neu-btn:hover {
+                        box-shadow: inset 4px 4px 8px #c4c6cc, inset -4px -4px 8px #ffffff;
+                    }
+                </style>
+                <div class="neu-card p-8 lg:p-14 flex flex-col lg:flex-row gap-12 lg:gap-16 relative overflow-hidden group">
                     
                     <!-- Animated Pattern Background -->
-                    <div class="absolute inset-0 z-0 opacity-10 invert pointer-events-none animate-pattern-move" style="background-image: url('{{ asset('images/network-pattern.svg') }}'); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
+                    <div class="absolute inset-0 z-0 opacity-5 pointer-events-none animate-pattern-move" style="background-image: url('{{ asset('images/network-pattern.svg') }}'); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
 
                     <!-- Left: Form -->
-                    <div class="w-full lg:w-[58%] relative z-10">
-                        <h3 class="text-[20px] font-bold text-gray-900 mb-1">Send Us A Message</h3>
-                        <p class="text-[11px] text-gray-400 font-medium mb-7">Our response time is within 30 minutes during business hours</p>
+                    <div class="w-full lg:w-[58%] relative z-10 flex flex-col items-center lg:items-start text-center lg:text-left">
+                        <h3 class="text-[26px] font-bold text-[#334155] mb-2">Send Us A Message</h3>
+                        <p class="text-sm text-[#64748b] font-medium mb-10">Our response time is within 30 minutes</p>
                         
-                        <form action="#" method="POST" class="flex flex-col gap-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input type="text" placeholder="First Name" class="w-full bg-[#f3f4f6] border-none rounded text-xs px-4 py-3.5 focus:ring-1 focus:ring-[#1e3a8a] outline-none text-gray-700 font-medium placeholder-gray-400">
-                                <input type="text" placeholder="Last Name" class="w-full bg-[#f3f4f6] border-none rounded text-xs px-4 py-3.5 focus:ring-1 focus:ring-[#1e3a8a] outline-none text-gray-700 font-medium placeholder-gray-400">
+                        <form action="#" method="POST" class="flex flex-col gap-6 w-full">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <input type="text" placeholder="First Name" class="neu-input w-full text-sm px-6 py-4">
+                                <input type="text" placeholder="Last Name" class="neu-input w-full text-sm px-6 py-4">
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input type="tel" placeholder="Phone Number" class="w-full bg-[#f3f4f6] border-none rounded text-xs px-4 py-3.5 focus:ring-1 focus:ring-[#1e3a8a] outline-none text-gray-700 font-medium placeholder-gray-400">
-                                <input type="email" placeholder="Email Address" class="w-full bg-[#f3f4f6] border-none rounded text-xs px-4 py-3.5 focus:ring-1 focus:ring-[#1e3a8a] outline-none text-gray-700 font-medium placeholder-gray-400">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <input type="tel" placeholder="Phone Number" class="neu-input w-full text-sm px-6 py-4">
+                                <input type="email" placeholder="Email Address" class="neu-input w-full text-sm px-6 py-4">
                             </div>
                             <div class="relative">
-                                <select class="w-full bg-[#f3f4f6] border-none rounded text-xs text-gray-400 font-medium px-4 py-3.5 focus:ring-1 focus:ring-[#1e3a8a] outline-none appearance-none">
-                                    <option value="">Service Type</option>
-                                </select>
+                                <input type="text" placeholder="Service Type" class="neu-input w-full text-sm px-6 py-4">
                             </div>
-                            <div class="mt-4">
-                                <button type="submit" class="w-full bg-[#1e3a8a] text-white font-bold py-3.5 rounded-lg hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-                                    Send Message <i class="fas fa-paper-plane ml-2"></i>
+                            <div class="mt-2">
+                                <button type="submit" class="neu-btn w-full font-bold py-4 text-base flex items-center justify-center gap-2">
+                                    Send Message <i class="far fa-paper-plane"></i>
                                 </button>
                             </div>
                         </form>
@@ -1162,8 +1290,8 @@
 
             const textContent = {
                 hire: {
-                    title: 'Find the best teachers and private <br>\n                    <div class="relative w-max mt-4 mb-2">\n                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">tutors</span>\n                    </div>',
-                    desc: 'We help you connect with expert teachers and dedicated tutors to ensure the best learning experience for a bright future.'
+                    title: 'Find the Right Tutor. Hire the Right Teacher. Build the Right <br>\n                    <div class="relative w-max mt-4 mb-2">\n                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">Team.</span>\n                    </div>',
+                    desc: 'Warriors Educare helps parents find suitable home tutors and helps schools hire qualified teaching and non-teaching staff.'
                 },
                 join: {
                     title: 'Join our team of expert <br>\n                    <div class="relative w-max mt-4 mb-2">\n                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">educators</span>\n                    </div>',

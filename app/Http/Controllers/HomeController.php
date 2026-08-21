@@ -46,7 +46,13 @@ class HomeController extends Controller
             'board' => 'required|string|max:255',
             'subjects' => 'required|string|max:255',
             'location' => 'required|string|max:255',
+            'pincode' => 'nullable|string|max:20',
         ]);
+
+        $locationWithPincode = $validated['location'];
+        if (!empty($validated['pincode'])) {
+            $locationWithPincode .= ' - Pincode: ' . $validated['pincode'];
+        }
 
         $validated['fee'] = 'Not Specified';
 
@@ -61,10 +67,11 @@ class HomeController extends Controller
             'class' => $validated['student_class'],
             'board' => $validated['board'],
             'subjects' => $validated['subjects'],
-            'location' => $validated['location'],
+            'location' => $locationWithPincode,
             'fee' => $validated['fee'],
             'additional_notes' => 'Guest Request: ' . ($validated['description'] ?? ''),
             'status' => $validated['status'],
+            'tutor_preference' => 'Any',
             'user_id' => $validated['user_id'] ?? null,
         ]);
 
