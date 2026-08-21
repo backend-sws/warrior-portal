@@ -6,11 +6,11 @@
     <div x-data="{ showWelcomeModal: false }" 
          x-init="setTimeout(() => { if(!sessionStorage.getItem('welcomeShown')) { showWelcomeModal = true; sessionStorage.setItem('welcomeShown', '1'); } }, 500);" 
          x-show="showWelcomeModal" 
-         class="fixed inset-0 z-[100] flex items-center justify-center bg-[#071520]/80 backdrop-blur-sm"
+         class="fixed inset-0 z-[100] flex items-center justify-center bg-[#071520]/80 backdrop-blur-sm px-4 py-8"
          style="display: none;"
          x-transition.opacity>
          
-        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-5xl w-[90%] mx-4 relative overflow-hidden" 
+        <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-5xl w-full relative overflow-y-auto max-h-[90vh]" 
              @click.away="showWelcomeModal = false"
              x-show="showWelcomeModal"
              x-transition:enter="transition ease-out duration-400"
@@ -25,9 +25,9 @@
                 <i class="fas fa-times text-lg"></i>
             </button>
             
-            <div class="text-center mb-10 relative z-10 pt-4">
-                <h2 class="text-3xl lg:text-4xl font-bold text-[#031b4e] mb-3">Welcome to Warriors Educare</h2>
-                <p class="text-slate-500 text-lg">Please select what you are looking for today</p>
+            <div class="text-center mb-8 relative z-10 pt-8 sm:pt-4">
+                <h2 class="text-2xl lg:text-4xl font-bold text-[#031b4e] mb-2 sm:mb-3">Welcome to Warriors Educare</h2>
+                <p class="text-slate-500 text-base sm:text-lg">Please select what you are looking for today</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 pb-4">
@@ -37,11 +37,11 @@
                     <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
                     
                     <div class="relative z-10">
-                        <div class="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
-                            <i class="fas fa-user-graduate text-3xl"></i>
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-4 sm:mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
+                            <i class="fas fa-user-graduate text-2xl sm:text-3xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-[#031b4e] group-hover:text-white mb-3 transition-colors">Hire a Home Tutor <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
-                        <p class="text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">For Parents & students</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-[#031b4e] group-hover:text-white mb-2 sm:mb-3 transition-colors">Hire a Home Tutor <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
+                        <p class="text-xs sm:text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">For Parents & students</p>
                     </div>
                 </a>
                 
@@ -51,11 +51,11 @@
                     <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
                     
                     <div class="relative z-10">
-                        <div class="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
-                            <i class="fas fa-school text-3xl"></i>
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-4 sm:mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
+                            <i class="fas fa-school text-2xl sm:text-3xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-[#031b4e] group-hover:text-white mb-3 transition-colors">Hire Teachers & Staff <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
-                        <p class="text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">For Schools / Institutions</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-[#031b4e] group-hover:text-white mb-2 sm:mb-3 transition-colors">Hire Teachers & Staff <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
+                        <p class="text-xs sm:text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">For Schools / Institutions</p>
                     </div>
                 </a>
                 
@@ -65,11 +65,11 @@
                     <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
                     
                     <div class="relative z-10">
-                        <div class="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
-                            <i class="fas fa-chalkboard-teacher text-3xl"></i>
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-4 sm:mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
+                            <i class="fas fa-chalkboard-teacher text-2xl sm:text-3xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-[#031b4e] group-hover:text-white mb-3 transition-colors">Join as Teacher / Tutor <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
-                        <p class="text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">Find School Jobs & Tuition Opportunities</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-[#031b4e] group-hover:text-white mb-2 sm:mb-3 transition-colors">Join as Teacher / Tutor <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
+                        <p class="text-xs sm:text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">Find School Jobs & Tuition Opportunities</p>
                     </div>
                 </a>
             </div>
@@ -1211,17 +1211,17 @@
                         <h3 class="text-[26px] font-bold text-[#334155] mb-2">Send Us A Message</h3>
                         <p class="text-sm text-[#64748b] font-medium mb-10">Our response time is within 30 minutes</p>
                         
-                        <form action="#" method="POST" class="flex flex-col gap-6 w-full">
+                        <form action="<?php echo e(route('contact.store')); ?>" method="POST" class="flex flex-col gap-6 w-full">
+                            <?php echo csrf_field(); ?>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <input type="text" placeholder="First Name" class="neu-input w-full text-sm px-6 py-4">
-                                <input type="text" placeholder="Last Name" class="neu-input w-full text-sm px-6 py-4">
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <input type="tel" placeholder="Phone Number" class="neu-input w-full text-sm px-6 py-4">
-                                <input type="email" placeholder="Email Address" class="neu-input w-full text-sm px-6 py-4">
+                                <input type="text" name="name" placeholder="Full Name" class="neu-input w-full text-sm px-6 py-4" required>
+                                <input type="email" name="email" placeholder="Email Address" class="neu-input w-full text-sm px-6 py-4">
                             </div>
                             <div class="relative">
-                                <input type="text" placeholder="Service Type" class="neu-input w-full text-sm px-6 py-4">
+                                <input type="tel" name="phone" placeholder="Phone Number" class="neu-input w-full text-sm px-6 py-4" required>
+                            </div>
+                            <div class="relative">
+                                <textarea name="message" placeholder="Your Message" class="neu-input w-full text-sm px-6 py-4 resize-none" rows="3" required></textarea>
                             </div>
                             <div class="mt-2">
                                 <button type="submit" class="neu-btn w-full font-bold py-4 text-base flex items-center justify-center gap-2">

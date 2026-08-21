@@ -38,27 +38,27 @@
                 <div>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user text-sm"></i></span>
-                        <input name="name" type="text" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Full Name" value="{{ old('name') }}">
+                        <input name="name" type="text" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-base md:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Full Name" value="{{ old('name') }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-envelope text-sm"></i></span>
-                        <input name="email" type="email" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Email" value="{{ old('email') }}">
+                        <input name="email" type="email" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-base md:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Email" value="{{ old('email') }}">
                     </div>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-phone-alt text-sm"></i></span>
-                        <input name="phone" type="text" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Phone Number" value="{{ old('phone') }}">
+                        <input name="phone" type="text" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-base md:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Phone Number" value="{{ old('phone') }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-lock text-sm"></i></span>
-                        <input name="password" type="password" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Password">
+                        <input name="password" type="password" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-base md:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Password">
                     </div>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-shield-alt text-sm"></i></span>
-                        <input name="password_confirmation" type="password" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Confirm Password">
+                        <input name="password_confirmation" type="password" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-base md:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Confirm Password">
                     </div>
                 </div>
                 
