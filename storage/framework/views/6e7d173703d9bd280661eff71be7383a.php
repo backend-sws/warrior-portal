@@ -508,11 +508,11 @@
             <div>
                 <h4 class="text-[17px] font-bold text-gray-900 mb-6 relative inline-block">Quick Links<span class="absolute bottom-[-6px] left-0 w-1/2 h-[2px] bg-[#031b4e]"></span></h4>
                 <ul class="flex flex-col gap-4 text-[13px] text-gray-600 font-semibold mt-4">
-                    <li><a href="#" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> About Us</a></li>
-                    <li><a href="#" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Services</a></li>
-                    <li><a href="#" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Solution</a></li>
+                    <li><a href="<?php echo e(route('about')); ?>" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> About Us</a></li>
+                    <li><a href="<?php echo e(route('services')); ?>" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Services</a></li>
+                    <li><a href="<?php echo e(route('home')); ?>" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Solution</a></li>
                     <li><a href="#" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Blog</a></li>
-                    <li><a href="#" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Contact Us</a></li>
+                    <li><a href="<?php echo e(route('contact')); ?>" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Contact Us</a></li>
                 </ul>
             </div>
 
