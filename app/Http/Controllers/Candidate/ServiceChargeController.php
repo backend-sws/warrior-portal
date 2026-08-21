@@ -134,6 +134,9 @@ class ServiceChargeController extends Controller
                     'gateway_response' => ['bypassed' => true]
                 ]);
 
+                // Sync to Admin Candidate Payments
+                $this->syncToAdminCandidatePayments($user, $invoice, $request->amount);
+
                 // Notify Admin
                 $adminUser = \App\Models\User::where('role', 'admin')->first();
                 if ($adminUser) {
@@ -235,6 +238,12 @@ class ServiceChargeController extends Controller
             }
         }
 
+        // Sync to Admin Candidate Payments
+        $invToSync = $invoiceId ? ServiceChargeInvoice::find($invoiceId) : ($latestInvoice ?? null);
+        if ($invToSync) {
+            $this->syncToAdminCandidatePayments($user, $invToSync, $amountPaid);
+        }
+
         // Notify Admin
         $adminUser = \App\Models\User::where('role', 'admin')->first();
         if ($adminUser) {
@@ -273,5 +282,46 @@ class ServiceChargeController extends Controller
         ]);
 
         return $pdf->download('Service-Charge-Invoice-' . $invoice->id . '.pdf');
+    }
+
+    private function syncToAdminCandidatePayments($user, $invoice, $amountPaid)
+    {
+        $tuitionName = 'Online Service Charge';
+        if ($invoice && $invoice->job_application_id) {
+            $jobApp = \App\Models\JobApplication::with('jobPost')->find($invoice->job_application_id);
+            if ($jobApp && $jobApp->jobPost) {
+                $tuitionName = $jobApp->jobPost->title;
+            }
+        }
+
+        $account = \App\Models\CandidatePaymentAccount::where('mobile_number', $user->phone ?? $user->email)
+            ->orWhere(function($q) use ($user, $tuitionName) {
+                $q->where('candidate_name', $user->name)
+                  ->where('tuition_assigned', 'like', "%{$tuitionName}%");
+            })
+            ->first();
+
+        if (!$account) {
+            $account = \App\Models\CandidatePaymentAccount::create([
+                'candidate_name' => $user->name,
+                'mobile_number' => $user->phone ?? $user->email,
+                'address' => $user->profile->address ?? 'Online',
+                'tuition_assigned' => $tuitionName,
+                'joining_date' => now(),
+                'monthly_amount' => $amountPaid,
+                'next_due_date' => now()->addMonth(),
+                'status' => 'active'
+            ]);
+        }
+
+        \App\Models\CandidatePaymentRecord::create([
+            'candidate_payment_account_id' => $account->id,
+            'payment_date' => now(),
+            'amount' => $amountPaid,
+            'payment_mode' => 'Online Gateway',
+            'type' => 'Collected',
+            'collected_by' => 'System (Auto)',
+            'remarks' => 'Online Service Charge Payment for ' . $tuitionName
+        ]);
     }
 }

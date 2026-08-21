@@ -8,9 +8,6 @@
         <h1 class="text-2xl font-black text-text-main">Candidate Payments</h1>
         <p class="text-text-dark/60 text-sm mt-1">Track payouts and commission collections for candidates.</p>
     </div>
-    <a href="{{ route('admin.candidate-payments.create') }}" class="bg-accent-blue text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-lg shadow-accent-blue/30">
-        <i class="fas fa-plus"></i> Add Candidate Profile
-    </a>
 </div>
 
 <!-- Dashboard Metrics -->
