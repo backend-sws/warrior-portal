@@ -8,17 +8,17 @@
         </button>
         
         <!-- Header -->
-        <div class="bg-gradient-to-r from-accent-blue to-blue-600 p-8 text-center relative overflow-hidden">
-            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-accent-blue shadow-lg text-2xl mx-auto mb-4 relative z-10">
-                <i class="fas fa-file-alt"></i>
+        <div class="p-8 text-center relative overflow-hidden bg-white/90 backdrop-blur-md rounded-t-2xl">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500"></div>
+            <div class="w-20 h-20 mx-auto bg-gradient-to-tr from-slate-50 to-indigo-50 rounded-full flex items-center justify-center text-indigo-600 shadow-[inset_0_2px_4px_rgba(255,255,255,0.8),_0_10px_20px_rgba(0,0,0,0.05)] text-3xl mb-5 relative z-10 border border-white">
+                <i class="fas fa-file-invoice"></i>
             </div>
-            <h3 class="text-2xl font-bold text-white relative z-10">Build Your Resume!</h3>
-            <p class="text-blue-100 mt-2 text-sm relative z-10">Register now to create a professional resume and land your dream job.</p>
+            <h3 class="text-2xl font-extrabold text-slate-800 tracking-tight">Build Your Resume</h3>
+            <p class="text-slate-500 mt-2 text-sm font-medium">Create a professional resume in minutes and land your dream job.</p>
         </div>
         
         <!-- Registration Form -->
-        <div class="p-6 bg-slate-50">
+        <div class="p-8 bg-slate-50/80 backdrop-blur-xl border-t border-white/50">
             @if($errors->any())
                 <div class="mb-4 bg-red-500/10 border border-red-500/30 p-3 rounded-xl">
                     <div class="flex items-start gap-2">
@@ -37,45 +37,44 @@
                 @csrf
                 <div>
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user text-sm"></i></span>
-                        <input name="name" type="text" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Full Name" value="{{ old('name') }}">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user text-sm"></i></span>
+                        <input name="name" type="text" required class="w-full bg-white/80 border border-slate-200/60 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]" placeholder="Full Name" value="{{ old('name') }}">
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-4">
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-envelope text-sm"></i></span>
-                        <input name="email" type="email" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Email" value="{{ old('email') }}">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-envelope text-sm"></i></span>
+                        <input name="email" type="email" required class="w-full bg-white/80 border border-slate-200/60 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]" placeholder="Email Address" value="{{ old('email') }}">
                     </div>
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-phone-alt text-sm"></i></span>
-                        <input name="phone" type="text" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Phone Number" value="{{ old('phone') }}">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-phone-alt text-sm"></i></span>
+                        <input name="phone" type="text" required class="w-full bg-white/80 border border-slate-200/60 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]" placeholder="Phone Number" value="{{ old('phone') }}">
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-4">
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-lock text-sm"></i></span>
-                        <input name="password" type="password" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Password">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-lock text-sm"></i></span>
+                        <input name="password" type="password" required class="w-full bg-white/80 border border-slate-200/60 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]" placeholder="Password">
                     </div>
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-shield-alt text-sm"></i></span>
-                        <input name="password_confirmation" type="password" required class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-accent-blue" placeholder="Confirm Password">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-shield-alt text-sm"></i></span>
+                        <input name="password_confirmation" type="password" required class="w-full bg-white/80 border border-slate-200/60 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]" placeholder="Confirm Password">
                     </div>
                 </div>
                 
-                <button type="submit" class="w-full bg-accent-blue text-white font-bold py-2.5 rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 mt-2">
+                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold py-3.5 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all shadow-[0_10px_20px_rgba(79,70,229,0.2),_inset_0_2px_0_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 mt-4 transform hover:-translate-y-0.5">
                     <i class="fas fa-user-plus"></i> Register & Build Profile
                 </button>
             </form>
             
-            <div class="mt-3">
-                <a href="{{ route('resume.builder') }}" class="w-full bg-white border-2 border-accent-blue text-accent-blue font-bold py-2 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-file-pdf"></i> Try Free Resume Builder
+            <div class="mt-4">
+                <a href="{{ route('resume.builder') }}" class="w-full bg-white border border-slate-200 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-50 transition-all shadow-[0_4px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_15px_rgba(0,0,0,0.05)] flex items-center justify-center gap-2 group">
+                    <i class="fas fa-file-pdf text-red-500 group-hover:scale-110 transition-transform"></i> Try Free Resume Builder
                 </a>
             </div>
 
-            <div class="mt-4 text-center border-t border-slate-200 pt-4">
-                <p class="text-xs text-slate-500">Already have an account? <a href="{{ route('login') }}" class="text-accent-blue font-bold hover:underline">Login here</a></p>
-                {{-- <p class="text-xs text-slate-400 mt-2">Looking to hire? <a href="{{ route('employer.register') }}" class="text-slate-600 hover:text-accent-yellow transition-colors underline">Register as Employer</a></p> --}}
+            <div class="mt-6 text-center">
+                <p class="text-sm text-slate-500 font-medium">Already have an account? <a href="{{ route('login') }}" class="text-indigo-600 font-bold hover:text-indigo-800 hover:underline transition-colors">Login here</a></p>
             </div>
         </div>
     </div>

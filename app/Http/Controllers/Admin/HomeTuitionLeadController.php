@@ -91,6 +91,21 @@ class HomeTuitionLeadController extends Controller
             'follow_up_date' => 'nullable|date',
         ]);
 
+        $user = \App\Models\User::where('phone', $validated['parent_mobile'])->first();
+
+        if (!$user) {
+            $user = \App\Models\User::create([
+                'name' => $validated['parent_name'],
+                'phone' => $validated['parent_mobile'],
+                'email' => $validated['parent_mobile'] . '@warriorseducare.com', // Auto-generated
+                'password' => bcrypt('12345678'), // Default password
+                'role' => 'parent',
+                'is_active' => true,
+            ]);
+        }
+
+        $validated['user_id'] = $user->id;
+
         $lead = HomeTuitionLead::create($validated);
 
         if ($request->filled('additional_notes')) {
