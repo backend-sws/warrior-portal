@@ -3,21 +3,21 @@
 @section('content')
 @include('candidate.partials.nav')
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
 
     {{-- Page Header --}}
-    <div class="text-center mb-10 reveal">
-        <div class="w-14 h-14 rounded-2xl bg-accent-yellow/10 text-accent-yellow flex items-center justify-center text-2xl mx-auto mb-4">
+    <div class="text-center mb-8 sm:mb-10 reveal">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-accent-yellow/10 text-accent-yellow flex items-center justify-center text-xl sm:text-2xl mx-auto mb-3 sm:mb-4">
             <i class="fas fa-crown"></i>
         </div>
-        <h1 class="text-2xl font-bold text-[#031b4e]">Select Your Membership Plan</h1>
-        <p class="text-sm text-[#031b4e]/60 mt-2 max-w-md mx-auto">Choose a plan that best fits your job search needs. Pay securely using PhonePe.</p>
+        <h1 class="text-xl sm:text-2xl font-bold text-[#031b4e]">Select Your Membership Plan</h1>
+        <p class="text-xs sm:text-sm text-[#031b4e]/70 mt-1.5 max-w-md mx-auto">Choose a plan that best fits your job search needs. Pay securely using PhonePe.</p>
     </div>
 
     @if(session('error'))
-        <div class="mb-8 bg-red-500/10 border border-red-500/30 p-4 rounded-xl flex items-center gap-3 text-center justify-center reveal">
-            <i class="fas fa-exclamation-circle text-red-400"></i>
-            <span class="text-sm text-red-400 font-medium">{{ session('error') }}</span>
+        <div class="mb-6 sm:mb-8 bg-red-500/10 border border-red-500/30 p-3.5 sm:p-4 rounded-xl flex items-center gap-3 text-center justify-center reveal">
+            <i class="fas fa-exclamation-circle text-red-500 text-sm sm:text-base"></i>
+            <span class="text-xs sm:text-sm text-red-700 font-medium">{{ session('error') }}</span>
         </div>
     @endif
 
@@ -25,41 +25,41 @@
 
     {{-- Already on Premium — Best plan message --}}
     @if(!$isRenewal && $profile->plan_type === 'premium' && ($profile->initial_fee_paid || $profile->is_fee_paid))
-    <div class="max-w-md mx-auto mb-10">
-        <div class="light-metallic-blue-card rounded-2xl border-0 p-8 text-center shadow-xl relative overflow-hidden">
+    <div class="max-w-md mx-auto mb-8 sm:mb-10">
+        <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 p-5 sm:p-8 text-center shadow-xl relative overflow-hidden bg-white">
             <div class="absolute -top-12 -right-12 w-24 h-24 bg-accent-yellow/10 rounded-full blur-2xl"></div>
             <div class="absolute -bottom-12 -left-12 w-24 h-24 bg-accent-yellow/5 rounded-full blur-2xl"></div>
             
             <div class="relative z-10">
-                <div class="w-20 h-20 rounded-2xl bg-accent-yellow/10 text-accent-yellow flex items-center justify-center text-4xl mx-auto mb-5">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-accent-yellow/10 text-accent-yellow flex items-center justify-center text-3xl sm:text-4xl mx-auto mb-4 sm:mb-5">
                     <i class="fas fa-crown"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-[#031b4e] mb-2">You're on the Premium Plan!</h3>
-                <p class="text-sm text-[#031b4e]/70 mb-6">You already have the best plan with all features unlocked. No upgrade needed.</p>
+                <h3 class="text-xl sm:text-2xl font-bold text-[#031b4e] mb-2">You're on the Premium Plan!</h3>
+                <p class="text-xs sm:text-sm text-[#031b4e]/70 mb-5 sm:mb-6">You already have the best plan with all features unlocked. No upgrade needed.</p>
                 
                 <div class="bg-accent-yellow/5 border border-accent-yellow/20 rounded-xl p-4 mb-6">
                     <ul class="space-y-3 text-left">
-                        <li class="flex items-center gap-3 text-sm text-[#031b4e]">
+                        <li class="flex items-center gap-3 text-xs sm:text-sm text-[#031b4e]">
                             <i class="fas fa-check text-accent-yellow"></i> Priority application processing
                         </li>
-                        <li class="flex items-center gap-3 text-sm text-[#031b4e]">
+                        <li class="flex items-center gap-3 text-xs sm:text-sm text-[#031b4e]">
                             <i class="fas fa-check text-accent-yellow"></i> Profile highlighted to employers
                         </li>
-                        <li class="flex items-center gap-3 text-sm text-[#031b4e]">
+                        <li class="flex items-center gap-3 text-xs sm:text-sm text-[#031b4e]">
                             <i class="fas fa-check text-accent-yellow"></i> Dedicated Relationship Manager
                         </li>
-                        <li class="flex items-center gap-3 text-sm text-[#031b4e]">
+                        <li class="flex items-center gap-3 text-xs sm:text-sm text-[#031b4e]">
                             <i class="fas fa-check text-accent-yellow"></i> Guaranteed Interviews
                         </li>
                     </ul>
                 </div>
 
-                <span class="inline-block px-6 py-3 bg-accent-yellow/10 text-accent-yellow font-bold text-sm rounded-xl border border-accent-yellow/20">
+                <span class="inline-block px-5 sm:px-6 py-2.5 sm:py-3 bg-accent-yellow/10 text-accent-yellow font-bold text-xs sm:text-sm rounded-xl border border-accent-yellow/20">
                     <i class="fas fa-star mr-1"></i> Active Premium Member
                 </span>
 
                 <div class="mt-6">
-                    <a href="{{ route('candidate.dashboard') }}" class="text-sm text-[#0ea5e9] hover:text-[#0ea5e9]-hover font-semibold">
+                    <a href="{{ route('candidate.dashboard') }}" class="text-xs sm:text-sm text-[#0ea5e9] hover:text-[#0ea5e9]-hover font-bold">
                         <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
                     </a>
                 </div>
@@ -67,10 +67,10 @@
         </div>
     </div>
     @else
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-8 max-w-3xl mx-auto mb-8 sm:mb-10">
 
         {{-- Standard Plan --}}
-        <div class="light-metallic-blue-card rounded-2xl border-0 p-8 flex flex-col hover:border-[#0ea5e9]/30 hover:shadow-xl transition-all duration-300 group reveal reveal-delay-1 relative overflow-hidden">
+        <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 p-5 sm:p-8 flex flex-col hover:border-[#0ea5e9]/30 hover:shadow-xl transition-all duration-300 group reveal reveal-delay-1 relative overflow-hidden bg-white">
             {{-- Decorative --}}
             <div class="absolute -top-12 -right-12 w-24 h-24 bg-[#0ea5e9]/5 rounded-full blur-2xl"></div>
 

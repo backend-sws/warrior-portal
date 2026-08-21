@@ -1,18 +1,17 @@
-@extends('layouts.app')
-
-@section('content')
-    @include('candidate.partials.nav')
+<?php $__env->startSection('content'); ?>
+    <?php echo $__env->make('candidate.partials.nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
         <div class="mb-5 sm:mb-8">
             <h2 class="text-xl sm:text-2xl font-bold text-[#031b4e]">Available Tuitions</h2>
             <p class="text-xs sm:text-sm text-[#031b4e]/80 mt-1">Find and apply for home tuitions matching your expertise.</p>
         </div>
 
-@if(session('success'))
+<?php if(session('success')): ?>
     <div class="bg-green-50 text-green-700 p-3.5 sm:p-4 rounded-xl border border-green-100 mb-5 sm:mb-6 flex items-center text-xs sm:text-sm">
-        <i class="fas fa-check-circle mr-2.5 sm:mr-3 text-sm sm:text-base"></i> {{ session('success') }}
+        <i class="fas fa-check-circle mr-2.5 sm:mr-3 text-sm sm:text-base"></i> <?php echo e(session('success')); ?>
+
     </div>
-@endif
+<?php endif; ?>
 
 <!-- Tuition Agreement Section -->
 <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 shadow-sm p-4 sm:p-6 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#f4f7f5]/80">
@@ -47,15 +46,15 @@
         
         <div id="printableTuitionAgreement" class="p-4 sm:p-6 md:p-8 overflow-y-auto custom-scrollbar text-[#031b4e]/80 text-xs sm:text-sm relative">
             <!-- Watermark Image -->
-            <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="watermark-img" alt="Watermark" style="position: absolute; top: 65%; left: 50%; transform: translateX(-50%); width: 60%; max-width: 500px; opacity: 0.1; z-index: 0; pointer-events: none;">
+            <img src="<?php echo e(asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg')); ?>" class="watermark-img" alt="Watermark" style="position: absolute; top: 65%; left: 50%; transform: translateX(-50%); width: 60%; max-width: 500px; opacity: 0.1; z-index: 0; pointer-events: none;">
 
             <div class="text-center mb-6 relative z-10 border-b-2 border-[#031b4e] pb-4">
-                <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" alt="Warriors Educare Logo" style="max-height: 80px; margin: 0 auto 10px auto;">
+                <img src="<?php echo e(asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg')); ?>" alt="Warriors Educare Logo" style="max-height: 80px; margin: 0 auto 10px auto;">
                 <h2 class="text-2xl font-bold text-[#031b4e] mb-1">WARRIORS EDUCARE</h2>
                 <h3 class="text-lg font-semibold text-[#031b4e]">HOME TUITION – TUTOR SERVICE AGREEMENT</h3>
             </div>
             
-            @php
+            <?php
                 $profile = auth()->user()->profile;
                 
                 // Photo URL
@@ -96,23 +95,23 @@
                         $signature = 'data:image/png;base64,' . base64_encode($profile->signature_data);
                     }
                 }
-            @endphp
+            ?>
             
             <div class="relative z-10">
             
             <!-- Candidate Details & Photo -->
             <div class="bg-gray-50 border border-gray-200 p-3 sm:p-4 mb-4 sm:mb-6 rounded-xl flex flex-col-reverse sm:flex-row justify-between items-start gap-3">
                 <div class="space-y-1 text-xs sm:text-sm">
-                    <p class="mb-0"><strong>Candidate Name:</strong> {{ auth()->user()->name }}</p>
-                    <p class="mb-0"><strong>Email:</strong> {{ auth()->user()->email }}</p>
-                    <p class="mb-0"><strong>Phone:</strong> {{ auth()->user()->phone }}</p>
-                    <p class="mb-0"><strong>Address:</strong> {{ $profile->address }}</p>
+                    <p class="mb-0"><strong>Candidate Name:</strong> <?php echo e(auth()->user()->name); ?></p>
+                    <p class="mb-0"><strong>Email:</strong> <?php echo e(auth()->user()->email); ?></p>
+                    <p class="mb-0"><strong>Phone:</strong> <?php echo e(auth()->user()->phone); ?></p>
+                    <p class="mb-0"><strong>Address:</strong> <?php echo e($profile->address); ?></p>
                 </div>
-                @if($photoUrl)
+                <?php if($photoUrl): ?>
                     <div class="shrink-0 self-center sm:self-auto">
-                        <img src="{{ $photoUrl }}" alt="Candidate Photo" class="w-16 h-20 sm:w-20 sm:h-24 object-cover border border-gray-300 rounded-lg shadow-sm">
+                        <img src="<?php echo e($photoUrl); ?>" alt="Candidate Photo" class="w-16 h-20 sm:w-20 sm:h-24 object-cover border border-gray-300 rounded-lg shadow-sm">
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
 
             <p class="mb-4">This Agreement is entered into voluntarily between Warriors Educare ("Agency") and the undersigned Candidate ("Tutor").</p>
@@ -192,17 +191,18 @@
             <div class="mt-8 pt-6 border-t border-gray-300 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6" style="page-break-inside: avoid;">
                 <div>
                     <div class="date mb-4 sm:mb-6">
-                        <strong>Date of Execution:</strong> {{ \Carbon\Carbon::now()->format('d F Y') }}
+                        <strong>Date of Execution:</strong> <?php echo e(\Carbon\Carbon::now()->format('d F Y')); ?>
+
                     </div>
                     <p class="font-bold mb-4 sm:mb-8">For Warriors Educare</p>
                     <p>(Authorized Signatory)</p>
                 </div>
                 <div class="text-left sm:text-left" style="font-family: 'Times New Roman', Times, serif; font-size: 13px; color: #000; line-height: 1.2;">
                     <i>Digitally Signed by</i><br>
-                    <i>Name : {{ auth()->user()->name }}</i><br>
-                    <i>Phone No : ******{{ substr(auth()->user()->phone ?? '0000', -4) }}</i><br>
+                    <i>Name : <?php echo e(auth()->user()->name); ?></i><br>
+                    <i>Phone No : ******<?php echo e(substr(auth()->user()->phone ?? '0000', -4)); ?></i><br>
                     <i>Reason: Agreement E-signature</i><br>
-                    <i>Date : {{ \Carbon\Carbon::parse($profile->signature_date_time ?? now())->format('D M d H:i:s T Y') }}</i>
+                    <i>Date : <?php echo e(\Carbon\Carbon::parse($profile->signature_date_time ?? now())->format('D M d H:i:s T Y')); ?></i>
                 </div>
             </div>
             </div> <!-- End relative z-10 -->
@@ -251,68 +251,73 @@ function printTuitionAgreement() {
 }
 </script>
 
-@if(session('info'))
+<?php if(session('info')): ?>
     <div class="bg-blue-50 text-blue-700 p-4 rounded-xl border border-blue-100 mb-6 flex items-center">
-        <i class="fas fa-info-circle mr-3"></i> {{ session('info') }}
-    </div>
-@endif
+        <i class="fas fa-info-circle mr-3"></i> <?php echo e(session('info')); ?>
 
-@if(session('error'))
-    <div class="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 mb-6 flex items-center">
-        <i class="fas fa-exclamation-circle mr-3"></i> {{ session('error') }}
     </div>
-@endif
+<?php endif; ?>
+
+<?php if(session('error')): ?>
+    <div class="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 mb-6 flex items-center">
+        <i class="fas fa-exclamation-circle mr-3"></i> <?php echo e(session('error')); ?>
+
+    </div>
+<?php endif; ?>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-    @forelse($tuitions as $tuition)
+    <?php $__empty_1 = true; $__currentLoopData = $tuitions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tuition): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
         <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 shadow-sm p-4 sm:p-6 flex flex-col hover:shadow-md transition-shadow bg-white">
             <div class="flex justify-between items-start gap-2 mb-3 sm:mb-4">
                 <span class="bg-[#0ea5e9]/10 text-[#0ea5e9] text-xs font-bold px-2.5 sm:px-3 py-1 rounded-full">
-                    Class {{ $tuition->{'class'} }}
+                    Class <?php echo e($tuition->{'class'}); ?>
+
                 </span>
                 <span class="bg-green-50 text-green-700 text-xs sm:text-sm font-bold px-2.5 sm:px-3 py-1 rounded-lg border border-green-100 whitespace-nowrap">
-                    ₹{{ $tuition->fee }}<span class="text-[10px] sm:text-xs font-normal">/mo</span>
+                    ₹<?php echo e($tuition->fee); ?><span class="text-[10px] sm:text-xs font-normal">/mo</span>
                 </span>
             </div>
 
-            <h3 class="text-base sm:text-lg md:text-xl font-bold text-[#031b4e] mb-2 leading-snug">{{ $tuition->subjects }}</h3>
+            <h3 class="text-base sm:text-lg md:text-xl font-bold text-[#031b4e] mb-2 leading-snug"><?php echo e($tuition->subjects); ?></h3>
             
             <div class="space-y-2 sm:space-y-2.5 mb-4 sm:mb-6 flex-grow text-xs sm:text-sm">
                 <div class="flex items-center text-gray-600">
                     <i class="fas fa-book w-5 text-[#031b4e]/50 shrink-0"></i>
-                    <span class="truncate">{{ $tuition->board }}</span>
+                    <span class="truncate"><?php echo e($tuition->board); ?></span>
                 </div>
                 <div class="flex items-center text-gray-600">
                     <i class="fas fa-map-marker-alt w-5 text-[#031b4e]/50 shrink-0"></i>
-                    <span class="line-clamp-1" title="{{ $tuition->location }}">{{ $tuition->location }}</span>
+                    <span class="line-clamp-1" title="<?php echo e($tuition->location); ?>"><?php echo e($tuition->location); ?></span>
                 </div>
-                @if($tuition->additional_notes)
-                <div class="text-[#031b4e]/80 mt-2 line-clamp-2 bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-xs" title="{{ $tuition->additional_notes }}">
-                    <strong class="text-slate-700 font-semibold">Note:</strong> {{ $tuition->additional_notes }}
+                <?php if($tuition->additional_notes): ?>
+                <div class="text-[#031b4e]/80 mt-2 line-clamp-2 bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-xs" title="<?php echo e($tuition->additional_notes); ?>">
+                    <strong class="text-slate-700 font-semibold">Note:</strong> <?php echo e($tuition->additional_notes); ?>
+
                 </div>
-                @endif
+                <?php endif; ?>
             </div>
 
             <div class="flex items-center justify-between mt-auto pt-3 sm:pt-4 border-t border-[#031b4e]/10 gap-2">
                 <span class="text-[11px] sm:text-xs text-[#031b4e]/60 whitespace-nowrap">
-                    <i class="far fa-clock mr-1"></i> {{ $tuition->created_at->diffForHumans() }}
+                    <i class="far fa-clock mr-1"></i> <?php echo e($tuition->created_at->diffForHumans()); ?>
+
                 </span>
 
-                @if(in_array($tuition->id, $appliedTuitionIds))
+                <?php if(in_array($tuition->id, $appliedTuitionIds)): ?>
                     <button disabled class="bg-gray-100 text-[#031b4e]/80 font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm cursor-not-allowed">
                         Applied <i class="fas fa-check ml-1 text-green-600"></i>
                     </button>
-                @else
-                    <form action="{{ route('candidate.tuitions.apply', $tuition->id) }}" method="POST" class="shrink-0">
-                        @csrf
+                <?php else: ?>
+                    <form action="<?php echo e(route('candidate.tuitions.apply', $tuition->id)); ?>" method="POST" class="shrink-0">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95">
                             Apply Now
                         </button>
                     </form>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
-    @empty
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <div class="col-span-full bg-white p-8 sm:p-12 text-center rounded-2xl border border-[#031b4e]/5">
             <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <i class="fas fa-book-reader text-[#031b4e]/50 text-xl sm:text-2xl"></i>
@@ -320,17 +325,20 @@ function printTuitionAgreement() {
             <h3 class="text-base sm:text-lg font-bold text-[#031b4e] mb-1">No Tuitions Available</h3>
             <p class="text-xs sm:text-sm text-[#031b4e]/80">There are currently no active tuitions to apply for. Please check back later.</p>
         </div>
-    @endforelse
+    <?php endif; ?>
 </div>
 
-@if($tuitions->hasPages())
+<?php if($tuitions->hasPages()): ?>
     <div class="mt-8">
-        {{ $tuitions->links() }}
-    </div>
-@endif
+        <?php echo e($tuitions->links()); ?>
 
     </div>
-@endsection
+<?php endif; ?>
+
+    </div>
+<?php $__env->stopSection(); ?>
 
 
 
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Employee\Desktop\warrioredu\resources\views/candidate/tuitions/index.blade.php ENDPATH**/ ?>
