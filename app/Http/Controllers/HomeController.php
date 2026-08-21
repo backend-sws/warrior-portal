@@ -82,7 +82,7 @@ class HomeController extends Controller
             'fas fa-chalkboard-teacher'
         );
 
-        return redirect()->route('home')->with('tuition_success', 'Your tuition requirement has been posted successfully! Our team will contact you soon.');
+        return back()->with('tuition_success', 'Your tuition requirement has been posted successfully! Our team will contact you soon.');
     }
 
     public function categoryJobs($id)
