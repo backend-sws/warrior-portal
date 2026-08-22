@@ -750,77 +750,508 @@
 
 
             
-            <div id="quick-request-form" class="max-w-4xl mx-auto mt-20 relative z-10 reveal bg-gradient-to-br from-[#f0f7ff] to-blue-50 rounded-3xl p-8 md:p-10 shadow-2xl border border-blue-200">
-                <div class="text-center mb-8">
-                    <h3 class="text-2xl md:text-3xl font-bold text-[#031b4e] mb-2">Need a Tutor for Your Child?</h3>
-                    <p class="text-slate-500">Fill this quick form and we'll match you with the best verified tutor.</p>
+            <div id="quick-request-form" x-data="quickRequirementForm()" x-ref="formContainer" class="max-w-4xl mx-auto mt-20 relative z-10 reveal bg-gradient-to-br from-[#f0f7ff] to-blue-50/80 backdrop-blur-xl rounded-3xl p-6 sm:p-10 shadow-2xl border border-blue-200/80 transition-all duration-300">
+                
+                {{-- Segmented Toggle Switch --}}
+                <div class="flex justify-center mb-8">
+                    <div class="inline-flex p-1.5 bg-white/90 backdrop-blur-md rounded-2xl shadow-inner border border-blue-100 gap-1.5 w-full sm:w-auto">
+                        <button type="button" @click="switchTab('tuition')"
+                            :class="tab === 'tuition' ? 'bg-[#031b4e] text-white shadow-md font-bold' : 'text-slate-600 hover:text-[#031b4e] font-semibold hover:bg-blue-50/80'"
+                            class="flex-1 sm:flex-initial px-5 py-3 rounded-xl text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                            <i class="fas fa-graduation-cap text-base" :class="tab === 'tuition' ? 'text-[#38bdf8]' : 'text-slate-400'"></i>
+                            <span>Need a Home Tutor</span>
+                            <span class="hidden md:inline text-[11px] px-2 py-0.5 rounded-full" :class="tab === 'tuition' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">Parent / Student</span>
+                        </button>
+                        <button type="button" @click="switchTab('school')"
+                            :class="tab === 'school' ? 'bg-[#031b4e] text-white shadow-md font-bold' : 'text-slate-600 hover:text-[#031b4e] font-semibold hover:bg-blue-50/80'"
+                            class="flex-1 sm:flex-initial px-5 py-3 rounded-xl text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                            <i class="fas fa-school text-base" :class="tab === 'school' ? 'text-[#f59e0b]' : 'text-slate-400'"></i>
+                            <span>Hire Teachers for School</span>
+                            <span class="hidden md:inline text-[11px] px-2 py-0.5 rounded-full" :class="tab === 'school' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">School / Institute</span>
+                        </button>
+                    </div>
                 </div>
 
-                @if(session('tuition_success'))
-                    <div class="mb-6 bg-green-500/10 border border-green-500 text-green-600 px-4 py-3 rounded-xl flex items-center justify-center font-medium">
-                        <i class="fas fa-check-circle mr-2"></i>
-                        {{ session('tuition_success') }}
+                {{-- Header Content --}}
+                <div class="text-center mb-8" x-show="!submitted">
+                    <template x-if="tab === 'tuition'">
+                        <div>
+                            <h3 class="text-2xl md:text-3xl font-extrabold text-[#031b4e] mb-2 tracking-tight">Need a Tutor for Your Child?</h3>
+                            <p class="text-slate-600 text-sm md:text-base max-w-lg mx-auto">Fill this quick form and our academic team will match you with the best verified home tutor in your area.</p>
+                        </div>
+                    </template>
+                    <template x-if="tab === 'school'">
+                        <div>
+                            <h3 class="text-2xl md:text-3xl font-extrabold text-[#031b4e] mb-2 tracking-tight">Hire Qualified Teachers for Your School / Institute</h3>
+                            <p class="text-slate-600 text-sm md:text-base max-w-xl mx-auto">Post your faculty requirements and access over 10,000+ pre-verified teachers, lecturers & staff across India.</p>
+                        </div>
+                    </template>
+                </div>
+
+                {{-- Server-Side Flash Messages (Fallback) --}}
+                @if(session('tuition_success') || session('school_success'))
+                    <div class="mb-6 bg-emerald-50 border border-emerald-300 text-emerald-800 px-6 py-5 rounded-2xl flex items-start gap-4 shadow-sm animate-fade-in">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 text-lg shadow-sm">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-emerald-900 text-base mb-0.5">Requirement Submitted Successfully!</h4>
+                            <p class="text-sm text-emerald-700 leading-relaxed">{{ session('tuition_success') ?? session('school_success') }}</p>
+                        </div>
                     </div>
                 @endif
 
-                <form action="{{ route('tuition.post') }}" method="POST" class="space-y-6">
-                    @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Guest Name -->
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Your Name *</label>
-                            <input type="text" name="guest_name" required placeholder="Enter your full name" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
-                        </div>
-                        <!-- Guest Phone -->
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Your Phone Number *</label>
-                            <input type="text" name="guest_phone" required placeholder="Enter your phone number" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
-                        </div>
-                        
-                        <!-- Class -->
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Student's Class *</label>
-                            <input type="text" name="student_class" placeholder="e.g. Class 10" required class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
-                        </div>
-                        
-                        <!-- Board -->
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Board *</label>
-                            <select name="board" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#031b4e] focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500 transition-colors outline-none appearance-none">
-                                <option value="">Select Board</option>
-                                <option value="CBSE">CBSE</option>
-                                <option value="ICSE">ICSE</option>
-                                <option value="State Board">State Board</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
+                {{-- Inline AJAX Error Banner --}}
+                <div x-show="errorMessage" x-cloak class="mb-6 bg-rose-50 border border-rose-300 text-rose-800 px-5 py-4 rounded-2xl flex items-center gap-3 shadow-sm">
+                    <i class="fas fa-exclamation-circle text-rose-500 text-lg shrink-0"></i>
+                    <span class="text-sm font-medium" x-text="errorMessage"></span>
+                    <button type="button" @click="errorMessage = ''" class="ml-auto text-rose-400 hover:text-rose-600"><i class="fas fa-times"></i></button>
+                </div>
 
-                        <!-- Subjects -->
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Subjects Needed *</label>
-                            <input type="text" name="subjects" required placeholder="e.g., Math, Science" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
-                        </div>
-
-                        <!-- Location -->
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Complete Location/Address *</label>
-                            <input type="text" name="location" required placeholder="Enter full address or area" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
-                        </div>
-
-                        <!-- Pincode -->
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Pincode *</label>
-                            <input type="text" name="pincode" required placeholder="Enter 6-digit Pincode" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
-                        </div>
+                {{-- Inline AJAX Success Celebration State --}}
+                <div x-show="submitted" x-cloak class="text-center py-10 px-4 bg-white/90 rounded-2xl border border-emerald-200 shadow-xl space-y-5 animate-fade-in">
+                    <div class="w-20 h-20 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-full flex items-center justify-center text-white text-3xl mx-auto shadow-lg shadow-emerald-500/30 ring-8 ring-emerald-50">
+                        <i class="fas fa-check"></i>
                     </div>
-
-                    <div class="text-center pt-4">
-                        <button type="submit" class="bg-[#031b4e] hover:bg-accent-500 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all inline-flex items-center gap-2">
-                            Post Requirement <i class="fas fa-paper-plane"></i>
+                    <div class="max-w-md mx-auto space-y-2">
+                        <h4 class="text-2xl font-extrabold text-[#031b4e]">Request Received Successfully! 🎉</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed" x-text="successMessage"></p>
+                    </div>
+                    <div class="p-4 bg-blue-50/80 rounded-xl border border-blue-100 max-w-md mx-auto text-xs text-[#031b4e]/80 flex items-center justify-center gap-2">
+                        <i class="fas fa-clock text-blue-500"></i>
+                        <span>Our coordinator will call or WhatsApp you shortly.</span>
+                    </div>
+                    <div class="pt-3">
+                        <button type="button" @click="resetForm()" class="inline-flex items-center gap-2 bg-[#031b4e] hover:bg-[#004de6] text-white px-8 py-3 rounded-full text-sm font-bold shadow-md transition-all hover:scale-105 active:scale-95">
+                            <i class="fas fa-redo-alt text-xs"></i> Post Another Requirement
                         </button>
                     </div>
-                </form>
+                </div>
+
+                {{-- 1. TUITION FORM --}}
+                <div x-show="tab === 'tuition' && !submitted">
+                    <form @submit.prevent="submitTuitionForm($event)" action="{{ route('tuition.post') }}" method="POST" class="space-y-6">
+                        @csrf
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Parent/Student Name -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Your Name <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user text-sm"></i></span>
+                                    <input type="text" name="guest_name" required placeholder="Enter your full name" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+                            <!-- Phone Number -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Phone Number <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-phone-alt text-sm"></i></span>
+                                    <input type="tel" name="guest_phone" required placeholder="Enter 10-digit mobile number" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+                            
+                            <!-- Class -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Student's Class / Grade <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-graduation-cap text-sm"></i></span>
+                                    <input type="text" name="student_class" placeholder="e.g. Class 10 / Class 1-5 / Nursery" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+                            
+                            <!-- Board -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Education Board <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-book text-sm"></i></span>
+                                    <select name="board" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
+                                        <option value="">Select Education Board</option>
+                                        <option value="CBSE">CBSE Board</option>
+                                        <option value="ICSE">ICSE / ISC Board</option>
+                                        <option value="State Board">State Board</option>
+                                        <option value="IB / IGCSE">IB / Cambridge / IGCSE</option>
+                                        <option value="Other">Other / Competitive Prep</option>
+                                    </select>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                            </div>
+
+                            <!-- Subjects -->
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Subjects Needed <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-pencil-alt text-sm"></i></span>
+                                    <input type="text" name="subjects" required placeholder="e.g. Mathematics, Physics, English, or All Subjects" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Complete Location / Area <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-map-marker-alt text-sm"></i></span>
+                                    <input type="text" name="location" required placeholder="e.g. Kankarbagh, Patna or Area name" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Pincode -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Pincode</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-mail-bulk text-sm"></i></span>
+                                    <input type="text" name="pincode" maxlength="6" placeholder="Enter 6-digit Pincode" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center pt-2">
+                            <button type="submit" :disabled="loading" class="bg-gradient-to-r from-[#031b4e] to-[#004de6] hover:from-[#021338] hover:to-[#003cb8] text-white px-10 py-4 rounded-full font-bold text-base md:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 inline-flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0">
+                                <template x-if="!loading">
+                                    <span class="inline-flex items-center gap-2">Post Tuition Requirement <i class="fas fa-paper-plane text-sm"></i></span>
+                                </template>
+                                <template x-if="loading">
+                                    <span class="inline-flex items-center gap-2"><i class="fas fa-circle-notch fa-spin"></i> Submitting...</span>
+                                </template>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                {{-- 2. SCHOOL / INSTITUTE HIRING FORM --}}
+                <div x-show="tab === 'school' && !submitted" x-cloak>
+                    <form @submit.prevent="submitSchoolForm($event)" action="{{ route('school.requirement.post') }}" method="POST" class="space-y-6">
+                        @csrf
+                        
+                        {{-- Job Title --}}
+                        <div>
+                            <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Job Title / Position Name <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-briefcase text-sm"></i></span>
+                                <input type="text" name="title" required placeholder="e.g. Senior Physics Teacher / PRT All Subjects / Academic Coordinator" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Institution Name -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">School / Institution Name <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-school text-sm"></i></span>
+                                    <input type="text" name="school_name" required placeholder="e.g. St. Xavier's High School / Apex Academy" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Contact Person -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Contact Person & Designation <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user-tie text-sm"></i></span>
+                                    <input type="text" name="contact_person" required placeholder="e.g. Ramesh Kumar (Principal / HR Head)" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Phone -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Contact Phone / Mobile <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-phone-alt text-sm"></i></span>
+                                    <input type="tel" name="phone" required placeholder="Enter 10-digit mobile number" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Official Email (Optional)</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-envelope text-sm"></i></span>
+                                    <input type="email" name="email" placeholder="e.g. hr@schoolname.org" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Job Category -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Job Category <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-layer-group text-sm"></i></span>
+                                    <select name="category_id" x-model="school_category_id" @change="fetchSchoolSubjects()" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
+                                        <option value="">Select Category</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                            </div>
+
+                            <!-- Subject (Dynamic based on Category) -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Subject <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-book text-sm"></i></span>
+                                    <select name="subject_id" x-model="school_subject_id" :disabled="!school_category_id || loadingSchoolSubjects" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
+                                        <option value="" x-text="!school_category_id ? '— First Select Category —' : (loadingSchoolSubjects ? 'Loading subjects...' : 'Select Subject')"></option>
+                                        <template x-for="subj in school_subjects" :key="subj.id">
+                                            <option :value="subj.id" x-text="subj.name"></option>
+                                        </template>
+                                    </select>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                            </div>
+
+                            <!-- Required Qualification -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Required Qualification <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-graduation-cap text-sm"></i></span>
+                                    <select name="qualification_id" x-model="school_qualification_id" :disabled="!school_subject_id" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
+                                        <option value="" x-text="!school_subject_id ? '— First Select Subject —' : 'Select Qualification'"></option>
+                                        @foreach($qualifications as $qualification)
+                                            <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                            </div>
+
+                            <!-- State -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">State <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-map text-sm"></i></span>
+                                    <select name="state_id" x-model="school_state_id" @change="fetchSchoolCities()" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
+                                        <option value="">Select State</option>
+                                        @foreach($states as $state)
+                                            <option value="{{ $state->id }}">{{ $state->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                            </div>
+
+                            <!-- City (Dynamic based on State) -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">City <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-city text-sm"></i></span>
+                                    <select name="city_id" x-model="school_city_id" :disabled="!school_state_id || loadingSchoolCities" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
+                                        <option value="" x-text="!school_state_id ? '— First Select State —' : (loadingSchoolCities ? 'Loading cities...' : 'Select City')"></option>
+                                        <template x-for="city in school_cities" :key="city.id">
+                                            <option :value="city.id" x-text="city.name"></option>
+                                        </template>
+                                    </select>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                            </div>
+
+                            <!-- Salary Range -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Salary Range / Budget (Monthly)</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-rupee-sign text-sm"></i></span>
+                                    <input type="text" name="salary_range" placeholder="e.g. ₹35,000 - ₹50,000 / Negotiable" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Additional Notes / Description -->
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Job Description & Experience Requirements (Optional)</label>
+                                <div class="relative">
+                                    <textarea name="description" rows="2" placeholder="e.g. Looking for an experienced teacher with B.Ed and minimum 2+ years of teaching experience..." class="w-full bg-white border border-blue-200 rounded-xl p-4 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm resize-none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center pt-2">
+                            <button type="submit" :disabled="loading" class="bg-gradient-to-r from-[#031b4e] to-[#004de6] hover:from-[#021338] hover:to-[#003cb8] text-white px-10 py-4 rounded-full font-bold text-base md:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 inline-flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0">
+                                <template x-if="!loading">
+                                    <span class="inline-flex items-center gap-2">Submit Job for Approval <i class="fas fa-arrow-right text-sm"></i></span>
+                                </template>
+                                <template x-if="loading">
+                                    <span class="inline-flex items-center gap-2"><i class="fas fa-circle-notch fa-spin"></i> Submitting for Approval...</span>
+                                </template>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
+
+            <script>
+            function quickRequirementForm() {
+                return {
+                    tab: 'tuition',
+                    loading: false,
+                    submitted: false,
+                    successMessage: '',
+                    errorMessage: '',
+
+                    // School form dynamic state
+                    school_category_id: '',
+                    school_subject_id: '',
+                    school_qualification_id: '',
+                    school_state_id: '',
+                    school_city_id: '',
+                    school_subjects: [],
+                    school_cities: [],
+                    loadingSchoolSubjects: false,
+                    loadingSchoolCities: false,
+
+                    switchTab(newTab) {
+                        this.tab = newTab;
+                        this.errorMessage = '';
+                    },
+                    resetForm() {
+                        this.submitted = false;
+                        this.successMessage = '';
+                        this.errorMessage = '';
+                        this.$nextTick(() => {
+                            this.scrollToSection();
+                        });
+                    },
+                    scrollToSection() {
+                        const el = document.getElementById('quick-request-form');
+                        if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    },
+                    fetchSchoolSubjects() {
+                        this.school_subject_id = '';
+                        this.school_qualification_id = '';
+                        if (this.school_category_id) {
+                            this.loadingSchoolSubjects = true;
+                            fetch(`/api/categories/${this.school_category_id}/subjects`)
+                                .then(res => res.json())
+                                .then(data => {
+                                    this.school_subjects = data;
+                                })
+                                .catch(err => {
+                                    console.error('Error fetching subjects:', err);
+                                    this.school_subjects = [];
+                                })
+                                .finally(() => {
+                                    this.loadingSchoolSubjects = false;
+                                });
+                        } else {
+                            this.school_subjects = [];
+                        }
+                    },
+                    fetchSchoolCities() {
+                        this.school_city_id = '';
+                        if (this.school_state_id) {
+                            this.loadingSchoolCities = true;
+                            fetch(`/api/states/${this.school_state_id}/cities`)
+                                .then(res => res.json())
+                                .then(data => {
+                                    this.school_cities = data;
+                                })
+                                .catch(err => {
+                                    console.error('Error fetching cities:', err);
+                                    this.school_cities = [];
+                                })
+                                .finally(() => {
+                                    this.loadingSchoolCities = false;
+                                });
+                        } else {
+                            this.school_cities = [];
+                        }
+                    },
+                    async submitTuitionForm(event) {
+                        const form = event.target;
+                        const formData = new FormData(form);
+                        this.loading = true;
+                        this.errorMessage = '';
+
+                        try {
+                            const response = await fetch(form.action, {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json',
+                                },
+                                body: formData
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok && data.success) {
+                                this.submitted = true;
+                                this.successMessage = data.message || 'Your tuition requirement has been posted successfully! Our team will contact you soon.';
+                                form.reset();
+                                this.scrollToSection();
+                            } else {
+                                if (data.errors) {
+                                    const firstErr = Object.values(data.errors)[0];
+                                    this.errorMessage = Array.isArray(firstErr) ? firstErr[0] : firstErr;
+                                } else {
+                                    this.errorMessage = data.message || 'Something went wrong. Please check the fields and try again.';
+                                }
+                                this.scrollToSection();
+                            }
+                        } catch (err) {
+                            this.errorMessage = 'Network connection error. Please try again.';
+                            this.scrollToSection();
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+                    async submitSchoolForm(event) {
+                        const form = event.target;
+                        const formData = new FormData(form);
+                        this.loading = true;
+                        this.errorMessage = '';
+
+                        try {
+                            const response = await fetch(form.action, {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json',
+                                },
+                                body: formData
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok && data.success) {
+                                this.submitted = true;
+                                this.successMessage = data.message || 'Your job requirement has been submitted for approval! Our administration team will review and approve it shortly.';
+                                form.reset();
+                                this.school_subjects = [];
+                                this.school_cities = [];
+                                this.school_category_id = '';
+                                this.school_subject_id = '';
+                                this.school_qualification_id = '';
+                                this.school_state_id = '';
+                                this.school_city_id = '';
+                                this.scrollToSection();
+                            } else {
+                                if (data.errors) {
+                                    const firstErr = Object.values(data.errors)[0];
+                                    this.errorMessage = Array.isArray(firstErr) ? firstErr[0] : firstErr;
+                                } else {
+                                    this.errorMessage = data.message || 'Something went wrong. Please check your details and try again.';
+                                }
+                                this.scrollToSection();
+                            }
+                        } catch (err) {
+                            this.errorMessage = 'Network connection error. Please try again.';
+                            this.scrollToSection();
+                        } finally {
+                            this.loading = false;
+                        }
+                    }
+                };
+            }
+
+            // Auto-scroll on hash or session flash if non-ajax redirect occurs
+            document.addEventListener('DOMContentLoaded', () => {
+                if (window.location.hash === '#quick-request-form' || {{ (session('tuition_success') || session('school_success')) ? 'true' : 'false' }}) {
+                    setTimeout(() => {
+                        const el = document.getElementById('quick-request-form');
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 200);
+                }
+            });
+            </script>
         </section>
 
     <!-- Our Clients -->

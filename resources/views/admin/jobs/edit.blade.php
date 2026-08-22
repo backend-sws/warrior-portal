@@ -65,7 +65,7 @@
                 <!-- Category -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Job Category *</label>
-                    <select name="category_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                    <select name="category_id" id="category_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
                         <option value="">Select Category</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" {{ old('category_id', $job->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
@@ -74,10 +74,10 @@
                     @error('category_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <!-- Subject -->
+                <!-- Subject (Dynamic based on Category) -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Subject *</label>
-                    <select name="subject_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                    <select name="subject_id" id="subject_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
                         <option value="">Select Subject</option>
                         @foreach($subjects as $subject)
                             <option value="{{ $subject->id }}" {{ old('subject_id', $job->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
@@ -89,7 +89,7 @@
                 <!-- Qualification -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Required Qualification *</label>
-                    <select name="qualification_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                    <select name="qualification_id" id="qualification_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
                         <option value="">Select Qualification</option>
                         @foreach($qualifications as $qualification)
                             <option value="{{ $qualification->id }}" {{ old('qualification_id', $job->qualification_id) == $qualification->id ? 'selected' : '' }}>{{ $qualification->name }}</option>
@@ -173,6 +173,34 @@
                 .catch(error => console.error('CKEditor init error:', error));
         }
     });
+
+    // Category -> Subject
+    const categorySelect = document.getElementById('category_id');
+    const subjectSelect = document.getElementById('subject_id');
+
+    if (categorySelect && subjectSelect) {
+        categorySelect.addEventListener('change', function() {
+            let categoryId = this.value;
+            subjectSelect.innerHTML = '<option value="">Loading subjects...</option>';
+
+            if (categoryId) {
+                fetch(`/api/categories/${categoryId}/subjects`)
+                    .then(response => response.json())
+                    .then(data => {
+                        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                        data.forEach(subject => {
+                            subjectSelect.innerHTML += `<option value="${subject.id}">${subject.name}</option>`;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching subjects:', error);
+                        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                    });
+            } else {
+                subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+            }
+        });
+    }
 
     document.getElementById('state_id').addEventListener('change', function() {
         let stateId = this.value;

@@ -64,7 +64,7 @@
                 <!-- Category -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Job Category *</label>
-                    <select name="category_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                    <select name="category_id" id="category_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
                         <option value="">Select Category</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
@@ -73,23 +73,25 @@
                     @error('category_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <!-- Subject -->
+                <!-- Subject (Dynamic based on Category) -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Subject *</label>
-                    <select name="subject_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        <option value="">Select Subject</option>
-                        @foreach($subjects as $subject)
-                            <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
-                        @endforeach
+                    <select name="subject_id" id="subject_id" required {{ old('category_id') ? '' : 'disabled' }} class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all disabled:opacity-50 cursor-pointer">
+                        <option value="">{{ old('category_id') ? 'Select Subject' : '— First Select Category —' }}</option>
+                        @if(old('category_id'))
+                            @foreach($subjects as $subject)
+                                <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
+                            @endforeach
+                        @endif
                     </select>
                     @error('subject_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <!-- Qualification -->
+                <!-- Qualification (Enabled once Subject is selected) -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Required Qualification *</label>
-                    <select name="qualification_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        <option value="">Select Qualification</option>
+                    <select name="qualification_id" id="qualification_id" required {{ (old('subject_id') || old('category_id')) ? '' : 'disabled' }} class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all disabled:opacity-50 cursor-pointer">
+                        <option value="">{{ (old('subject_id') || old('category_id')) ? 'Select Qualification' : '— First Select Subject —' }}</option>
                         @foreach($qualifications as $qualification)
                             <option value="{{ $qualification->id }}" {{ old('qualification_id') == $qualification->id ? 'selected' : '' }}>{{ $qualification->name }}</option>
                         @endforeach
@@ -180,6 +182,59 @@
                 .catch(error => console.error('CKEditor init error:', error));
         }
     });
+
+    // Category -> Subject -> Qualification
+    const categorySelect = document.getElementById('category_id');
+    const subjectSelect = document.getElementById('subject_id');
+    const qualificationSelect = document.getElementById('qualification_id');
+
+    if (categorySelect && subjectSelect) {
+        categorySelect.addEventListener('change', function() {
+            let categoryId = this.value;
+            subjectSelect.innerHTML = '<option value="">Loading subjects...</option>';
+            subjectSelect.disabled = true;
+            if (qualificationSelect) {
+                qualificationSelect.disabled = true;
+                qualificationSelect.innerHTML = '<option value="">— First Select Subject —</option>';
+            }
+
+            if (categoryId) {
+                fetch(`/api/categories/${categoryId}/subjects`)
+                    .then(response => response.json())
+                    .then(data => {
+                        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                        data.forEach(subject => {
+                            subjectSelect.innerHTML += `<option value="${subject.id}">${subject.name}</option>`;
+                        });
+                        subjectSelect.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching subjects:', error);
+                        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                        subjectSelect.disabled = false;
+                    });
+            } else {
+                subjectSelect.innerHTML = '<option value="">— First Select Category —</option>';
+            }
+        });
+    }
+
+    if (subjectSelect && qualificationSelect) {
+        subjectSelect.addEventListener('change', function() {
+            if (this.value) {
+                qualificationSelect.disabled = false;
+                qualificationSelect.innerHTML = `
+                    <option value="">Select Qualification</option>
+                    @foreach($qualifications as $qualification)
+                        <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
+                    @endforeach
+                `;
+            } else {
+                qualificationSelect.disabled = true;
+                qualificationSelect.innerHTML = '<option value="">— First Select Subject —</option>';
+            }
+        });
+    }
 
     document.getElementById('state_id').addEventListener('change', function() {
         let stateId = this.value;

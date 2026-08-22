@@ -34,7 +34,10 @@ class HomeController extends Controller
         $employerTuitions = \App\Models\TuitionRequirement::where('status', 'Pending')->whereNotNull('employer_id')->latest()->take(6)->get();
         $guestTuitions = \App\Models\TuitionRequirement::where('status', 'Pending')->whereNull('employer_id')->latest()->take(6)->get();
 
-        return view('welcome', compact('recentJobs', 'categories', 'services', 'testimonials', 'clients', 'totalJobs', 'totalApplications', 'totalEmployers', 'employerTuitions', 'guestTuitions'));
+        $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
+        $qualifications = \App\Models\Qualification::where('is_active', true)->orderBy('name')->get();
+
+        return view('welcome', compact('recentJobs', 'categories', 'services', 'testimonials', 'clients', 'totalJobs', 'totalApplications', 'totalEmployers', 'employerTuitions', 'guestTuitions', 'states', 'qualifications'));
     }
 
     public function storeTuition(Request $request)
@@ -47,6 +50,7 @@ class HomeController extends Controller
             'subjects' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'pincode' => 'nullable|string|max:20',
+            'description' => 'nullable|string|max:1000',
         ]);
 
         $locationWithPincode = $validated['location'];
@@ -55,7 +59,6 @@ class HomeController extends Controller
         }
 
         $validated['fee'] = 'Not Specified';
-
         $validated['status'] = 'New Lead';
         if (auth()->check()) {
             $validated['user_id'] = auth()->id();
@@ -69,20 +72,91 @@ class HomeController extends Controller
             'subjects' => $validated['subjects'],
             'location' => $locationWithPincode,
             'fee' => $validated['fee'],
-            'additional_notes' => 'Guest Request: ' . ($validated['description'] ?? ''),
+            'additional_notes' => 'Guest Tuition Request: ' . ($validated['description'] ?? 'None'),
             'status' => $validated['status'],
             'tutor_preference' => 'Any',
             'user_id' => $validated['user_id'] ?? null,
         ]);
 
         \App\Helpers\NotificationHelper::notifyAdmin(
-            'New Tuition Enquiry',
-            $validated['guest_name'] . ' has posted a new tuition requirement.',
+            'New Tuition Enquiry (Pending Action)',
+            $validated['guest_name'] . ' has posted a new tuition requirement for ' . $validated['student_class'] . ' (' . $validated['subjects'] . '). Review and post in Tuition Leads.',
             route('admin.tuition-leads.index'),
             'fas fa-chalkboard-teacher'
         );
 
-        return back()->with('tuition_success', 'Your tuition requirement has been posted successfully! Our team will contact you soon.');
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Thank you! Your tuition requirement has been submitted successfully. Our team will review, match verified tutors, and contact you shortly.'
+            ]);
+        }
+
+        return redirect()->to(url()->previous() . '#quick-request-form')->with('tuition_success', 'Your tuition requirement has been posted successfully! Our team will contact you soon.');
+    }
+
+    public function storeSchoolRequirement(Request $request)
+    {
+        $validated = $request->validate([
+            'school_name' => 'required|string|max:255',
+            'contact_person' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'title' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'qualification_id' => 'required|exists:qualifications,id',
+            'state_id' => 'required|exists:states,id',
+            'city_id' => 'required|exists:cities,id',
+            'salary_range' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:2000',
+        ]);
+
+        // 1. Create JobPost with pending approval status
+        $jobPost = \App\Models\JobPost::create([
+            'user_id' => (auth()->check() && auth()->user()->role === 'employer') ? auth()->id() : null,
+            'school_name' => $validated['school_name'],
+            'contact_person' => $validated['contact_person'],
+            'email' => $validated['email'] ?? ($validated['phone'] . '@school.warriorseducare.com'),
+            'phone' => $validated['phone'],
+            'title' => $validated['title'],
+            'category_id' => $validated['category_id'],
+            'subject_id' => $validated['subject_id'],
+            'qualification_id' => $validated['qualification_id'],
+            'state_id' => $validated['state_id'],
+            'city_id' => $validated['city_id'],
+            'salary_range' => $validated['salary_range'],
+            'description' => $validated['description'] ?? 'Submitted via website quick requirement form',
+            'status' => 'pending',
+        ]);
+
+        // 2. Also log in Contact Leads for CRM follow-up
+        $catName = \App\Models\Category::find($validated['category_id'])?->name ?? 'General';
+        $subjName = \App\Models\Subject::find($validated['subject_id'])?->name ?? 'Subject';
+        \App\Models\ContactLead::create([
+            'name' => $validated['contact_person'] . ' [' . $validated['school_name'] . ']',
+            'email' => $validated['email'] ?? null,
+            'phone' => $validated['phone'],
+            'message' => "🏫 School Job Requirement (Pending Approval - Job #{$jobPost->id}):\n• Title: {$validated['title']}\n• Category: {$catName}\n• Subject: {$subjName}\n• Salary: " . ($validated['salary_range'] ?? 'Negotiable') . "\n• Extra Notes: " . ($validated['description'] ?? 'None'),
+            'status' => 'new',
+        ]);
+
+        // 3. Notify Admin to review and approve
+        \App\Helpers\NotificationHelper::notifyAdmin(
+            'New Job Requirement Awaiting Approval',
+            $validated['school_name'] . ' submitted a new job: "' . $validated['title'] . '". Review and approve in Job Management.',
+            route('admin.jobs.index', ['status' => 'pending']),
+            'fas fa-briefcase'
+        );
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Thank you! Your teacher requirement has been submitted for approval. Our administration team will review and approve it shortly.'
+            ]);
+        }
+
+        return redirect()->to(url()->previous() . '#quick-request-form')->with('school_success', 'Your teacher requirement has been submitted for approval! Our team will review and approve it shortly.');
     }
 
     public function categoryJobs($id)

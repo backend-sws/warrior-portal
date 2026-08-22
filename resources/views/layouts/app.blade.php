@@ -510,7 +510,7 @@
                     <li><a href="{{ route('about') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> About Us</a></li>
                     <li><a href="{{ route('services') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Services</a></li>
                     <li><a href="{{ route('home') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Solution</a></li>
-                    <li><a href="#" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Blog</a></li>
+                    <!-- <li><a href="#" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Blog</a></li> -->
                     <li><a href="{{ route('contact') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Contact Us</a></li>
                 </ul>
             </div>
@@ -532,17 +532,17 @@
                         <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-envelope text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
                         <span class="mt-1">support@warriorseducare.com</span>
                     </li>
-                    <li class="flex items-start gap-3 group">
+                    <!-- <li class="flex items-start gap-3 group">
                         <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-globe text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
                         <span class="mt-1">warriorseducare.com</span>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>
 
         <div class="max-w-[1200px] mx-auto px-6 border-t border-gray-300 pt-6 pb-2 text-center text-[13px] text-gray-500 font-medium relative z-10">
             <div>&copy; Copyright 2024 - Warriors Educare. All Right Reserved</div>
-            <div class="mt-1 text-xs opacity-80">Designed By: Startup Web Support</div>
+            <a href="https://www.startupwebsupport.com/" target="_blank" class="mt-1 text-xs opacity-80">Designed By: Startup Web Support</a>
         </div>
     </footer>
 
