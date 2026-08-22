@@ -153,7 +153,7 @@
             </div>
 
             <div class="mb-8 grid grid-cols-1 gap-4 relative z-20">
-                <a href="{{ route('parent.register') }}"
+                <a href="{{ route('contact') }}"
                     class="flex flex-col items-center justify-center p-4 rounded-xl text-center font-bold border border-gray-200 hover:bg-purple-600/10 hover:border-purple-600/30 transition-all group cursor-pointer pointer-events-auto">
                     <div class="flex items-center gap-2 text-gray-800 text-sm">
                         <i class="fas fa-user-friends text-purple-600 group-hover:scale-110 transition-transform"></i>

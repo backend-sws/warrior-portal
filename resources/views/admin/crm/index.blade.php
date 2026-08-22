@@ -130,10 +130,11 @@
                 @php
                     $route = 'admin.crm.index';
                     $order = request('order') === 'asc' ? 'desc' : 'asc';
+                    $isCandidate = request('role', 'candidate') === 'candidate';
                 @endphp
                 <th>
                     <a href="{{ route($route, array_merge(request()->query(), ['sort_by' => 'name', 'order' => $order])) }}" class="flex items-center gap-2 hover:text-accent-blue transition-colors">
-                        Candidate
+                        {{ $isCandidate ? 'Candidate' : 'Parent' }}
                         @if(request('sort_by') === 'name')
                             <i class="fas fa-sort-{{ request('order') === 'asc' ? 'up' : 'down' }} text-accent-blue"></i>
                         @else
@@ -141,8 +142,13 @@
                         @endif
                     </a>
                 </th>
-                <th>Registration Status</th>
-                <th>Hired Roles</th>
+                @if($isCandidate)
+                    <th>Registration Status</th>
+                    <th>Hired Roles</th>
+                @else
+                    <th>Location</th>
+                    <th>Tuitions Posted</th>
+                @endif
                 <th>
                     <a href="{{ route($route, array_merge(request()->query(), ['sort_by' => 'created_at', 'order' => $order])) }}" class="flex items-center gap-2 hover:text-accent-blue transition-colors">
                         Joined
@@ -153,7 +159,9 @@
                         @endif
                     </a>
                 </th>
-                <th>Admin Rating</th>
+                @if($isCandidate)
+                    <th>Admin Rating</th>
+                @endif
                 <th class="text-right">Actions</th>
             </tr>
         </thead>
@@ -166,7 +174,7 @@
                         <span><i class="fas fa-envelope text-[10px] w-3"></i> {{ $candidate->email }}</span>
                         <span><i class="fas fa-phone-alt text-[10px] w-3"></i> {{ $candidate->phone }}</span>
                     </div>
-                    @if($candidate->profile && $candidate->profile->plan_type === 'standard' && !$candidate->profile->is_fee_paid)
+                    @if($isCandidate && $candidate->profile && $candidate->profile->plan_type === 'standard' && !$candidate->profile->is_fee_paid)
                         <div class="mt-2">
                             <span class="bg-red-500/10 text-red-500 px-2 py-0.5 rounded flex items-center gap-1 text-[10px] font-bold w-max" title="Standard Plan Placement Fee Pending">
                                 <i class="fas fa-exclamation-triangle"></i> ₹500 Due
@@ -174,47 +182,63 @@
                         </div>
                     @endif
                 </td>
-                <td>
-                    @if($candidate->profile && $candidate->profile->is_fee_paid)
-                        <span class="bg-green-500/10 text-green-400 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-green-500/20 uppercase tracking-wider flex items-center gap-1 w-max">
-                            <i class="fas fa-check-circle"></i> Active / Paid
+                @if($isCandidate)
+                    <td>
+                        @if($candidate->profile && $candidate->profile->is_fee_paid)
+                            <span class="bg-green-500/10 text-green-400 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-green-500/20 uppercase tracking-wider flex items-center gap-1 w-max">
+                                <i class="fas fa-check-circle"></i> Active / Paid
+                            </span>
+                        @elseif($candidate->profile && $candidate->profile->is_agreement_signed)
+                            <span class="bg-accent-blue/10 text-accent-blue px-2.5 py-1 rounded-lg text-[10px] font-bold border border-accent-blue/20 uppercase tracking-wider flex items-center gap-1 w-max">
+                                <i class="fas fa-signature"></i> Signed
+                            </span>
+                        @else
+                            <span class="bg-card-border/50 text-text-dark/60 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-card-border uppercase tracking-wider flex items-center gap-1 w-max">
+                                <i class="fas fa-exclamation-circle"></i> Incomplete
+                            </span>
+                        @endif
+                    </td>
+                    <td>
+                        @php
+                            $hired = $candidate->applications->where('status', 'hired');
+                        @endphp
+                        @if($hired->count() > 0)
+                            <span class="text-green-400 font-bold bg-green-500/10 px-2.5 py-1 rounded-lg text-xs">{{ $hired->count() }} Role(s)</span>
+                        @else
+                            <span class="text-text-dark/30 text-xs font-semibold">None</span>
+                        @endif
+                    </td>
+                @else
+                    <td>
+                        <span class="text-sm font-semibold text-text-dark/80">
+                            {{ $candidate->parentProfile->city ?? 'N/A' }}
                         </span>
-                    @elseif($candidate->profile && $candidate->profile->is_agreement_signed)
-                        <span class="bg-accent-blue/10 text-accent-blue px-2.5 py-1 rounded-lg text-[10px] font-bold border border-accent-blue/20 uppercase tracking-wider flex items-center gap-1 w-max">
-                            <i class="fas fa-signature"></i> Signed
-                        </span>
-                    @else
-                        <span class="bg-card-border/50 text-text-dark/60 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-card-border uppercase tracking-wider flex items-center gap-1 w-max">
-                            <i class="fas fa-exclamation-circle"></i> Incomplete
-                        </span>
-                    @endif
-                </td>
-                <td>
-                    @php
-                        $hired = $candidate->applications->where('status', 'hired');
-                    @endphp
-                    @if($hired->count() > 0)
-                        <span class="text-green-400 font-bold bg-green-500/10 px-2.5 py-1 rounded-lg text-xs">{{ $hired->count() }} Role(s)</span>
-                    @else
-                        <span class="text-text-dark/30 text-xs font-semibold">None</span>
-                    @endif
-                </td>
+                    </td>
+                    <td>
+                        @php
+                            $tuitionsCount = \App\Models\HomeTuitionLead::where('user_id', $candidate->id)->count();
+                        @endphp
+                        <span class="text-sm font-bold text-text-main">{{ $tuitionsCount }}</span>
+                    </td>
+                @endif
                 <td class="text-text-dark/60 text-sm">
                     {{ $candidate->created_at->format('M d, Y') }}
                 </td>
-                <td>
-                    @if($candidate->rating)
-                        <div class="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity" onclick="openRatingModal({{ $candidate->id }}, {{ $candidate->rating->communication }}, {{ $candidate->rating->subject_knowledge }}, {{ $candidate->rating->demo_performance }}, {{ $candidate->rating->english_fluency }}, {{ $candidate->rating->discipline }}, '{{ addslashes($candidate->rating->remarks ?? '') }}')">
-                            <span class="bg-yellow-500/10 text-yellow-500 text-xs font-bold px-2 py-1 rounded border border-yellow-500/20">
-                                <i class="fas fa-star text-yellow-500 mr-1"></i> {{ number_format($candidate->rating->overall_rating, 1) }}
-                            </span>
-                        </div>
-                    @else
-                        <button type="button" onclick="openRatingModal({{ $candidate->id }}, 3, 3, 3, 3, 3, '')" class="text-[10px] uppercase font-bold text-text-dark/50 hover:text-accent-blue transition-colors px-2 py-1 border border-dashed border-card-border rounded">
-                            <i class="far fa-star"></i> Rate
-                        </button>
-                    @endif
-                </td>
+                @if($isCandidate)
+                    <td>
+                        @if($candidate->rating)
+                            <div class="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity" onclick="openRatingModal({{ $candidate->id }}, {{ $candidate->rating->communication }}, {{ $candidate->rating->subject_knowledge }}, {{ $candidate->rating->demo_performance }}, {{ $candidate->rating->english_fluency }}, {{ $candidate->rating->discipline }}, '{{ addslashes($candidate->rating->remarks ?? '') }}')">
+                                <span class="bg-yellow-500/10 text-yellow-500 text-xs font-bold px-2 py-1 rounded border border-yellow-500/20">
+                                    <i class="fas fa-star text-yellow-500 mr-1"></i> {{ number_format($candidate->rating->overall_rating, 1) }}
+                                </span>
+                            </div>
+                        @else
+                            <button type="button" onclick="openRatingModal({{ $candidate->id }}, 3, 3, 3, 3, 3, '')" class="text-[10px] uppercase font-bold text-text-dark/50 hover:text-accent-blue transition-colors px-2 py-1 border border-dashed border-card-border rounded">
+                                <i class="far fa-star"></i> Rate
+                            </button>
+                        @endif
+                    </td>
+                @endif
                 <td>
                     <div class="flex items-center justify-end gap-2">
                         <a href="{{ route('admin.crm.show', $candidate->id) }}" class="px-3 py-1.5 rounded-lg bg-accent-blue/10 text-accent-blue hover:bg-accent-blue hover:text-white text-xs font-semibold transition-colors flex items-center gap-1">
