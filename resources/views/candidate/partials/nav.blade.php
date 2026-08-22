@@ -20,7 +20,7 @@
                     ['route' => 'candidate.dashboard', 'routeIs' => 'candidate.dashboard', 'icon' => 'fa-th-large', 'label' => 'Dashboard'],
                     ['route' => 'candidate.applications.available', 'routeIs' => 'candidate.applications.available', 'icon' => 'fa-briefcase', 'label' => 'School Jobs'],
                     ['route' => 'candidate.tuitions.index', 'routeIs' => 'candidate.tuitions.*', 'icon' => 'fa-book-reader', 'label' => 'Home Tuitions'],
-                    ['route' => 'candidate.applications.index', 'routeIs' => 'candidate.applications.index', 'icon' => 'fa-paper-plane', 'label' => 'My Applications', 'badge' => $appCount],
+                    ['route' => 'candidate.applications.index', 'routeIs' => 'candidate.applications.index', 'icon' => 'fa-paper-plane', 'label' => 'My Applications', 'badge' => ($appCount + $tuitionCount)],
                     ['route' => 'candidate.profile.edit', 'routeIs' => 'candidate.profile.*', 'icon' => 'fa-user-circle', 'label' => 'My Profile'],
                     ['route' => 'candidate.agreement.show', 'routeIs' => 'candidate.agreement.*', 'icon' => 'fa-file-signature', 'label' => 'My Agreement'],
                     ['route' => 'candidate.serviceCharge.show', 'routeIs' => 'candidate.servicecharge.*', 'icon' => 'fa-file-invoice-dollar', 'label' => 'Service Charge'],

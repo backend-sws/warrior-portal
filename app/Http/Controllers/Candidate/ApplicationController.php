@@ -15,16 +15,26 @@ class ApplicationController extends Controller
         return null;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         if ($redirect = $this->ensureRegistrationComplete()) return $redirect;
+
+        $activeTab = $request->input('tab', 'jobs');
 
         $applications = JobApplication::with(['jobPost.category', 'jobPost.city', 'jobPost.state'])
             ->where('candidate_id', auth()->id())
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10, ['*'], 'jobs_page');
 
-        return view('candidate.applications.index', compact('applications'));
+        $tuitionApplications = \App\Models\TuitionApplication::with(['tuitionLead'])
+            ->where('candidate_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(10, ['*'], 'tuitions_page');
+
+        $jobCount = JobApplication::where('candidate_id', auth()->id())->count();
+        $tuitionCount = \App\Models\TuitionApplication::where('candidate_id', auth()->id())->count();
+
+        return view('candidate.applications.index', compact('applications', 'tuitionApplications', 'activeTab', 'jobCount', 'tuitionCount'));
     }
 
     public function available()

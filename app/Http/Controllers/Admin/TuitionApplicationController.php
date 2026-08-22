@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TuitionApplication;
 use App\Models\HomeTuitionLead;
+use App\Models\ServiceChargeInvoice;
 use App\Helpers\NotificationHelper;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class TuitionApplicationController extends Controller
 {
@@ -72,12 +74,16 @@ class TuitionApplicationController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status'    => 'required|in:Applied,Shortlisted,Assigned,Rejected',
-            'remarks'   => 'nullable|string|max:500',
-            'demo_date' => 'nullable|date',
+            'status'                     => 'required|in:Applied,Shortlisted,Assigned,Rejected',
+            'remarks'                    => 'nullable|string|max:500',
+            'demo_date'                  => 'nullable|date',
+            'create_service_charge'      => 'nullable|boolean',
+            'service_charge_amount'      => 'nullable|numeric|min:0',
+            'service_charge_due_date'    => 'nullable|date',
+            'service_charge_description' => 'nullable|string|max:255',
         ]);
 
-        $application = TuitionApplication::with(['candidate', 'tuitionLead'])->findOrFail($id);
+        $application = TuitionApplication::with(['candidate.profile', 'tuitionLead'])->findOrFail($id);
         $oldStatus = $application->status;
         
         $application->status = $request->status;
@@ -107,12 +113,48 @@ class TuitionApplicationController extends Controller
                 'follow_up_date' => now()->addDays(2)->toDateString(),
             ]);
 
-            // Notify candidate
+            // Generate Service Charge Invoice for Candidate if requested
+            if ($request->boolean('create_service_charge') && $request->filled('service_charge_amount') && $request->service_charge_amount > 0) {
+                $amount = (float) $request->service_charge_amount;
+                $dueDate = $request->service_charge_due_date ?? now()->addDays(7)->toDateString();
+                $desc = $request->service_charge_description ?: "Service Charge for Home Tuition (Class {$lead->class} - {$lead->subjects})";
+
+                $invoice = ServiceChargeInvoice::create([
+                    'candidate_id'       => $candidate->id,
+                    'job_application_id' => null,
+                    'amount'             => $amount,
+                    'due_date'           => $dueDate,
+                    'status'             => 'pending',
+                    'description'        => $desc,
+                ]);
+
+                if ($candidate->profile) {
+                    $candidate->profile->increment('pending_amount', $amount);
+                }
+
+                // Notify Candidate for invoice
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    'Service Charge Invoice Generated 🧾',
+                    "An invoice for ₹" . number_format($amount, 2) . " has been created for your Home Tuition assignment. Please pay by " . Carbon::parse($dueDate)->format('d M Y') . ".",
+                    route('candidate.serviceCharge.show'),
+                    'fas fa-file-invoice-dollar'
+                );
+
+                // Send invoice email
+                try {
+                    Mail::to($candidate->email)->send(new \App\Mail\ServiceChargeInvoiceMail($invoice));
+                } catch (\Throwable $e) {
+                    // Ignore email failure
+                }
+            }
+
+            // Notify candidate for assignment
             NotificationHelper::notifyUser(
                 $candidate->id,
                 'Tuition Assigned! 🎉',
                 "Congratulations! You have been assigned as the tutor for {$lead->class} ({$lead->subjects}) in {$lead->location}. Parent Contact: {$lead->parent_name} ({$lead->parent_mobile}).",
-                route('candidate.tuitions.index'),
+                route('candidate.applications.index', ['tab' => 'tuitions']),
                 'fas fa-chalkboard-teacher'
             );
         } elseif ($request->status === 'Shortlisted' && $oldStatus !== 'Shortlisted') {
@@ -120,7 +162,7 @@ class TuitionApplicationController extends Controller
                 $candidate->id,
                 'Shortlisted for Home Tuition ⭐',
                 "You have been shortlisted for {$lead?->class} ({$lead?->subjects}) in {$lead?->location}. Admin will contact you soon for the demo session.",
-                route('candidate.tuitions.index'),
+                route('candidate.applications.index', ['tab' => 'tuitions']),
                 'fas fa-star'
             );
         } elseif ($request->status === 'Rejected' && $oldStatus !== 'Rejected') {
@@ -128,7 +170,7 @@ class TuitionApplicationController extends Controller
                 $candidate->id,
                 'Tuition Application Update',
                 "Your application for {$lead?->class} ({$lead?->subjects}) was not shortlisted for this requirement.",
-                route('candidate.tuitions.index'),
+                route('candidate.applications.index', ['tab' => 'tuitions']),
                 'fas fa-info-circle'
             );
         }
@@ -140,7 +182,7 @@ class TuitionApplicationController extends Controller
                 $candidate->id,
                 'Demo Class Scheduled! 📅',
                 "Your demo session for {$lead?->class} ({$lead?->subjects}) is scheduled on {$formattedDemo}. Location: {$lead?->location}.",
-                route('candidate.tuitions.index'),
+                route('candidate.applications.index', ['tab' => 'tuitions']),
                 'fas fa-calendar-check'
             );
         }

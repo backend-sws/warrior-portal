@@ -253,9 +253,36 @@
                 <p class="text-[11px] text-slate-400 mt-1">If set, candidate will receive a notification with this date & time.</p>
             </div>
 
+            {{-- Service Charge Invoice Generation (Shown when Assigned) --}}
+            <div id="serviceChargeBox" class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+                <label class="flex items-center gap-2.5 cursor-pointer">
+                    <input type="checkbox" name="create_service_charge" value="1" id="createServiceChargeCheckbox" class="w-4 h-4 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500 cursor-pointer" onchange="toggleServiceChargeFields()">
+                    <span class="text-xs font-bold text-emerald-900">
+                        <i class="fas fa-file-invoice-dollar mr-1"></i> Generate Candidate Service Charge Invoice
+                    </span>
+                </label>
+
+                <div id="serviceChargeFields" class="hidden space-y-3 pt-2 border-t border-emerald-200/60">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-emerald-900 mb-1">Charge Amount (₹)</label>
+                            <input type="number" step="0.01" name="service_charge_amount" id="serviceChargeAmount" value="500" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2 text-xs font-bold text-[#031b4e]">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-emerald-900 mb-1">Due Date</label>
+                            <input type="date" name="service_charge_due_date" id="serviceChargeDueDate" value="{{ now()->addDays(7)->format('Y-m-d') }}" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2 text-xs font-medium text-[#031b4e]">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-emerald-900 mb-1">Invoice Description</label>
+                        <input type="text" name="service_charge_description" id="serviceChargeDesc" value="Service Charge for Home Tuition Assignment" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2 text-xs text-[#031b4e]">
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Admin Remarks / Notes</label>
-                <textarea name="remarks" id="modalRemarks" rows="3" placeholder="Enter internal notes, interview feedback, or remarks..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 resize-none"></textarea>
+                <textarea name="remarks" id="modalRemarks" rows="2" placeholder="Enter internal notes, interview feedback, or remarks..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 resize-none"></textarea>
             </div>
 
             <div class="pt-4 border-t border-slate-100 flex justify-end gap-2.5">
@@ -277,12 +304,38 @@ function openStatusModal(appId, status, remarks, demoDate, candidateName, classN
     document.getElementById('modalStatusSelect').value = status;
     document.getElementById('modalRemarks').value = remarks || '';
     document.getElementById('modalDemoDate').value = demoDate || '';
+    document.getElementById('serviceChargeDesc').value = `Service Charge for Home Tuition (Class ${className} - ${subjects})`;
+    
+    // Auto-check invoice if status is Assigned
+    const isAssigned = (status === 'Assigned');
+    document.getElementById('createServiceChargeCheckbox').checked = isAssigned;
+    toggleServiceChargeFields();
+
     document.getElementById('statusModal').classList.remove('hidden');
 }
 
 function closeStatusModal() {
     document.getElementById('statusModal').classList.add('hidden');
 }
+
+function toggleServiceChargeFields() {
+    const isChecked = document.getElementById('createServiceChargeCheckbox').checked;
+    const fields = document.getElementById('serviceChargeFields');
+    if (isChecked) {
+        fields.classList.remove('hidden');
+    } else {
+        fields.classList.add('hidden');
+    }
+}
+
+document.getElementById('modalStatusSelect').addEventListener('change', function() {
+    if (this.value === 'Assigned') {
+        document.getElementById('createServiceChargeCheckbox').checked = true;
+    } else {
+        document.getElementById('createServiceChargeCheckbox').checked = false;
+    }
+    toggleServiceChargeFields();
+});
 </script>
 
 @endsection
