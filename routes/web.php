@@ -135,6 +135,7 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
 
     Route::get('/registration', [\App\Http\Controllers\Candidate\RegistrationController::class, 'show'])->name('registration.show');
     Route::get('/service-charge', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'show'])->name('serviceCharge.show');
+    Route::get('/service-charge/invoice/{id}', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'downloadInvoicePdf'])->name('serviceCharge.invoice');
     Route::get('/service-charge/invoice/{id}/pdf', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'downloadInvoicePdf'])->name('serviceCharge.invoicePdf');
     Route::get('/service-charge/checkout/{id}', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'checkout'])->name('serviceCharge.checkout');
     Route::post('/service-charge/pay', [\App\Http\Controllers\Candidate\ServiceChargeController::class, 'process'])->name('serviceCharge.pay');

@@ -189,18 +189,25 @@
         <thead>
             <tr>
                 <th>Description</th>
-                <th>Job Post</th>
+                <th>Placement / Requirement</th>
                 <th class="amount-col">Amount (INR)</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>
-                    <strong>Placement Service Charge</strong><br>
-                    <small style="color: #64748b;">Service charge for placement assistance and recruitment processing.</small>
+                    <strong>{{ $invoice->home_tuition_lead_id ? 'Home Tuition Service Charge' : 'Placement Service Charge' }}</strong><br>
+                    <small style="color: #64748b;">{{ $invoice->description ?: 'Service charge for placement assistance and processing.' }}</small>
                 </td>
                 <td>
-                    {{ $invoice->jobApplication->jobPost->title ?? 'Educational Institution Placement' }}
+                    @if($invoice->tuitionLead)
+                        Class {{ $invoice->tuitionLead->class }} ({{ $invoice->tuitionLead->subjects }})<br>
+                        <small style="color: #64748b;">{{ $invoice->tuitionLead->location }}</small>
+                    @elseif($invoice->jobApplication && $invoice->jobApplication->jobPost)
+                        {{ $invoice->jobApplication->jobPost->title }} ({{ $invoice->jobApplication->jobPost->school_name ?? 'School' }})
+                    @else
+                        {{ $invoice->description ?: 'Educational Placement' }}
+                    @endif
                 </td>
                 <td class="amount-col">₹{{ number_format($invoice->amount, 2) }}</td>
             </tr>
