@@ -304,7 +304,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Notification Management
     Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/{id}/mark-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markRead'])->name('notifications.mark-read');
+    Route::get('/notifications/{id}/mark-unread', [\App\Http\Controllers\Admin\NotificationController::class, 'markUnread'])->name('notifications.mark-unread');
     Route::get('/notifications/mark-all-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    Route::post('/notifications/clear-read', [\App\Http\Controllers\Admin\NotificationController::class, 'clearRead'])->name('notifications.clear-read');
 
     Route::resource('services', \App\Http\Controllers\Admin\ServiceController::class)->except(['create', 'show', 'edit']);
     Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class)->except(['create', 'show', 'edit']);
