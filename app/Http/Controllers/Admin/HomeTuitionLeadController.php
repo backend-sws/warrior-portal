@@ -61,10 +61,16 @@ class HomeTuitionLeadController extends Controller
 
         $leads = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
         
+        $candidates = \App\Models\User::where('role', 'candidate')
+            ->where('is_active', true)
+            ->with('profile.subject')
+            ->orderBy('name')
+            ->get(['id', 'name', 'phone', 'email']);
+
         $viewName = 'admin.home_tuition_leads.index';
-        $title = $filterStatus === 'All' ? 'All Home Tuition Leads' : $filterStatus . ' Home Tuition Leads';
+        $title = $filterStatus === 'All' ? 'All Home Tuitions' : $filterStatus . ' Home Tuitions';
         
-        return view($viewName, compact('leads', 'title', 'filterStatus'));
+        return view($viewName, compact('leads', 'candidates', 'title', 'filterStatus'));
     }
 
     public function create()
@@ -151,6 +157,49 @@ class HomeTuitionLeadController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Tuition requirement approved and posted live on the portal!');
+    }
+
+    public function assignTeacher(Request $request, $id)
+    {
+        $request->validate([
+            'candidate_id' => 'required|exists:users,id',
+        ]);
+
+        $lead = HomeTuitionLead::findOrFail($id);
+        $candidate = \App\Models\User::with('profile')->findOrFail($request->candidate_id);
+
+        $lead->update([
+            'teacher_name' => $candidate->name,
+            'teacher_contact' => $candidate->phone,
+            'status' => 'Confirmed',
+        ]);
+
+        // Create or update TuitionApplication record
+        \App\Models\TuitionApplication::updateOrCreate(
+            [
+                'home_tuition_lead_id' => $lead->id,
+                'candidate_id' => $candidate->id,
+            ],
+            [
+                'status' => 'Assigned',
+            ]
+        );
+
+        $lead->followUps()->create([
+            'admin_id' => auth()->id(),
+            'note' => "Teacher \"{$candidate->name}\" (Ph: {$candidate->phone}) assigned to this tuition requirement.",
+        ]);
+
+        // Notify Candidate
+        \App\Helpers\NotificationHelper::notifyUser(
+            $candidate->id,
+            'Tuition Assigned to You!',
+            "You have been assigned as teacher for {$lead->class} ({$lead->subjects}) at {$lead->location}.",
+            route('candidate.tuitions.index'),
+            'fas fa-chalkboard-teacher'
+        );
+
+        return redirect()->back()->with('success', "Teacher \"{$candidate->name}\" assigned successfully to {$lead->parent_name}'s tuition!");
     }
 
     public function updateStatus(Request $request, $id)

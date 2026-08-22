@@ -227,23 +227,23 @@
                 </a>
                 <a href="{{ route('admin.tuition-leads.index') }}"
                     class="sidebar-link {{ (request()->routeIs('admin.tuition-leads.*') && request('status') !== 'New Lead') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-list-alt w-5 text-center"></i> All Tuition Leads
+                    <i class="fas fa-list-alt w-5 text-center"></i> All Tuitions
                 </a>
                 <a href="{{ route('admin.candidate-tuition.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.candidate-tuition.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-user-graduate w-5 text-center"></i> Appointed Tutors
+                    <i class="fas fa-user-graduate w-5 text-center"></i> Assign Teachers
                 </a>
                 <a href="{{ route('admin.tuition-fees.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.tuition-fees.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-money-check-alt w-5 text-center"></i> Tuition Fee Accounts
+                    <i class="fas fa-money-check-alt w-5 text-center"></i> Tuition Fees
                 </a>
 
-                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Support & Leads
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Support & Inquiries
                 </div>
 
                 <a href="{{ route('admin.leads.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-headset w-5 text-center"></i> Support Leads
+                    <i class="fas fa-headset w-5 text-center"></i> Contact Inquiries
                 </a>
 
 

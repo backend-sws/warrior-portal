@@ -254,6 +254,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/tuition-leads/{id}', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'update'])->name('tuition-leads.update');
     Route::put('/tuition-leads/{id}/status', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'updateStatus'])->name('tuition-leads.status.update');
     Route::post('/tuition-leads/{id}/approve', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'approve'])->name('tuition-leads.approve');
+    Route::post('/tuition-leads/{id}/assign-teacher', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'assignTeacher'])->name('tuition-leads.assign-teacher');
     Route::post('/tuition-leads/{id}/follow-up', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'storeFollowUp'])->name('tuition-leads.followup.store');
     Route::post('/tuition-leads/{id}/service-charge-invoice', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'storeInvoice'])->name('tuition-leads.invoice.store');
     Route::put('/tuition-leads/service-charge-invoice/{invoiceId}/status', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'updateInvoiceStatus'])->name('tuition-leads.invoice.status');

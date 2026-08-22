@@ -1,32 +1,46 @@
 @extends('layouts.admin')
 
-@section('title', 'Home Tuition Leads')
-@section('subtitle', 'Review incoming tuition requests, approve them to post live, or edit details.')
+@section('title', 'Home Tuitions')
+@section('subtitle', 'Manage tuition requirements, approve to publish live on website, and assign verified teachers.')
 
 @section('content')
+
+<div x-data="{ 
+    assignModalOpen: false, 
+    selectedLeadId: null, 
+    selectedParentName: '', 
+    selectedRequirement: '',
+    candidateSearch: '',
+    openAssignModal(id, parent, req) {
+        this.selectedLeadId = id;
+        this.selectedParentName = parent;
+        this.selectedRequirement = req;
+        this.assignModalOpen = true;
+    }
+}">
 
 {{-- Top Action Bar --}}
 <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div class="flex flex-wrap gap-2">
         <a href="{{ route('admin.tuition-leads.index') }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ (!request('status')) ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
-            All Leads
+            All Tuitions
         </a>
         <a href="{{ route('admin.tuition-leads.index', ['status' => 'New Lead']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === 'New Lead' ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
-            <i class="fas fa-clock mr-1"></i> Awaiting Approval
+            <i class="fas fa-clock mr-1"></i> Pending Approvals
             @php $pendingCount = \App\Models\HomeTuitionLead::where('status', 'New Lead')->count(); @endphp
             @if($pendingCount > 0)
                 <span class="ml-1.5 bg-yellow-400 text-slate-900 text-xs px-1.5 py-0.5 rounded-full font-bold">{{ $pendingCount }}</span>
             @endif
         </a>
         <a href="{{ route('admin.tuition-leads.index', ['status' => 'Approved']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === 'Approved' ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
-            <i class="fas fa-check-double mr-1"></i> Live on Website
+            <i class="fas fa-check-double mr-1"></i> Live Tuitions
         </a>
         <a href="{{ route('admin.tuition-leads.index', ['status' => 'Confirmed']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === 'Confirmed' ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
-            Confirmed / Assigned
+            <i class="fas fa-user-check mr-1"></i> Teacher Assigned
         </a>
     </div>
     <a href="{{ route('admin.tuition-leads.create') }}" class="px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-bold hover:bg-emerald-600 transition-colors flex items-center gap-2 shadow-sm">
-        <i class="fas fa-plus"></i> Post New Tuition
+        <i class="fas fa-plus"></i> Add Tuition Requirement
     </a>
 </div>
 
@@ -44,10 +58,10 @@
         
         <select name="status" class="w-full sm:w-auto px-3 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50">
             <option value="">All Statuses</option>
-            <option value="New Lead" {{ request('status') == 'New Lead' ? 'selected' : '' }}>New Lead (Pending)</option>
-            <option value="Approved" {{ request('status') == 'Approved' ? 'selected' : '' }}>Approved (Live)</option>
-            <option value="Confirmed" {{ request('status') == 'Confirmed' ? 'selected' : '' }}>Confirmed</option>
-            <option value="Cancelled" {{ request('status') == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+            <option value="New Lead" {{ request('status') == 'New Lead' ? 'selected' : '' }}>Pending Approval</option>
+            <option value="Approved" {{ request('status') == 'Approved' ? 'selected' : '' }}>Live on Website</option>
+            <option value="Confirmed" {{ request('status') == 'Confirmed' ? 'selected' : '' }}>Teacher Assigned</option>
+            <option value="Cancelled" {{ request('status') == 'Cancelled' ? 'selected' : '' }}>Closed</option>
         </select>
 
         <button type="submit" class="w-full sm:w-auto bg-accent-blue text-white rounded-xl px-4 py-2 text-sm font-bold shadow hover:bg-accent-blue-hover transition-colors whitespace-nowrap">Filter</button>
@@ -69,7 +83,7 @@
                 <th>Class & Board</th>
                 <th>Subjects Needed</th>
                 <th>Location & Pincode</th>
-                <th>Status</th>
+                <th>Status & Assigned Teacher</th>
                 <th class="text-right">Action</th>
             </tr>
         </thead>
@@ -84,7 +98,7 @@
                 </td>
                 <td class="align-middle">
                     <div class="text-sm font-semibold text-text-main">{{ $lead->class }}</div>
-                    <div class="text-xs text-accent-blue font-medium mt-0.5">{{ $lead->board ?: 'Not Specified' }}</div>
+                    <div class="text-xs text-accent-blue font-medium mt-0.5">{{ $lead->board ?: 'General' }}</div>
                 </td>
                 <td class="align-middle">
                     <div class="text-sm font-medium text-text-main max-w-xs truncate" title="{{ $lead->subjects }}">
@@ -102,16 +116,28 @@
                 <td class="align-middle">
                     @php
                         $statusColors = [
-                            'New Lead' => 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-                            'Approved' => 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-                            'Confirmed' => 'bg-green-500/10 text-green-500 border-green-500/20',
+                            'New Lead' => 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+                            'Approved' => 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+                            'Confirmed' => 'bg-blue-500/10 text-blue-600 border-blue-500/20',
                             'Cancelled' => 'bg-red-500/10 text-red-500 border-red-500/20',
                         ];
                         $colorClass = $statusColors[$lead->status] ?? 'bg-gray-500/10 text-gray-500 border-gray-500/20';
                     @endphp
                     <span class="{{ $colorClass }} px-2.5 py-1 rounded-lg text-[10px] font-bold border uppercase tracking-wider inline-block">
-                        {{ $lead->status === 'New Lead' ? '⏳ Awaiting Review' : ($lead->status === 'Approved' ? '✅ Live / Approved' : $lead->status) }}
+                        {{ $lead->status === 'New Lead' ? '⏳ Pending Approval' : ($lead->status === 'Approved' ? '✅ Live on Website' : ($lead->status === 'Confirmed' ? '🎉 Teacher Assigned' : $lead->status)) }}
                     </span>
+
+                    @if($lead->teacher_name)
+                        <div class="text-xs font-semibold text-text-main mt-1 flex items-center gap-1">
+                            <i class="fas fa-chalkboard-teacher text-accent-blue text-[10px]"></i>
+                            <span>{{ $lead->teacher_name }}</span>
+                            @if($lead->teacher_contact)
+                                <a href="https://wa.me/91{{ preg_replace('/[^0-9]/', '', $lead->teacher_contact) }}" target="_blank" class="text-green-500 hover:text-green-600 ml-1" title="WhatsApp Teacher">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            @endif
+                        </div>
+                    @endif
                 </td>
                 <td class="align-middle text-right">
                     <div class="flex items-center justify-end gap-2 flex-wrap">
@@ -124,7 +150,12 @@
                             </form>
                         @endif
 
-                        <a href="{{ route('admin.tuition-leads.edit', $lead->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue rounded-lg text-xs font-bold transition-colors" title="Edit Tuition Lead">
+                        {{-- Assign Teacher Button --}}
+                        <button type="button" @click="openAssignModal({{ $lead->id }}, '{{ addslashes($lead->parent_name) }}', '{{ addslashes($lead->class . ' - ' . $lead->subjects) }}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-500/10 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-500/20 rounded-lg text-xs font-bold transition-colors whitespace-nowrap" title="Assign Teacher / Candidate">
+                            <i class="fas fa-user-plus text-xs"></i> Assign Teacher
+                        </button>
+
+                        <a href="{{ route('admin.tuition-leads.edit', $lead->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue rounded-lg text-xs font-bold transition-colors" title="Edit Tuition Requirement">
                             <i class="fas fa-edit text-xs"></i> Edit
                         </a>
 
@@ -139,7 +170,7 @@
                 <td colspan="6" class="text-center py-12">
                     <div class="flex flex-col items-center justify-center text-text-dark/40">
                         <i class="fas fa-chalkboard-teacher text-4xl mb-3"></i>
-                        <p class="text-base font-semibold">No tuition leads found</p>
+                        <p class="text-base font-semibold">No tuition requirements found</p>
                         <p class="text-xs mt-1">Tuition requirements submitted from the website will show up here.</p>
                     </div>
                 </td>
@@ -152,6 +183,81 @@
 {{-- Pagination --}}
 <div class="mt-6">
     {{ $leads->appends(request()->query())->links() }}
+</div>
+
+{{-- Assign Teacher Modal --}}
+<div x-show="assignModalOpen" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
+    <div class="bg-card-bg border border-card-border rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden" @click.away="assignModalOpen = false" x-transition.scale>
+        
+        <!-- Modal Header -->
+        <div class="p-6 border-b border-card-border bg-secondary-bg/40 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 font-bold">
+                    <i class="fas fa-user-check text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-text-main">Assign Teacher / Tutor</h3>
+                    <p class="text-xs text-text-dark/60" x-text="selectedParentName + ' (' + selectedRequirement + ')'"></p>
+                </div>
+            </div>
+            <button @click="assignModalOpen = false" class="text-text-dark/40 hover:text-text-main transition-colors">
+                <i class="fas fa-times text-base"></i>
+            </button>
+        </div>
+
+        <!-- Modal Form -->
+        <form :action="'{{ url('admin/tuition-leads') }}/' + selectedLeadId + '/assign-teacher'" method="POST" class="p-6 space-y-5">
+            @csrf
+            
+            <div>
+                <label class="block text-xs font-bold text-text-dark/80 uppercase tracking-wider mb-2">Select Verified Teacher / Candidate *</label>
+                
+                <div class="relative mb-3">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                    <input type="text" x-model="candidateSearch" placeholder="Search teacher by name or phone..." class="w-full pl-8 pr-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-xs text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/40">
+                </div>
+
+                <div class="max-h-60 overflow-y-auto border border-card-border rounded-xl divide-y divide-card-border bg-secondary-bg/20 custom-scrollbar">
+                    @forelse($candidates as $candidate)
+                        <label class="p-3 flex items-center justify-between hover:bg-secondary-bg/60 cursor-pointer transition-colors"
+                               x-show="!candidateSearch || '{{ strtolower($candidate->name) }}'.includes(candidateSearch.toLowerCase()) || '{{ $candidate->phone }}'.includes(candidateSearch)">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="candidate_id" value="{{ $candidate->id }}" required class="text-accent-blue focus:ring-accent-blue/40">
+                                <div>
+                                    <div class="text-xs font-bold text-text-main">{{ $candidate->name }}</div>
+                                    <div class="text-[11px] text-text-dark/60 flex items-center gap-2 mt-0.5">
+                                        <span><i class="fas fa-phone-alt text-[9px]"></i> {{ $candidate->phone }}</span>
+                                        @if($candidate->profile && $candidate->profile->subject)
+                                            <span class="text-accent-blue font-medium">• {{ $candidate->profile->subject->name }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="text-[10px] bg-blue-500/10 text-blue-600 px-2 py-0.5 rounded font-bold">Teacher</span>
+                        </label>
+                    @empty
+                        <div class="p-4 text-center text-xs text-text-dark/50">No registered candidates found.</div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="p-3 bg-blue-500/5 rounded-xl border border-blue-500/10 text-[11px] text-text-dark/70 flex items-start gap-2">
+                <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                <span>Assigning this teacher will mark the tuition requirement as <strong>Confirmed</strong> and send a notification to the teacher.</span>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-card-border">
+                <button type="button" @click="assignModalOpen = false" class="px-4 py-2 bg-secondary-bg text-text-main border border-card-border rounded-xl text-xs font-semibold hover:bg-card-border/50 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5">
+                    <i class="fas fa-check-circle"></i> Confirm Assignment
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 </div>
 
 @endsection
