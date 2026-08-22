@@ -216,18 +216,13 @@
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Home Tuitions
                 </div>
 
-                <a href="{{ route('admin.tuition-leads.index', ['status' => 'New Lead']) }}"
-                    class="sidebar-link {{ (request()->routeIs('admin.tuition-leads.*') && request('status') === 'New Lead') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Tuition Approvals
+                <a href="{{ route('admin.tuition-leads.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.tuition-leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-chalkboard-teacher w-5 text-center"></i> All Tuitions
                     @php $pendingTuitionsCount = \App\Models\HomeTuitionLead::where('status', 'New Lead')->count(); @endphp
                     @if($pendingTuitionsCount > 0)
-                        <span
-                            class="ml-auto bg-emerald-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingTuitionsCount }}</span>
+                        <span class="ml-auto bg-emerald-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingTuitionsCount }}</span>
                     @endif
-                </a>
-                <a href="{{ route('admin.tuition-leads.index') }}"
-                    class="sidebar-link {{ (request()->routeIs('admin.tuition-leads.*') && request('status') !== 'New Lead') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-list-alt w-5 text-center"></i> All Tuitions
                 </a>
                 <a href="{{ route('admin.tuition-applications.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.tuition-applications.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
@@ -236,10 +231,6 @@
                     @if($tuitionAppCount > 0)
                         <span class="ml-auto bg-sky-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $tuitionAppCount }}</span>
                     @endif
-                </a>
-                <a href="{{ route('admin.candidate-tuition.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.candidate-tuition.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-user-graduate w-5 text-center"></i> Assign Teachers
                 </a>
                 <a href="{{ route('admin.tuition-service-charges.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.tuition-service-charges.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
@@ -253,10 +244,6 @@
                     @if($pendingTuitionInvoicesCount > 0)
                         <span class="ml-auto bg-amber-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingTuitionInvoicesCount }}</span>
                     @endif
-                </a>
-                <a href="{{ route('admin.tuition-fees.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.tuition-fees.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-money-check-alt w-5 text-center"></i> Parent Tuition Fees
                 </a>
 
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Support & Inquiries
