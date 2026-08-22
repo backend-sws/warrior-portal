@@ -163,7 +163,7 @@
                     <i class="fas fa-user-graduate text-[#1e3a8a] group-hover:scale-110 transition-transform"></i>
                     <span>Candidate</span>
                 </a>
-                <a href="{{ route('parent.register') }}"
+                <a href="{{ route('contact') }}"
                     class="flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold border border-card-border text-text-main hover:bg-purple-600/10 hover:border-purple-600/30 transition-all group cursor-pointer pointer-events-auto block w-full text-center">
                     <i class="fas fa-user-friends text-purple-600 group-hover:scale-110 transition-transform"></i>
                     <span>Parent</span>

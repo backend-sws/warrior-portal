@@ -299,10 +299,18 @@ class CrmController extends Controller
     {
         $role = $request->input('role', 'candidate');
         
+        $relations = ['applications.jobPost', 'applications' => function($q) {
+            $q->where('status', 'hired');
+        }];
+        
+        if ($role === 'parent') {
+            $relations[] = 'parentProfile';
+        } else {
+            $relations[] = 'profile';
+        }
+
         $query = User::where('role', $role)
-            ->with(['profile', 'applications.jobPost', 'applications' => function($q) {
-                $q->where('status', 'hired');
-            }]);
+            ->with($relations);
 
         // Search text
         if ($search = $request->input('search')) {
@@ -411,7 +419,7 @@ class CrmController extends Controller
 
     public function show($id)
     {
-        $candidate = User::whereIn('role', ['candidate', 'parent'])->with(['profile', 'applications.jobPost', 'applications' => function($q) {
+        $candidate = User::whereIn('role', ['candidate', 'parent'])->with(['profile', 'parentProfile', 'applications.jobPost', 'applications' => function($q) {
             $q->orderBy('created_at', 'desc');
         }])->findOrFail($id);
 
