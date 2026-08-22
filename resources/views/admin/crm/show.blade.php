@@ -227,18 +227,113 @@
                     </div>
                 </div>
 
-                <!-- Agreement Manager Form -->
-                <div class="pt-4 border-t border-card-border space-y-3">
-                    <form action="{{ route('admin.crm.candidate.upload-agreement', $candidate->id) }}" method="POST" enctype="multipart/form-data" class="bg-secondary-bg p-3.5 rounded-xl border border-card-border">
-                        @csrf
-                        <label class="block text-xs font-bold text-text-main mb-1.5">Upload Custom Signed Agreement (PDF)</label>
-                        <div class="flex items-center gap-2">
-                            <input type="file" name="agreement_pdf" accept=".pdf" required class="flex-1 text-xs text-text-dark/60 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-card-bg file:text-text-main cursor-pointer">
-                            <button type="submit" class="px-3 py-1.5 bg-accent-blue text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors">
-                                Upload
-                            </button>
+                <!-- Agreement Management Section -->
+                <div class="pt-4 border-t border-card-border space-y-4">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-text-main flex items-center gap-2">
+                        <i class="fas fa-file-signature text-accent-blue"></i> Agreements & Signing Control
+                    </h4>
+
+                    {{-- 1. School Job Placement Agreement Control --}}
+                    <div class="bg-secondary-bg p-4 rounded-2xl border border-card-border space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-text-main">School Job Agreement:</span>
+                            @if($profile?->is_agreement_signed || $profile?->agreement_pdf_path)
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <i class="fas fa-check-circle mr-0.5"></i> Signed & Valid
+                                </span>
+                            @elseif($profile?->agreement_status === 'pending_signature')
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                                    <i class="fas fa-hourglass-half mr-0.5"></i> Active on Candidate Panel
+                                </span>
+                            @else
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-card-border/50 text-text-dark/60 border border-card-border">
+                                    <i class="fas fa-ban mr-0.5"></i> Inactive / Not Sent
+                                </span>
+                            @endif
                         </div>
-                    </form>
+
+                        {{-- 1-Click Send / Activate Agreement Button for Candidate --}}
+                        @if(!$profile?->is_agreement_signed && $profile?->agreement_status !== 'pending_signature')
+                            <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="agreement_status" value="pending_signature">
+                                <button type="submit" class="w-full py-2.5 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+                                    <i class="fas fa-paper-plane"></i> <span>Activate Agreement on Candidate Panel</span>
+                                </button>
+                                <p class="text-[10px] text-text-dark/50 mt-1.5 leading-tight">Enables the "Sign Now" digital signature banner in candidate dashboard.</p>
+                            </form>
+                        @elseif($profile?->agreement_status === 'pending_signature')
+                            <div class="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-800 space-y-2">
+                                <p class="font-bold flex items-center gap-1.5"><i class="fas fa-bell"></i> Agreement is LIVE on candidate portal</p>
+                                <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="agreement_status" value="signed">
+                                    <button type="submit" class="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+                                        <i class="fas fa-check-double mr-1"></i> Force Mark as Signed & Approved
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+
+                        {{-- Status Selector Dropdown --}}
+                        <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST" class="pt-2 border-t border-card-border flex items-center justify-between gap-2">
+                            @csrf
+                            <label class="text-[11px] font-bold text-text-dark/70">Change Status:</label>
+                            <div class="flex items-center gap-1.5">
+                                <select name="agreement_status" class="text-xs bg-card-bg border border-card-border rounded-lg py-1 px-2 text-text-main font-semibold focus:ring-1 focus:ring-accent-blue">
+                                    <option value="not_required" {{ $profile?->agreement_status === 'not_required' ? 'selected' : '' }}>Not Required</option>
+                                    <option value="pending_signature" {{ $profile?->agreement_status === 'pending_signature' ? 'selected' : '' }}>Pending Signature</option>
+                                    <option value="signed" {{ ($profile?->agreement_status === 'signed' || $profile?->is_agreement_signed) ? 'selected' : '' }}>Signed</option>
+                                </select>
+                                <button type="submit" class="px-2.5 py-1 bg-text-main hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors">
+                                    Set
+                                </button>
+                            </div>
+                        </form>
+
+                        {{-- Upload Signed Agreement PDF --}}
+                        <form action="{{ route('admin.crm.candidate.upload-agreement', $candidate->id) }}" method="POST" enctype="multipart/form-data" class="pt-2 border-t border-card-border">
+                            @csrf
+                            <label class="block text-[11px] font-bold text-text-dark/70 mb-1.5">Or Upload Physical Signed Copy (PDF):</label>
+                            <div class="flex items-center gap-2">
+                                <input type="file" name="agreement_pdf" accept=".pdf" required class="flex-1 text-[11px] text-text-dark/60 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-card-bg file:text-text-main cursor-pointer">
+                                <button type="submit" class="px-3 py-1 bg-secondary-bg hover:bg-card-bg border border-card-border text-text-main rounded-lg text-xs font-bold transition-colors">
+                                    Upload
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {{-- 2. Home Tuition Agreement Control --}}
+                    <div class="bg-secondary-bg p-4 rounded-2xl border border-card-border space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-text-main">Home Tuition Agreement:</span>
+                            @if($profile?->is_tuition_agreement_signed)
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
+                                    <i class="fas fa-check-circle mr-0.5"></i> Signed & Valid
+                                </span>
+                            @else
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-card-border/50 text-text-dark/60 border border-card-border">
+                                    <i class="fas fa-clock mr-0.5"></i> Pending
+                                </span>
+                            @endif
+                        </div>
+
+                        <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                            @csrf
+                            @if($profile?->is_tuition_agreement_signed)
+                                <input type="hidden" name="is_tuition_agreement_signed" value="0">
+                                <button type="submit" class="w-full py-2 px-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+                                    <i class="fas fa-ban"></i> <span>Revoke Tuition Agreement</span>
+                                </button>
+                            @else
+                                <input type="hidden" name="is_tuition_agreement_signed" value="1">
+                                <button type="submit" class="w-full py-2.5 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+                                    <i class="fas fa-check-circle"></i> <span>Activate / Approve Tuition Agreement</span>
+                                </button>
+                            @endif
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

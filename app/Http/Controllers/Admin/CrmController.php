@@ -718,17 +718,60 @@ class CrmController extends Controller
     public function updateAgreementStatus(Request $request, $id)
     {
         $request->validate([
-            'agreement_status' => 'required|in:not_required,pending_signature,signed',
+            'agreement_status'            => 'nullable|in:not_required,pending_signature,signed',
+            'is_tuition_agreement_signed' => 'nullable|boolean',
         ]);
 
         $user = User::with('profile')->findOrFail($id);
         if ($user->profile) {
-            $user->profile->update([
-                'agreement_status'    => $request->agreement_status,
-                'is_agreement_signed' => $request->agreement_status === 'signed',
-            ]);
+            $updates = [];
+            
+            if ($request->filled('agreement_status')) {
+                $status = $request->agreement_status;
+                $updates['agreement_status'] = $status;
+                $updates['is_agreement_signed'] = ($status === 'signed');
+                if ($status === 'signed') {
+                    $updates['signature_date_time'] = now();
+                }
 
-            return back()->with('success', 'Agreement status updated to ' . ucfirst($request->agreement_status) . '.');
+                if ($status === 'pending_signature') {
+                    NotificationHelper::notifyUser(
+                        $user->id,
+                        'Action Required: Sign Candidate Agreement ✍️',
+                        'Warriors Educare admin has activated your Placement Agreement. Please visit your dashboard to review and sign it.',
+                        route('candidate.agreement.show'),
+                        'fas fa-file-signature'
+                    );
+                } elseif ($status === 'signed') {
+                    NotificationHelper::notifyUser(
+                        $user->id,
+                        'Agreement Approved & Verified! ✅',
+                        'Your Teacher Placement Service Agreement is verified. You can now apply for all eligible school jobs.',
+                        route('candidate.dashboard'),
+                        'fas fa-check-circle'
+                    );
+                }
+            }
+
+            if ($request->has('is_tuition_agreement_signed')) {
+                $isTuitionSigned = $request->boolean('is_tuition_agreement_signed');
+                $updates['is_tuition_agreement_signed'] = $isTuitionSigned;
+                $updates['tuition_agreement_signed_at'] = $isTuitionSigned ? now() : null;
+
+                if ($isTuitionSigned) {
+                    NotificationHelper::notifyUser(
+                        $user->id,
+                        'Tuition Agreement Approved! 🏠',
+                        'Your Home Tuition Agreement is verified. You can now apply for home tuition assignments.',
+                        route('tuitions.index'),
+                        'fas fa-chalkboard-teacher'
+                    );
+                }
+            }
+
+            $user->profile->update($updates);
+
+            return back()->with('success', 'Agreement settings updated successfully.');
         }
 
         return back()->with('error', 'Candidate profile not found.');
