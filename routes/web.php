@@ -145,11 +145,12 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
     Route::post('/tuitions/{id}/apply', [\App\Http\Controllers\Candidate\TuitionController::class, 'apply'])->name('tuitions.apply');
 });
 
-// Parent Auth Routes
-Route::get('/parent/register', [\App\Http\Controllers\ParentAuthController::class, 'showRegistrationForm'])->middleware('guest')->name('parent.register');
-Route::post('/parent/register', [\App\Http\Controllers\ParentAuthController::class, 'register'])->middleware('guest')->name('parent.register.post');
+// Parent Auth Routes (Disabled as requested)
+// Route::get('/parent/register', [\App\Http\Controllers\ParentAuthController::class, 'showRegistrationForm'])->middleware('guest')->name('parent.register');
+// Route::post('/parent/register', [\App\Http\Controllers\ParentAuthController::class, 'register'])->middleware('guest')->name('parent.register.post');
 
-// Parent Routes (Protected)
+// Parent Routes (Protected) - Disabled as requested
+/*
 Route::middleware(['auth', 'parent'])->prefix('parent')->name('parent.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Parent\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [\App\Http\Controllers\Parent\ProfileController::class, 'edit'])->name('profile.edit');
@@ -169,6 +170,7 @@ Route::middleware(['auth', 'parent'])->prefix('parent')->name('parent.')->group(
     Route::get('/service-charge/invoice/{id}/print', [\App\Http\Controllers\Parent\ServiceChargeController::class, 'printInvoice'])->name('serviceCharge.print');
     Route::get('/service-charge/invoice/{id}/download', [\App\Http\Controllers\Parent\ServiceChargeController::class, 'downloadInvoice'])->name('serviceCharge.download');
 });
+*/
 
 // Employer Auth Routes (Commented out)
 // Route::get('/employer/register', [\App\Http\Controllers\EmployerAuthController::class, 'showRegistrationForm'])->name('employer.register');

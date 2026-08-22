@@ -12,7 +12,11 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        return view('auth.login');
+        $categories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
+        $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
+        $qualifications = \App\Models\Qualification::where('is_active', true)->orderBy('name')->get();
+
+        return view('auth.login', compact('categories', 'states', 'qualifications'));
     }
 
     public function login(Request $request)
