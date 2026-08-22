@@ -154,12 +154,34 @@ class JobController extends Controller
 
     public function reject(Request $request, JobPost $job)
     {
+        $reason = $request->input('rejection_reason');
+
         $job->update([
-            'status' => 'rejected'
+            'status'           => 'rejected',
+            'rejection_reason' => $reason,
         ]);
 
-        return redirect()->route('admin.jobs.index')->with('success', 'Job has been rejected.');
+        // Email to School/Employer if email exists
+        if ($job->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($job->email)
+                    ->send(new \App\Mail\JobRejectedMail($job, $reason));
+            } catch (\Exception $e) {
+                \Log::error('JobRejected Email Error: ' . $e->getMessage());
+            }
+        }
+
+        // Notify Admin panel (audit trail)
+        \App\Helpers\NotificationHelper::notifyAdmin(
+            'Job Post Rejected',
+            'Job "' . $job->title . '" at ' . ($job->school_name ?? 'N/A') . ' was rejected by you.' . ($reason ? ' Reason: ' . $reason : ''),
+            null,
+            'fas fa-ban'
+        );
+
+        return redirect()->route('admin.jobs.index')->with('success', 'Job has been rejected and the school has been notified.');
     }
+
 
     public function create()
     {

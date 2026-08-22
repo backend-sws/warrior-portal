@@ -113,26 +113,26 @@
 
             <div class="relative z-10 space-y-6">
                 <h2 class="text-3xl font-bold text-white leading-snug h-[80px] typewriter-effect" data-speed="40" data-repeat="8000" data-highlight="Warriors Educare" data-highlight-color="text-[#0ea5e9]">
-                    Start your teaching
-career with Warriors Educare
+                    Find the perfect
+tutor for your child
                 </h2>
                 <p class="text-sm text-gray-200 leading-relaxed max-w-xs h-[60px] typewriter-effect" data-speed="40" data-repeat="8000">
-                    Create your free candidate profile, discover job opportunities, and get placed at top schools across India.
+                    Register as a parent, post your tuition requirements, and get matched with highly qualified home tutors instantly.
                 </p>
 
                 {{-- Benefits --}}
                 <div class="space-y-3 pt-2">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center text-xs"><i class="fas fa-briefcase"></i></div>
-                        <span class="text-sm text-gray-200">Access 20K+ verified job vacancies</span>
+                        <div class="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center text-xs"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <span class="text-sm text-gray-200">Verified & experienced tutors</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center text-xs"><i class="fas fa-shield-alt"></i></div>
-                        <span class="text-sm text-gray-200">100% free registration for candidates</span>
+                        <div class="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center text-xs"><i class="fas fa-laptop-house"></i></div>
+                        <span class="text-sm text-gray-200">100% free registration for parents</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center text-xs"><i class="fas fa-headset"></i></div>
-                        <span class="text-sm text-gray-200">Dedicated placement support team</span>
+                        <div class="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center text-xs"><i class="fas fa-star"></i></div>
+                        <span class="text-sm text-gray-200">Free demo classes available</span>
                     </div>
                 </div>
             </div>

@@ -249,7 +249,15 @@
                     <i class="fas fa-receipt w-5 text-center"></i> Transactions
                 </a>
 
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Communication</div>
+
+                <a href="{{ route('admin.reminders.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.reminders.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm text-orange-300 hover:text-orange-200">
+                    <i class="fas fa-paper-plane w-5 text-center"></i> Reminder Center
+                </a>
+
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">CMS</div>
+
 
                 <!-- <a href="{{ route('admin.services.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">

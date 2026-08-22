@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Candidate;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\NotificationHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
@@ -147,11 +148,29 @@ class RegistrationWizardController extends Controller
             'agreed' => 'required|boolean|accepted',
         ]);
 
-        $profile = auth()->user()->profile;
+        $user    = auth()->user();
+        $profile = $user->profile;
 
         $profile->update([
             'is_terms_agreed' => true,
         ]);
+
+        // Notify Candidate — terms accepted
+        NotificationHelper::notifyUser(
+            $user->id,
+            'Terms & Conditions Accepted ✅',
+            'You have successfully accepted the Terms & Conditions. Please proceed to sign your digital agreement.',
+            null,
+            'fas fa-file-contract'
+        );
+
+        // Notify Admin
+        NotificationHelper::notifyAdmin(
+            'Candidate Accepted Terms',
+            $user->name . ' has accepted the Terms & Conditions and is proceeding to sign the agreement.',
+            null,
+            'fas fa-file-contract'
+        );
 
         return response()->json(['success' => true]);
     }
@@ -166,7 +185,7 @@ class RegistrationWizardController extends Controller
             'live_photo' => 'required|string', // Base64 expected
         ]);
 
-        $user = auth()->user();
+        $user    = auth()->user();
         $profile = $user->profile;
 
         $signatureData = $request->signature_data;
@@ -190,15 +209,32 @@ class RegistrationWizardController extends Controller
 
         $profile->update([
             'is_agreement_signed' => true,
-            'signature_type' => $request->signature_type,
-            'signature_data' => $signatureData,
+            'signature_type'      => $request->signature_type,
+            'signature_data'      => $signatureData,
             'signature_date_time' => now(),
             'signature_device_info' => $request->header('User-Agent'),
-            'signature_ip_address' => $request->ip(),
-            'live_photo_path' => $livePhotoPath,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
+            'signature_ip_address'  => $request->ip(),
+            'live_photo_path'       => $livePhotoPath,
+            'latitude'              => $request->latitude,
+            'longitude'             => $request->longitude,
         ]);
+
+        // Notify Candidate — agreement signed
+        NotificationHelper::notifyUser(
+            $user->id,
+            'Agreement Signed Successfully ✍️',
+            'Your digital signature has been recorded. You are now ready to select a registration plan and complete payment.',
+            null,
+            'fas fa-signature'
+        );
+
+        // Notify Admin — agreement signed
+        NotificationHelper::notifyAdmin(
+            'Candidate Signed Agreement',
+            $user->name . ' has digitally signed the registration agreement and is proceeding to payment.',
+            null,
+            'fas fa-signature'
+        );
 
         return response()->json(['success' => true]);
     }
@@ -293,8 +329,34 @@ class RegistrationWizardController extends Controller
             'gateway_response' => $statusResult['raw']
         ]);
 
-        // If payment failed, stop here — do NOT update the profile
+        // If payment failed — notify candidate and admin, then stop
         if (!$isSuccess) {
+            // DB Notification to Candidate
+            NotificationHelper::notifyUser(
+                $user->id,
+                'Payment Failed ❌',
+                'Your registration payment could not be processed. Transaction ID: ' . $transactionId . '. Please try again from your dashboard.',
+                null,
+                'fas fa-times-circle'
+            );
+
+            // DB Notification to Admin
+            NotificationHelper::notifyAdmin(
+                'Payment Failed',
+                $user->name . ' attempted payment (TXN: ' . $transactionId . ') but it failed or was cancelled.',
+                null,
+                'fas fa-exclamation-circle'
+            );
+
+            // Email to Candidate
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(
+                    new \App\Mail\PaymentFailedMail($user, $transactionId, $amountPaid)
+                );
+            } catch (\Exception $e) {
+                \Log::error('PaymentFailed Email Error: ' . $e->getMessage());
+            }
+
             return redirect()->route('candidate.dashboard')->with('error', 'Payment failed or cancelled. Please try again.');
         }
 
