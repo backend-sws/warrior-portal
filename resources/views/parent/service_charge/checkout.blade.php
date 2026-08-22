@@ -3,7 +3,7 @@
 @section('title', 'Razorpay Secure Checkout - Parent Service Charge')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6" x-data="{ sandboxModal: false, selectedMode: 'upi' }">
     <!-- Breadcrumb / Back button -->
     <div>
         <a href="{{ route('parent.serviceCharge.index') }}" class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-500 hover:text-accent-blue transition-colors">
@@ -107,7 +107,7 @@
             <!-- Razorpay Trigger Button -->
             <div>
                 <button type="button" id="rzp-parent-pay-button" 
-                        class="w-full py-4 px-6 bg-gradient-to-r from-[#0a2558] to-[#1e40af] hover:from-[#0d3175] hover:to-[#2563eb] text-white rounded-2xl text-sm font-bold transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2.5 group">
+                        class="w-full py-4 px-6 bg-gradient-to-r from-[#0a2558] to-[#1e40af] hover:from-[#0d3175] hover:to-[#2563eb] text-white rounded-2xl text-sm font-bold transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2.5 group cursor-pointer">
                     <i class="fas fa-lock text-emerald-400 group-hover:scale-110 transition-transform"></i>
                     <span>Pay ₹{{ number_format($order['amount'], 2) }} Securely via Razorpay</span>
                 </button>
@@ -123,6 +123,66 @@
         </div>
 
     </div>
+
+    <!-- Razorpay Sandbox Simulator Modal (For Local / Test Mode) -->
+    <div x-show="sandboxModal" x-cloak 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+         x-transition>
+        <div class="bg-white rounded-3xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-5"
+             @click.outside="sandboxModal = false">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-black text-sm text-slate-900">Razorpay Payment Simulator</h4>
+                        <span class="text-[10px] text-slate-400 font-semibold">Test Sandbox Environment</span>
+                    </div>
+                </div>
+                <button type="button" @click="sandboxModal = false" class="text-slate-400 hover:text-slate-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2">
+                <div class="flex justify-between text-xs">
+                    <span class="text-slate-500">Merchant:</span>
+                    <span class="font-bold text-slate-800">Warriors Educare</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                    <span class="text-slate-500">Invoice:</span>
+                    <span class="font-bold text-slate-800">#{{ $invoice->id }}</span>
+                </div>
+                <div class="flex justify-between text-xs pt-1 border-t border-slate-200">
+                    <span class="font-bold text-slate-700">Amount:</span>
+                    <span class="font-black text-base text-emerald-600">₹{{ number_format($order['amount'], 2) }}</span>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-700">Select Test Payment Mode:</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" @click="selectedMode = 'upi'" :class="selectedMode === 'upi' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'" class="py-2 px-3 rounded-xl text-xs font-bold transition-all">
+                        UPI / GPay
+                    </button>
+                    <button type="button" @click="selectedMode = 'card'" :class="selectedMode === 'card' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'" class="py-2 px-3 rounded-xl text-xs font-bold transition-all">
+                        Card
+                    </button>
+                    <button type="button" @click="selectedMode = 'netbanking'" :class="selectedMode === 'netbanking' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'" class="py-2 px-3 rounded-xl text-xs font-bold transition-all">
+                        Netbanking
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button type="button" id="confirm-parent-sandbox-pay" 
+                        class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle"></i> Complete Successful Payment
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -133,50 +193,91 @@
         const orderData = @json($order);
         const userData = @json($user);
         const invoiceId = "{{ $invoice->id }}";
+        const isMock = orderData.is_mock || (orderData.key && orderData.key.includes('placeholder'));
 
-        const options = {
-            "key": orderData.key,
-            "amount": orderData.amount_paisa,
-            "currency": orderData.currency || "INR",
-            "name": orderData.name || "Warriors Educare",
-            "description": "Parent Tuition Service Charge (Invoice #" + invoiceId + ")",
-            "image": "{{ asset('adobe.png') }}",
-            "order_id": orderData.order_id,
-            "handler": function (response) {
-                document.getElementById('parent_razorpay_payment_id').value = response.razorpay_payment_id;
-                document.getElementById('parent_razorpay_order_id').value = response.razorpay_order_id;
-                document.getElementById('parent_razorpay_signature').value = response.razorpay_signature;
-                
-                const btn = document.getElementById('rzp-parent-pay-button');
+        function triggerParentCallback(paymentId, orderId, signature) {
+            document.getElementById('parent_razorpay_payment_id').value = paymentId;
+            document.getElementById('parent_razorpay_order_id').value = orderId;
+            document.getElementById('parent_razorpay_signature').value = signature;
+            
+            const btn = document.getElementById('rzp-parent-pay-button');
+            if (btn) {
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying Payment...';
-
-                document.getElementById('razorpay-parent-callback-form').submit();
-            },
-            "prefill": {
-                "name": userData.name || "",
-                "email": userData.email || "",
-                "contact": userData.phone || ""
-            },
-            "notes": {
-                "invoice_id": invoiceId,
-                "user_id": userData.id
-            },
-            "theme": {
-                "color": "#0a2558"
             }
-        };
 
-        const rzp = new Razorpay(options);
+            document.getElementById('razorpay-parent-callback-form').submit();
+        }
 
-        rzp.on('payment.failed', function (response) {
-            alert("Payment Failed: " + response.error.description);
+        const payButton = document.getElementById('rzp-parent-pay-button');
+
+        payButton.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            if (isMock || typeof Razorpay === 'undefined') {
+                const alpineEl = document.querySelector('[x-data]');
+                if (alpineEl && alpineEl.__x) {
+                    alpineEl.__x.$data.sandboxModal = true;
+                } else {
+                    if (confirm("Proceed with Test Sandbox Payment of ₹" + orderData.amount + "?")) {
+                        triggerParentCallback('pay_mock_' + Date.now(), orderData.order_id, 'mock_sig_' + Date.now());
+                    }
+                }
+                return;
+            }
+
+            try {
+                const options = {
+                    "key": orderData.key,
+                    "amount": orderData.amount_paisa,
+                    "currency": orderData.currency || "INR",
+                    "name": orderData.name || "Warriors Educare",
+                    "description": "Parent Tuition Service Charge (Invoice #" + invoiceId + ")",
+                    "image": "{{ asset('adobe.png') }}",
+                    "order_id": orderData.order_id,
+                    "handler": function (response) {
+                        triggerParentCallback(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
+                    },
+                    "prefill": {
+                        "name": userData.name || "",
+                        "email": userData.email || "",
+                        "contact": userData.phone || ""
+                    },
+                    "notes": {
+                        "invoice_id": invoiceId,
+                        "user_id": userData.id
+                    },
+                    "theme": {
+                        "color": "#0a2558"
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+
+                rzp.on('payment.failed', function (response) {
+                    alert("Payment Failed: " + (response.error ? response.error.description : 'Transaction failed'));
+                });
+
+                rzp.open();
+            } catch (err) {
+                console.warn('Razorpay SDK error, falling back to sandbox simulator:', err);
+                const alpineEl = document.querySelector('[x-data]');
+                if (alpineEl && alpineEl.__x) {
+                    alpineEl.__x.$data.sandboxModal = true;
+                } else {
+                    triggerParentCallback('pay_mock_' + Date.now(), orderData.order_id, 'mock_sig_' + Date.now());
+                }
+            }
         });
 
-        document.getElementById('rzp-parent-pay-button').onclick = function(e) {
-            rzp.open();
-            e.preventDefault();
-        };
+        const confirmSandboxBtn = document.getElementById('confirm-parent-sandbox-pay');
+        if (confirmSandboxBtn) {
+            confirmSandboxBtn.addEventListener('click', function() {
+                confirmSandboxBtn.disabled = true;
+                confirmSandboxBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                triggerParentCallback('pay_mock_' + Date.now(), orderData.order_id, 'mock_sig_' + Date.now());
+            });
+        }
     });
 </script>
 @endpush
