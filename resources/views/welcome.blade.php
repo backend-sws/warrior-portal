@@ -3,80 +3,127 @@
     @section('content')
     
     <!-- Welcome Modal -->
-    <div x-data="{ showWelcomeModal: false }" 
-         x-init="setTimeout(() => { if(!sessionStorage.getItem('welcomeShown')) { showWelcomeModal = true; sessionStorage.setItem('welcomeShown', '1'); } }, 500);" 
+    <div x-data="{ 
+            showWelcomeModal: false,
+            openTuitionRequirement() {
+                this.showWelcomeModal = false;
+                window.dispatchEvent(new CustomEvent('switch-requirement-tab', { detail: { tab: 'tuition' } }));
+                setTimeout(() => {
+                    const el = document.getElementById('quick-request-form');
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 150);
+            },
+            openSchoolRequirement() {
+                this.showWelcomeModal = false;
+                window.dispatchEvent(new CustomEvent('switch-requirement-tab', { detail: { tab: 'school' } }));
+                setTimeout(() => {
+                    const el = document.getElementById('quick-request-form');
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 150);
+            }
+         }" 
+         x-init="setTimeout(() => { if(!sessionStorage.getItem('welcomeShown')) { showWelcomeModal = true; sessionStorage.setItem('welcomeShown', '1'); } }, 400);" 
          x-show="showWelcomeModal" 
-         class="fixed inset-0 z-[100] flex items-center justify-center bg-[#071520]/80 backdrop-blur-sm px-4 py-8"
+         class="fixed inset-0 z-[100] flex items-center justify-center bg-[#071520]/80 backdrop-blur-md p-4 sm:p-6"
          style="display: none;"
-         x-transition.opacity>
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
          
-        <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-5xl w-full relative overflow-y-auto max-h-[90vh]" 
+        <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 max-w-4xl w-full relative overflow-hidden border border-slate-100" 
              @click.away="showWelcomeModal = false"
              x-show="showWelcomeModal"
              x-transition:enter="transition ease-out duration-400"
-             x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+             x-transition:enter-start="opacity-0 translate-y-6 scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-             x-transition:leave-end="opacity-0 translate-y-8 scale-95">
+             x-transition:leave-end="opacity-0 translate-y-6 scale-95">
              
             <!-- Close Button -->
-            <button @click="showWelcomeModal = false" class="absolute top-6 right-6 w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors z-20">
-                <i class="fas fa-times text-lg"></i>
+            <button @click="showWelcomeModal = false" 
+                    class="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 sm:w-10 sm:h-10 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 rounded-full flex items-center justify-center transition-all duration-200 z-20 shadow-sm">
+                <i class="fas fa-times text-sm sm:text-base"></i>
             </button>
             
-            <div class="text-center mb-8 relative z-10 pt-8 sm:pt-4">
-                <h2 class="text-2xl lg:text-4xl font-bold text-[#031b4e] mb-2 sm:mb-3">Welcome to Warriors Educare</h2>
-                <p class="text-slate-500 text-base sm:text-lg">Please select what you are looking for today</p>
+            <!-- Header -->
+            <div class="text-center mb-6 sm:mb-8 relative z-10">
+                <div class="inline-flex items-center gap-2 bg-blue-50 text-[#031b4e] px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border border-blue-100">
+                    <i class="fas fa-sparkles text-amber-500"></i>
+                    <span>Educational Placement & Home Tutors</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#031b4e] mb-1.5 tracking-tight">Welcome to Warriors Educare</h2>
+                <p class="text-slate-500 text-xs sm:text-sm md:text-base max-w-lg mx-auto">Please select what you are looking for today to get started.</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 pb-4">
-                <!-- Card 1: Parents -->
-                <a href="{{ route('contact') }}" class="group relative rounded-2xl p-8 text-center transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 hover:border-[#031b4e] overflow-hidden isolate">
-                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 z-0" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop');"></div>
-                    <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
-                    
-                    <div class="relative z-10">
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-4 sm:mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
-                            <i class="fas fa-user-graduate text-2xl sm:text-3xl"></i>
-                        </div>
-                        <h3 class="text-lg sm:text-xl font-bold text-[#031b4e] group-hover:text-white mb-2 sm:mb-3 transition-colors">Hire a Home Tutor <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
-                        <p class="text-xs sm:text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">For Parents & students</p>
-                    </div>
-                </a>
+            <!-- 3 Interactive Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 relative z-10">
                 
-                <!-- Card 2: Schools -->
-                <a href="{{ route('contact') }}" class="group relative rounded-2xl p-8 text-center transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 hover:border-[#031b4e] overflow-hidden isolate">
-                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 z-0" style="background-image: url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=600&auto=format&fit=crop');"></div>
-                    <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
-                    
-                    <div class="relative z-10">
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-4 sm:mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
-                            <i class="fas fa-school text-2xl sm:text-3xl"></i>
+                <!-- Card 1: Hire a Home Tutor -->
+                <button type="button" 
+                        @click="openTuitionRequirement()" 
+                        class="group relative rounded-2xl p-6 text-center transition-all duration-300 bg-gradient-to-b from-blue-50/60 to-white hover:from-[#031b4e] hover:to-[#0a2c7a] border-2 border-blue-100 hover:border-[#031b4e] shadow-md hover:shadow-2xl hover:-translate-y-1.5 flex flex-col items-center justify-between cursor-pointer">
+                    <div class="w-full flex flex-col items-center">
+                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white group-hover:bg-white/10 text-[#031b4e] group-hover:text-cyan-300 flex items-center justify-center text-2xl sm:text-3xl shadow-md group-hover:scale-110 transition-all duration-300 mb-4 border border-blue-100/80 group-hover:border-white/20">
+                            <i class="fas fa-user-graduate"></i>
                         </div>
-                        <h3 class="text-lg sm:text-xl font-bold text-[#031b4e] group-hover:text-white mb-2 sm:mb-3 transition-colors">Hire Teachers & Staff <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
-                        <p class="text-xs sm:text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">For Schools / Institutions</p>
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-600 group-hover:text-cyan-300 mb-1 transition-colors">For Parents & Students</span>
+                        <h3 class="text-base sm:text-lg font-black text-[#031b4e] group-hover:text-white mb-2 transition-colors">Hire a Home Tutor</h3>
+                        <p class="text-xs text-slate-500 group-hover:text-blue-100 leading-relaxed transition-colors">Find top rated verified home tutors in your city for all subjects & boards.</p>
                     </div>
-                </a>
+                    <div class="mt-4 pt-3 border-t border-slate-100 group-hover:border-white/10 w-full flex items-center justify-center gap-1.5 text-xs font-bold text-[#031b4e] group-hover:text-white transition-colors">
+                        <span>Fill Requirement</span>
+                        <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </button>
                 
-                <!-- Card 3: Candidates -->
-                <a href="{{ route('candidate.register') }}" class="group relative rounded-2xl p-8 text-center transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 hover:border-[#031b4e] overflow-hidden isolate">
-                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 z-0" style="background-image: url('https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=600&auto=format&fit=crop');"></div>
-                    <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
-                    
-                    <div class="relative z-10">
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-md mb-4 sm:mb-6 group-hover:scale-110 transition-transform text-[#031b4e]">
-                            <i class="fas fa-chalkboard-teacher text-2xl sm:text-3xl"></i>
+                <!-- Card 2: Hire Teachers & Staff -->
+                <button type="button" 
+                        @click="openSchoolRequirement()" 
+                        class="group relative rounded-2xl p-6 text-center transition-all duration-300 bg-gradient-to-b from-indigo-50/60 to-white hover:from-[#031b4e] hover:to-[#0a2c7a] border-2 border-indigo-100 hover:border-[#031b4e] shadow-md hover:shadow-2xl hover:-translate-y-1.5 flex flex-col items-center justify-between cursor-pointer">
+                    <div class="w-full flex flex-col items-center">
+                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white group-hover:bg-white/10 text-indigo-700 group-hover:text-cyan-300 flex items-center justify-center text-2xl sm:text-3xl shadow-md group-hover:scale-110 transition-all duration-300 mb-4 border border-indigo-100/80 group-hover:border-white/20">
+                            <i class="fas fa-school"></i>
                         </div>
-                        <h3 class="text-lg sm:text-xl font-bold text-[#031b4e] group-hover:text-white mb-2 sm:mb-3 transition-colors">Join as Teacher / Tutor <i class="fas fa-arrow-right ml-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1"></i></h3>
-                        <p class="text-xs sm:text-sm font-semibold text-slate-600 group-hover:text-white/90 transition-colors">Find School Jobs & Tuition Opportunities</p>
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 group-hover:text-cyan-300 mb-1 transition-colors">For Schools & Institutes</span>
+                        <h3 class="text-base sm:text-lg font-black text-[#031b4e] group-hover:text-white mb-2 transition-colors">Hire Teachers & Staff</h3>
+                        <p class="text-xs text-slate-500 group-hover:text-blue-100 leading-relaxed transition-colors">Access 10,000+ qualified PGT, TGT, PRT faculty & academic staff.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 group-hover:border-white/10 w-full flex items-center justify-center gap-1.5 text-xs font-bold text-[#031b4e] group-hover:text-white transition-colors">
+                        <span>Post Faculty Need</span>
+                        <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </button>
+                
+                <!-- Card 3: Join as Teacher / Tutor -->
+                <a href="{{ route('candidate.register') }}" 
+                   class="group relative rounded-2xl p-6 text-center transition-all duration-300 bg-gradient-to-b from-amber-50/60 to-white hover:from-[#031b4e] hover:to-[#0a2c7a] border-2 border-amber-100 hover:border-[#031b4e] shadow-md hover:shadow-2xl hover:-translate-y-1.5 flex flex-col items-center justify-between cursor-pointer">
+                    <div class="w-full flex flex-col items-center">
+                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white group-hover:bg-white/10 text-amber-600 group-hover:text-amber-300 flex items-center justify-center text-2xl sm:text-3xl shadow-md group-hover:scale-110 transition-all duration-300 mb-4 border border-amber-100/80 group-hover:border-white/20">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 group-hover:text-amber-300 mb-1 transition-colors">For Teachers & Tutors</span>
+                        <h3 class="text-base sm:text-lg font-black text-[#031b4e] group-hover:text-white mb-2 transition-colors">Join as Teacher / Tutor</h3>
+                        <p class="text-xs text-slate-500 group-hover:text-blue-100 leading-relaxed transition-colors">Find school teaching jobs & home tuition opportunities in your city.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 group-hover:border-white/10 w-full flex items-center justify-center gap-1.5 text-xs font-bold text-[#031b4e] group-hover:text-white transition-colors">
+                        <span>Register Free</span>
+                        <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform"></i>
                     </div>
                 </a>
+
             </div>
             
-            <!-- Decorative elements inside modal -->
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
-            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-cyan-50 rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
+            <!-- Decorative blurred backdrop circles -->
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-cyan-100/50 rounded-full blur-3xl pointer-events-none"></div>
         </div>
     </div>
     
@@ -1094,6 +1141,20 @@
                     school_cities: [],
                     loadingSchoolSubjects: false,
                     loadingSchoolCities: false,
+
+                    init() {
+                        window.addEventListener('switch-requirement-tab', (e) => {
+                            if (e.detail && e.detail.tab) {
+                                this.switchTab(e.detail.tab);
+                            }
+                        });
+
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const tabParam = urlParams.get('tab') || urlParams.get('requirement');
+                        if (tabParam === 'school' || tabParam === 'tuition') {
+                            this.switchTab(tabParam);
+                        }
+                    },
 
                     switchTab(newTab) {
                         this.tab = newTab;
