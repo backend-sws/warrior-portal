@@ -120,12 +120,14 @@ class TuitionApplicationController extends Controller
                 $desc = $request->service_charge_description ?: "Service Charge for Home Tuition (Class {$lead->class} - {$lead->subjects})";
 
                 $invoice = ServiceChargeInvoice::create([
-                    'candidate_id'       => $candidate->id,
-                    'job_application_id' => null,
-                    'amount'             => $amount,
-                    'due_date'           => $dueDate,
-                    'status'             => 'pending',
-                    'description'        => $desc,
+                    'candidate_id'           => $candidate->id,
+                    'job_application_id'     => null,
+                    'home_tuition_lead_id'   => $lead->id,
+                    'tuition_application_id' => $application->id,
+                    'amount'                 => $amount,
+                    'due_date'               => $dueDate,
+                    'status'                 => 'pending',
+                    'description'            => $desc,
                 ]);
 
                 if ($candidate->profile) {

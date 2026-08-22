@@ -241,9 +241,22 @@
                     class="sidebar-link {{ request()->routeIs('admin.candidate-tuition.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-user-graduate w-5 text-center"></i> Assign Teachers
                 </a>
+                <a href="{{ route('admin.tuition-service-charges.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.tuition-service-charges.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-file-invoice-dollar w-5 text-center"></i> Tuition Service Charges
+                    @php 
+                        $pendingTuitionInvoicesCount = \App\Models\ServiceChargeInvoice::where('status', 'pending')
+                            ->where(function($q) {
+                                $q->whereNotNull('home_tuition_lead_id')->orWhere(function($sub){ $sub->whereNull('job_application_id')->where('description', 'like', '%tuition%'); });
+                            })->count(); 
+                    @endphp
+                    @if($pendingTuitionInvoicesCount > 0)
+                        <span class="ml-auto bg-amber-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingTuitionInvoicesCount }}</span>
+                    @endif
+                </a>
                 <a href="{{ route('admin.tuition-fees.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.tuition-fees.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-money-check-alt w-5 text-center"></i> Tuition Fees
+                    <i class="fas fa-money-check-alt w-5 text-center"></i> Parent Tuition Fees
                 </a>
 
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Support & Inquiries

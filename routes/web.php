@@ -269,6 +269,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/candidate-tuition', [\App\Http\Controllers\Admin\CandidateTuitionController::class, 'index'])->name('candidate-tuition.index');
     Route::post('/candidate-tuition/{candidateId}/appoint', [\App\Http\Controllers\Admin\CandidateTuitionController::class, 'appoint'])->name('candidate-tuition.appoint');
 
+    // Tuition Service Charges (Teacher / Candidate Invoices)
+    Route::get('/tuition-service-charges', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'index'])->name('tuition-service-charges.index');
+    Route::post('/tuition-service-charges', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'store'])->name('tuition-service-charges.store');
+    Route::put('/tuition-service-charges/{id}', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'update'])->name('tuition-service-charges.update');
+    Route::post('/tuition-service-charges/{id}/mark-paid', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'markPaid'])->name('tuition-service-charges.mark-paid');
+    Route::post('/tuition-service-charges/{id}/remind', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'sendReminder'])->name('tuition-service-charges.remind');
+    Route::delete('/tuition-service-charges/{id}', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'destroy'])->name('tuition-service-charges.destroy');
+
     // Tuition Fee Accounts (Payment Management)
     Route::get('/tuition-fees', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'index'])->name('tuition-fees.index');
     Route::get('/tuition-fees/create', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'create'])->name('tuition-fees.create');
