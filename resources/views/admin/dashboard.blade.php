@@ -1,130 +1,115 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin Executive Dashboard')
-@section('subtitle', 'Warriors Educare platform performance, hiring pipeline, tuition assignments, and collections.')
+@section('title', 'Welcome back, ' . (auth()->user()->name ?? 'Admin'))
+@section('subtitle', 'Operations Command • Real-time overview of school jobs, home tuitions, applications, and collections.')
+
+@section('actions')
+    <!-- Date Filter Form in Page Header -->
+    <form method="GET" action="{{ route('admin.dashboard') }}" class="flex items-center gap-2 bg-card-bg p-1.5 rounded-2xl border border-card-border shadow-sm">
+        <div class="flex items-center gap-1.5 px-2.5 border-r border-card-border">
+            <i class="fas fa-calendar-alt text-text-dark/40 text-xs"></i>
+            <input type="date" name="from_date" value="{{ request('from_date') }}" class="bg-transparent border-none text-xs text-text-main outline-none focus:ring-0 w-28">
+        </div>
+        <div class="flex items-center gap-1.5 px-2.5">
+            <span class="text-text-dark/40 text-xs">to</span>
+            <input type="date" name="to_date" value="{{ request('to_date') }}" class="bg-transparent border-none text-xs text-text-main outline-none focus:ring-0 w-28">
+        </div>
+        <button type="submit" class="bg-accent-blue hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold transition-colors shadow-sm">
+            <i class="fas fa-filter text-[10px]"></i> <span>Filter</span>
+        </button>
+        @if(request('from_date') || request('to_date'))
+            <a href="{{ route('admin.dashboard') }}" class="text-red-500 hover:text-red-700 px-2 py-1 bg-red-50 rounded-lg text-xs font-bold transition-colors" title="Clear Filter">
+                <i class="fas fa-times"></i>
+            </a>
+        @endif
+    </form>
+@endsection
 
 @section('content')
 
-{{-- 1. Executive Hero Header --}}
-<div class="bg-gradient-to-r from-[#0f2854] via-[#1a4480] to-[#0ea5e9] rounded-3xl p-6 sm:p-8 shadow-lg mb-8 text-white relative overflow-hidden">
-    <!-- Abstract Background shapes -->
-    <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-    <div class="absolute bottom-0 left-0 w-64 h-64 bg-cyan-400/10 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4 pointer-events-none"></div>
-
-    <!-- Top Row: Welcome + Date Filter -->
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 relative z-10 gap-4">
+{{-- 1. Primary KPI Metric Cards (Clean, Clickable, No Duplicate Hero Box) --}}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <!-- Card 1: School Jobs -->
+    <a href="{{ route('admin.jobs.index') }}" class="bg-card-bg hover:border-blue-300 border border-card-border rounded-2xl p-5 shadow-sm transition-all group flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-xl group-hover:bg-blue-500/10 transition-colors pointer-events-none"></div>
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="px-2.5 py-0.5 rounded-full bg-white/10 text-cyan-200 text-xs font-bold border border-white/15">
-                    <i class="fas fa-shield-alt mr-1"></i> Operations Command
-                </span>
-                <span class="text-xs text-blue-200">{{ now()->format('l, d M Y') }}</span>
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-text-dark/60">School Jobs</span>
+                <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fas fa-school"></i>
+                </div>
             </div>
-            <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-white">Welcome back, Admin</h2>
-            <p class="text-blue-100/80 text-xs sm:text-sm mt-0.5">Real-time overview of school jobs, home tuitions, and finance operations.</p>
+            <h3 class="text-3xl font-black tracking-tight text-blue-600">{{ number_format($activeJobs) }}</h3>
+            <span class="text-xs text-text-dark/50 font-medium">Live Active Postings</span>
         </div>
-        
-        <!-- Date Filter Form -->
-        <form method="GET" action="{{ route('admin.dashboard') }}" class="flex items-center gap-2 bg-white/10 p-1.5 rounded-2xl border border-white/20 backdrop-blur-md shadow-sm">
-            <div class="flex items-center gap-1.5 px-2.5 border-r border-white/20">
-                <i class="fas fa-calendar-alt text-white/70 text-xs"></i>
-                <input type="date" name="from_date" value="{{ request('from_date') }}" class="bg-transparent border-none text-xs text-white outline-none [&::-webkit-calendar-picker-indicator]:filter-[invert(1)] focus:ring-0 w-28">
-            </div>
-            <div class="flex items-center gap-1.5 px-2.5">
-                <span class="text-white/50 text-xs">to</span>
-                <input type="date" name="to_date" value="{{ request('to_date') }}" class="bg-transparent border-none text-xs text-white outline-none [&::-webkit-calendar-picker-indicator]:filter-[invert(1)] focus:ring-0 w-28">
-            </div>
-            <button type="submit" class="bg-white text-[#0f2854] px-3 py-1.5 rounded-xl flex items-center gap-1 text-xs font-black hover:bg-cyan-50 transition-colors shadow-sm">
-                <i class="fas fa-filter text-[10px]"></i> <span>Filter</span>
-            </button>
-            @if(request('from_date') || request('to_date'))
-                <a href="{{ route('admin.dashboard') }}" class="text-rose-200 hover:text-white px-2 py-1 bg-rose-500/30 rounded-lg text-xs font-bold transition-colors" title="Clear Filter">
-                    <i class="fas fa-times"></i>
-                </a>
+        <div class="mt-4 pt-3 border-t border-card-border flex items-center justify-between text-xs text-text-dark/60">
+            <span>{{ $totalJobs }} Total Jobs</span>
+            @if($pendingJobsCount > 0)
+                <span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full text-[10px] border border-amber-200">{{ $pendingJobsCount }} Pending</span>
             @endif
-        </form>
-    </div>
+        </div>
+    </a>
     
-    <!-- 4 High-Impact KPI Cards Inside Hero -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
-        <!-- Card 1: School Jobs -->
-        <a href="{{ route('admin.jobs.index') }}" class="bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md rounded-2xl p-5 transition-all group shadow-sm flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-blue-100 text-xs font-bold uppercase tracking-wider">School Jobs</span>
-                    <div class="w-9 h-9 rounded-xl bg-blue-400/20 text-cyan-200 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
-                        <i class="fas fa-school"></i>
-                    </div>
+    <!-- Card 2: Home Tuitions -->
+    <a href="{{ route('admin.tuition-leads.index') }}" class="bg-card-bg hover:border-emerald-300 border border-card-border rounded-2xl p-5 shadow-sm transition-all group flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-colors pointer-events-none"></div>
+        <div>
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-text-dark/60">Home Tuitions</span>
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fas fa-chalkboard-teacher"></i>
                 </div>
-                <h3 class="text-3xl font-black tracking-tight text-white">{{ number_format($activeJobs) }}</h3>
-                <span class="text-xs text-blue-200 font-medium">Live Active Postings</span>
             </div>
-            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-blue-100">
-                <span>{{ $totalJobs }} Total Jobs</span>
-                @if($pendingJobsCount > 0)
-                    <span class="bg-amber-400 text-slate-900 font-bold px-2 py-0.5 rounded-full text-[10px]">{{ $pendingJobsCount }} Pending</span>
-                @endif
-            </div>
-        </a>
-        
-        <!-- Card 2: Home Tuitions -->
-        <a href="{{ route('admin.tuition-leads.index') }}" class="bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md rounded-2xl p-5 transition-all group shadow-sm flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-blue-100 text-xs font-bold uppercase tracking-wider">Home Tuitions</span>
-                    <div class="w-9 h-9 rounded-xl bg-emerald-400/20 text-emerald-200 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
+            <h3 class="text-3xl font-black tracking-tight text-emerald-600">{{ number_format($activeTuitions) }}</h3>
+            <span class="text-xs text-text-dark/50 font-medium">Live on Website</span>
+        </div>
+        <div class="mt-4 pt-3 border-t border-card-border flex items-center justify-between text-xs text-text-dark/60">
+            <span>{{ $assignedTuitions }} Tutors Assigned</span>
+            @if($pendingTuitionsCount > 0)
+                <span class="bg-yellow-100 text-yellow-800 font-bold px-2 py-0.5 rounded-full text-[10px] border border-yellow-200">{{ $pendingTuitionsCount }} New</span>
+            @endif
+        </div>
+    </a>
+    
+    <!-- Card 3: Candidates CRM -->
+    <a href="{{ route('admin.crm.index') }}" class="bg-card-bg hover:border-purple-300 border border-card-border rounded-2xl p-5 shadow-sm transition-all group flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-xl group-hover:bg-purple-500/10 transition-colors pointer-events-none"></div>
+        <div>
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-text-dark/60">Candidates Pool</span>
+                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fas fa-users"></i>
                 </div>
-                <h3 class="text-3xl font-black tracking-tight text-white">{{ number_format($activeTuitions) }}</h3>
-                <span class="text-xs text-emerald-200 font-medium">Live on Website</span>
             </div>
-            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-blue-100">
-                <span>{{ $assignedTuitions }} Tutors Assigned</span>
-                @if($pendingTuitionsCount > 0)
-                    <span class="bg-yellow-400 text-slate-900 font-bold px-2 py-0.5 rounded-full text-[10px]">{{ $pendingTuitionsCount }} New</span>
-                @endif
-            </div>
-        </a>
-        
-        <!-- Card 3: Candidates CRM -->
-        <a href="{{ route('admin.crm.index') }}" class="bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md rounded-2xl p-5 transition-all group shadow-sm flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-blue-100 text-xs font-bold uppercase tracking-wider">Candidates / Tutors</span>
-                    <div class="w-9 h-9 rounded-xl bg-purple-400/20 text-purple-200 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
-                        <i class="fas fa-users"></i>
-                    </div>
+            <h3 class="text-3xl font-black tracking-tight text-purple-600">{{ number_format($totalCandidates) }}</h3>
+            <span class="text-xs text-text-dark/50 font-medium">Registered Pool</span>
+        </div>
+        <div class="mt-4 pt-3 border-t border-card-border flex items-center justify-between text-xs text-text-dark/60">
+            <span>{{ $signedCandidates }} Signed</span>
+            <span class="text-emerald-600 font-bold">{{ $verifiedCandidates }} Verified</span>
+        </div>
+    </a>
+    
+    <!-- Card 4: Platform Collections -->
+    <a href="{{ route('admin.tuition-service-charges.index') }}" class="bg-card-bg hover:border-cyan-300 border border-card-border rounded-2xl p-5 shadow-sm transition-all group flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-xl group-hover:bg-cyan-500/10 transition-colors pointer-events-none"></div>
+        <div>
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-text-dark/60">Total Collections</span>
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fas fa-wallet"></i>
                 </div>
-                <h3 class="text-3xl font-black tracking-tight text-white">{{ number_format($totalCandidates) }}</h3>
-                <span class="text-xs text-purple-200 font-medium">Registered Pool</span>
             </div>
-            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-blue-100">
-                <span>{{ $signedCandidates }} Agreements Signed</span>
-                <span class="text-emerald-300 font-bold">{{ $verifiedCandidates }} Verified</span>
-            </div>
-        </a>
-        
-        <!-- Card 4: Platform Collections -->
-        <a href="{{ route('admin.tuition-service-charges.index') }}" class="bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md rounded-2xl p-5 transition-all group shadow-sm flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-blue-100 text-xs font-bold uppercase tracking-wider">Total Collections</span>
-                    <div class="w-9 h-9 rounded-xl bg-cyan-400/20 text-cyan-200 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
-                        <i class="fas fa-wallet"></i>
-                    </div>
-                </div>
-                <h3 class="text-3xl font-black tracking-tight text-white">₹{{ number_format($totalRevenue) }}</h3>
-                <span class="text-xs text-cyan-200 font-medium">Service Fees & Direct</span>
-            </div>
-            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-blue-100">
-                <span>₹{{ number_format($pendingDues) }} Dues</span>
-                @if($overdueInvoicesCount > 0)
-                    <span class="bg-rose-500 text-white font-bold px-2 py-0.5 rounded-full text-[10px]">{{ $overdueInvoicesCount }} Overdue</span>
-                @endif
-            </div>
-        </a>
-    </div>
+            <h3 class="text-3xl font-black tracking-tight text-cyan-600">₹{{ number_format($totalRevenue) }}</h3>
+            <span class="text-xs text-text-dark/50 font-medium">Service Fees & Direct</span>
+        </div>
+        <div class="mt-4 pt-3 border-t border-card-border flex items-center justify-between text-xs text-text-dark/60">
+            <span>₹{{ number_format($pendingDues) }} Dues</span>
+            @if($overdueInvoicesCount > 0)
+                <span class="bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded-full text-[10px] border border-rose-200">{{ $overdueInvoicesCount }} Overdue</span>
+            @endif
+        </div>
+    </a>
 </div>
 
 {{-- 2. Dual Operations Row: School Jobs vs Home Tuitions Operations --}}
