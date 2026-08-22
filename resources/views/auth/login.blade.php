@@ -148,36 +148,27 @@
                 </a>
             </div>
 
-            <div class="mb-6">
+            <div class="mb-5">
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">Sign In</h2>
                 <p class="mt-1 text-xs sm:text-sm text-gray-500">Enter your credentials to access your account</p>
             </div>
 
-            <div class="mb-4 flex items-center gap-4">
-                <div class="flex-1 h-px bg-gray-200"></div>
-                <span class="text-[11px] sm:text-xs text-gray-400 uppercase tracking-wider font-bold">New here? Choose an option</span>
-                <div class="flex-1 h-px bg-gray-200"></div>
-            </div>
-
-            <div class="mb-6 grid grid-cols-1 gap-3 relative z-20">
-                {{-- 1. Register as Teacher --}}
-                <a href="{{ route('candidate.register') }}"
-                    class="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-2xl text-center font-bold border-2 border-blue-100 hover:border-accent-blue hover:bg-blue-50/50 transition-all group shadow-sm">
-                    <div class="flex items-center gap-2 text-[#031b4e] text-sm md:text-base font-extrabold">
-                        <i class="fas fa-chalkboard-teacher text-accent-blue group-hover:scale-110 transition-transform"></i>
-                        <span>Register as Teacher (For Tuition & School Jobs) &rarr;</span>
-                    </div>
-                    <span class="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">Apply for verified school teaching vacancies & home tuitions</span>
-                </a>
-
-                {{-- 2. Post Requirement Modal Trigger --}}
+            {{-- 1. Post Requirement Card (For Parents & Schools) --}}
+            <div class="mb-6">
                 <button type="button" @click="openPostModal = true"
-                    class="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-2xl text-center font-bold border-2 border-purple-100 hover:border-purple-500 hover:bg-purple-50/50 transition-all group shadow-sm cursor-pointer">
-                    <div class="flex items-center gap-2 text-[#031b4e] text-sm md:text-base font-extrabold">
-                        <i class="fas fa-bullhorn text-purple-600 group-hover:scale-110 transition-transform"></i>
-                        <span>Need a Teacher or Tutor? (Post Requirement) &rarr;</span>
+                    class="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 border border-purple-200/80 hover:border-purple-500 hover:shadow-md transition-all group cursor-pointer text-left">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-md shadow-purple-600/20 group-hover:scale-105 transition-transform shrink-0">
+                            <i class="fas fa-bullhorn text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs sm:text-sm font-extrabold text-[#031b4e]">Need a Teacher or Home Tutor?</div>
+                            <div class="text-[11px] text-slate-500 font-medium">Post school job or home tuition requirement</div>
+                        </div>
                     </div>
-                    <span class="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">Quick requirement form for Schools & Parents</span>
+                    <span class="inline-flex items-center gap-1 text-xs font-bold text-purple-700 bg-white px-2.5 py-1 rounded-lg border border-purple-100 shadow-xs shrink-0">
+                        Post Free <i class="fas fa-arrow-right text-[10px]"></i>
+                    </span>
                 </button>
             </div>
 
@@ -236,14 +227,17 @@
                     <i class="fas fa-sign-in-alt"></i>
                     Sign In
                 </button>
-                
-                <div class="text-center pt-1">
-                    <a href="{{ route('login.otp') }}" class="w-full bg-white text-gray-900 border border-gray-200 font-bold py-3 rounded-xl hover:bg-gray-50 focus:outline-none transition-all shadow-sm flex items-center justify-center gap-2 text-sm">
-                        <i class="fas fa-mobile-alt text-[#0ea5e9]"></i>
-                        Login with Mobile OTP
-                    </a>
-                </div>
             </form>
+
+            {{-- Register as Teacher Card (Placed below Sign In as requested) --}}
+            <div class="mt-6 pt-5 border-t border-gray-100 text-center">
+                <p class="text-xs text-gray-500 mb-2.5 font-medium">New educator looking for teaching opportunities?</p>
+                <a href="{{ route('candidate.register') }}"
+                    class="w-full flex items-center justify-center gap-2.5 p-3.5 rounded-2xl font-extrabold text-xs sm:text-sm text-[#031b4e] bg-blue-50/80 hover:bg-blue-100 border border-blue-200 hover:border-accent-blue transition-all shadow-sm group">
+                    <i class="fas fa-user-plus text-accent-blue group-hover:scale-110 transition-transform"></i>
+                    <span>Register as Teacher (For Tuition & School Jobs) &rarr;</span>
+                </a>
+            </div>
         </div>
     </div>
 
