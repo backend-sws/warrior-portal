@@ -10,24 +10,38 @@ class TransactionController extends Controller
 {
     public function index(Request $request)
     {
-        $roleFilter = $request->input('role', 'all');
+        $roleFilter    = $request->input('role', 'all');
+        $statusFilter  = $request->input('status', 'all');
+        $gatewayFilter = $request->input('gateway', 'all');
+        $typeFilter    = $request->input('type', 'all');
+        $search        = $request->input('search');
 
-        $query = PaymentTransaction::with('candidate');
+        $query = PaymentTransaction::with(['candidate', 'invoice', 'tuitionLead']);
 
-        if ($search = $request->input('search')) {
-            $query->whereHas('candidate', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
-            })->orWhere('transaction_id', 'like', "%{$search}%");
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('transaction_id', 'like', "%{$search}%")
+                  ->orWhere('order_id', 'like', "%{$search}%")
+                  ->orWhere('payment_id', 'like', "%{$search}%")
+                  ->orWhere('payment_method', 'like', "%{$search}%")
+                  ->orWhereHas('candidate', function ($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%");
+                  });
+            });
         }
 
-        if ($status = $request->input('status')) {
-            $query->where('status', $status);
+        if ($statusFilter !== 'all') {
+            $query->where('status', $statusFilter);
+        }
+
+        if ($gatewayFilter !== 'all') {
+            $query->where('gateway', $gatewayFilter);
         }
         
-        if ($type = $request->input('type')) {
-            $query->where('type', $type);
+        if ($typeFilter !== 'all') {
+            $query->where('type', $typeFilter);
         }
 
         if ($roleFilter !== 'all') {
@@ -39,12 +53,22 @@ class TransactionController extends Controller
         $transactions = $query->latest()->paginate(20)->withQueryString();
 
         $stats = [
-            'total_revenue' => PaymentTransaction::where('status', 'success')->sum('amount'),
-            'candidate_revenue' => PaymentTransaction::where('status', 'success')->whereHas('candidate', function($q) { $q->where('role', 'candidate'); })->sum('amount'),
-            'parent_revenue' => PaymentTransaction::where('status', 'success')->whereHas('candidate', function($q) { $q->where('role', 'parent'); })->sum('amount'),
+            'total_revenue'      => PaymentTransaction::where('status', 'success')->sum('amount'),
+            'success_count'      => PaymentTransaction::where('status', 'success')->count(),
+            'pending_count'      => PaymentTransaction::where('status', 'pending')->count(),
+            'failed_count'       => PaymentTransaction::where('status', 'failed')->count(),
+            'razorpay_count'     => PaymentTransaction::where('gateway', 'razorpay')->count(),
             'total_transactions' => PaymentTransaction::count(),
         ];
 
-        return view('admin.transactions.index', compact('transactions', 'stats', 'roleFilter'));
+        return view('admin.transactions.index', compact(
+            'transactions', 
+            'stats', 
+            'roleFilter', 
+            'statusFilter', 
+            'gatewayFilter', 
+            'typeFilter', 
+            'search'
+        ));
     }
 }

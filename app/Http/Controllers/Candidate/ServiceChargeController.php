@@ -6,44 +6,35 @@ use App\Http\Controllers\Controller;
 use App\Helpers\NotificationHelper;
 use App\Models\ServiceChargeInvoice;
 use App\Models\PaymentTransaction;
+use App\Models\CandidatePaymentAccount;
+use App\Models\CandidatePaymentRecord;
+use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Http\Request;
-use App\Services\PhonePeService;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class ServiceChargeController extends Controller
 {
+    protected PaymentGatewayManager $paymentManager;
+
+    public function __construct(PaymentGatewayManager $paymentManager)
+    {
+        $this->paymentManager = $paymentManager;
+    }
+
     public function show()
     {
         $candidateId = auth()->id();
         $user = auth()->user();
         $profile = $user->profile;
-
-        // Auto-create pending service charge invoice for standard plan remaining balance
-        if ($profile && $profile->pending_amount > 0) {
-            $hasPending = ServiceChargeInvoice::where('candidate_id', $candidateId)
-                ->whereIn('status', ['pending', 'overdue'])
-                ->exists();
-
-            if (!$hasPending) {
-                $latestApp = \App\Models\JobApplication::where('candidate_id', $candidateId)->latest()->first();
-
-                ServiceChargeInvoice::create([
-                    'candidate_id' => $candidateId,
-                    'job_application_id' => $latestApp?->id,
-                    'amount' => $profile->pending_amount,
-                    'late_fee' => 0,
-                    'due_date' => now()->addDays(7),
-                    'status' => 'pending',
-                    'description' => 'Standard Plan Remaining Placement Balance'
-                ]);
-            }
-        }
         
         $invoices = ServiceChargeInvoice::where('candidate_id', $candidateId)
+            ->with(['tuitionLead', 'jobApplication.jobPost'])
             ->latest()
             ->get();
         
         $paymentHistory = PaymentTransaction::where('candidate_id', $candidateId)
-            ->where('type', 'service_charge')
             ->latest()
             ->get();
             
@@ -56,314 +47,212 @@ class ServiceChargeController extends Controller
         $invoice = ServiceChargeInvoice::where('id', $id)
             ->where('candidate_id', $user->id)
             ->whereIn('status', ['pending', 'overdue'])
+            ->with(['tuitionLead', 'jobApplication.jobPost'])
             ->firstOrFail();
 
-        $transactionId = 'SC_' . $invoice->id . '_' . time();
-        session(['sc_invoice_id' => $invoice->id, 'last_txn_id' => $transactionId]);
-
-        return view('candidate.serviceCharge.checkout', compact('invoice', 'transactionId'));
-    }
-
-    public function process(Request $request)
-    {
-        $request->validate(['invoice_id' => 'required|exists:service_charge_invoices,id']);
-        $user = auth()->user();
-        
-        $invoice = ServiceChargeInvoice::where('id', $request->invoice_id)
-            ->where('candidate_id', $user->id)
-            ->whereIn('status', ['pending', 'overdue'])
-            ->first();
-
-        if (!$invoice) {
-            return back()->with('error', 'No pending service charge invoice found.');
-        }
-
-        $amount = $invoice->amount + $invoice->late_fee;
+        $amount = (float) ($invoice->amount + $invoice->late_fee);
         if ($amount <= 0) {
-            return back()->with('error', 'Invalid invoice amount.');
+            return redirect()->route('candidate.serviceCharge.show')->with('error', 'Invalid invoice amount.');
         }
 
-        // --- LOCAL BYPASS (Disabled for gateway testing) ---
-        // if (env('APP_ENV') === 'local') {
-        //     return redirect()->route('candidate.serviceCharge.callback', [
-        //         'transactionId' => 'BYPASS_' . time(),
-        //         'bypass' => true,
-        //         'amount' => $amount
-        //     ]);
-        // }
-        // --------------------
+        $receipt = 'SC_' . $invoice->id . '_' . time();
+        $gateway = $this->paymentManager->driver();
 
-        $transactionId = 'SC_' . $invoice->id . '_' . time();
-        session(['sc_invoice_id' => $invoice->id, 'last_txn_id' => $transactionId]);
-
-        $redirectUrl = route('candidate.serviceCharge.callback');
-
-        // Initiate payment via PhonePe V2
-        $phonePe = new PhonePeService();
-        $result = $phonePe->initiatePay($transactionId, $amount, $redirectUrl);
-
-        if ($result['success']) {
-            return redirect()->away($result['redirect_url']);
-        }
-
-        \Illuminate\Support\Facades\Log::info('PhonePe ServiceCharge Pay Initiation Fallback to Gateway Checkout', [
-            'error' => $result['error'] ?? null,
+        // Create Razorpay Order
+        $order = $gateway->createOrder([
+            'amount'   => $amount,
+            'receipt'  => $receipt,
+            'notes'    => [
+                'invoice_id'   => (string)$invoice->id,
+                'user_id'      => (string)$user->id,
+                'user_name'    => (string)$user->name,
+                'user_email'   => (string)$user->email,
+                'user_phone'   => (string)$user->phone,
+                'type'         => 'service_charge',
+            ]
         ]);
 
-        return redirect()->route('candidate.serviceCharge.checkout', ['id' => $invoice->id]);
+        if (!$order['success']) {
+            Log::error('Razorpay Service Charge Order Creation Failed', ['error' => $order['error']]);
+            return back()->with('error', 'Payment gateway error: ' . ($order['error'] ?? 'Please try again later.'));
+        }
+
+        // Record Pending Payment Transaction
+        PaymentTransaction::updateOrCreate(
+            ['order_id' => $order['order_id']],
+            [
+                'candidate_id'   => $user->id,
+                'amount'         => $amount,
+                'currency'       => 'INR',
+                'transaction_id' => $receipt,
+                'type'           => 'service_charge',
+                'status'         => 'pending',
+                'gateway'        => $gateway->getGatewayName(),
+                'invoice_id'     => $invoice->id,
+                'tuition_lead_id'=> $invoice->home_tuition_lead_id,
+                'ip_address'     => request()->ip(),
+            ]
+        );
+
+        session(['active_order_id' => $order['order_id'], 'sc_invoice_id' => $invoice->id]);
+
+        return view('candidate.serviceCharge.checkout', compact('invoice', 'order', 'user'));
     }
 
     public function callback(Request $request)
     {
         $user = auth()->user();
-        
-        // --- LOCAL BYPASS ---
-        if ($request->bypass && env('APP_ENV') === 'local') {
-            $invoice = ServiceChargeInvoice::where('candidate_id', $user->id)->whereIn('status', ['pending', 'overdue'])->latest()->first();
-            if ($invoice) {
-                $invoice->update(['status' => 'paid', 'payment_date' => now()]);
-                if ($user->profile) {
-                    $user->profile->pending_amount = max(0, $user->profile->pending_amount - $invoice->amount);
-                    $user->profile->save();
-                }
-                PaymentTransaction::create([
-                    'candidate_id' => $user->id,
-                    'amount' => $request->amount,
-                    'transaction_id' => $request->transactionId,
-                    'type' => 'service_charge',
-                    'status' => 'success',
-                    'gateway_response' => ['bypassed' => true]
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Session expired. Please log in.');
+        }
+
+        $orderId   = $request->input('razorpay_order_id', session('active_order_id'));
+        $paymentId = $request->input('razorpay_payment_id');
+        $signature = $request->input('razorpay_signature');
+
+        if (empty($paymentId) || empty($orderId)) {
+            Log::warning('Razorpay Callback Missing Parameters', $request->all());
+            return redirect()->route('candidate.serviceCharge.show')->with('error', 'Payment was cancelled or failed to verify.');
+        }
+
+        // Verify with Razorpay
+        $gateway = $this->paymentManager->driver();
+        $verification = $gateway->verifyPayment([
+            'order_id'   => $orderId,
+            'payment_id' => $paymentId,
+            'signature'  => $signature,
+        ]);
+
+        $txn = PaymentTransaction::where('order_id', $orderId)->first();
+
+        if (!$verification['success']) {
+            if ($txn) {
+                $txn->update([
+                    'status'            => 'failed',
+                    'payment_id'        => $paymentId,
+                    'signature'         => $signature,
+                    'error_description' => $verification['error'] ?? 'Signature verification failed',
+                ]);
+            }
+            return redirect()->route('candidate.serviceCharge.show')->with('error', 'Payment verification failed: ' . ($verification['error'] ?? 'Invalid signature.'));
+        }
+
+        // Verification Succeeded
+        $paymentDetails = $verification['raw'] ?? [];
+        $paymentMethod  = $verification['payment_method'] ?? 'online';
+        $invoiceId      = $txn?->invoice_id ?? session('sc_invoice_id');
+
+        $invoice = ServiceChargeInvoice::find($invoiceId);
+
+        DB::transaction(function () use ($txn, $invoice, $user, $orderId, $paymentId, $signature, $paymentMethod, $paymentDetails) {
+            $amount = $invoice ? ($invoice->amount + $invoice->late_fee) : ($txn?->amount ?? 0);
+
+            if ($txn) {
+                $txn->update([
+                    'payment_id'       => $paymentId,
+                    'signature'        => $signature,
+                    'status'           => 'success',
+                    'payment_method'   => $paymentMethod,
+                    'gateway'          => 'razorpay',
+                    'gateway_response' => $paymentDetails,
+                ]);
+            }
+
+            if ($invoice && $invoice->status !== 'paid') {
+                $invoice->update([
+                    'status'       => 'paid',
+                    'payment_date' => now(),
                 ]);
 
-                // Sync to Admin Candidate Payments
-                $this->syncToAdminCandidatePayments($user, $invoice, $request->amount);
-
-                // Notify Admin
-                $adminUser = \App\Models\User::where('role', 'admin')->first();
-                if ($adminUser) {
-                    \Illuminate\Support\Facades\DB::table('notifications')->insert([
-                        'id'              => \Illuminate\Support\Str::uuid(),
-                        'type'            => 'App\Notifications\ServiceChargePaid',
-                        'notifiable_type' => 'App\Models\User',
-                        'notifiable_id'   => $adminUser->id,
-                        'data'            => json_encode([
-                            'title'        => 'Service Charge Received',
-                            'message'      => '₹' . $request->amount . ' was received from ' . $user->name . ' for Service Charge.',
-                            'candidate_id' => $user->id,
-                            'amount'       => $request->amount
-                        ]),
-                        'created_at' => now(),
-                        'updated_at' => now(),
+                if ($user->profile) {
+                    $user->profile->update([
+                        'pending_amount' => max(0, (float)$user->profile->pending_amount - (float)$invoice->amount),
+                        'is_fee_paid'    => true,
                     ]);
                 }
 
-                // Notify Candidate — payment receipt
+                // Sync to Admin Candidate Payments
+                $this->syncToAdminCandidatePayments($user, $invoice, $amount);
+
+                // Notify Admin
+                NotificationHelper::notifyAdmin(
+                    'Service Charge Received 💳',
+                    '₹' . number_format($amount, 2) . ' received from ' . $user->name . ' via Razorpay (' . strtoupper($paymentMethod) . ').',
+                    route('admin.transactions.index'),
+                    'fas fa-receipt'
+                );
+
+                // Notify Candidate
                 NotificationHelper::notifyUser(
                     $user->id,
-                    'Service Charge Payment Received ✅',
-                    '₹' . number_format($request->amount, 2) . ' service charge payment received successfully. Thank you!',
+                    'Service Charge Payment Confirmed ✅',
+                    '₹' . number_format($amount, 2) . ' received successfully via Razorpay. Your receipt has been generated.',
                     route('candidate.serviceCharge.show'),
                     'fas fa-check-circle'
                 );
 
-                // Email receipt to Candidate
+                // Email Receipt
                 try {
-                    if ($invoice) {
-                        \Illuminate\Support\Facades\Mail::to($user->email)->send(
-                            new \App\Mail\ServiceChargePaymentReceiptMail($invoice, $user, $request->amount)
-                        );
-                    }
+                    Mail::to($user->email)->send(
+                        new \App\Mail\ServiceChargePaymentReceiptMail($invoice, $user, $amount)
+                    );
                 } catch (\Exception $e) {
-                    \Log::error('ServiceChargeReceipt Email Error: ' . $e->getMessage());
+                    Log::error('ServiceChargeReceipt Email Error: ' . $e->getMessage());
                 }
             }
-            return redirect()->route('candidate.serviceCharge.show')->with('success', 'Service charge paid successfully! (Local Bypass)');
-        }
-        // --------------------
+        });
 
-        $transactionId = $request->merchantOrderId ?? $request->transactionId ?? session('last_txn_id');
-        $invoiceId = session('sc_invoice_id');
+        session()->forget(['active_order_id', 'sc_invoice_id']);
 
-        // Guard: If transactionId or user is missing, abort
-        if (!$transactionId || !$user) {
-            return redirect()->route('candidate.serviceCharge.show')->with('error', 'Payment session expired. Please try again.');
-        }
-
-        // Guard: Prevent duplicate processing
-        $existingTxn = PaymentTransaction::where('transaction_id', $transactionId)->first();
-        if ($existingTxn) {
-            if ($existingTxn->status === 'success') {
-                return redirect()->route('candidate.serviceCharge.show')->with('success', 'Payment already processed successfully.');
-            }
-            return redirect()->route('candidate.serviceCharge.show')->with('error', 'Payment failed or was already processed.');
-        }
-
-        // Verify status with PhonePe V2
-        $phonePe = new PhonePeService();
-        $statusResult = $phonePe->checkStatus($transactionId);
-
-        // Log full response for debugging
-        \Illuminate\Support\Facades\Log::info('PhonePe V2 Service Charge Callback', [
-            'txn' => $transactionId,
-            'invoice_id' => $invoiceId,
-            'result' => $statusResult,
-        ]);
-
-        $isSuccess = $statusResult['success'];
-        $amountPaid = $statusResult['amount'] / 100; // Convert paise to rupees
-
-        // Always record transaction
-        PaymentTransaction::create([
-            'candidate_id' => $user->id,
-            'amount' => $amountPaid,
-            'transaction_id' => $transactionId,
-            'type' => 'service_charge',
-            'status' => $isSuccess ? 'success' : 'failed',
-            'gateway_response' => $statusResult['raw']
-        ]);
-
-        // If payment failed, stop here — do NOT update invoice or profile
-        if (!$isSuccess) {
-            return redirect()->route('candidate.serviceCharge.show')->with('error', 'Payment failed or cancelled. Please try again.');
-        }
-
-        // Payment confirmed COMPLETED — update invoice and profile
-        if ($invoiceId) {
-            ServiceChargeInvoice::where('id', $invoiceId)->update([
-                'status' => 'paid',
-                'payment_date' => now()
-            ]);
-            $inv = ServiceChargeInvoice::find($invoiceId);
-            if ($inv && $user->profile) {
-                $user->profile->pending_amount = max(0, $user->profile->pending_amount - $inv->amount);
-                if ($user->profile->pending_amount <= 0) {
-                    $user->profile->is_fee_paid = true;
-                }
-                $user->profile->save();
-            }
-        } else {
-            // Fallback to latest pending invoice
-            $latestInvoice = ServiceChargeInvoice::where('candidate_id', $user->id)
-                ->whereIn('status', ['pending', 'overdue'])
-                ->latest()
-                ->first();
-            if ($latestInvoice) {
-                $latestInvoice->update(['status' => 'paid', 'payment_date' => now()]);
-                if ($user->profile) {
-                    $user->profile->pending_amount = max(0, $user->profile->pending_amount - $latestInvoice->amount);
-                    if ($user->profile->pending_amount <= 0) {
-                        $user->profile->is_fee_paid = true;
-                    }
-                    $user->profile->save();
-                }
-            }
-        }
-
-        // Sync to Admin Candidate Payments
-        $invToSync = $invoiceId ? ServiceChargeInvoice::find($invoiceId) : ($latestInvoice ?? null);
-        if ($invToSync) {
-            $this->syncToAdminCandidatePayments($user, $invToSync, $amountPaid);
-        }
-
-        // Notify Admin
-        $adminUser = \App\Models\User::where('role', 'admin')->first();
-        if ($adminUser) {
-            \Illuminate\Support\Facades\DB::table('notifications')->insert([
-                'id'              => \Illuminate\Support\Str::uuid(),
-                'type'            => 'App\Notifications\ServiceChargePaid',
-                'notifiable_type' => 'App\Models\User',
-                'notifiable_id'   => $adminUser->id,
-                'data'            => json_encode([
-                    'title'        => 'Service Charge Received',
-                    'message'      => '₹' . $amountPaid . ' was received from ' . $user->name . ' for Service Charge.',
-                    'candidate_id' => $user->id,
-                    'amount'       => $amountPaid
-                ]),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        // Notify Candidate — payment receipt DB notification
-        NotificationHelper::notifyUser(
-            $user->id,
-            'Service Charge Payment Received ✅',
-            '₹' . number_format($amountPaid, 2) . ' service charge payment received successfully. Your invoice has been updated.',
-            route('candidate.serviceCharge.show'),
-            'fas fa-check-circle'
-        );
-
-        // Email receipt to Candidate
-        $paidInvoice = $invoiceId ? ServiceChargeInvoice::find($invoiceId) : ($latestInvoice ?? null);
-        if ($paidInvoice) {
-            try {
-                \Illuminate\Support\Facades\Mail::to($user->email)->send(
-                    new \App\Mail\ServiceChargePaymentReceiptMail($paidInvoice, $user, $amountPaid)
-                );
-            } catch (\Exception $e) {
-                \Log::error('ServiceChargeReceipt Email Error: ' . $e->getMessage());
-            }
-        }
-
-        return redirect()->route('candidate.serviceCharge.show')->with('success', 'Service charge paid successfully!');
+        return redirect()->route('candidate.serviceCharge.show')->with('success', '✅ Payment verified and recorded successfully via Razorpay!');
     }
 
-    public function downloadInvoicePdf($id)
+    public function invoice($id)
     {
-        $candidateId = auth()->id();
+        $user = auth()->user();
         $invoice = ServiceChargeInvoice::where('id', $id)
-            ->where('candidate_id', $candidateId)
-            ->with(['jobApplication.jobPost', 'candidate'])
+            ->where('candidate_id', $user->id)
+            ->with(['candidate.profile', 'jobApplication.jobPost', 'tuitionLead'])
             ->firstOrFail();
 
-        $user = auth()->user();
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('candidate.serviceCharge.invoice_pdf', [
-            'invoice' => $invoice,
-            'user' => $user
-        ]);
-
-        return $pdf->download('Service-Charge-Invoice-' . $invoice->id . '.pdf');
+        return view('candidate.serviceCharge.invoice', compact('invoice'));
     }
 
-    private function syncToAdminCandidatePayments($user, $invoice, $amountPaid)
+    private function syncToAdminCandidatePayments($candidate, $invoice, $amount)
     {
-        $tuitionName = 'Online Service Charge';
-        if ($invoice && $invoice->job_application_id) {
-            $jobApp = \App\Models\JobApplication::with('jobPost')->find($invoice->job_application_id);
-            if ($jobApp && $jobApp->jobPost) {
-                $tuitionName = $jobApp->jobPost->title;
+        try {
+            $account = CandidatePaymentAccount::firstOrCreate(
+                ['candidate_id' => $candidate->id],
+                [
+                    'candidate_name' => $candidate->name,
+                    'mobile_number'  => $candidate->phone ?? 'N/A',
+                    'role'           => $invoice->jobApplication?->jobPost?->title ?? ($invoice->tuitionLead ? 'Home Tutor' : 'Teacher'),
+                    'school_name'    => $invoice->jobApplication?->jobPost?->school_name ?? ($invoice->tuitionLead ? 'Home Tuition' : 'Private Placement'),
+                    'total_service_charge' => $amount,
+                    'paid_amount'    => 0,
+                    'pending_amount' => $amount,
+                    'status'         => 'active',
+                ]
+            );
+
+            $account->paid_amount += $amount;
+            $account->pending_amount = max(0, $account->pending_amount - $amount);
+            if ($account->pending_amount <= 0) {
+                $account->status = 'completed';
             }
-        }
+            $account->save();
 
-        $account = \App\Models\CandidatePaymentAccount::where('mobile_number', $user->phone ?? $user->email)
-            ->orWhere(function($q) use ($user, $tuitionName) {
-                $q->where('candidate_name', $user->name)
-                  ->where('tuition_assigned', 'like', "%{$tuitionName}%");
-            })
-            ->first();
-
-        if (!$account) {
-            $account = \App\Models\CandidatePaymentAccount::create([
-                'candidate_name' => $user->name,
-                'mobile_number' => $user->phone ?? $user->email,
-                'address' => $user->profile->address ?? 'Online',
-                'tuition_assigned' => $tuitionName,
-                'joining_date' => now(),
-                'monthly_amount' => $amountPaid,
-                'next_due_date' => now()->addMonth(),
-                'status' => 'active'
+            CandidatePaymentRecord::create([
+                'candidate_payment_account_id' => $account->id,
+                'amount'         => $amount,
+                'payment_mode'   => 'Razorpay Online',
+                'transaction_id' => 'RZP_' . time(),
+                'payment_date'   => now(),
+                'received_by'    => 'Razorpay Gateway',
+                'notes'          => 'Online payment for Invoice #' . $invoice->id,
             ]);
+        } catch (\Exception $e) {
+            Log::error('Sync to CandidatePaymentAccount failed: ' . $e->getMessage());
         }
-
-        \App\Models\CandidatePaymentRecord::create([
-            'candidate_payment_account_id' => $account->id,
-            'payment_date' => now(),
-            'amount' => $amountPaid,
-            'payment_mode' => 'Online Gateway',
-            'type' => 'Collected',
-            'collected_by' => 'System (Auto)',
-            'remarks' => 'Online Service Charge Payment for ' . $tuitionName
-        ]);
     }
 }

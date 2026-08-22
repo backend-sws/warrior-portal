@@ -327,3 +327,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 Route::post('/submit-tuition-request', [\App\Http\Controllers\FrontendLeadController::class, 'storeTuitionLead'])->name('submit-tuition-request');
+
+// Razorpay Webhooks
+Route::post('/webhooks/razorpay', [\App\Http\Controllers\WebhookController::class, 'handleRazorpay'])->name('webhook.razorpay');

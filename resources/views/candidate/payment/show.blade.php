@@ -11,7 +11,7 @@
             <i class="fas fa-crown"></i>
         </div>
         <h1 class="text-xl sm:text-2xl font-bold text-[#031b4e]">Select Your Membership Plan</h1>
-        <p class="text-xs sm:text-sm text-[#031b4e]/70 mt-1.5 max-w-md mx-auto">Choose a plan that best fits your job search needs. Pay securely using PhonePe.</p>
+        <p class="text-xs sm:text-sm text-[#031b4e]/70 mt-1.5 max-w-md mx-auto">Choose a plan that best fits your job search needs. Pay securely using Razorpay.</p>
     </div>
 
     @if(session('error'))
@@ -196,7 +196,7 @@
     <div class="text-center reveal reveal-delay-3">
         <div class="inline-flex items-center gap-2 bg-white border border-[#031b4e]/10 px-5 py-2.5 rounded-full text-sm text-[#031b4e]/60">
             <i class="fas fa-lock text-green-400 text-xs"></i>
-            Secure payments processed by <strong class="text-purple-400 ml-0.5">PhonePe</strong>
+            Secure payments processed by <strong class="text-blue-600 ml-0.5">Razorpay</strong>
         </div>
     </div>
 </div>
