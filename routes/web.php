@@ -142,6 +142,7 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
     Route::view('/additional-feature', 'candidate.aditionalFeature.show')->name('aditionalFeature.show');
 
     Route::get('/tuitions', [\App\Http\Controllers\Candidate\TuitionController::class, 'index'])->name('tuitions.index');
+    Route::post('/tuitions/sign-agreement', [\App\Http\Controllers\Candidate\TuitionController::class, 'signAgreement'])->name('tuitions.sign-agreement');
     Route::post('/tuitions/{id}/apply', [\App\Http\Controllers\Candidate\TuitionController::class, 'apply'])->name('tuitions.apply');
 });
 
