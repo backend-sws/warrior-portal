@@ -56,8 +56,8 @@ Route::get('/resume-builder', [\App\Http\Controllers\ResumeBuilderController::cl
 Route::post('/resume-builder/download', [\App\Http\Controllers\ResumeBuilderController::class, 'download'])->name('resume.builder.download');
 
 // Authentication Routes
-Route::get('/login', [\App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login'])->name('login.post');
+Route::get('/login', [\App\Http\Controllers\AuthController::class, 'showLoginForm'])->middleware('guest')->name('login');
+Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login'])->middleware('guest')->name('login.post');
 
 // Password Reset Routes
 Route::get('/password/reset', [\App\Http\Controllers\PasswordResetController::class, 'showLinkRequestForm'])->middleware('guest')->name('password.request');
@@ -66,9 +66,9 @@ Route::get('/password/reset/{token}', [\App\Http\Controllers\PasswordResetContro
 Route::post('/password/reset', [\App\Http\Controllers\PasswordResetController::class, 'reset'])->middleware('guest')->name('password.update');
 
 // OTP Login Routes
-Route::get('/login/otp', [\App\Http\Controllers\AuthController::class, 'showOtpForm'])->name('login.otp');
-Route::post('/login/otp/send', [\App\Http\Controllers\AuthController::class, 'sendOtp'])->name('login.otp.send');
-Route::post('/login/otp/verify', [\App\Http\Controllers\AuthController::class, 'verifyOtp'])->name('login.otp.verify');
+Route::get('/login/otp', [\App\Http\Controllers\AuthController::class, 'showOtpForm'])->middleware('guest')->name('login.otp');
+Route::post('/login/otp/send', [\App\Http\Controllers\AuthController::class, 'sendOtp'])->middleware('guest')->name('login.otp.send');
+Route::post('/login/otp/verify', [\App\Http\Controllers\AuthController::class, 'verifyOtp'])->middleware('guest')->name('login.otp.verify');
 
 Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
@@ -93,8 +93,8 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 // Candidate Auth Routes
-Route::get('/register', [\App\Http\Controllers\CandidateAuthController::class, 'showRegistrationForm'])->name('candidate.register');
-Route::post('/register', [\App\Http\Controllers\CandidateAuthController::class, 'register'])->name('candidate.register.post');
+Route::get('/register', [\App\Http\Controllers\CandidateAuthController::class, 'showRegistrationForm'])->middleware('guest')->name('candidate.register');
+Route::post('/register', [\App\Http\Controllers\CandidateAuthController::class, 'register'])->middleware('guest')->name('candidate.register.post');
 
 // Candidate Routes (Unverified but Auth Required)
 Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.')->group(function () {
@@ -145,8 +145,8 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
 });
 
 // Parent Auth Routes
-Route::get('/parent/register', [\App\Http\Controllers\ParentAuthController::class, 'showRegistrationForm'])->name('parent.register');
-Route::post('/parent/register', [\App\Http\Controllers\ParentAuthController::class, 'register'])->name('parent.register.post');
+Route::get('/parent/register', [\App\Http\Controllers\ParentAuthController::class, 'showRegistrationForm'])->middleware('guest')->name('parent.register');
+Route::post('/parent/register', [\App\Http\Controllers\ParentAuthController::class, 'register'])->middleware('guest')->name('parent.register.post');
 
 // Parent Routes (Protected)
 Route::middleware(['auth', 'parent'])->prefix('parent')->name('parent.')->group(function () {
