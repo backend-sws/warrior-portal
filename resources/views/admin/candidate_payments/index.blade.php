@@ -10,37 +10,40 @@
     </div>
 </div>
 
-<!-- Dashboard Metrics -->
+<!-- Dashboard Metrics (Clickable Filters) -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white rounded-xl shadow-sm border border-card-border p-4 flex items-center gap-4 relative overflow-hidden">
-        <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500 text-xl font-black relative z-10">
+    <a href="{{ route('admin.candidate-payments.index', ['search' => request('search')]) }}" 
+       class="bg-white rounded-2xl shadow-sm border {{ (!request('status') && !request('due_date')) ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/10' : 'border-card-border hover:border-blue-300' }} p-4 flex items-center gap-4 relative overflow-hidden transition-all cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600 text-xl font-black shrink-0">
+            <i class="fas fa-users"></i>
+        </div>
+        <div>
+            <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-0.5">All Accounts</p>
+            <h3 class="text-xl font-black text-text-main">{{ $accounts->total() }} Accounts</h3>
+        </div>
+    </a>
+
+    <a href="{{ route('admin.candidate-payments.index', ['status' => 'paid', 'search' => request('search')]) }}" 
+       class="bg-white rounded-2xl shadow-sm border {{ request('status') === 'paid' ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-card-border hover:border-emerald-300' }} p-4 flex items-center gap-4 relative overflow-hidden transition-all cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 text-xl font-black shrink-0">
             <i class="fas fa-arrow-down"></i>
         </div>
-        <div class="relative z-10">
-            <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-0.5">Collected This Month</p>
-            <h3 class="text-xl font-black text-text-main">₹{{ number_format($totalCollected) }}</h3>
+        <div>
+            <p class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-0.5">Collected This Month</p>
+            <h3 class="text-xl font-black text-emerald-600">₹{{ number_format($totalCollected) }}</h3>
         </div>
-    </div>
+    </a>
 
-    <div class="bg-white rounded-xl shadow-sm border border-card-border p-4 flex items-center gap-4 relative overflow-hidden">
-        <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 text-xl font-black relative z-10">
-            <i class="fas fa-arrow-up"></i>
-        </div>
-        <div class="relative z-10">
-            <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-0.5">Paid Out This Month</p>
-            <h3 class="text-xl font-black text-text-main">₹{{ number_format($totalPaidOut) }}</h3>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-card-border p-4 flex items-center gap-4 relative overflow-hidden">
-        <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 text-xl font-black relative z-10">
+    <a href="{{ route('admin.candidate-payments.index', ['status' => 'pending', 'search' => request('search')]) }}" 
+       class="bg-white rounded-2xl shadow-sm border {{ request('status') === 'pending' ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/10' : 'border-card-border hover:border-amber-300' }} p-4 flex items-center gap-4 relative overflow-hidden transition-all cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 text-xl font-black shrink-0">
             <i class="fas fa-clock"></i>
         </div>
-        <div class="relative z-10 flex-1">
+        <div class="flex-1">
             <div class="flex justify-between items-center w-full">
                 <div>
-                    <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-0.5">Due Today</p>
-                    <h3 class="text-lg font-black text-text-main">{{ $dueToday }}</h3>
+                    <p class="text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-0.5">Due Today</p>
+                    <h3 class="text-lg font-black text-amber-600">{{ $dueToday }}</h3>
                 </div>
                 <div class="h-8 w-px bg-card-border"></div>
                 <div class="text-right">
@@ -49,17 +52,18 @@
                 </div>
             </div>
         </div>
-    </div>
+    </a>
 
-    <div class="bg-white rounded-xl shadow-sm border border-card-border p-4 flex items-center gap-4 relative overflow-hidden">
-        <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 text-xl font-black relative z-10">
+    <a href="{{ route('admin.candidate-payments.index', ['status' => 'overdue', 'search' => request('search')]) }}" 
+       class="bg-white rounded-2xl shadow-sm border {{ request('status') === 'overdue' ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50/10' : 'border-card-border hover:border-red-300' }} p-4 flex items-center gap-4 relative overflow-hidden transition-all cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 text-xl font-black shrink-0">
             <i class="fas fa-exclamation-triangle"></i>
         </div>
-        <div class="relative z-10">
-            <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-0.5">Overdue Accounts</p>
-            <h3 class="text-xl font-black text-text-main">{{ $overdueCount }}</h3>
+        <div>
+            <p class="text-[10px] font-bold text-red-700 uppercase tracking-wider mb-0.5">Overdue Accounts</p>
+            <h3 class="text-xl font-black text-red-600">{{ $overdueCount }}</h3>
         </div>
-    </div>
+    </a>
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-card-border overflow-hidden">

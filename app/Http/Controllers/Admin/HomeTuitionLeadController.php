@@ -61,6 +61,22 @@ class HomeTuitionLeadController extends Controller
 
         $leads = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
         
+        $baseQuery = HomeTuitionLead::query();
+        if ($search) {
+            $baseQuery->where(function($q) use ($search) {
+                $q->where('parent_name', 'like', "%{$search}%")
+                  ->orWhere('parent_mobile', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+        $stats = [
+            'total'     => (clone $baseQuery)->count(),
+            'new_lead'  => (clone $baseQuery)->where('status', 'New Lead')->count(),
+            'approved'  => (clone $baseQuery)->where('status', 'Approved')->count(),
+            'confirmed' => (clone $baseQuery)->where('status', 'Confirmed')->count(),
+            'cancelled' => (clone $baseQuery)->where('status', 'Cancelled')->count(),
+        ];
+
         $candidates = \App\Models\User::where('role', 'candidate')
             ->where('is_active', true)
             ->with('profile.subject')
@@ -70,7 +86,7 @@ class HomeTuitionLeadController extends Controller
         $viewName = 'admin.home_tuition_leads.index';
         $title = $filterStatus === 'All' ? 'All Home Tuitions' : $filterStatus . ' Home Tuitions';
         
-        return view($viewName, compact('leads', 'candidates', 'title', 'filterStatus'));
+        return view($viewName, compact('leads', 'candidates', 'title', 'filterStatus', 'stats'));
     }
 
     public function create()

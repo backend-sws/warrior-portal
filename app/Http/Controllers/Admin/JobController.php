@@ -26,14 +26,9 @@ class JobController extends Controller
         }
 
         // Status Filter
-        $status = $request->input('status');
-        if ($status) {
-            if ($status !== 'all') {
-                $query->where('status', $status);
-            }
-        } else {
-            // Default to live (approved) jobs when no status is provided
-            $query->where('status', 'approved');
+        $status = $request->input('status', 'all');
+        if ($status && $status !== 'all') {
+            $query->where('status', $status);
         }
 
         // Sorting
@@ -49,15 +44,24 @@ class JobController extends Controller
 
         $jobs = $query->paginate(15)->withQueryString();
 
-        // Analytics based on current filtered query
+        // Accurate Global / Search Base Analytics
+        $baseQuery = JobPost::query();
+        if ($search) {
+            $baseQuery->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('school_name', 'like', "%{$search}%")
+                  ->orWhere('contact_person', 'like', "%{$search}%");
+            });
+        }
+
         $stats = [
-            'total' => (clone $query)->count(),
-            'live' => (clone $query)->where('status', 'approved')->count(),
-            'pending' => (clone $query)->where('status', 'pending')->count(),
-            'rejected' => (clone $query)->where('status', 'rejected')->count(),
+            'total' => (clone $baseQuery)->count(),
+            'live' => (clone $baseQuery)->where('status', 'approved')->count(),
+            'pending' => (clone $baseQuery)->where('status', 'pending')->count(),
+            'rejected' => (clone $baseQuery)->where('status', 'rejected')->count(),
         ];
         
-        return view('admin.jobs.index', compact('jobs', 'stats', 'sortField', 'sortDirection'));
+        return view('admin.jobs.index', compact('jobs', 'stats', 'sortField', 'sortDirection', 'status'));
     }
 
     public function show(JobPost $job)

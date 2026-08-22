@@ -12,24 +12,39 @@
 
 @section('content')
 
-{{-- Analytics Cards --}}
+{{-- Analytics Cards (Clickable Filters) --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-gradient-to-br from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 border border-white/20 rounded-xl p-4 shadow-[0_0_20px_rgba(52,211,153,0.5)] flex flex-col items-center justify-center relative overflow-hidden group transition-all">
-        <p class="text-[10px] text-white/80 font-bold uppercase tracking-wider mb-1 relative z-10">Total Candidates</p>
-        <h4 class="text-2xl font-extrabold text-white relative z-10">{{ $stats['total'] }}</h4>
-    </div>
-    <div class="bg-gradient-to-br from-violet-600 to-indigo-500 hover:from-violet-700 hover:to-indigo-600 border border-white/20 rounded-xl p-4 shadow-[0_0_20px_rgba(139,92,246,0.5)] flex flex-col items-center justify-center relative overflow-hidden group transition-all">
-        <p class="text-[10px] text-white/80 font-bold uppercase tracking-wider mb-1 relative z-10">Active / Paid</p>
-        <h4 class="text-2xl font-extrabold text-white relative z-10">{{ $stats['active_paid'] }}</h4>
-    </div>
-    <div class="bg-gradient-to-br from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 border border-white/20 rounded-xl p-4 shadow-[0_0_20px_rgba(6,182,212,0.5)] flex flex-col items-center justify-center relative overflow-hidden group transition-all">
-        <p class="text-[10px] text-white/80 font-bold uppercase tracking-wider mb-1 relative z-10">Signed Agreement</p>
-        <h4 class="text-2xl font-extrabold text-white relative z-10">{{ $stats['signed'] }}</h4>
-    </div>
-    <div class="bg-gradient-to-br from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 border border-white/20 rounded-xl p-4 shadow-[0_0_20px_rgba(249,115,22,0.5)] flex flex-col items-center justify-center relative overflow-hidden group transition-all">
-        <p class="text-[10px] text-white/80 font-bold uppercase tracking-wider mb-1 relative z-10">Incomplete</p>
-        <h4 class="text-2xl font-extrabold text-white relative z-10">{{ $stats['incomplete'] }}</h4>
-    </div>
+    <a href="{{ route('admin.crm.index', ['crm_status' => '', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ !request('crm_status') ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-card-border hover:border-emerald-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Total Candidates</p>
+        <h4 class="text-2xl font-black text-emerald-600 relative z-10">{{ $stats['total'] }}</h4>
+        <span class="text-[10px] text-slate-400 mt-0.5">All Registrations</span>
+    </a>
+
+    <a href="{{ route('admin.crm.index', ['crm_status' => 'active_paid', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('crm_status') === 'active_paid' ? 'border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/10' : 'border-card-border hover:border-purple-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Active / Paid</p>
+        <h4 class="text-2xl font-black text-purple-600 relative z-10">{{ $stats['active_paid'] }}</h4>
+        <span class="text-[10px] text-purple-600 font-bold mt-0.5">Verified & Paid</span>
+    </a>
+
+    <a href="{{ route('admin.crm.index', ['crm_status' => 'signed', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('crm_status') === 'signed' ? 'border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/10' : 'border-card-border hover:border-sky-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-sky-500/5 group-hover:bg-sky-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Signed Agreement</p>
+        <h4 class="text-2xl font-black text-sky-600 relative z-10">{{ $stats['signed'] }}</h4>
+        <span class="text-[10px] text-sky-600 font-bold mt-0.5">Agreement Verified</span>
+    </a>
+
+    <a href="{{ route('admin.crm.index', ['crm_status' => 'incomplete', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('crm_status') === 'incomplete' ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/10' : 'border-card-border hover:border-amber-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Incomplete</p>
+        <h4 class="text-2xl font-black text-amber-600 relative z-10">{{ $stats['incomplete'] }}</h4>
+        <span class="text-[10px] text-amber-600 font-bold mt-0.5">Pending Details</span>
+    </a>
 </div>
 
 {{-- Filter/Search Bar --}}

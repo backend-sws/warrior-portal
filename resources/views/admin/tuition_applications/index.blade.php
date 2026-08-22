@@ -5,33 +5,47 @@
 
 @section('content')
 
-{{-- Analytics Stats Cards --}}
+{{-- Analytics Stats Cards (Clickable Filters) --}}
 <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-    <div class="bg-card-bg border border-card-border rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+    <a href="{{ route('admin.tuition-applications.index', ['status' => '', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ !request('status') ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/10' : 'border-card-border hover:border-blue-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Total Applications</p>
         <h4 class="text-2xl font-black text-blue-600 relative z-10">{{ $stats['total'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+        <span class="text-[10px] text-slate-400 mt-0.5">All Submissions</span>
+    </a>
+
+    <a href="{{ route('admin.tuition-applications.index', ['status' => 'Applied', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'Applied' ? 'border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/10' : 'border-card-border hover:border-sky-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-sky-500/5 group-hover:bg-sky-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">New (Applied)</p>
         <h4 class="text-2xl font-black text-sky-600 relative z-10">{{ $stats['applied'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+        <span class="text-[10px] text-sky-600 font-bold mt-0.5">Under Review</span>
+    </a>
+
+    <a href="{{ route('admin.tuition-applications.index', ['status' => 'Shortlisted', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'Shortlisted' ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/10' : 'border-card-border hover:border-amber-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Shortlisted</p>
         <h4 class="text-2xl font-black text-amber-600 relative z-10">{{ $stats['shortlisted'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+        <span class="text-[10px] text-amber-600 font-bold mt-0.5">Demo Scheduled</span>
+    </a>
+
+    <a href="{{ route('admin.tuition-applications.index', ['status' => 'Assigned', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'Assigned' ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-card-border hover:border-emerald-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Assigned Tutors</p>
         <h4 class="text-2xl font-black text-emerald-600 relative z-10">{{ $stats['assigned'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+        <span class="text-[10px] text-emerald-600 font-bold mt-0.5">Confirmed & Placed</span>
+    </a>
+
+    <a href="{{ route('admin.tuition-applications.index', ['status' => 'Rejected', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'Rejected' ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50/10' : 'border-card-border hover:border-red-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Rejected</p>
         <h4 class="text-2xl font-black text-red-500 relative z-10">{{ $stats['rejected'] }}</h4>
-    </div>
+        <span class="text-[10px] text-red-400 font-bold mt-0.5">Not Selected</span>
+    </a>
 </div>
 
 @if(session('success'))

@@ -5,32 +5,39 @@
 
 @section('content')
 
-{{-- Analytics Stats Cards --}}
+{{-- Analytics Stats Cards (Clickable Filters) --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-card-bg border border-card-border rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+    <a href="{{ route('admin.tuition-service-charges.index', ['status' => '', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ !request('status') ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/10' : 'border-card-border hover:border-blue-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Total Invoiced</p>
         <h4 class="text-2xl font-black text-blue-600 relative z-10">₹{{ number_format($stats['total_invoiced'], 2) }}</h4>
         <span class="text-[10px] text-slate-400 mt-0.5">{{ $stats['paid_count'] + $stats['pending_count'] }} Invoices</span>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+    </a>
+
+    <a href="{{ route('admin.tuition-service-charges.index', ['status' => 'paid', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'paid' ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-card-border hover:border-emerald-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Collected / Paid</p>
         <h4 class="text-2xl font-black text-emerald-600 relative z-10">₹{{ number_format($stats['total_paid'], 2) }}</h4>
         <span class="text-[10px] text-emerald-600 font-bold mt-0.5">{{ $stats['paid_count'] }} Paid</span>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+    </a>
+
+    <a href="{{ route('admin.tuition-service-charges.index', ['status' => 'pending', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'pending' ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/10' : 'border-card-border hover:border-amber-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Pending Dues</p>
         <h4 class="text-2xl font-black text-amber-600 relative z-10">₹{{ number_format($stats['total_pending'], 2) }}</h4>
         <span class="text-[10px] text-amber-600 font-bold mt-0.5">{{ $stats['pending_count'] }} Pending</span>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+    </a>
+
+    <a href="{{ route('admin.tuition-service-charges.index', ['status' => 'overdue', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'overdue' ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50/10' : 'border-card-border hover:border-red-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Overdue Invoices</p>
         <h4 class="text-2xl font-black text-red-500 relative z-10">{{ $stats['overdue_count'] }}</h4>
         <span class="text-[10px] text-red-400 font-bold mt-0.5">Needs Follow-up</span>
-    </div>
+    </a>
 </div>
 
 @if(session('success'))

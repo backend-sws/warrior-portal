@@ -383,6 +383,20 @@ class CrmController extends Controller
             });
         }
 
+        // Status filter from analytics cards
+        if ($crmStatus = $request->input('crm_status')) {
+            if ($crmStatus === 'active_paid') {
+                $query->whereHas('profile', fn($q) => $q->where('is_fee_paid', true));
+            } elseif ($crmStatus === 'signed') {
+                $query->whereHas('profile', fn($q) => $q->where('is_fee_paid', false)->where('is_agreement_signed', true));
+            } elseif ($crmStatus === 'incomplete') {
+                $query->where(function($subQ) {
+                    $subQ->whereDoesntHave('profile')
+                         ->orWhereHas('profile', fn($q) => $q->where('is_fee_paid', false)->where('is_agreement_signed', false));
+                });
+            }
+        }
+
         // Sorting
         $sortField = $request->input('sort_by', 'created_at');
         $sortDirection = $request->input('order', 'desc');
@@ -396,17 +410,22 @@ class CrmController extends Controller
 
         $candidates = $query->with('rating')->paginate(15)->withQueryString();
 
-        // Analytics based on current filtered query
+        // Accurate Analytics based on search/base
+        $baseQuery = User::where('role', 'candidate');
+        if ($search) {
+            $baseQuery->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
         $stats = [
-            'total' => (clone $query)->count(),
-            'active_paid' => (clone $query)->whereHas('profile', function($q) {
-                $q->where('is_fee_paid', true);
-            })->count(),
-            'signed' => (clone $query)->whereHas('profile', function($q) {
-                $q->where('is_fee_paid', false)->where('is_agreement_signed', true);
-            })->count(),
+            'total' => (clone $baseQuery)->count(),
+            'active_paid' => (clone $baseQuery)->whereHas('profile', fn($q) => $q->where('is_fee_paid', true))->count(),
+            'signed' => (clone $baseQuery)->whereHas('profile', fn($q) => $q->where('is_fee_paid', false)->where('is_agreement_signed', true))->count(),
         ];
-        $stats['incomplete'] = $stats['total'] - $stats['active_paid'] - $stats['signed'];
+        $stats['incomplete'] = max(0, $stats['total'] - $stats['active_paid'] - $stats['signed']);
 
         // Pass master data for filters
         $subjects = \App\Models\Subject::all();

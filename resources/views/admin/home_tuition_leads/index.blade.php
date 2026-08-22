@@ -3,6 +3,12 @@
 @section('title', 'Home Tuitions')
 @section('subtitle', 'Manage tuition requirements, approve to publish live on website, and assign verified teachers.')
 
+@section('actions')
+    <a href="{{ route('admin.tuition-leads.create') }}" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition-all shadow flex items-center gap-2">
+        <i class="fas fa-plus"></i> <span>Add Tuition Requirement</span>
+    </a>
+@endsection
+
 @section('content')
 
 <div x-data="{ 
@@ -19,28 +25,38 @@
     }
 }">
 
-{{-- Top Action Bar --}}
-<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-    <div class="flex flex-wrap gap-2">
-        <a href="{{ route('admin.tuition-leads.index') }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ (!request('status')) ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
-            All Tuitions
-        </a>
-        <a href="{{ route('admin.tuition-leads.index', ['status' => 'New Lead']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === 'New Lead' ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
-            <i class="fas fa-clock mr-1"></i> Pending Approvals
-            @php $pendingCount = \App\Models\HomeTuitionLead::where('status', 'New Lead')->count(); @endphp
-            @if($pendingCount > 0)
-                <span class="ml-1.5 bg-yellow-400 text-slate-900 text-xs px-1.5 py-0.5 rounded-full font-bold">{{ $pendingCount }}</span>
-            @endif
-        </a>
-        <a href="{{ route('admin.tuition-leads.index', ['status' => 'Approved']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === 'Approved' ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
-            <i class="fas fa-check-double mr-1"></i> Live Tuitions
-        </a>
-        <a href="{{ route('admin.tuition-leads.index', ['status' => 'Confirmed']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === 'Confirmed' ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
-            <i class="fas fa-user-check mr-1"></i> Teacher Assigned
-        </a>
-    </div>
-    <a href="{{ route('admin.tuition-leads.create') }}" class="px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-bold hover:bg-emerald-600 transition-colors flex items-center gap-2 shadow-sm">
-        <i class="fas fa-plus"></i> Add Tuition Requirement
+{{-- Clickable Analytics Cards --}}
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <a href="{{ route('admin.tuition-leads.index', ['search' => request('search')]) }}" 
+       class="bg-card-bg border {{ !request('status') ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/10' : 'border-card-border hover:border-blue-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Total Tuitions</p>
+        <h4 class="text-2xl font-black text-blue-600 relative z-10">{{ $stats['total'] ?? 0 }}</h4>
+        <span class="text-[10px] text-slate-400 mt-0.5">All Requirements</span>
+    </a>
+
+    <a href="{{ route('admin.tuition-leads.index', ['status' => 'New Lead', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'New Lead' ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/10' : 'border-card-border hover:border-amber-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Pending Approvals</p>
+        <h4 class="text-2xl font-black text-amber-500 relative z-10">{{ $stats['new_lead'] ?? 0 }}</h4>
+        <span class="text-[10px] text-amber-600 font-bold mt-0.5">Needs Approval</span>
+    </a>
+
+    <a href="{{ route('admin.tuition-leads.index', ['status' => 'Approved', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'Approved' ? 'border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/10' : 'border-card-border hover:border-sky-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-sky-500/5 group-hover:bg-sky-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Live on Website</p>
+        <h4 class="text-2xl font-black text-sky-600 relative z-10">{{ $stats['approved'] ?? 0 }}</h4>
+        <span class="text-[10px] text-sky-600 font-bold mt-0.5">Accepting Teachers</span>
+    </a>
+
+    <a href="{{ route('admin.tuition-leads.index', ['status' => 'Confirmed', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'Confirmed' ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-card-border hover:border-emerald-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Tutor Assigned</p>
+        <h4 class="text-2xl font-black text-emerald-600 relative z-10">{{ $stats['confirmed'] ?? 0 }}</h4>
+        <span class="text-[10px] text-emerald-600 font-bold mt-0.5">Confirmed & Fulfilled</span>
     </a>
 </div>
 
