@@ -87,7 +87,7 @@ class HomeTuitionLeadController extends Controller
             'tutor_preference' => 'required|in:Male,Female,Any',
             'dues' => 'nullable|string|max:255',
             'additional_notes' => 'nullable|string',
-            'status' => 'required|in:New Lead,Demo Scheduled,Demo Completed,Confirmed,Pending,Cancelled',
+            'status' => 'required|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
             'follow_up_date' => 'nullable|date',
         ]);
 
@@ -149,6 +149,7 @@ class HomeTuitionLeadController extends Controller
             'tutor_preference' => 'required|in:Male,Female,Any',
             'dues' => 'nullable|string|max:255',
             'additional_notes' => 'nullable|string',
+            'status' => 'nullable|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
         ]);
 
         $lead->update($validated);
@@ -156,12 +157,27 @@ class HomeTuitionLeadController extends Controller
         return redirect()->route('admin.tuition-leads.show', $lead->id)->with('success', 'Lead updated successfully.');
     }
 
+    public function approve(Request $request, $id)
+    {
+        $lead = HomeTuitionLead::findOrFail($id);
+        $lead->update([
+            'status' => 'Approved'
+        ]);
+
+        $lead->followUps()->create([
+            'admin_id' => auth()->id(),
+            'note' => 'Tuition requirement approved and published live for candidates/tutors.',
+        ]);
+
+        return redirect()->back()->with('success', 'Tuition requirement approved and posted live on the portal!');
+    }
+
     public function updateStatus(Request $request, $id)
     {
         $lead = HomeTuitionLead::findOrFail($id);
         
         $request->validate([
-            'status' => 'required|in:New Lead,Demo Scheduled,Demo Completed,Confirmed,Pending,Cancelled',
+            'status' => 'required|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
             'follow_up_date' => 'nullable|date',
             'teacher_contact' => 'nullable|string|max:20',
             'teacher_name' => 'nullable|string|max:255'

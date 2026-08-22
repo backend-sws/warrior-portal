@@ -222,7 +222,7 @@ class HomeController extends Controller
 
     public function tuitions(\Illuminate\Http\Request $request)
     {
-        $tuitions = \App\Models\HomeTuitionLead::whereNotIn('status', ['Confirmed', 'Cancelled', 'Closed'])
+        $tuitions = \App\Models\HomeTuitionLead::where('status', 'Approved')
             ->latest()
             ->paginate(12);
 

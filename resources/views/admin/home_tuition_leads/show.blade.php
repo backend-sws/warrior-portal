@@ -31,6 +31,7 @@
                 @php
                     $statusColors = [
                         'New Lead' => 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+                        'Approved' => 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
                         'Demo Scheduled' => 'bg-purple-500/10 text-purple-500 border-purple-500/20',
                         'Demo Completed' => 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20',
                         'Confirmed' => 'bg-green-500/10 text-green-500 border-green-500/20',
@@ -39,9 +40,24 @@
                     ];
                     $colorClass = $statusColors[$lead->status] ?? 'bg-gray-500/10 text-gray-500 border-gray-500/20';
                 @endphp
-                <span class="{{ $colorClass }} px-3 py-1.5 rounded-lg text-xs font-bold border uppercase tracking-wider flex items-center gap-1">
-                    {{ $lead->status }}
-                </span>
+                <div class="flex items-center gap-2 flex-wrap justify-end">
+                    <span class="{{ $colorClass }} px-3 py-1.5 rounded-lg text-xs font-bold border uppercase tracking-wider flex items-center gap-1">
+                        {{ $lead->status }}
+                    </span>
+
+                    @if($lead->status === 'New Lead' || $lead->status === 'Pending')
+                        <form action="{{ route('admin.tuition-leads.approve', $lead->id) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-md flex items-center gap-1.5">
+                                <i class="fas fa-check-circle"></i> Approve & Post Live
+                            </button>
+                        </form>
+                    @endif
+
+                    <a href="{{ route('admin.tuition-leads.edit', $lead->id) }}" class="px-3.5 py-1.5 bg-secondary-bg hover:bg-card-border/50 text-text-main border border-card-border rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
+                        <i class="fas fa-edit"></i> Edit Details
+                    </a>
+                </div>
                 
                 @if($lead->follow_up_date)
                     <div class="text-xs font-bold text-orange-500 flex items-center gap-1 bg-orange-500/10 px-2 py-1 rounded">
@@ -322,6 +338,7 @@
                         <label class="block text-xs font-bold text-text-dark/60 uppercase tracking-wider mb-2">New Status</label>
                         <select name="status" class="w-full px-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-semibold text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
                             <option value="New Lead" {{ $lead->status === 'New Lead' ? 'selected' : '' }}>New Lead</option>
+                            <option value="Approved" {{ $lead->status === 'Approved' ? 'selected' : '' }}>Approved (Live on Portal)</option>
                             <option value="Demo Scheduled" {{ $lead->status === 'Demo Scheduled' ? 'selected' : '' }}>Demo Scheduled</option>
                             <option value="Demo Completed" {{ $lead->status === 'Demo Completed' ? 'selected' : '' }}>Demo Completed</option>
                             <option value="Confirmed" {{ $lead->status === 'Confirmed' ? 'selected' : '' }}>Confirmed</option>

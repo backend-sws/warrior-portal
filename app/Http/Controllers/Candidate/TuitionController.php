@@ -11,7 +11,7 @@ class TuitionController extends Controller
 {
     public function index()
     {
-        $tuitions = \App\Models\HomeTuitionLead::whereNotIn('status', ['Confirmed', 'Cancelled', 'Closed'])
+        $tuitions = \App\Models\HomeTuitionLead::where('status', 'Approved')
             ->latest()
             ->paginate(12);
 
@@ -26,7 +26,7 @@ class TuitionController extends Controller
     {
         $tuition = \App\Models\HomeTuitionLead::findOrFail($id);
 
-        if (in_array($tuition->status, ['Confirmed', 'Cancelled', 'Closed'])) {
+        if ($tuition->status !== 'Approved') {
             return back()->with('error', 'This tuition lead is no longer active or accepting applications.');
         }
 

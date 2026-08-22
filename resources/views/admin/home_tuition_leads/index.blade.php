@@ -11,6 +11,9 @@
         <a href="{{ route('admin.tuition-leads.index') }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ (request()->routeIs('admin.tuition-leads.index') && !request('status') && $filterStatus === 'All') ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
             All Leads
         </a>
+        <a href="{{ route('admin.tuition-leads.index', ['status' => 'Approved']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === 'Approved' ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
+            <i class="fas fa-check-double mr-1"></i> Live / Approved
+        </a>
         <a href="{{ route('admin.tuition-leads.pending') }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ $filterStatus === 'Pending' ? 'bg-accent-blue text-white' : 'bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue' }}">
             Pending Follow-ups
         </a>
@@ -38,6 +41,7 @@
         <select name="status" class="w-full sm:w-auto px-3 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50">
             <option value="">All Statuses</option>
             <option value="New Lead" {{ request('status') == 'New Lead' ? 'selected' : '' }}>New Lead</option>
+            <option value="Approved" {{ request('status') == 'Approved' ? 'selected' : '' }}>Approved (Live)</option>
             <option value="Demo Scheduled" {{ request('status') == 'Demo Scheduled' ? 'selected' : '' }}>Demo Scheduled</option>
             <option value="Demo Completed" {{ request('status') == 'Demo Completed' ? 'selected' : '' }}>Demo Completed</option>
             <option value="Confirmed" {{ request('status') == 'Confirmed' ? 'selected' : '' }}>Confirmed</option>
@@ -90,6 +94,7 @@
                     @php
                         $statusColors = [
                             'New Lead' => 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+                            'Approved' => 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
                             'Demo Scheduled' => 'bg-purple-500/10 text-purple-500 border-purple-500/20',
                             'Demo Completed' => 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20',
                             'Confirmed' => 'bg-green-500/10 text-green-500 border-green-500/20',
@@ -130,7 +135,20 @@
                     <div class="text-[10px] text-text-dark/40 mt-1">Enquiry: {{ $lead->enquiry_date ? $lead->enquiry_date->format('M d, Y') : 'Unknown' }}</div>
                 </td>
                 <td class="align-top text-right">
-                    <div class="flex items-center justify-end gap-2">
+                    <div class="flex items-center justify-end gap-2 flex-wrap">
+                        @if($lead->status === 'New Lead' || $lead->status === 'Pending')
+                            <form action="{{ route('admin.tuition-leads.approve', $lead->id) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 rounded-lg text-xs font-bold transition-colors whitespace-nowrap shadow-sm" title="Approve and post live on website">
+                                    <i class="fas fa-check-circle"></i> Approve & Post
+                                </button>
+                            </form>
+                        @endif
+
+                        <a href="{{ route('admin.tuition-leads.edit', $lead->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary-bg text-text-dark/70 hover:text-accent-blue border border-card-border hover:border-accent-blue transition-colors" title="Edit Tuition Lead">
+                            <i class="fas fa-edit text-xs"></i>
+                        </a>
+
                         <a href="https://wa.me/91{{ preg_replace('/[^0-9]/', '', $lead->parent_mobile) }}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white transition-colors" title="WhatsApp Parent">
                             <i class="fab fa-whatsapp text-sm"></i>
                         </a>
