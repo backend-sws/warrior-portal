@@ -55,8 +55,13 @@ class TuitionController extends Controller
     public function apply(Request $request, $id)
     {
         $profile = auth()->user()->profile;
-        if (!$profile || !$profile->is_tuition_agreement_signed) {
-            return back()->with('error', 'Please review and digitally sign the Home Tuition Tutor Service Agreement before applying.');
+
+        if (!$profile || !$profile->gender || !$profile->date_of_birth || !$profile->address || !$profile->preferred_state_id || !$profile->preferred_city_id || !$profile->subject_id || !$profile->highest_qualification_id) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your Basic Profile (Date of Birth, Gender, Address, Location, Qualification & Subject) before applying for home tuitions.');
+        }
+
+        if (!$profile->is_tuition_agreement_signed) {
+            return redirect()->route('candidate.tuitions.index')->with('error', 'Please review and digitally sign the Home Tuition Tutor Service Agreement before applying.');
         }
 
         $tuition = HomeTuitionLead::findOrFail($id);

@@ -73,6 +73,10 @@ class ApplicationController extends Controller
         $user = auth()->user();
         $profile = $user->profile;
 
+        if (!$profile || !$profile->gender || !$profile->date_of_birth || !$profile->address || !$profile->preferred_state_id || !$profile->preferred_city_id || !$profile->highest_qualification_id || !$profile->subject_id || !$profile->category_id || !$profile->resume_path) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your Professional Teaching Profile (Category, Subject, Qualification & Resume Upload) before applying for school jobs.');
+        }
+
         // Calculate score again for saving
         $score = 0;
         if ($job->subject_id == $profile->subject_id) $score += 40;
