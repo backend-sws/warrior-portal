@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\NotificationHelper;
 use App\Models\CrmFollowUp;
 use App\Models\JobApplication;
 use App\Models\ServiceChargeInvoice;
@@ -136,6 +137,32 @@ class CrmController extends Controller
                 ],
             ]);
 
+            // Welcome DB notification to candidate
+            NotificationHelper::notifyUser(
+                $user->id,
+                'Welcome to Warriors Educare! 🎉',
+                'Your profile has been created by our team. Log in to your dashboard to view your details and start your placement journey.',
+                null,
+                'fas fa-user-plus'
+            );
+
+            // Welcome email with login credentials
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(
+                    new \App\Mail\WelcomeCandidateMail($user, $request->password)
+                );
+            } catch (\Exception $emailEx) {
+                \Log::error('WelcomeCandidate Email Error: ' . $emailEx->getMessage());
+            }
+
+            // Admin confirmation notify
+            NotificationHelper::notifyAdmin(
+                'New Candidate Onboarded',
+                $user->name . ' has been manually registered with ' . ucfirst($request->plan_type) . ' plan by admin.',
+                null,
+                'fas fa-user-plus'
+            );
+
             return redirect()->route('admin.crm.show', $user->id)->with('success', 'Candidate manually onboarded successfully.');
             
         } catch (\Exception $e) {
@@ -250,6 +277,15 @@ class CrmController extends Controller
             }
 
             $profile->update($updates);
+
+            // Notify candidate of profile update
+            NotificationHelper::notifyUser(
+                $user->id,
+                'Your Profile Has Been Updated',
+                'Your candidate profile has been updated by the Warriors Educare team. Log in to view the changes.',
+                null,
+                'fas fa-user-edit'
+            );
 
             return redirect()->route('admin.crm.show', $user->id)->with('success', 'Candidate profile updated successfully.');
             
@@ -509,10 +545,26 @@ class CrmController extends Controller
                 'agreement_status' => $request->agreement_status,
             ];
 
-            // We only update the status. The candidate will see the form again if it's set to pending_signature.
-            // When they sign, the new PDF will overwrite the old one.
-
             $candidate->profile->update($updates);
+
+            // Notify candidate when admin requests signature
+            if ($request->agreement_status === 'pending_signature') {
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    'Action Required: Sign Your Agreement ✍️',
+                    'The Warriors Educare team has requested you to sign your registration agreement. Please log in to complete this step.',
+                    null,
+                    'fas fa-file-signature'
+                );
+
+                try {
+                    \Illuminate\Support\Facades\Mail::to($candidate->email)->send(
+                        new \App\Mail\AgreementPendingMail($candidate)
+                    );
+                } catch (\Exception $e) {
+                    \Log::error('AgreementPending Email Error: ' . $e->getMessage());
+                }
+            }
         }
 
         return back()->with('success', 'Agreement status updated successfully.');
@@ -532,18 +584,33 @@ class CrmController extends Controller
         }
 
         if ($request->hasFile('agreement_pdf')) {
-            $file = $request->file('agreement_pdf');
+            $file     = $request->file('agreement_pdf');
             $fileName = 'agreements/admin_uploaded_' . $candidate->id . '_' . time() . '.pdf';
             
-            // Store the file in public disk
             \Illuminate\Support\Facades\Storage::disk('public')->put($fileName, file_get_contents($file));
 
-            // Update profile
             $profile->update([
                 'is_agreement_signed' => true,
-                'agreement_pdf_path' => $fileName,
-                'agreement_status' => 'signed'
+                'agreement_pdf_path'  => $fileName,
+                'agreement_status'    => 'signed'
             ]);
+
+            // Notify candidate that agreement PDF is available
+            NotificationHelper::notifyUser(
+                $candidate->id,
+                'Agreement PDF Uploaded 📄',
+                'Your signed Registration Agreement has been uploaded by the Warriors Educare team. You can now download it from your dashboard.',
+                null,
+                'fas fa-file-pdf'
+            );
+
+            try {
+                \Illuminate\Support\Facades\Mail::to($candidate->email)->send(
+                    new \App\Mail\AgreementPendingMail($candidate)
+                );
+            } catch (\Exception $e) {
+                \Log::error('AgreementUploaded Email Error: ' . $e->getMessage());
+            }
 
             return back()->with('success', 'Agreement PDF uploaded successfully. The candidate can now view and download it.');
         }
@@ -629,6 +696,24 @@ class CrmController extends Controller
             if ($candidate && $candidate->profile) {
                 $candidate->profile->decrement('pending_amount', $invoice->amount);
                 $candidate->profile->increment('paid_amount', $invoice->amount);
+
+                // Notify candidate that invoice was marked paid
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    'Invoice Marked as Paid ✅',
+                    'Your service charge invoice of ₹' . number_format($invoice->amount, 2) . ' has been marked as paid by the team.',
+                    route('candidate.serviceCharge.show'),
+                    'fas fa-check-circle'
+                );
+
+                // Email
+                try {
+                    \Illuminate\Support\Facades\Mail::to($candidate->email)->send(
+                        new \App\Mail\InvoicePaidByAdminMail($invoice, $candidate)
+                    );
+                } catch (\Exception $e) {
+                    \Log::error('InvoicePaidByAdmin Email Error: ' . $e->getMessage());
+                }
             }
         }
         $invoice->save();
@@ -653,6 +738,15 @@ class CrmController extends Controller
             $candidate = User::find($invoice->candidate_id);
             if ($candidate && $candidate->profile) {
                 $candidate->profile->decrement('pending_amount', $deduction);
+
+                // Notify candidate of late fee waiver/adjustment
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    'Late Fee Adjusted 👍',
+                    'Good news! A late fee of ₹' . number_format($deduction, 2) . ' has been waived/adjusted on your invoice by the Warriors Educare team.',
+                    route('candidate.serviceCharge.show'),
+                    'fas fa-hand-holding-usd'
+                );
             }
         }
 
@@ -675,7 +769,7 @@ class CrmController extends Controller
             // DB Notification
             \App\Helpers\NotificationHelper::notifyUser(
                 $candidate->id,
-                'Profile Verified!',
+                'Profile Verified! ✅',
                 'Congratulations! Your profile has been officially verified by our team. You now have the Verified Badge.',
                 null,
                 'fas fa-check-circle'
@@ -686,8 +780,18 @@ class CrmController extends Controller
             return back()->with('success', 'Candidate profile has been verified and notified.');
         }
 
-        return back()->with('success', 'Candidate verification removed.');
+        // Verification removed — notify candidate
+        \App\Helpers\NotificationHelper::notifyUser(
+            $candidate->id,
+            'Profile Verification Removed ⚠️',
+            'Your profile verification badge has been removed by the Warriors Educare team. Please contact us if you have any questions.',
+            null,
+            'fas fa-user-times'
+        );
+
+        return back()->with('success', 'Candidate verification removed and candidate notified.');
     }
+
 
     public function assignJob(Request $request, $id)
     {
@@ -702,11 +806,21 @@ class CrmController extends Controller
         }
 
         \App\Models\JobApplication::create([
-            'job_post_id' => $request->job_post_id,
+            'job_post_id'  => $request->job_post_id,
             'candidate_id' => $candidate->id,
-            'status' => 'applied',
-            'match_score' => 0 // Manually assigned by admin
+            'status'       => 'applied',
+            'match_score'  => 0 // Manually assigned by admin
         ]);
+
+        // Notify candidate that a job was assigned
+        $job = \App\Models\JobPost::find($request->job_post_id);
+        NotificationHelper::notifyUser(
+            $candidate->id,
+            'New Job Assigned to You 💼',
+            'The Warriors Educare team has assigned you to apply for "' . ($job->title ?? 'a job') . '" at ' . ($job->school_name ?? 'a school') . '. Check your applications.',
+            route('candidate.applications.index'),
+            'fas fa-briefcase'
+        );
 
         return back()->with('success', 'Job application assigned successfully.');
     }
