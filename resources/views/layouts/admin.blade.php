@@ -155,14 +155,82 @@
                     <i class="fas fa-bell w-5 text-center text-lg"></i> Notifications
                 </a>
 
-                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Master Data
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-5 mb-2 px-4">School Jobs & Hiring
+                </div>
+
+                <a href="{{ route('admin.jobs.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.jobs.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-briefcase w-5 text-center"></i> All Jobs
+                    @php $pendingJobsCount = \App\Models\JobPost::where('status', 'pending')->count(); @endphp
+                    @if($pendingJobsCount > 0)
+                        <span class="ml-auto bg-accent-yellow text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingJobsCount }}</span>
+                    @endif
+                </a>
+                <a href="{{ route('admin.applications.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.applications.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-file-signature w-5 text-center"></i> Job Applications
+                </a>
+                <a href="{{ route('admin.crm.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.crm.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-users-cog w-5 text-center"></i> Candidates CRM
+                </a>
+
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-5 mb-2 px-4">Home Tuitions
+                </div>
+
+                <a href="{{ route('admin.tuition-leads.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.tuition-leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-chalkboard-teacher w-5 text-center"></i> All Tuitions
+                    @php $pendingTuitionsCount = \App\Models\HomeTuitionLead::where('status', 'New Lead')->count(); @endphp
+                    @if($pendingTuitionsCount > 0)
+                        <span class="ml-auto bg-emerald-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingTuitionsCount }}</span>
+                    @endif
+                </a>
+                <a href="{{ route('admin.tuition-applications.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.tuition-applications.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-file-signature w-5 text-center"></i> Tuition Applications
+                    @php $tuitionAppCount = \App\Models\TuitionApplication::where('status', 'Applied')->count(); @endphp
+                    @if($tuitionAppCount > 0)
+                        <span class="ml-auto bg-sky-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $tuitionAppCount }}</span>
+                    @endif
+                </a>
+                <a href="{{ route('admin.tuition-service-charges.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.tuition-service-charges.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-file-invoice-dollar w-5 text-center"></i> Tuition Service Charges
+                    @php 
+                        $pendingTuitionInvoicesCount = \App\Models\ServiceChargeInvoice::where('status', 'pending')
+                            ->where(function($q) {
+                                $q->whereNotNull('home_tuition_lead_id')->orWhere(function($sub){ $sub->whereNull('job_application_id')->where('description', 'like', '%tuition%'); });
+                            })->count(); 
+                    @endphp
+                    @if($pendingTuitionInvoicesCount > 0)
+                        <span class="ml-auto bg-amber-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingTuitionInvoicesCount }}</span>
+                    @endif
+                </a>
+
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-5 mb-2 px-4">Payments & Finance
+                </div>
+
+                <a href="{{ route('admin.candidate-payments.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.candidate-payments.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-wallet w-5 text-center"></i> Candidate Payments
+                </a>
+                <a href="{{ route('admin.transactions.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-receipt w-5 text-center"></i> Online Transactions
+                </a>
+                <a href="{{ route('admin.reminders.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.reminders.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm text-amber-300 hover:text-amber-200">
+                    <i class="fas fa-bell w-5 text-center"></i> Reminder Center
+                </a>
+
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-5 mb-2 px-4">Master Data
                 </div>
 
                 <a href="{{ route('admin.users.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-users w-5 text-center"></i> Users
                 </a>
-
                 <a href="{{ route('admin.categories.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-layer-group w-5 text-center"></i> Categories
@@ -184,63 +252,13 @@
                     <i class="fas fa-city w-5 text-center"></i> Cities
                 </a>
 
-                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Candidates & Jobs
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-5 mb-2 px-4">Support & CMS
                 </div>
 
-                <a href="{{ route('admin.jobs.index', ['status' => 'pending']) }}"
-                    class="sidebar-link {{ request('status') === 'pending' ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-clipboard-check w-5 text-center"></i> Job Approvals
-                    @php $pendingCount = \App\Models\JobPost::where('status', 'pending')->count(); @endphp
-                    @if($pendingCount > 0)
-                        <span
-                            class="ml-auto bg-accent-yellow text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingCount }}</span>
-                    @endif
-                </a>
-                <a href="{{ route('admin.jobs.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.jobs.*') && request('status') !== 'pending' ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-briefcase w-5 text-center"></i> All Jobs
-                </a>
-                <a href="{{ route('admin.crm.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.crm.*') && request('role') !== 'parent' ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-users-cog w-5 text-center"></i> Candidates CRM
-                </a>
-                <a href="{{ route('admin.applications.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.applications.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-file-signature w-5 text-center"></i> Job Applications
-                </a>
-                <a href="{{ route('admin.candidate-payments.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.candidate-payments.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-wallet w-5 text-center"></i> Candidate Payments
-                </a>
                 <a href="{{ route('admin.leads.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-headset w-5 text-center"></i> Support Leads
+                    <i class="fas fa-headset w-5 text-center"></i> Contact Inquiries
                 </a>
-
-
-
-                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Finance
-                </div>
-
-                <a href="{{ route('admin.transactions.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-receipt w-5 text-center"></i> Transactions
-                </a>
-
-                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Communication</div>
-
-                <a href="{{ route('admin.reminders.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.reminders.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm text-orange-300 hover:text-orange-200">
-                    <i class="fas fa-paper-plane w-5 text-center"></i> Reminder Center
-                </a>
-
-                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">CMS</div>
-
-
-                <!-- <a href="{{ route('admin.services.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-concierge-bell w-5 text-center"></i> Services
-                </a> -->
                 <a href="{{ route('admin.testimonials.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.testimonials.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-star w-5 text-center"></i> Testimonials

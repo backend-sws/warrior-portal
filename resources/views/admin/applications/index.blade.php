@@ -5,33 +5,47 @@
 
 @section('content')
 
-{{-- Analytics Cards --}}
+{{-- Analytics Cards (Clickable Filters) --}}
 <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-    <div class="bg-card-bg border border-card-border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+    <a href="{{ route('admin.applications.index', ['status' => '', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ !request('status') ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/10' : 'border-card-border hover:border-blue-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Total Apps</p>
-        <h4 class="text-2xl font-extrabold text-blue-500 relative z-10">{{ $stats['total'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
-        <div class="absolute inset-0 bg-gray-500/5 group-hover:bg-gray-500/10 transition-colors"></div>
+        <h4 class="text-2xl font-black text-blue-600 relative z-10">{{ $stats['total'] }}</h4>
+        <span class="text-[10px] text-slate-400 mt-0.5">All Submissions</span>
+    </a>
+
+    <a href="{{ route('admin.applications.index', ['status' => 'applied', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'applied' ? 'border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/10' : 'border-card-border hover:border-sky-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-sky-500/5 group-hover:bg-sky-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">New (Applied)</p>
-        <h4 class="text-2xl font-extrabold text-gray-500 relative z-10">{{ $stats['applied'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+        <h4 class="text-2xl font-black text-sky-600 relative z-10">{{ $stats['applied'] }}</h4>
+        <span class="text-[10px] text-sky-600 font-bold mt-0.5">Under Review</span>
+    </a>
+
+    <a href="{{ route('admin.applications.index', ['status' => 'shortlisted', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'shortlisted' ? 'border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/10' : 'border-card-border hover:border-purple-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Forwarded</p>
-        <h4 class="text-2xl font-extrabold text-purple-500 relative z-10">{{ $stats['shortlisted'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
-        <div class="absolute inset-0 bg-green-500/5 group-hover:bg-green-500/10 transition-colors"></div>
-        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Hired</p>
-        <h4 class="text-2xl font-extrabold text-green-500 relative z-10">{{ $stats['hired'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+        <h4 class="text-2xl font-black text-purple-600 relative z-10">{{ $stats['shortlisted'] }}</h4>
+        <span class="text-[10px] text-purple-600 font-bold mt-0.5">Sent to School</span>
+    </a>
+
+    <a href="{{ route('admin.applications.index', ['status' => 'hired', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'hired' ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-card-border hover:border-emerald-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Selected (Hired)</p>
+        <h4 class="text-2xl font-black text-emerald-600 relative z-10">{{ $stats['hired'] }}</h4>
+        <span class="text-[10px] text-emerald-600 font-bold mt-0.5">Joined School</span>
+    </a>
+
+    <a href="{{ route('admin.applications.index', ['status' => 'rejected', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'rejected' ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50/10' : 'border-card-border hover:border-red-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Rejected</p>
-        <h4 class="text-2xl font-extrabold text-red-500 relative z-10">{{ $stats['rejected'] }}</h4>
-    </div>
+        <h4 class="text-2xl font-black text-red-500 relative z-10">{{ $stats['rejected'] }}</h4>
+        <span class="text-[10px] text-red-400 font-bold mt-0.5">Not Selected</span>
+    </a>
 </div>
 
 <div class="bg-card-bg rounded-t-2xl border-x border-t border-card-border p-4">

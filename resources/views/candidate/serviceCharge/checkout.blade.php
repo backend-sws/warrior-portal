@@ -1,153 +1,213 @@
 @extends('layouts.app')
 
-@section('title', 'Payment Gateway - Pay Service Charge')
-@section('subtitle', 'Secure Online Payment Gateway')
+@section('title', 'Razorpay Secure Checkout - Service Charge')
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-8">
+@include('candidate.partials.nav')
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
     <!-- Breadcrumb / Back button -->
     <div>
-        <a href="{{ route('candidate.serviceCharge.show') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-[#1e3a8a] transition-colors">
-            <i class="fas fa-arrow-left"></i> Back to Service Charge Invoices
+        <a href="{{ route('candidate.serviceCharge.show') }}" class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-500 hover:text-accent-blue transition-colors">
+            <i class="fas fa-arrow-left"></i> Back to Invoices & Service Charges
         </a>
     </div>
 
     <!-- Main Payment Checkout Card -->
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-12">
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12">
         
         <!-- Left Side: Order Summary -->
-        <div class="md:col-span-5 bg-[#1e3a8a] text-white p-8 flex flex-col justify-between relative overflow-hidden">
-            <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-white/10 rounded-full"></div>
-            <div class="absolute -left-12 -top-12 w-48 h-48 bg-white/10 rounded-full"></div>
+        <div class="md:col-span-5 bg-gradient-to-br from-[#0a2558] to-[#1e40af] text-white p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+            <div class="absolute -left-12 -top-12 w-48 h-48 bg-cyan-400/10 rounded-full blur-xl pointer-events-none"></div>
 
             <div class="relative z-10 space-y-6">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('adobe.png') }}" alt="Logo" class="h-10 bg-white p-2 rounded-xl">
+                    <div class="w-10 h-10 bg-white/15 rounded-2xl flex items-center justify-center text-white text-lg font-black shadow-inner">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
                     <div>
-                        <h4 class="font-bold text-lg text-white">Warriors Educare</h4>
-                        <p class="text-sm text-blue-100 font-semibold">Payment Gateway</p>
+                        <h4 class="font-black text-base sm:text-lg text-white">Warriors Educare</h4>
+                        <p class="text-xs text-blue-200 font-semibold">Razorpay Verified Merchant</p>
                     </div>
                 </div>
 
-                <div class="border-t border-white/20 pt-6 space-y-3">
-                    <p class="text-xs font-bold uppercase tracking-wider text-blue-200">Invoice Details</p>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-blue-100 font-medium">Invoice #:</span>
-                        <span class="font-mono font-bold text-white">{{ $invoice->invoice_number }}</span>
+                <div class="border-t border-white/15 pt-5 space-y-3">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-300 block">Service Invoice Details</span>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-blue-100">Invoice ID:</span>
+                        <span class="font-mono font-bold text-white">#{{ $invoice->id }}</span>
                     </div>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-blue-100 font-medium">Service:</span>
-                        <span class="font-bold text-white">{{ $invoice->title }}</span>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-blue-100">Category:</span>
+                        <span class="font-bold text-white">{{ $invoice->home_tuition_lead_id ? 'Home Tuition Commission' : 'School Job Placement Fee' }}</span>
                     </div>
-                    @if($invoice->lead)
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-blue-100 font-medium">Class / Subject:</span>
-                        <span class="font-bold text-white">{{ $invoice->lead->class }} ({{ $invoice->lead->subjects }})</span>
+                    @if($invoice->tuitionLead)
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-blue-100">Class & Location:</span>
+                        <span class="font-bold text-white">Class {{ $invoice->tuitionLead->class }} ({{ $invoice->tuitionLead->location }})</span>
+                    </div>
+                    @elseif($invoice->jobApplication?->jobPost)
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-blue-100">Job Role:</span>
+                        <span class="font-bold text-white">{{ $invoice->jobApplication->jobPost->title }} ({{ $invoice->jobApplication->jobPost->school_name }})</span>
+                    </div>
+                    @endif
+                    @if($invoice->late_fee > 0)
+                    <div class="flex justify-between items-center text-xs text-rose-300">
+                        <span>Late Fee Penalty:</span>
+                        <span class="font-bold">+ ₹{{ number_format($invoice->late_fee, 2) }}</span>
                     </div>
                     @endif
                 </div>
 
-                <div class="border-t border-white/20 pt-6 space-y-2">
-                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Total Payable Amount</p>
-                    <div class="text-3xl font-extrabold text-green-400">
-                        ₹{{ number_format($invoice->amount + ($invoice->late_fee ?? 0), 2) }}
+                <div class="border-t border-white/15 pt-5 space-y-1.5">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-blue-200">Total Payable Amount</p>
+                    <div class="text-3xl sm:text-4xl font-black text-emerald-400">
+                        ₹{{ number_format($order['amount'], 2) }}
                     </div>
-                    <p class="text-[11px] text-gray-400">Includes all applicable service taxes and platform processing fees.</p>
+                    <p class="text-[10px] text-blue-200/80">Inclusive of all digital processing & placement settlement charges.</p>
                 </div>
             </div>
 
-            <div class="relative z-10 pt-8 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
-                <span class="inline-flex items-center gap-1.5 text-green-400">
-                    <i class="fas fa-lock text-xs"></i> 256-Bit SSL Encrypted
+            <div class="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-blue-200/80">
+                <span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
+                    <i class="fas fa-lock text-xs"></i> 256-Bit SSL Secured
                 </span>
-                <span>PCI-DSS Compliant</span>
+                <span>Razorpay PCI-DSS</span>
             </div>
         </div>
 
-        <!-- Right Side: Gateway Options -->
-        <div class="md:col-span-7 p-8 space-y-6 bg-white" x-data="{ paymentMethod: 'upi' }">
+        <!-- Right Side: Gateway Trigger View -->
+        <div class="md:col-span-7 p-7 sm:p-8 space-y-6 bg-white flex flex-col justify-between">
             <div>
-                <h3 class="text-xl font-bold text-gray-900">Select Payment Method</h3>
-                <p class="text-xs text-gray-500 mt-1">Choose your preferred gateway channel to complete the transaction.</p>
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-lg sm:text-xl font-black text-slate-900">Secure Payment Checkout</h3>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+                        <i class="fas fa-bolt text-[9px]"></i> Instant Confirmation
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500">Pay securely via Razorpay using UPI (Google Pay, PhonePe, Paytm), Credit/Debit Cards, NetBanking, or Wallets.</p>
             </div>
 
-            <!-- Payment Method Tabs -->
+            <!-- Supported Modes Highlights -->
             <div class="grid grid-cols-3 gap-3">
-                <button type="button" @click="paymentMethod = 'upi'"
-                    :class="paymentMethod === 'upi' ? 'border-[#1e3a8a] bg-blue-50/50 text-[#1e3a8a] shadow-sm' : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
-                    class="p-4 rounded-2xl border-2 text-center transition-all flex flex-col items-center gap-2">
-                    <i class="fas fa-qrcode text-xl"></i>
-                    <span class="text-xs font-bold">UPI / QR</span>
-                </button>
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center flex flex-col items-center gap-1.5">
+                    <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-sm">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <span class="text-xs font-bold text-slate-800">UPI / QR</span>
+                    <span class="text-[9px] text-slate-400">GPay, PhonePe, Paytm</span>
+                </div>
 
-                <button type="button" @click="paymentMethod = 'card'"
-                    :class="paymentMethod === 'card' ? 'border-[#1e3a8a] bg-blue-50/50 text-[#1e3a8a] shadow-sm' : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
-                    class="p-4 rounded-2xl border-2 text-center transition-all flex flex-col items-center gap-2">
-                    <i class="fas fa-credit-card text-xl"></i>
-                    <span class="text-xs font-bold">Card</span>
-                </button>
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center flex flex-col items-center gap-1.5">
+                    <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <span class="text-xs font-bold text-slate-800">Cards</span>
+                    <span class="text-[9px] text-slate-400">Visa, Master, RuPay</span>
+                </div>
 
-                <button type="button" @click="paymentMethod = 'netbanking'"
-                    :class="paymentMethod === 'netbanking' ? 'border-[#1e3a8a] bg-blue-50/50 text-[#1e3a8a] shadow-sm' : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
-                    class="p-4 rounded-2xl border-2 text-center transition-all flex flex-col items-center gap-2">
-                    <i class="fas fa-university text-xl"></i>
-                    <span class="text-xs font-bold">Net Banking</span>
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center flex flex-col items-center gap-1.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm">
+                        <i class="fas fa-building-columns"></i>
+                    </div>
+                    <span class="text-xs font-bold text-slate-800">Net Banking</span>
+                    <span class="text-[9px] text-slate-400">50+ Major Banks</span>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 text-xs text-slate-700 space-y-1.5">
+                <div class="flex items-center gap-2 font-bold text-blue-900">
+                    <i class="fas fa-info-circle text-blue-600"></i>
+                    <span>Payment Information:</span>
+                </div>
+                <p class="text-[11px] text-slate-600">
+                    Clicking "Pay Now" will open the Razorpay secure payment gateway modal. Once completed, your invoice and digital receipt will be automatically verified and updated in real-time.
+                </p>
+            </div>
+
+            <!-- Razorpay Trigger Button -->
+            <div>
+                <button type="button" id="rzp-pay-button" 
+                        class="w-full py-4 px-6 bg-gradient-to-r from-[#0a2558] to-[#1e40af] hover:from-[#0d3175] hover:to-[#2563eb] text-white rounded-2xl text-sm font-bold transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2.5 group">
+                    <i class="fas fa-lock text-emerald-400 group-hover:scale-110 transition-transform"></i>
+                    <span>Pay ₹{{ number_format($order['amount'], 2) }} Securely via Razorpay</span>
                 </button>
             </div>
 
-            <!-- Form submission to callback with bypass or payment gateway response -->
-            <form action="{{ route('candidate.serviceCharge.callback') }}" method="POST" class="space-y-6">
+            <!-- Hidden Form Submitted Upon Razorpay Success -->
+            <form id="razorpay-callback-form" action="{{ route('candidate.serviceCharge.callback') }}" method="POST" class="hidden">
                 @csrf
-                <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">
-                <input type="hidden" name="transactionId" value="{{ $transactionId }}">
-                <input type="hidden" name="bypass" value="1">
-                <input type="hidden" name="amount" value="{{ $invoice->amount }}">
-
-                <!-- UPI Details View -->
-                <div x-show="paymentMethod === 'upi'" class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-gray-700">UPI ID / VPA</span>
-                        <span class="text-[10px] text-green-600 font-semibold bg-green-100 px-2 py-0.5 rounded-full">Instant Approval</span>
-                    </div>
-                    <input type="text" placeholder="e.g. parent@upi or 9876543210@paytm" class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1e3a8a] outline-none">
-                    <p class="text-xs text-gray-400">Supported apps: PhonePe, Google Pay, Paytm, BHIM</p>
-                </div>
-
-                <!-- Card Details View -->
-                <div x-show="paymentMethod === 'card'" class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-4" style="display: none;">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Card Number</label>
-                        <input type="text" placeholder="4532 •••• •••• 8901" class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1e3a8a] outline-none">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Expiry Date</label>
-                            <input type="text" placeholder="MM / YY" class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1e3a8a] outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">CVV</label>
-                            <input type="password" placeholder="•••" maxlength="4" class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1e3a8a] outline-none">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Net Banking Details View -->
-                <div x-show="paymentMethod === 'netbanking'" class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-4" style="display: none;">
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Select Your Bank</label>
-                    <select class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1e3a8a] outline-none">
-                        <option>State Bank of India (SBI)</option>
-                        <option>HDFC Bank</option>
-                        <option>ICICI Bank</option>
-                        <option>Axis Bank</option>
-                        <option>Kotak Mahindra Bank</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="w-full bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm">
-                    <i class="fas fa-lock"></i> Pay ₹{{ number_format($invoice->amount + ($invoice->late_fee ?? 0), 2) }} Securely
-                </button>
+                <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+                <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+                <input type="hidden" name="razorpay_signature" id="razorpay_signature">
             </form>
         </div>
+
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const orderData = @json($order);
+        const userData = @json($user);
+        const invoiceId = "{{ $invoice->id }}";
+
+        const options = {
+            "key": orderData.key,
+            "amount": orderData.amount_paisa,
+            "currency": orderData.currency || "INR",
+            "name": orderData.name || "Warriors Educare",
+            "description": "Service Charge Settlement (Invoice #" + invoiceId + ")",
+            "image": "{{ asset('adobe.png') }}",
+            "order_id": orderData.order_id,
+            "handler": function (response) {
+                // Set hidden inputs
+                document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+                document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                
+                // Show loading state
+                const btn = document.getElementById('rzp-pay-button');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying Payment...';
+
+                // Submit form to callback
+                document.getElementById('razorpay-callback-form').submit();
+            },
+            "prefill": {
+                "name": userData.name || "",
+                "email": userData.email || "",
+                "contact": userData.phone || ""
+            },
+            "notes": {
+                "invoice_id": invoiceId,
+                "user_id": userData.id
+            },
+            "theme": {
+                "color": "#0a2558"
+            },
+            "modal": {
+                "ondismiss": function() {
+                    console.log('Razorpay modal closed by user');
+                }
+            }
+        };
+
+        const rzp = new Razorpay(options);
+
+        rzp.on('payment.failed', function (response) {
+            alert("Payment Failed: " + response.error.description + " (Error Code: " + response.error.code + ")");
+        });
+
+        document.getElementById('rzp-pay-button').onclick = function(e) {
+            rzp.open();
+            e.preventDefault();
+        };
+    });
+</script>
+@endpush

@@ -1,711 +1,748 @@
 @extends('layouts.admin')
 
 @section('title')
-    CRM: {{ $candidate->name }}
+    Candidate CRM: {{ $candidate->name }}
     @if($candidate->profile && $candidate->profile->is_verified)
-        <i class="fas fa-check-circle text-blue-500 text-base" title="Verified Candidate"></i>
+        <span class="ml-2 inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 bg-blue-500/10 text-accent-blue rounded-full border border-accent-blue/20">
+            <i class="fas fa-check-circle"></i> Verified
+        </span>
     @endif
 @endsection
 
+@section('subtitle', 'Detailed candidate profile, school job tracking, home tuition mappings, and payment invoices.')
+
 @section('actions')
-    <div class="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
-        <a href="{{ route('admin.crm.index') }}" class="text-sm text-gray-600 hover:underline shrink-0">&larr; Back to List</a>
-        
-        @if($candidate->role === 'candidate')
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{{ route('admin.crm.index') }}" class="px-4 py-2 bg-secondary-bg hover:bg-card-bg border border-card-border text-text-main rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
+            <i class="fas fa-arrow-left"></i> <span>Back</span>
+        </a>
+
         <form action="{{ route('admin.crm.candidate.verify', $candidate->id) }}" method="POST" class="inline">
             @csrf
             @if($candidate->profile && $candidate->profile->is_verified)
-                <button type="submit" class="px-4 py-2 bg-red-100 text-red-700 text-sm font-semibold rounded-xl hover:bg-red-200 transition-colors flex items-center shadow-sm">
-                    <i class="fas fa-times-circle mr-2"></i> Remove Verification
+                <button type="submit" class="px-4 py-2 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+                    <i class="fas fa-times-circle"></i> <span>Revoke Verification</span>
                 </button>
             @else
-                <button type="submit" class="px-4 py-2 bg-green-100 text-green-700 text-sm font-semibold rounded-xl hover:bg-green-200 transition-colors flex items-center shadow-sm">
-                    <i class="fas fa-check-circle mr-2"></i> Verify Profile
+                <button type="submit" class="px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+                    <i class="fas fa-check-circle"></i> <span>Verify Profile</span>
                 </button>
             @endif
         </form>
 
-        <a href="{{ route('admin.crm.edit', $candidate->id) }}" class="px-4 py-2 bg-blue-100 text-blue-700 text-sm font-semibold rounded-xl hover:bg-blue-200 transition-colors flex items-center shadow-sm">
-            <i class="fas fa-edit mr-2"></i> Edit Profile
+        <a href="{{ route('admin.crm.edit', $candidate->id) }}" class="px-4 py-2 bg-accent-blue hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+            <i class="fas fa-edit"></i> <span>Edit Profile</span>
         </a>
-        @endif
-        
-        <a href="{{ route('admin.crm.candidate.magic-login', $candidate->id) }}" target="_blank" class="px-4 py-2 bg-indigo-100 text-indigo-700 text-sm font-semibold rounded-xl hover:bg-indigo-200 transition-colors flex items-center shadow-sm">
-            <i class="fas fa-sign-in-alt mr-2"></i> {{ $candidate->role === 'parent' ? 'Login as Parent' : 'Login as Candidate' }}
+
+        <a href="{{ route('admin.crm.candidate.magic-login', $candidate->id) }}" target="_blank" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+            <i class="fas fa-sign-in-alt"></i> <span>Candidate Portal</span>
         </a>
     </div>
 @endsection
 
 @section('content')
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- Left Column: Profile & Applications -->
-    <div class="lg:col-span-1 space-y-6 min-w-0">
-        <!-- Candidate Profile -->
-        <div class="bg-white shadow-sm sm:rounded-2xl border border-gray-100 mb-6 overflow-hidden">
-            <!-- Banner / Header -->
-            <div class="p-4 sm:p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50/50 to-white flex flex-col sm:flex-row justify-between items-start relative gap-4">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 relative z-10 w-full">
-                    @if($candidate->profile && $candidate->profile->profile_photo_path)
-                        <img src="{{ Storage::url($candidate->profile->profile_photo_path) }}" alt="{{ $candidate->name }}" class="w-16 h-16 shrink-0 rounded-full object-cover shadow-sm border-4 border-white">
-                    @elseif($candidate->profile && $candidate->profile->live_photo_path)
-                        <img src="{{ Storage::url($candidate->profile->live_photo_path) }}" alt="{{ $candidate->name }}" class="w-16 h-16 shrink-0 rounded-full object-cover shadow-sm border-4 border-white">
-                    @else
-                        <div class="w-16 h-16 shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xl font-extrabold shadow-sm border-4 border-white">
-                            {{ strtoupper(substr($candidate->name, 0, 1)) }}
-                        </div>
-                    @endif
-                    <div class="min-w-0">
-                        <h3 class="text-xl font-extrabold text-gray-900 break-words">{{ $candidate->name }}</h3>
-                        <div class="text-xs text-gray-500 mt-1.5 flex flex-wrap items-center gap-1.5 sm:gap-4">
-                            <span class="flex items-center gap-1.5"><i class="fas fa-envelope text-gray-400"></i> {{ $candidate->email }}</span>
-                            <span class="flex items-center gap-1.5"><i class="fas fa-phone-alt text-gray-400"></i> {{ $candidate->phone }}</span>
-                            @if($candidate->profile && $candidate->profile->latitude && $candidate->profile->longitude)
-                                <a href="https://www.google.com/maps/search/?api=1&query={{ $candidate->profile->latitude }},{{ $candidate->profile->longitude }}" target="_blank" class="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
-                                    <i class="fas fa-map-marker-alt text-gray-400"></i> {{ $candidate->profile->latitude }}, {{ $candidate->profile->longitude }}
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
+@if(session('success'))
+    <div class="mb-5 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl flex items-center gap-3 text-sm font-bold shadow-sm">
+        <i class="fas fa-check-circle text-emerald-600 text-lg"></i>
+        <span>{{ session('success') }}</span>
+    </div>
+@endif
 
-            <div class="p-6">
-                @if($candidate->profile && $candidate->role === 'candidate')
-                    <!-- Personal Info -->
-                    <div class="mb-6">
-                        <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Personal Details</h4>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Gender</div>
-                                <div class="text-sm font-medium text-gray-800">{{ $candidate->profile->gender ?? 'N/A' }}</div>
-                            </div>
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Date of Birth</div>
-                                <div class="text-sm font-medium text-gray-800">{{ $candidate->profile->date_of_birth ? $candidate->profile->date_of_birth->format('M d, Y') : 'N/A' }}</div>
-                            </div>
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100 col-span-2">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Address</div>
-                                <div class="text-sm font-medium text-gray-800">{{ $candidate->profile->address ?? 'N/A' }}</div>
-                            </div>
-                        </div>
-                    </div>
+@if(session('error'))
+    <div class="mb-5 bg-red-50 border border-red-200 text-red-800 p-4 rounded-2xl flex items-center gap-3 text-sm font-bold shadow-sm">
+        <i class="fas fa-exclamation-circle text-red-600 text-lg"></i>
+        <span>{{ session('error') }}</span>
+    </div>
+@endif
 
-                    <!-- Professional Info -->
-                    <div class="mb-6">
-                        <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Professional Details</h4>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-50">
-                                <div class="text-[10px] text-blue-400 uppercase font-bold mb-0.5 flex items-center gap-1"><i class="fas fa-folder"></i> Category</div>
-                                <div class="text-sm font-bold text-blue-900">{{ $candidate->profile->category?->name ?? 'N/A' }}</div>
-                            </div>
-                            <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-50">
-                                <div class="text-[10px] text-blue-400 uppercase font-bold mb-0.5 flex items-center gap-1"><i class="fas fa-book"></i> Subject</div>
-                                <div class="text-sm font-bold text-blue-900">{{ $candidate->profile->subject?->name ?? 'N/A' }}</div>
-                            </div>
-                            <div class="bg-orange-50/50 p-3 rounded-xl border border-orange-50">
-                                <div class="text-[10px] text-orange-400 uppercase font-bold mb-0.5 flex items-center gap-1"><i class="fas fa-graduation-cap"></i> Qualification</div>
-                                <div class="text-sm font-bold text-orange-900">{{ $candidate->profile->highestQualification?->name ?? 'N/A' }}</div>
-                            </div>
-                            <div class="bg-emerald-50/50 p-3 rounded-xl border border-emerald-50">
-                                <div class="text-[10px] text-emerald-500 uppercase font-bold mb-0.5 flex items-center gap-1"><i class="fas fa-briefcase"></i> Experience</div>
-                                <div class="text-sm font-bold text-emerald-900">{{ $candidate->profile->experience_years ?? 0 }} Years</div>
-                            </div>
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Current Salary</div>
-                                <div class="text-sm font-medium text-gray-800">{{ $candidate->profile->current_salary ?? 'N/A' }}</div>
-                            </div>
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Expected Salary</div>
-                                <div class="text-sm font-medium text-gray-800">{{ $candidate->profile->expected_salary ?? 'N/A' }}</div>
-                            </div>
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100 col-span-2">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5 flex items-center gap-1"><i class="fas fa-map-marker-alt"></i> Preferred Location</div>
-                                <div class="text-sm font-medium text-gray-800">{{ $candidate->profile->preferredCity?->name ?? 'N/A' }}, {{ $candidate->profile->preferredState?->name ?? 'N/A' }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Plan & Transactions -->
-                    <div class="mb-6">
-                        <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Plan & Transaction</h4>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-1">Status</div>
-                                @if($candidate->profile->is_fee_paid)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1 text-[10px]"></i> Active</span>
-                                @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-yellow-100 text-yellow-800"><i class="fas fa-clock mr-1 text-[10px]"></i> Pending</span>
-                                @endif
-                            </div>
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-1">Plan Details</div>
-                                <div class="text-sm font-bold text-gray-800">{{ $candidate->profile->plan_type ?? 'N/A' }}</div>
-                            </div>
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100 col-span-2 flex justify-between items-center">
-                                <div>
-                                    <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Transaction ID</div>
-                                    <div class="font-mono text-xs font-bold text-gray-600">{{ $candidate->profile->payment_id ?? 'No Transaction' }}</div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Paid On</div>
-                                    <div class="text-xs font-medium text-gray-600">{{ $candidate->profile->registration_completed_at ? $candidate->profile->registration_completed_at->format('M d, Y') : 'N/A' }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Documents -->
-                    <div class="mb-6">
-                        <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Documents</h4>
-                        <div class="flex flex-wrap gap-2">
-                            @if($candidate->profile->resume_path)
-                                <a href="{{ Storage::url($candidate->profile->resume_path) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 text-indigo-700 rounded-lg text-xs font-bold transition-colors">
-                                    <i class="fas fa-file-pdf"></i> Resume
-                                </a>
-                            @endif
-                            @if($candidate->profile->salary_slip_path)
-                                <a href="{{ Storage::url($candidate->profile->salary_slip_path) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 text-emerald-700 rounded-lg text-xs font-bold transition-colors">
-                                    <i class="fas fa-file-invoice-dollar"></i> Salary Slip
-                                </a>
-                            @endif
-                            @if($candidate->profile->offer_letter_path)
-                                <a href="{{ Storage::url($candidate->profile->offer_letter_path) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-purple-50 hover:bg-purple-100 border border-purple-100 text-purple-700 rounded-lg text-xs font-bold transition-colors">
-                                    <i class="fas fa-file-contract"></i> Offer Letter
-                                </a>
-                            @endif
-                            @if($candidate->profile->profile_photo_path)
-                                <a href="{{ Storage::url($candidate->profile->profile_photo_path) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-amber-50 hover:bg-amber-100 border border-amber-100 text-amber-700 rounded-lg text-xs font-bold transition-colors">
-                                    <i class="fas fa-image"></i> Profile Photo
-                                </a>
-                            @endif
-                            @if($candidate->profile->live_photo_path)
-                                <a href="{{ Storage::url($candidate->profile->live_photo_path) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-700 rounded-lg text-xs font-bold transition-colors">
-                                    <i class="fas fa-camera"></i> Live Photo
-                                </a>
-                            @endif
-                             @if($candidate->profile->agreement_pdf_path)
-                                 <a href="{{ Storage::url($candidate->profile->agreement_pdf_path) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-teal-50 hover:bg-teal-100 border border-teal-100 text-teal-700 rounded-lg text-xs font-bold transition-colors">
-                                     <i class="fas fa-file-signature"></i> Signed Agreement (PDF)
-                                 </a>
-                             @elseif($candidate->profile->is_agreement_signed)
-                                 <span class="inline-flex items-center gap-2 px-3 py-2 bg-teal-50 border border-teal-100 text-teal-700 rounded-lg text-xs font-bold">
-                                     <i class="fas fa-file-signature"></i> Signed Digitally ({{ $candidate->profile->signature_date_time ? $candidate->profile->signature_date_time->format('d M, Y') : 'Active' }})
-                                 </span>
-                             @endif
-                        </div>
-                    </div>
-
-                    <!-- Manual Agreement Upload -->
-                    <div class="mt-6 pt-6 border-t border-gray-100">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Agreement Status</h4>
-                            @if($candidate->profile->agreement_status === 'signed' || $candidate->profile->is_agreement_signed || $candidate->profile->agreement_pdf_path || $candidate->profile->signature_date_time)
-                                @if($candidate->profile->agreement_pdf_path)
-                                    <a href="{{ Storage::url($candidate->profile->agreement_pdf_path) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-200 hover:bg-green-100 transition-colors">
-                                        <i class="fas fa-check-circle"></i> Signed & Valid (PDF)
-                                    </a>
-                                @else
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-200">
-                                        <i class="fas fa-check-circle"></i> Signed (Digitally)
-                                    </span>
-                                @endif
-                            @elseif($candidate->profile->agreement_status === 'pending_signature')
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold border border-amber-200">
-                                    <i class="fas fa-hourglass-half"></i> Pending Signature
-                                </span>
-                            @else
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-50 text-gray-700 rounded-full text-xs font-bold border border-gray-200">
-                                    <i class="fas fa-ban"></i> Not Required
-                                </span>
-                            @endif
-                        </div>
-
-                        <!-- Update Agreement Status Form -->
-                        <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST" class="mb-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            @csrf
-                            <label class="block text-xs font-bold text-gray-700">Change Status:</label>
-                            <div class="flex items-center gap-2">
-                                <select name="agreement_status" class="text-xs bg-gray-50 border-gray-200 rounded-lg py-1.5 px-3 focus:ring-indigo-500 focus:border-indigo-500">
-                                    <option value="not_required" {{ $candidate->profile->agreement_status === 'not_required' ? 'selected' : '' }}>Not Required</option>
-                                    <option value="pending_signature" {{ $candidate->profile->agreement_status === 'pending_signature' ? 'selected' : '' }}>Pending Signature</option>
-                                    <option value="signed" {{ $candidate->profile->agreement_status === 'signed' ? 'selected' : '' }}>Signed</option>
-                                </select>
-                                <button type="submit" class="px-3 py-1.5 bg-gray-800 text-white rounded-lg text-xs font-bold hover:bg-gray-700 transition-colors">
-                                    Update
-                                </button>
-                            </div>
-                        </form>
-
-                        <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST" class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-4">
-                            @csrf
-                            <input type="hidden" name="agreement_status" value="pending_signature">
-                            <label class="block text-xs font-bold text-gray-700 mb-2">Generate & Send Standard Agreement</label>
-                            <p class="text-[10px] text-gray-500 mb-3">Proceed to send the standard formatted agreement. The candidate will see it in their portal to sign.</p>
-                            <div class="flex flex-col sm:flex-row gap-3">
-                                <button type="submit" class="shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-2">
-                                    <i class="fas fa-paper-plane"></i> Proceed & Send to Candidate
-                                </button>
-                            </div>
-                        </form>
-
-                        <form action="{{ route('admin.crm.candidate.upload-agreement', $candidate->id) }}" method="POST" enctype="multipart/form-data" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                            @csrf
-                            <label class="block text-xs font-bold text-gray-700 mb-2">Or Manually Upload Custom Agreement (PDF)</label>
-                            <div class="flex flex-col sm:flex-row gap-3">
-                                <input type="file" name="agreement_pdf" accept="application/pdf" required class="flex-1 block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer">
-                                <button type="submit" class="shrink-0 px-4 py-2 bg-gray-800 text-white rounded-lg text-xs font-bold hover:bg-gray-900 transition-colors shadow-sm">
-                                    Upload & Send
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Verification -->
-                    <div class="mt-6 pt-6 border-t border-gray-100">
-                        <form action="{{ route('admin.crm.candidate.verify', $candidate->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="w-full px-4 py-3 {{ $candidate->profile->is_verified ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100' : 'bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100' }} rounded-xl text-sm font-bold transition-colors shadow-sm flex items-center justify-center gap-2">
-                                @if($candidate->profile->is_verified)
-                                    <i class="fas fa-times-circle"></i> Revoke Verification Badge
-                                @else
-                                    <i class="fas fa-check-circle"></i> Verify & Award Badge
-                                @endif
-                            </button>
-                        </form>
-                    </div>
-                @elseif($candidate->role === 'parent')
-                    <div class="mb-6">
-                        <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Parent Details</h4>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Address</div>
-                                <div class="text-sm font-medium text-gray-800">{{ $candidate->parentProfile->address ?? 'N/A' }}</div>
-                            </div>
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">City</div>
-                                <div class="text-sm font-medium text-gray-800">{{ $candidate->parentProfile->city ?? 'N/A' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                @elseif($candidate->role === 'candidate')
-                    <div class="py-10 flex flex-col items-center justify-center text-gray-500">
-                        <i class="fas fa-user-slash text-4xl mb-3 text-gray-300"></i>
-                        <p class="font-medium text-sm">No profile data available yet.</p>
-                        <p class="text-xs text-gray-400 mt-1">Candidate has not completed their profile setup.</p>
-                    </div>
-                @endif
-            </div>
+{{-- Top Readiness & Agreement Status Strip --}}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    {{-- School Jobs Readiness --}}
+    <div class="bg-card-bg border {{ $isJobReady ? 'border-indigo-500/40 bg-indigo-50/10' : 'border-amber-500/40 bg-amber-50/10' }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl {{ $isJobReady ? 'bg-indigo-500/10 text-indigo-600' : 'bg-amber-500/10 text-amber-600' }} flex items-center justify-center font-bold text-lg shrink-0">
+            <i class="fas fa-school"></i>
         </div>
-
-        <!-- Job Applications -->
-        @if($candidate->role === 'candidate')
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex flex-col gap-3 mb-4">
-                    <h3 class="text-lg font-bold text-gray-900">Job Applications</h3>
-                    <form action="{{ route('admin.crm.application.assign', $candidate->id) }}" method="POST" class="flex flex-col gap-2 w-full">
-                        @csrf
-                        <select name="job_post_id" required class="text-sm rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full">
-                            <option value="">-- Assign a Job to Candidate --</option>
-                            @foreach($availableJobs as $job)
-                                <option value="{{ $job->id }}">{{ $job->title }} ({{ $job->school_name }})</option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="px-3 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition shadow-sm w-full text-center">Assign Job</button>
-                    </form>
-                </div>
-                @forelse($candidate->applications as $app)
-                    <div class="mb-4 pb-4 border-b border-gray-100 last:border-0 last:mb-0 last:pb-0">
-                        <div class="font-semibold text-gray-800">{{ $app->jobPost->title }}</div>
-                        <div class="text-xs text-gray-500 mb-1">{{ $app->jobPost->school_name }}</div>
-                            <div class="mt-3">
-                                <form action="{{ route('admin.applications.status.update', $app->id) }}" method="POST" class="space-y-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                    @csrf
-                                    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                                        <label class="text-xs font-bold text-gray-700 shrink-0">Status:</label>
-                                        <select name="status" class="text-xs font-bold px-2 py-1.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 cursor-pointer w-full">
-                                            <option value="applied" {{ $app->status === 'applied' ? 'selected' : '' }}>Applied</option>
-                                            <option value="shortlisted" {{ $app->status === 'shortlisted' ? 'selected' : '' }}>Shortlisted (Schedule Interview)</option>
-                                            <option value="hired" {{ $app->status === 'hired' ? 'selected' : '' }}>Hired</option>
-                                            <option value="rejected" {{ $app->status === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        <div>
-                                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Interview Date (If Shortlisted)</label>
-                                            <input type="datetime-local" name="interview_date" value="{{ $app->interview_date }}" class="w-full text-xs rounded-lg border-gray-300 shadow-sm px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500">
-                                        </div>
-                                        <div>
-                                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Interview Link / Location</label>
-                                            <input type="text" name="interview_link" value="{{ $app->interview_link }}" placeholder="e.g. Zoom Link or Address" class="w-full text-xs rounded-lg border-gray-300 shadow-sm px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500">
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Remarks (Visible to Candidate)</label>
-                                        <textarea name="remarks" rows="2" class="w-full text-xs rounded-lg border-gray-300 shadow-sm px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500" placeholder="Add feedback or updates here...">{{ $app->remarks }}</textarea>
-                                    </div>
-
-                                    <div class="flex flex-col sm:flex-row justify-end gap-2 sm:items-center w-full">
-                                        @if($app->status === 'hired')
-                                            @if(!$app->invoice)
-                                                <button type="button" onclick="prepareInvoice({{ $app->id }})" class="w-full sm:w-auto text-xs px-3 py-2 sm:py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-bold transition-colors shadow-sm text-center">
-                                                    <i class="fas fa-file-invoice-dollar mr-1"></i> Generate Invoice
-                                                </button>
-                                            @else
-                                                <span class="w-full sm:w-auto text-center text-xs px-3 py-2 sm:py-1.5 bg-gray-100 text-green-700 font-bold rounded-lg border border-green-200">
-                                                    <i class="fas fa-check-circle mr-1"></i> Invoiced
-                                                </span>
-                                            @endif
-                                        @endif
-                                        
-                                        <button type="submit" class="w-full sm:w-auto text-center text-xs px-4 py-2 sm:py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold transition-colors shadow-sm whitespace-nowrap">
-                                            Save Updates
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                    </div>
-                @empty
-                    <p class="text-sm text-gray-500">No applications found.</p>
-                @endforelse
-            </div>
+        <div>
+            <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider">School Hiring Readiness</p>
+            <h4 class="text-sm font-black {{ $isJobReady ? 'text-indigo-600' : 'text-amber-600' }}">
+                {{ $isJobReady ? 'Ready for Schools' : 'Incomplete Profile' }}
+            </h4>
         </div>
-
-        <!-- Candidate Rating System -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-900">Admin Ratings</h3>
-                    @if($rating)
-                        <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded"><i class="fas fa-star text-yellow-500 mr-1"></i> {{ number_format($rating->overall_rating, 1) }} Overall</span>
-                    @endif
-                </div>
-
-                <form action="{{ route('admin.crm.candidate.rate', $candidate->id) }}" method="POST" class="space-y-4">
-                    @csrf
-                    @php
-                        $params = [
-                            'communication' => 'Communication Skills',
-                            'subject_knowledge' => 'Subject Knowledge',
-                            'demo_performance' => 'Demo Performance',
-                            'english_fluency' => 'English Fluency',
-                            'discipline' => 'Professionalism & Discipline'
-                        ];
-                    @endphp
-
-                    @foreach($params as $key => $label)
-                    <div class="flex items-center justify-between">
-                        <label class="text-sm font-medium text-gray-700">{{ $label }}</label>
-                        <select name="{{ $key }}" class="rounded-md border-gray-300 shadow-sm text-sm p-1 w-24">
-                            @for($i=1; $i<=5; $i++)
-                                <option value="{{ $i }}" {{ ($rating && $rating->$key == $i) ? 'selected' : ($i==3 ? 'selected' : '') }}>{{ $i }} Stars</option>
-                            @endfor
-                        </select>
-                    </div>
-                    @endforeach
-
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Remarks</label>
-                        <textarea name="remarks" rows="2" class="w-full rounded-md border-gray-300 shadow-sm text-sm">{{ $rating->remarks ?? '' }}</textarea>
-                    </div>
-
-                    <button type="submit" class="w-full bg-gray-800 text-white px-4 py-2 rounded text-sm font-bold hover:bg-gray-900 transition-colors">
-                        Save Ratings
-                    </button>
-                </form>
-            </div>
-        </div>
-        @endif
     </div>
 
-    <!-- Right Column: CRM Follow-ups & Invoices -->
-    <div class="lg:col-span-2 space-y-6 min-w-0">
-        
-        <!-- Alerts -->
-        @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
-        @if($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                <ul class="list-disc pl-5">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    {{-- Home Tuitions Readiness --}}
+    <div class="bg-card-bg border {{ $isTuitionReady ? 'border-emerald-500/40 bg-emerald-50/10' : 'border-amber-500/40 bg-amber-50/10' }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl {{ $isTuitionReady ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600' }} flex items-center justify-center font-bold text-lg shrink-0">
+            <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+        <div>
+            <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider">Home Tuition Readiness</p>
+            <h4 class="text-sm font-black {{ $isTuitionReady ? 'text-emerald-600' : 'text-amber-600' }}">
+                {{ $isTuitionReady ? 'Ready for Tuitions' : 'Missing Basic Details' }}
+            </h4>
+        </div>
+    </div>
 
-        <!-- Parent Tuitions or Service Charge Invoices -->
-        @if($candidate->role === 'parent')
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Home Tuition Requirements</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm text-left">
-                            <thead class="text-xs text-gray-500 uppercase bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-3 font-bold">Class & Subjects</th>
-                                    <th class="px-4 py-3 font-bold">Location</th>
-                                    <th class="px-4 py-3 font-bold">Status</th>
-                                    <th class="px-4 py-3 font-bold">Date Posted</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                @forelse($tuitions as $tuition)
-                                    <tr class="hover:bg-gray-50 transition-colors">
-                                        <td class="px-4 py-3">
-                                            <div class="font-bold text-gray-900">{{ $tuition->class }}</div>
-                                            <div class="text-gray-500 text-xs">{{ $tuition->subjects }}</div>
-                                        </td>
-                                        <td class="px-4 py-3 text-gray-600">{{ $tuition->location }}</td>
-                                        <td class="px-4 py-3">
-                                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold
-                                                {{ $tuition->status === 'Confirmed' ? 'bg-green-100 text-green-700' : '' }}
-                                                {{ in_array($tuition->status, ['New Lead', 'Pending']) ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                {{ in_array($tuition->status, ['Demo Scheduled', 'Demo Completed']) ? 'bg-blue-100 text-blue-700' : '' }}
-                                                {{ $tuition->status === 'Cancelled' ? 'bg-red-100 text-red-700' : '' }}
-                                            ">
-                                                {{ $tuition->status }}
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-gray-500">{{ $tuition->created_at->format('M d, Y') }}</td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="px-4 py-8 text-center text-gray-500">
-                                            No tuition requirements posted yet.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+    {{-- School Job Agreement --}}
+    <div class="bg-card-bg border {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'border-blue-500/40 bg-blue-50/10' : 'border-red-500/40 bg-red-50/10' }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'bg-blue-500/10 text-blue-600' : 'bg-red-500/10 text-red-500' }} flex items-center justify-center font-bold text-lg shrink-0">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <div>
+            <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider">Job Service Agreement</p>
+            <h4 class="text-sm font-black {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'text-blue-600' : 'text-red-500' }}">
+                {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'Agreement Signed' : 'Pending Signature' }}
+            </h4>
+        </div>
+    </div>
+
+    {{-- Tuition Agreement --}}
+    <div class="bg-card-bg border {{ $profile?->is_tuition_agreement_signed ? 'border-teal-500/40 bg-teal-50/10' : 'border-red-500/40 bg-red-50/10' }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl {{ $profile?->is_tuition_agreement_signed ? 'bg-teal-500/10 text-teal-600' : 'bg-red-500/10 text-red-500' }} flex items-center justify-center font-bold text-lg shrink-0">
+            <i class="fas fa-file-signature"></i>
+        </div>
+        <div>
+            <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider">Tuition Agreement</p>
+            <h4 class="text-sm font-black {{ $profile?->is_tuition_agreement_signed ? 'text-teal-600' : 'text-red-500' }}">
+                {{ $profile?->is_tuition_agreement_signed ? 'Tuition Signed' : 'Pending Signature' }}
+            </h4>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Left Column: Profile Card & Documents -->
+    <div class="lg:col-span-1 space-y-6">
+        <!-- Candidate Profile Card -->
+        <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden">
+            <!-- Header Header with Photo -->
+            <div class="p-6 border-b border-card-border bg-secondary-bg flex items-center gap-4">
+                @if($profile && $profile->profile_photo_path)
+                    <img src="{{ Storage::url($profile->profile_photo_path) }}" alt="{{ $candidate->name }}" class="w-16 h-16 rounded-2xl object-cover border-2 border-accent-blue/30 shadow-sm shrink-0">
+                @elseif($profile && $profile->live_photo_path)
+                    <img src="{{ Storage::url($profile->live_photo_path) }}" alt="{{ $candidate->name }}" class="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-500/30 shadow-sm shrink-0">
+                @else
+                    <div class="w-16 h-16 rounded-2xl bg-accent-blue/10 text-accent-blue flex items-center justify-center text-2xl font-black border border-accent-blue/20 shrink-0">
+                        {{ strtoupper(substr($candidate->name, 0, 1)) }}
+                    </div>
+                @endif
+                <div class="min-w-0">
+                    <h3 class="text-lg font-black text-text-main truncate">{{ $candidate->name }}</h3>
+                    <p class="text-xs text-text-dark/60 mt-0.5 flex items-center gap-1.5"><i class="fas fa-phone-alt text-[10px]"></i> {{ $candidate->phone }}</p>
+                    <p class="text-xs text-text-dark/60 mt-0.5 flex items-center gap-1.5 truncate"><i class="fas fa-envelope text-[10px]"></i> {{ $candidate->email }}</p>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <!-- Personal Info -->
+                <div>
+                    <h4 class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-2.5">Personal Info</h4>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block">Gender</span>
+                            <span class="font-bold text-text-main">{{ $profile?->gender ?? 'N/A' }}</span>
+                        </div>
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block">Date of Birth</span>
+                            <span class="font-bold text-text-main">{{ $profile?->date_of_birth ? $profile->date_of_birth->format('d M Y') : 'N/A' }}</span>
+                        </div>
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border col-span-2">
+                            <span class="text-[10px] text-text-dark/50 block">Address</span>
+                            <span class="font-medium text-text-main">{{ $profile?->address ?? 'N/A' }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @else
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-900">Service Charge Invoices</h3>
+
+                <!-- Professional Info -->
+                <div>
+                    <h4 class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-2.5">Education & Teaching Profile</h4>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block">Qualification</span>
+                            <span class="font-bold text-text-main">{{ $profile?->highestQualification?->name ?? 'N/A' }}</span>
+                        </div>
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block">Subject</span>
+                            <span class="font-bold text-accent-blue">{{ $profile?->subject?->name ?? 'N/A' }}</span>
+                        </div>
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block">School Category</span>
+                            <span class="font-bold text-text-main">{{ $profile?->category?->name ?? 'None' }}</span>
+                        </div>
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block">Experience</span>
+                            <span class="font-bold text-text-main">{{ $profile?->experience_years ?? 0 }} Years</span>
+                        </div>
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block">Current Salary</span>
+                            <span class="font-bold text-text-main">{{ $profile?->current_salary ? '₹'.$profile->current_salary : 'N/A' }}</span>
+                        </div>
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block">Expected Salary</span>
+                            <span class="font-bold text-emerald-600">{{ $profile?->expected_salary ? '₹'.$profile->expected_salary : 'N/A' }}</span>
+                        </div>
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border col-span-2">
+                            <span class="text-[10px] text-text-dark/50 block">Preferred Location</span>
+                            <span class="font-bold text-text-main">{{ $profile?->preferredCity?->name ?? 'N/A' }}, {{ $profile?->preferredState?->name ?? '' }}</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="overflow-x-auto mb-6">
-                    <table class="min-w-full bg-white border border-gray-200 text-sm">
-                        <thead class="bg-gray-50 text-gray-500">
-                            <tr>
-                                <th class="py-2 px-4 text-left font-medium">Job Role</th>
-                                <th class="py-2 px-4 text-left font-medium">Amount</th>
-                                <th class="py-2 px-4 text-left font-medium">Late Fee</th>
-                                <th class="py-2 px-4 text-left font-medium">Due Date</th>
-                                <th class="py-2 px-4 text-left font-medium">Status</th>
-                                <th class="py-2 px-4 text-left font-medium">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @forelse($invoices as $invoice)
-                            <tr>
-                                <td class="py-2 px-4">{{ $invoice->jobApplication->jobPost->title }}</td>
-                                <td class="py-2 px-4">₹{{ number_format($invoice->amount, 2) }}</td>
-                                <td class="py-2 px-4 text-red-600">₹{{ number_format($invoice->late_fee, 2) }}</td>
-                                <td class="py-2 px-4">{{ \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') }}</td>
-                                <td class="py-2 px-4">
-                                    <span class="px-2 py-1 rounded text-xs font-bold 
-                                        {{ $invoice->status === 'paid' ? 'bg-green-100 text-green-800' : ($invoice->status === 'overdue' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">
-                                        {{ ucfirst($invoice->status) }}
-                                    </span>
-                                </td>
-                                <td class="py-2 px-4 space-y-2">
-                                    @if($invoice->status !== 'paid')
-                                    <form action="{{ route('admin.crm.invoice.update', $invoice->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('PUT')
-                                        <input type="hidden" name="status" value="paid">
-                                        <button type="submit" class="text-xs text-green-600 hover:text-green-900 font-bold" onclick="return confirm('Mark this invoice as Paid?')">Mark Paid</button>
-                                    </form>
-                                    
-                                    @if($invoice->late_fee > 0)
-                                    <div class="mt-2 border-t border-gray-100 pt-2">
-                                        <form action="{{ route('admin.crm.invoice.adjust', $invoice->id) }}" method="POST" class="flex items-center gap-2">
-                                            @csrf
-                                            <input type="number" name="deduction" max="{{ $invoice->late_fee }}" min="1" required placeholder="Amt" class="w-16 rounded-md border-gray-300 shadow-sm text-xs py-1 px-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <button type="submit" class="text-xs text-blue-600 hover:text-blue-900 font-bold bg-blue-50 px-2 py-1 rounded">Waive</button>
-                                        </form>
-                                    </div>
-                                    @endif
-
-                                    @else
-                                        <span class="text-xs text-gray-400">Settled</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="6" class="py-4 text-center text-gray-500">No invoices generated yet.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                <!-- Documents -->
+                <div>
+                    <h4 class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-2.5">Uploaded Documents</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        @if($profile?->resume_path)
+                            <a href="{{ Storage::url($profile->resume_path) }}" target="_blank" class="p-2.5 bg-blue-50/50 hover:bg-blue-100/60 border border-blue-200 text-accent-blue rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                                <i class="fas fa-file-pdf text-sm"></i> <span>Resume</span>
+                            </a>
+                        @endif
+                        @if($profile?->profile_photo_path)
+                            <a href="{{ Storage::url($profile->profile_photo_path) }}" target="_blank" class="p-2.5 bg-purple-50/50 hover:bg-purple-100/60 border border-purple-200 text-purple-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                                <i class="fas fa-image text-sm"></i> <span>Photo</span>
+                            </a>
+                        @endif
+                        @if($profile?->live_photo_path)
+                            <a href="{{ Storage::url($profile->live_photo_path) }}" target="_blank" class="p-2.5 bg-emerald-50/50 hover:bg-emerald-100/60 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                                <i class="fas fa-id-card text-sm"></i> <span>ID Card</span>
+                            </a>
+                        @endif
+                        @if($profile?->salary_slip_path)
+                            <a href="{{ Storage::url($profile->salary_slip_path) }}" target="_blank" class="p-2.5 bg-amber-50/50 hover:bg-amber-100/60 border border-amber-200 text-amber-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                                <i class="fas fa-file-invoice text-sm"></i> <span>Salary Slip</span>
+                            </a>
+                        @endif
+                        @if($profile?->offer_letter_path)
+                            <a href="{{ Storage::url($profile->offer_letter_path) }}" target="_blank" class="p-2.5 bg-sky-50/50 hover:bg-sky-100/60 border border-sky-200 text-sky-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                                <i class="fas fa-file-contract text-sm"></i> <span>Offer Letter</span>
+                            </a>
+                        @endif
+                        @if($profile?->agreement_pdf_path)
+                            <a href="{{ Storage::url($profile->agreement_pdf_path) }}" target="_blank" class="p-2.5 bg-teal-50/50 hover:bg-teal-100/60 border border-teal-200 text-teal-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2 col-span-2">
+                                <i class="fas fa-file-signature text-sm"></i> <span>Signed Agreement (PDF)</span>
+                            </a>
+                        @endif
+                    </div>
                 </div>
 
-                <!-- Generate Invoice Form -->
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mt-4">
-                    <h4 class="font-bold text-sm text-gray-800 mb-3">Generate New Invoice</h4>
-                    <form action="{{ route('admin.crm.invoice.store', $candidate->id) }}" method="POST" class="flex flex-wrap gap-4 items-end">
-                        @csrf
-                        
-                        @if($errors->any())
-                            <div class="w-full bg-red-100 text-red-700 p-2 rounded text-xs mb-2">
-                                <ul>
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
+                <!-- Agreement Management Section -->
+                <div class="pt-4 border-t border-card-border space-y-4">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-text-main flex items-center gap-2">
+                        <i class="fas fa-file-signature text-accent-blue"></i> Agreements & Signing Control
+                    </h4>
+
+                    {{-- 1. School Job Placement Agreement Control --}}
+                    <div class="bg-secondary-bg p-4 rounded-2xl border border-card-border space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-text-main">School Job Agreement:</span>
+                            @if($profile?->is_agreement_signed || $profile?->agreement_pdf_path)
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <i class="fas fa-check-circle mr-0.5"></i> Signed & Valid
+                                </span>
+                            @elseif($profile?->agreement_status === 'pending_signature')
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                                    <i class="fas fa-hourglass-half mr-0.5"></i> Active on Candidate Panel
+                                </span>
+                            @else
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-card-border/50 text-text-dark/60 border border-card-border">
+                                    <i class="fas fa-ban mr-0.5"></i> Inactive / Not Sent
+                                </span>
+                            @endif
+                        </div>
+
+                        {{-- 1-Click Send / Activate Agreement Button for Candidate --}}
+                        @if(!$profile?->is_agreement_signed && $profile?->agreement_status !== 'pending_signature')
+                            <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="agreement_status" value="pending_signature">
+                                <button type="submit" class="w-full py-2.5 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+                                    <i class="fas fa-paper-plane"></i> <span>Activate Agreement on Candidate Panel</span>
+                                </button>
+                                <p class="text-[10px] text-text-dark/50 mt-1.5 leading-tight">Enables the "Sign Now" digital signature banner in candidate dashboard.</p>
+                            </form>
+                        @elseif($profile?->agreement_status === 'pending_signature')
+                            <div class="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-800 space-y-2">
+                                <p class="font-bold flex items-center gap-1.5"><i class="fas fa-bell"></i> Agreement is LIVE on candidate portal</p>
+                                <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="agreement_status" value="signed">
+                                    <button type="submit" class="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+                                        <i class="fas fa-check-double mr-1"></i> Force Mark as Signed & Approved
+                                    </button>
+                                </form>
                             </div>
                         @endif
 
-                        <div class="w-full md:w-auto flex-1">
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Select Job Application</label>
-                            <select name="job_application_id" id="job_application_id" class="w-full rounded-lg border-gray-300 shadow-sm text-sm py-2.5 px-3 focus:ring-blue-500 focus:border-blue-500" required>
-                                <option value="">-- Select Application --</option>
-                                @foreach($candidate->applications->where('status', '!=', 'rejected') as $app)
-                                    <option value="{{ $app->id }}">{{ $app->jobPost->title }} ({{ $app->jobPost->school_name }}) - {{ ucfirst($app->status) }}</option>
-                                @endforeach
-                            </select>
+                        {{-- Status Selector Dropdown --}}
+                        <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST" class="pt-2 border-t border-card-border flex items-center justify-between gap-2">
+                            @csrf
+                            <label class="text-[11px] font-bold text-text-dark/70">Change Status:</label>
+                            <div class="flex items-center gap-1.5">
+                                <select name="agreement_status" class="text-xs bg-card-bg border border-card-border rounded-lg py-1 px-2 text-text-main font-semibold focus:ring-1 focus:ring-accent-blue">
+                                    <option value="not_required" {{ $profile?->agreement_status === 'not_required' ? 'selected' : '' }}>Not Required</option>
+                                    <option value="pending_signature" {{ $profile?->agreement_status === 'pending_signature' ? 'selected' : '' }}>Pending Signature</option>
+                                    <option value="signed" {{ ($profile?->agreement_status === 'signed' || $profile?->is_agreement_signed) ? 'selected' : '' }}>Signed</option>
+                                </select>
+                                <button type="submit" class="px-2.5 py-1 bg-text-main hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors">
+                                    Set
+                                </button>
+                            </div>
+                        </form>
+
+                        {{-- Upload Signed Agreement PDF --}}
+                        <form action="{{ route('admin.crm.candidate.upload-agreement', $candidate->id) }}" method="POST" enctype="multipart/form-data" class="pt-2 border-t border-card-border">
+                            @csrf
+                            <label class="block text-[11px] font-bold text-text-dark/70 mb-1.5">Or Upload Physical Signed Copy (PDF):</label>
+                            <div class="flex items-center gap-2">
+                                <input type="file" name="agreement_pdf" accept=".pdf" required class="flex-1 text-[11px] text-text-dark/60 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-card-bg file:text-text-main cursor-pointer">
+                                <button type="submit" class="px-3 py-1 bg-secondary-bg hover:bg-card-bg border border-card-border text-text-main rounded-lg text-xs font-bold transition-colors">
+                                    Upload
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {{-- 2. Home Tuition Agreement Control --}}
+                    <div class="bg-secondary-bg p-4 rounded-2xl border border-card-border space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-text-main">Home Tuition Agreement:</span>
+                            @if($profile?->is_tuition_agreement_signed)
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
+                                    <i class="fas fa-check-circle mr-0.5"></i> Signed & Valid
+                                </span>
+                            @else
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-card-border/50 text-text-dark/60 border border-card-border">
+                                    <i class="fas fa-clock mr-0.5"></i> Pending
+                                </span>
+                            @endif
                         </div>
-                        <div class="w-24">
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Amount (₹)</label>
-                            <input type="number" name="amount" class="w-full rounded-lg border-gray-300 shadow-sm text-sm py-2.5 px-3 focus:ring-blue-500 focus:border-blue-500" required min="0">
-                        </div>
-                        <div class="w-36">
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Due Date</label>
-                            <input type="date" name="due_date" class="w-full rounded-lg border-gray-300 shadow-sm text-sm py-2.5 px-3 focus:ring-blue-500 focus:border-blue-500" required>
-                        </div>
-                        <div>
-                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
-                                Create Invoice
-                            </button>
-                        </div>
-                    </form>
+
+                        <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                            @csrf
+                            @if($profile?->is_tuition_agreement_signed)
+                                <input type="hidden" name="is_tuition_agreement_signed" value="0">
+                                <button type="submit" class="w-full py-2 px-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+                                    <i class="fas fa-ban"></i> <span>Revoke Tuition Agreement</span>
+                                </button>
+                            @else
+                                <input type="hidden" name="is_tuition_agreement_signed" value="1">
+                                <button type="submit" class="w-full py-2.5 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+                                    <i class="fas fa-check-circle"></i> <span>Activate / Approve Tuition Agreement</span>
+                                </button>
+                            @endif
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-        @endif
+    </div>
 
-        <!-- Follow-ups -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Follow-ups & Notes</h3>
-                
-                <!-- Add Follow-up Form -->
-                <form action="{{ route('admin.crm.followup.store', $candidate->id) }}" method="POST" class="mb-6 bg-gray-50 p-4 rounded border border-gray-200">
+    <!-- Right Column: Tabs for Jobs, Tuitions, Invoices, CRM Followups, and Ratings -->
+    <div class="lg:col-span-2 space-y-6" x-data="{ tab: 'jobs' }">
+        <!-- Tab Navigation -->
+        <div class="bg-card-bg border border-card-border rounded-2xl p-1.5 flex gap-1 shadow-sm overflow-x-auto">
+            <button @click="tab = 'jobs'" :class="tab === 'jobs' ? 'bg-accent-blue text-white shadow-sm' : 'text-text-dark/60 hover:text-text-main'" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
+                <i class="fas fa-school"></i> <span>School Jobs ({{ $candidate->applications->count() }})</span>
+            </button>
+            <button @click="tab = 'tuitions'" :class="tab === 'tuitions' ? 'bg-accent-blue text-white shadow-sm' : 'text-text-dark/60 hover:text-text-main'" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
+                <i class="fas fa-chalkboard-teacher"></i> <span>Home Tuitions ({{ $tuitionApplications->count() }})</span>
+            </button>
+            <button @click="tab = 'invoices'" :class="tab === 'invoices' ? 'bg-accent-blue text-white shadow-sm' : 'text-text-dark/60 hover:text-text-main'" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
+                <i class="fas fa-file-invoice-dollar"></i> <span>Invoices ({{ $invoices->count() }})</span>
+            </button>
+            <button @click="tab = 'followups'" :class="tab === 'followups' ? 'bg-accent-blue text-white shadow-sm' : 'text-text-dark/60 hover:text-text-main'" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
+                <i class="fas fa-comments"></i> <span>Follow-ups ({{ $followUps->count() }})</span>
+            </button>
+            <button @click="tab = 'timeline'" :class="tab === 'timeline' ? 'bg-accent-blue text-white shadow-sm' : 'text-text-dark/60 hover:text-text-main'" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
+                <i class="fas fa-history"></i> <span>Timeline</span>
+            </button>
+        </div>
+
+        <!-- TAB 1: SCHOOL JOBS -->
+        <div x-show="tab === 'jobs'" class="space-y-6">
+            <!-- Assign Job Form -->
+            <div class="bg-card-bg rounded-2xl border border-card-border p-5 shadow-sm">
+                <h4 class="text-sm font-black text-text-main mb-3 flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-accent-blue"></i> Map & Assign School Teaching Job
+                </h4>
+                <form action="{{ route('admin.crm.application.assign', $candidate->id) }}" method="POST" class="flex flex-col sm:flex-row gap-3">
                     @csrf
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes / Call Summary</label>
-                        <textarea name="notes" rows="2" class="w-full rounded-lg border-gray-300 shadow-sm text-sm py-2.5 px-3 focus:ring-blue-500 focus:border-blue-500" required placeholder="What was discussed?"></textarea>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="flex-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Next Follow-up Date</label>
-                            <input type="date" name="follow_up_date" class="w-full rounded-lg border-gray-300 shadow-sm text-sm py-2.5 px-3 focus:ring-blue-500 focus:border-blue-500">
+                    <select name="job_post_id" required class="flex-1 bg-secondary-bg border border-card-border rounded-xl text-xs py-2.5 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                        <option value="">-- Select Active School Job --</option>
+                        @foreach($availableJobs as $job)
+                            <option value="{{ $job->id }}">{{ $job->title }} — {{ $job->school_name }} ({{ $job->city->name ?? '' }})</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="px-5 py-2.5 bg-accent-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm shrink-0">
+                        Assign Job
+                    </button>
+                </form>
+            </div>
+
+            <!-- Job Applications List -->
+            <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-card-border bg-secondary-bg flex justify-between items-center">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-text-main">Applied & Mapped School Jobs</h4>
+                    <span class="text-xs font-bold text-text-dark/50">{{ $candidate->applications->count() }} Total</span>
+                </div>
+
+                <div class="divide-y divide-card-border">
+                    @forelse($candidate->applications as $app)
+                        <div class="p-5 space-y-4">
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                                <div>
+                                    <h5 class="text-sm font-black text-text-main">{{ $app->jobPost->title ?? 'N/A' }}</h5>
+                                    <p class="text-xs text-text-dark/60">{{ $app->jobPost->school_name ?? 'School' }} • {{ $app->jobPost->city->name ?? '' }}</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full 
+                                        {{ $app->status === 'hired' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($app->status === 'shortlisted' ? 'bg-amber-50 text-amber-700 border border-amber-200' : ($app->status === 'rejected' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-blue-50 text-accent-blue border border-blue-200')) }}">
+                                        {{ ucfirst($app->status) }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Update Application Status Form -->
+                            <form action="{{ route('admin.applications.status.update', $app->id) }}" method="POST" class="bg-secondary-bg p-4 rounded-xl border border-card-border space-y-3">
+                                @csrf
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Status</label>
+                                        <select name="status" class="w-full bg-card-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                                            <option value="applied" {{ $app->status === 'applied' ? 'selected' : '' }}>Applied (New)</option>
+                                            <option value="shortlisted" {{ $app->status === 'shortlisted' ? 'selected' : '' }}>Shortlisted (Schedule Interview)</option>
+                                            <option value="hired" {{ $app->status === 'hired' ? 'selected' : '' }}>Hired (Selected)</option>
+                                            <option value="rejected" {{ $app->status === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Interview Date</label>
+                                        <input type="datetime-local" name="interview_date" value="{{ $app->interview_date }}" 
+                                               class="w-full bg-card-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Interview Location / Link</label>
+                                        <input type="text" name="interview_link" value="{{ $app->interview_link }}" placeholder="e.g. Zoom link / School Campus" 
+                                               class="w-full bg-card-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Feedback / Notes (Visible to Candidate)</label>
+                                    <input type="text" name="remarks" value="{{ $app->remarks }}" placeholder="e.g. Interview scheduled for 11 AM..." 
+                                           class="w-full bg-card-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                                </div>
+
+                                <div class="flex justify-end items-center gap-2 pt-1">
+                                    <button type="submit" class="px-4 py-2 bg-text-main hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="flex-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                            <select name="status" class="w-full rounded-lg border-gray-300 shadow-sm text-sm py-2.5 px-3 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="open">Open (Needs Action)</option>
-                                <option value="closed">Closed (Resolved)</option>
+                    @empty
+                        <div class="p-8 text-center text-text-dark/50 text-xs">
+                            <i class="fas fa-briefcase text-2xl mb-2 block text-text-dark/30"></i>
+                            No school job applications recorded yet.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: HOME TUITIONS -->
+        <div x-show="tab === 'tuitions'" class="space-y-6" style="display: none;">
+            <!-- Direct Assign Tuition Form -->
+            <div class="bg-card-bg rounded-2xl border border-card-border p-5 shadow-sm">
+                <h4 class="text-sm font-black text-text-main mb-3 flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-emerald-600"></i> Assign Home Tuition to Candidate
+                </h4>
+                <form action="{{ route('admin.crm.tuition.assign', $candidate->id) }}" method="POST" class="space-y-3">
+                    @csrf
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Select Home Tuition Requirement <span class="text-red-500">*</span></label>
+                            <select name="home_tuition_lead_id" required class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2.5 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                                <option value="">-- Choose Home Tuition Lead --</option>
+                                @foreach($availableTuitionLeads as $tLead)
+                                    <option value="{{ $tLead->id }}">
+                                        Class {{ $tLead->class }} ({{ $tLead->subjects }}) — {{ $tLead->location }} [Parent: {{ $tLead->parent_name }} - {{ $tLead->parent_mobile }}]
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Assignment Status</label>
+                            <select name="status" class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2.5 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                                <option value="Assigned">Assigned & Confirmed (Direct Placement)</option>
+                                <option value="Shortlisted">Shortlisted (Demo Trial)</option>
+                                <option value="Applied">Applied (Under Review)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Demo / Start Date</label>
+                            <input type="date" name="demo_date" value="{{ date('Y-m-d') }}" 
+                                   class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2.5 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Teacher Instructions / Notes</label>
+                            <input type="text" name="remarks" placeholder="e.g. 5 days/week demo starting Monday, 5 PM" 
+                                   class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                        </div>
+
+                        <div class="sm:col-span-2 bg-emerald-50/20 p-3 rounded-xl border border-emerald-200">
+                            <label class="flex items-center gap-2 cursor-pointer mb-2">
+                                <input type="checkbox" name="create_service_charge" value="1" checked class="w-4 h-4 text-emerald-600 rounded">
+                                <span class="text-xs font-bold text-text-main">Generate Tuition Service Charge Invoice</span>
+                            </label>
+                            <div class="flex items-center gap-3">
+                                <div class="w-36">
+                                    <input type="number" name="service_charge_amount" value="500" min="0" placeholder="Amount ₹" 
+                                           class="w-full bg-card-bg border border-card-border rounded-xl text-xs py-1.5 px-3 text-text-main font-bold">
+                                </div>
+                                <span class="text-[10px] text-text-dark/60">Candidate will see this invoice under Tuition Service Charges.</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mt-4 text-right">
-                        <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
-                            Add Follow-up
+
+                    <div class="flex justify-end pt-1">
+                        <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                            <i class="fas fa-user-check mr-1"></i> Confirm Tuition Assignment
                         </button>
                     </div>
                 </form>
+            </div>
 
-                <!-- Follow-up History -->
-                <div class="space-y-4">
-                    <h4 class="font-bold text-sm text-gray-600 uppercase tracking-wider mb-2">History</h4>
-                    @forelse($followUps as $fu)
-                        <div class="border-l-4 {{ $fu->status === 'open' ? 'border-yellow-400' : 'border-green-400' }} pl-4 py-2">
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs font-bold text-gray-500">{{ $fu->admin->name }} &bull; {{ $fu->created_at->format('M d, Y h:i A') }}</span>
-                                <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded {{ $fu->status === 'open' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">{{ $fu->status }}</span>
+            <!-- Home Tuition Applications List -->
+            <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-card-border bg-secondary-bg flex justify-between items-center">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-text-main">Tuition Applications & Placements</h4>
+                    <span class="text-xs font-bold text-text-dark/50">{{ $tuitionApplications->count() }} Total</span>
+                </div>
+
+                <div class="divide-y divide-card-border">
+                    @forelse($tuitionApplications as $tApp)
+                        <div class="p-5 space-y-3">
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                                <div>
+                                    <h5 class="text-sm font-black text-text-main">
+                                        Class {{ $tApp->tuitionLead->class ?? 'N/A' }} ({{ $tApp->tuitionLead->subjects ?? '' }})
+                                    </h5>
+                                    <p class="text-xs text-text-dark/60">
+                                        📍 {{ $tApp->tuitionLead->location ?? '' }} • Parent: {{ $tApp->tuitionLead->parent_name ?? '' }} ({{ $tApp->tuitionLead->parent_mobile ?? '' }})
+                                    </p>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full 
+                                        {{ $tApp->status === 'Assigned' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($tApp->status === 'Shortlisted' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-blue-50 text-accent-blue border border-blue-200') }}">
+                                        {{ $tApp->status }}
+                                    </span>
+                                </div>
                             </div>
-                            <p class="text-sm text-gray-800">{{ $fu->notes }}</p>
-                            @if($fu->follow_up_date)
-                                <div class="mt-2 text-xs text-indigo-600 font-medium">
-                                    <i class="fas fa-calendar-alt mr-1"></i> Next Follow-up: {{ \Carbon\Carbon::parse($fu->follow_up_date)->format('M d, Y') }}
+                            
+                            @if($tApp->remarks || $tApp->demo_date)
+                                <div class="bg-secondary-bg p-3 rounded-xl text-xs text-text-dark/80 flex items-center justify-between">
+                                    <div><i class="fas fa-info-circle text-accent-blue mr-1"></i> {{ $tApp->remarks ?: 'No remarks' }}</div>
+                                    @if($tApp->demo_date)
+                                        <span class="font-bold text-text-main">Demo: {{ \Carbon\Carbon::parse($tApp->demo_date)->format('d M Y') }}</span>
+                                    @endif
                                 </div>
                             @endif
                         </div>
                     @empty
-                        <p class="text-sm text-gray-500 italic">No follow-ups recorded yet.</p>
+                        <div class="p-8 text-center text-text-dark/50 text-xs">
+                            <i class="fas fa-chalkboard-teacher text-2xl mb-2 block text-text-dark/30"></i>
+                            No home tuition applications or assignments yet.
+                        </div>
                     @endforelse
                 </div>
-
             </div>
         </div>
 
-        <!-- History Timeline -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-6">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-bold text-gray-900 mb-6">Audit Trail / History</h3>
-                
-                <div class="relative border-l-2 border-gray-200 ml-4 space-y-8">
-                    @forelse($history as $event)
-                        <div class="relative pl-6">
-                            <!-- Timeline Dot -->
-                            <div class="absolute -left-3.5 top-0 w-7 h-7 rounded-full {{ $event['color'] }} text-white flex items-center justify-center text-xs shadow-md border-2 border-white">
-                                <i class="{{ $event['icon'] }}"></i>
-                            </div>
-                            
-                            <!-- Content -->
+        <!-- TAB 3: INVOICES -->
+        <div x-show="tab === 'invoices'" class="space-y-6" style="display: none;">
+            <!-- Create Invoice Form -->
+            <div class="bg-card-bg rounded-2xl border border-card-border p-5 shadow-sm">
+                <h4 class="text-sm font-black text-text-main mb-3 flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-accent-blue"></i> Issue Placement Service Charge Invoice
+                </h4>
+                <form action="{{ route('admin.crm.invoice.store', $candidate->id) }}" method="POST" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    @csrf
+                    <div>
+                        <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Invoice Amount (₹) <span class="text-red-500">*</span></label>
+                        <input type="number" name="amount" required min="1" placeholder="e.g. 1500" 
+                               class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Due Date <span class="text-red-500">*</span></label>
+                        <input type="date" name="due_date" value="{{ date('Y-m-d', strtotime('+7 days')) }}" required 
+                               class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Description</label>
+                        <input type="text" name="description" placeholder="e.g. Placement Service Charge" 
+                               class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                    </div>
+                    <div class="sm:col-span-3 flex justify-end">
+                        <button type="submit" class="px-5 py-2 bg-accent-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                            Create Invoice
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Invoices List -->
+            <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-card-border bg-secondary-bg flex justify-between items-center">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-text-main">Issued Invoices</h4>
+                    <span class="text-xs font-bold text-text-dark/50">{{ $invoices->count() }} Total</span>
+                </div>
+
+                <div class="divide-y divide-card-border">
+                    @forelse($invoices as $inv)
+                        <div class="p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
                             <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <h4 class="font-bold text-gray-800 text-sm">{{ $event['title'] }}</h4>
-                                    <span class="text-xs text-gray-500 font-medium">{{ \Carbon\Carbon::parse($event['date'])->format('M d, Y h:i A') }}</span>
+                                <div class="flex items-center gap-2">
+                                    <h5 class="text-sm font-black text-text-main">₹{{ number_format($inv->amount, 2) }}</h5>
+                                    <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full {{ $inv->status === 'paid' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($inv->status === 'overdue' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200') }}">
+                                        {{ ucfirst($inv->status) }}
+                                    </span>
                                 </div>
-                                <p class="text-sm text-gray-600 leading-relaxed">{{ $event['description'] }}</p>
+                                <p class="text-xs text-text-dark/60 mt-0.5">{{ $inv->description ?: 'Placement Service Charge' }}</p>
+                                <p class="text-[10px] text-text-dark/40">Due: {{ \Carbon\Carbon::parse($inv->due_date)->format('d M Y') }}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('admin.serviceCharge.invoice', $inv->id) }}" target="_blank" class="px-3 py-1.5 bg-secondary-bg hover:bg-card-bg border border-card-border text-text-main rounded-lg text-xs font-bold transition-colors">
+                                    <i class="fas fa-file-pdf"></i> View PDF
+                                </a>
                             </div>
                         </div>
                     @empty
-                        <div class="pl-6 text-sm text-gray-500 italic">No history found for this candidate.</div>
+                        <div class="p-8 text-center text-text-dark/50 text-xs">
+                            <i class="fas fa-file-invoice text-2xl mb-2 block text-text-dark/30"></i>
+                            No invoices generated for this candidate yet.
+                        </div>
                     @endforelse
                 </div>
             </div>
         </div>
 
+        <!-- TAB 4: FOLLOW-UPS -->
+        <div x-show="tab === 'followups'" class="space-y-6" style="display: none;">
+            <div class="bg-card-bg rounded-2xl border border-card-border p-5 shadow-sm">
+                <h4 class="text-sm font-black text-text-main mb-3 flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-accent-blue"></i> Add Follow-up / Call Log
+                </h4>
+                <form action="{{ route('admin.crm.followup.store', $candidate->id) }}" method="POST" class="space-y-3">
+                    @csrf
+                    <div>
+                        <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Notes / Discussion Details <span class="text-red-500">*</span></label>
+                        <textarea name="notes" rows="2" required placeholder="e.g. Spoke with candidate, agreed for demo on Monday..."
+                                  class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Next Follow-up Date</label>
+                            <input type="date" name="follow_up_date" 
+                                   class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Status</label>
+                            <select name="status" class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending Next Call</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-5 py-2 bg-accent-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                            Log Follow-up
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-card-border bg-secondary-bg flex justify-between items-center">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-text-main">Follow-up History</h4>
+                    <span class="text-xs font-bold text-text-dark/50">{{ $followUps->count() }} Total</span>
+                </div>
+                <div class="divide-y divide-card-border">
+                    @forelse($followUps as $fu)
+                        <div class="p-4 space-y-1 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-text-main">{{ $fu->admin->name ?? 'Admin' }}</span>
+                                <span class="text-[10px] text-text-dark/40">{{ $fu->created_at->format('d M Y, h:i A') }}</span>
+                            </div>
+                            <p class="text-text-dark/80">{{ $fu->notes }}</p>
+                            @if($fu->follow_up_date)
+                                <p class="text-[10px] text-accent-blue font-bold">Next Follow-up: {{ \Carbon\Carbon::parse($fu->follow_up_date)->format('d M Y') }}</p>
+                            @endif
+                        </div>
+                    @empty
+                        <div class="p-8 text-center text-text-dark/50 text-xs">
+                            <i class="fas fa-comments text-2xl mb-2 block text-text-dark/30"></i>
+                            No follow-up notes logged yet.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: TIMELINE & RATING -->
+        <div x-show="tab === 'timeline'" class="space-y-6" style="display: none;">
+            <!-- Candidate Rating -->
+            <div class="bg-card-bg rounded-2xl border border-card-border p-5 shadow-sm">
+                <h4 class="text-sm font-black text-text-main mb-3 flex items-center gap-2">
+                    <i class="fas fa-star text-amber-500"></i> Performance Rating & Feedback
+                </h4>
+                <form action="{{ route('admin.crm.candidate.rate', $candidate->id) }}" method="POST" class="space-y-3">
+                    @csrf
+                    <div class="flex items-center gap-4">
+                        <label class="text-xs font-bold text-text-main">Score:</label>
+                        <select name="rating" class="bg-secondary-bg border border-card-border rounded-xl text-xs py-1.5 px-3 font-bold text-amber-600">
+                            @for($i = 5; $i >= 1; $i--)
+                                <option value="{{ $i }}" {{ ($rating?->rating == $i) ? 'selected' : '' }}>⭐ {{ $i }} Stars</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div>
+                        <input type="text" name="feedback" value="{{ $rating?->feedback }}" placeholder="Feedback regarding teaching skills, demo results, or communication..." 
+                               class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                            Save Rating
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Activity Timeline -->
+            <div class="bg-card-bg rounded-2xl border border-card-border p-5 shadow-sm">
+                <h4 class="text-sm font-black text-text-main mb-4">Activity Timeline</h4>
+                <div class="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-card-border">
+                    @foreach($history as $item)
+                        <div class="relative">
+                            <div class="absolute -left-6 top-0 w-5 h-5 rounded-full {{ $item['color'] ?? 'bg-accent-blue' }} text-white text-[10px] flex items-center justify-center shadow-sm">
+                                <i class="{{ $item['icon'] ?? 'fas fa-circle' }}"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-text-main">{{ $item['title'] }}</h5>
+                                <p class="text-xs text-text-dark/60 mt-0.5">{{ $item['description'] }}</p>
+                                <span class="text-[10px] text-text-dark/40 mt-1 block">{{ \Carbon\Carbon::parse($item['date'])->format('d M Y, h:i A') }}</span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 @endsection
-
-@push('scripts')
-<script>
-    function prepareInvoice(appId) {
-        const select = document.getElementById('job_application_id');
-        if(select) {
-            select.value = appId;
-            select.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            // Highlight the form momentarily
-            const formContainer = select.closest('.bg-gray-50');
-            if(formContainer) {
-                formContainer.classList.add('ring-2', 'ring-indigo-500', 'transition-all', 'duration-500');
-                setTimeout(() => formContainer.classList.remove('ring-2', 'ring-indigo-500'), 1500);
-            }
-
-            // Focus on amount
-            const amountInput = document.querySelector('input[name="amount"]');
-            if(amountInput) {
-                amountInput.focus();
-            }
-        }
-    }
-</script>
-@endpush

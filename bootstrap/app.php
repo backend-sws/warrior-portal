@@ -19,9 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'parent' => \App\Http\Middleware\IsParent::class,
         ]);
         $middleware->validateCsrfTokens(except: [
+            'webhooks/*',
             'candidate/payment/callback',
             'candidate/wizard/callback',
-            'candidate/service-charge/callback'
+            'candidate/service-charge/callback',
+            'parent/service-charge/callback',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

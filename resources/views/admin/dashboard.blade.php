@@ -1,376 +1,417 @@
 @extends('layouts.admin')
 
-@section('title', 'Dashboard Overview')
+@section('title', 'Welcome back, ' . (auth()->user()->name ?? 'Admin'))
+@section('subtitle', 'Operations Command • Real-time overview of school jobs, home tuitions, applications, and collections.')
+
+@section('actions')
+    <!-- Date Filter Form in Page Header -->
+    <form method="GET" action="{{ route('admin.dashboard') }}" class="flex items-center gap-2 bg-card-bg p-1.5 rounded-2xl border border-card-border shadow-sm">
+        <div class="flex items-center gap-1.5 px-2.5 border-r border-card-border">
+            <i class="fas fa-calendar-alt text-text-dark/40 text-xs"></i>
+            <input type="date" name="from_date" value="{{ request('from_date') }}" class="bg-transparent border-none text-xs text-text-main outline-none focus:ring-0 w-28">
+        </div>
+        <div class="flex items-center gap-1.5 px-2.5">
+            <span class="text-text-dark/40 text-xs">to</span>
+            <input type="date" name="to_date" value="{{ request('to_date') }}" class="bg-transparent border-none text-xs text-text-main outline-none focus:ring-0 w-28">
+        </div>
+        <button type="submit" class="bg-accent-blue hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold transition-colors shadow-sm">
+            <i class="fas fa-filter text-[10px]"></i> <span>Filter</span>
+        </button>
+        @if(request('from_date') || request('to_date'))
+            <a href="{{ route('admin.dashboard') }}" class="text-red-500 hover:text-red-700 px-2 py-1 bg-red-50 rounded-lg text-xs font-bold transition-colors" title="Clear Filter">
+                <i class="fas fa-times"></i>
+            </a>
+        @endif
+    </form>
+@endsection
 
 @section('content')
 
-{{-- Hero Section --}}
-<div class="bg-gradient-to-r from-[#1b64bd] to-[#124d9c] rounded-3xl p-6 md:p-8 shadow-lg mb-8 text-white relative overflow-hidden">
-    <!-- Abstract Background shapes -->
-    <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-    <div class="absolute bottom-0 left-0 w-48 h-48 bg-[#00a8e8]/20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4"></div>
-
-    <!-- Top Row: Welcome + Date Filter -->
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 relative z-10 gap-4">
+{{-- 1. Primary KPI Metric Cards (Clean, Clickable, No Duplicate Hero Box) --}}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <!-- Card 1: School Jobs -->
+    <a href="{{ route('admin.jobs.index') }}" class="bg-card-bg hover:border-blue-300 border border-card-border rounded-2xl p-5 shadow-sm transition-all group flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-xl group-hover:bg-blue-500/10 transition-colors pointer-events-none"></div>
         <div>
-            <h2 class="text-3xl font-bold mb-1">Welcome back, Admin</h2>
-            <p class="text-blue-100 text-sm">Here's your platform performance overview</p>
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-text-dark/60">School Jobs</span>
+                <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fas fa-school"></i>
+                </div>
+            </div>
+            <h3 class="text-3xl font-black tracking-tight text-blue-600">{{ number_format($activeJobs) }}</h3>
+            <span class="text-xs text-text-dark/50 font-medium">Live Active Postings</span>
         </div>
-        
-        <!-- Date Filter Form -->
-        <form method="GET" action="{{ route('admin.dashboard') }}" class="flex items-center gap-2 bg-white/10 p-2 rounded-xl border border-white/20 backdrop-blur-md">
-            <div class="flex items-center gap-2 px-2 border-r border-white/20">
-                <i class="fas fa-filter text-white/70 text-xs"></i>
-                <input type="date" name="from_date" value="{{ request('from_date') }}" class="bg-transparent border-none text-sm text-white outline-none [&::-webkit-calendar-picker-indicator]:filter-[invert(1)] focus:ring-0 w-32">
-            </div>
-            <div class="flex items-center gap-2 px-2">
-                <span class="text-white/50 text-xs">to</span>
-                <input type="date" name="to_date" value="{{ request('to_date') }}" class="bg-transparent border-none text-sm text-white outline-none [&::-webkit-calendar-picker-indicator]:filter-[invert(1)] focus:ring-0 w-32">
-            </div>
-            <button type="submit" class="bg-white text-[#124d9c] w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors shadow-sm">
-                <i class="fas fa-search text-xs"></i>
-            </button>
-            @if(request('from_date') || request('to_date'))
-                <a href="{{ route('admin.dashboard') }}" class="text-red-300 hover:text-red-200 ml-1 text-xs px-2 py-1 bg-red-500/20 rounded-md transition-colors"><i class="fas fa-times"></i></a>
+        <div class="mt-4 pt-3 border-t border-card-border flex items-center justify-between text-xs text-text-dark/60">
+            <span>{{ $totalJobs }} Total Jobs</span>
+            @if($pendingJobsCount > 0)
+                <span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full text-[10px] border border-amber-200">{{ $pendingJobsCount }} Pending</span>
             @endif
-        </form>
-    </div>
+        </div>
+    </a>
     
-    <!-- Stats Row (4 cards inside hero) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 relative z-10">
-        <!-- Card 1: Total Candidates (Green Gradient) -->
-        <a href="{{ route('admin.crm.index') }}" class="bg-gradient-to-br from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 border border-white/20 rounded-2xl p-5 transition-all group shadow-[0_0_20px_rgba(52,211,153,0.5)]">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform"><i class="fas fa-users"></i></div>
-                <span class="text-blue-100 text-sm font-medium">Total Candidates</span>
+    <!-- Card 2: Home Tuitions -->
+    <a href="{{ route('admin.tuition-leads.index') }}" class="bg-card-bg hover:border-emerald-300 border border-card-border rounded-2xl p-5 shadow-sm transition-all group flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-colors pointer-events-none"></div>
+        <div>
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-text-dark/60">Home Tuitions</span>
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
             </div>
-            <h3 class="text-3xl font-bold tracking-tight">{{ number_format($totalCandidates) }}</h3>
-            <p class="text-blue-200 text-xs mt-2 font-medium flex items-center gap-1"><i class="fas fa-arrow-up text-[10px]"></i> +12% from last month</p>
-        </a>
-        
-        <!-- Card 2: Active Jobs (Purple Gradient) -->
-        <a href="{{ route('admin.jobs.index') }}" class="bg-gradient-to-br from-violet-600 to-indigo-500 hover:from-violet-700 hover:to-indigo-600 border border-white/20 rounded-2xl p-5 transition-all group shadow-[0_0_20px_rgba(139,92,246,0.5)]">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform"><i class="fas fa-briefcase"></i></div>
-                <span class="text-blue-100 text-sm font-medium">Active Jobs</span>
+            <h3 class="text-3xl font-black tracking-tight text-emerald-600">{{ number_format($activeTuitions) }}</h3>
+            <span class="text-xs text-text-dark/50 font-medium">Live on Website</span>
+        </div>
+        <div class="mt-4 pt-3 border-t border-card-border flex items-center justify-between text-xs text-text-dark/60">
+            <span>{{ $assignedTuitions }} Tutors Assigned</span>
+            @if($pendingTuitionsCount > 0)
+                <span class="bg-yellow-100 text-yellow-800 font-bold px-2 py-0.5 rounded-full text-[10px] border border-yellow-200">{{ $pendingTuitionsCount }} New</span>
+            @endif
+        </div>
+    </a>
+    
+    <!-- Card 3: Candidates CRM -->
+    <a href="{{ route('admin.crm.index') }}" class="bg-card-bg hover:border-purple-300 border border-card-border rounded-2xl p-5 shadow-sm transition-all group flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-xl group-hover:bg-purple-500/10 transition-colors pointer-events-none"></div>
+        <div>
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-text-dark/60">Candidates Pool</span>
+                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fas fa-users"></i>
+                </div>
             </div>
-            <h3 class="text-3xl font-bold tracking-tight">{{ number_format($activeJobs) }}</h3>
-            <p class="text-blue-200 text-xs mt-2 font-medium flex items-center gap-1"><i class="fas fa-arrow-up text-[10px]"></i> +5% from last month</p>
-        </a>
-        
-        <!-- Card 3: Total Revenue (Cyan Gradient) -->
-        <a href="{{ route('admin.transactions.index') }}" class="bg-gradient-to-br from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 border border-white/20 rounded-2xl p-5 transition-all group shadow-[0_0_20px_rgba(6,182,212,0.5)]">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform"><i class="fas fa-wallet"></i></div>
-                <span class="text-blue-100 text-sm font-medium">Total Revenue</span>
+            <h3 class="text-3xl font-black tracking-tight text-purple-600">{{ number_format($totalCandidates) }}</h3>
+            <span class="text-xs text-text-dark/50 font-medium">Registered Pool</span>
+        </div>
+        <div class="mt-4 pt-3 border-t border-card-border flex items-center justify-between text-xs text-text-dark/60">
+            <span>{{ $signedCandidates }} Signed</span>
+            <span class="text-emerald-600 font-bold">{{ $verifiedCandidates }} Verified</span>
+        </div>
+    </a>
+    
+    <!-- Card 4: Platform Collections -->
+    <a href="{{ route('admin.tuition-service-charges.index') }}" class="bg-card-bg hover:border-cyan-300 border border-card-border rounded-2xl p-5 shadow-sm transition-all group flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-xl group-hover:bg-cyan-500/10 transition-colors pointer-events-none"></div>
+        <div>
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-text-dark/60">Total Collections</span>
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fas fa-wallet"></i>
+                </div>
             </div>
-            <h3 class="text-3xl font-bold tracking-tight">₹{{ number_format($totalCollections) }}</h3>
-            <p class="text-blue-200 text-xs mt-2 font-medium flex items-center gap-1"><i class="fas fa-arrow-up text-[10px]"></i> +18% from last month</p>
-        </a>
-        
-        <!-- Card 4: Pending Jobs (Orange Gradient) -->
-        <a href="{{ route('admin.jobs.index', ['status' => 'pending']) }}" class="bg-gradient-to-br from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 border border-white/20 rounded-2xl p-5 transition-all group shadow-[0_0_20px_rgba(249,115,22,0.5)]">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center text-sm shadow-inner group-hover:scale-110 transition-transform"><i class="fas fa-clock"></i></div>
-                <span class="text-blue-100 text-sm font-medium">Pending Jobs</span>
+            <h3 class="text-3xl font-black tracking-tight text-cyan-600">₹{{ number_format($totalRevenue) }}</h3>
+            <span class="text-xs text-text-dark/50 font-medium">Service Fees & Direct</span>
+        </div>
+        <div class="mt-4 pt-3 border-t border-card-border flex items-center justify-between text-xs text-text-dark/60">
+            <span>₹{{ number_format($pendingDues) }} Dues</span>
+            @if($overdueInvoicesCount > 0)
+                <span class="bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded-full text-[10px] border border-rose-200">{{ $overdueInvoicesCount }} Overdue</span>
+            @endif
+        </div>
+    </a>
+</div>
+
+{{-- 2. Dual Operations Row: School Jobs vs Home Tuitions Operations --}}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    {{-- School Jobs Pipeline Module --}}
+    <div class="bg-card-bg rounded-3xl p-6 border border-card-border shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div class="flex justify-between items-center mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-blue-500/10 text-accent-blue flex items-center justify-center text-lg font-bold">
+                    <i class="fas fa-school"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-text-main text-base">School Jobs Pipeline</h3>
+                    <p class="text-xs text-text-dark/50">Hiring metrics and school placements</p>
+                </div>
             </div>
-            <h3 class="text-3xl font-bold tracking-tight">{{ number_format($pendingJobs->count()) }}</h3>
-            <p class="text-red-200 text-xs mt-2 font-medium bg-red-500/30 w-max px-2 py-0.5 rounded-full">Requires Action</p>
-        </a>
+            <a href="{{ route('admin.jobs.index') }}" class="text-xs font-bold text-accent-blue hover:underline">View Jobs &rarr;</a>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mb-4">
+            <div class="bg-secondary-bg p-3.5 rounded-2xl border border-card-border text-center">
+                <span class="text-[10px] font-bold text-text-dark/50 uppercase block mb-0.5">Applications</span>
+                <span class="text-xl font-black text-text-main">{{ number_format($totalJobApps) }}</span>
+                <span class="text-[10px] text-accent-blue block font-bold mt-0.5">Submitted</span>
+            </div>
+            <div class="bg-secondary-bg p-3.5 rounded-2xl border border-card-border text-center">
+                <span class="text-[10px] font-bold text-text-dark/50 uppercase block mb-0.5">Forwarded</span>
+                <span class="text-xl font-black text-indigo-600">{{ number_format($forwardedJobApps) }}</span>
+                <span class="text-[10px] text-indigo-600 block font-bold mt-0.5">To Schools</span>
+            </div>
+            <div class="bg-secondary-bg p-3.5 rounded-2xl border border-card-border text-center">
+                <span class="text-[10px] font-bold text-text-dark/50 uppercase block mb-0.5">Placements</span>
+                <span class="text-xl font-black text-emerald-600">{{ number_format($hiredPlacements) }}</span>
+                <span class="text-[10px] text-emerald-600 block font-bold mt-0.5">Hired Teachers</span>
+            </div>
+        </div>
+
+        @if($pendingJobsCount > 0)
+            <div class="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-3.5 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i class="fas fa-exclamation-circle text-amber-500 text-sm"></i>
+                    <span class="text-xs font-bold text-amber-800">{{ $pendingJobsCount }} School Job(s) awaiting approval</span>
+                </div>
+                <a href="{{ route('admin.jobs.index', ['status' => 'pending']) }}" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+                    Review Now
+                </a>
+            </div>
+        @endif
+    </div>
+
+    {{-- Home Tuitions Pipeline Module --}}
+    <div class="bg-card-bg rounded-3xl p-6 border border-card-border shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div class="flex justify-between items-center mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-lg font-bold">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-text-main text-base">Home Tuitions Ecosystem</h3>
+                    <p class="text-xs text-text-dark/50">Private tutoring leads & tutor assignments</p>
+                </div>
+            </div>
+            <a href="{{ route('admin.tuition-leads.index') }}" class="text-xs font-bold text-emerald-600 hover:underline">View Tuitions &rarr;</a>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mb-4">
+            <div class="bg-secondary-bg p-3.5 rounded-2xl border border-card-border text-center">
+                <span class="text-[10px] font-bold text-text-dark/50 uppercase block mb-0.5">Total Inquiries</span>
+                <span class="text-xl font-black text-text-main">{{ number_format($totalTuitions) }}</span>
+                <span class="text-[10px] text-text-dark/40 block font-bold mt-0.5">Parent Demands</span>
+            </div>
+            <div class="bg-secondary-bg p-3.5 rounded-2xl border border-card-border text-center">
+                <span class="text-[10px] font-bold text-text-dark/50 uppercase block mb-0.5">Applications</span>
+                <span class="text-xl font-black text-sky-600">{{ number_format($totalTuitionApps) }}</span>
+                <span class="text-[10px] text-sky-600 block font-bold mt-0.5">Tutor Requests</span>
+            </div>
+            <div class="bg-secondary-bg p-3.5 rounded-2xl border border-card-border text-center">
+                <span class="text-[10px] font-bold text-text-dark/50 uppercase block mb-0.5">Assigned Tutors</span>
+                <span class="text-xl font-black text-emerald-600">{{ number_format($assignedTuitions) }}</span>
+                <span class="text-[10px] text-emerald-600 block font-bold mt-0.5">Confirmed</span>
+            </div>
+        </div>
+
+        @if($pendingTuitionsCount > 0)
+            <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-3.5 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i class="fas fa-clock text-yellow-600 text-sm"></i>
+                    <span class="text-xs font-bold text-yellow-800">{{ $pendingTuitionsCount }} Tuition Requirement(s) need review</span>
+                </div>
+                <a href="{{ route('admin.tuition-leads.index', ['status' => 'New Lead']) }}" class="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-slate-900 rounded-lg text-xs font-bold transition-all shadow-sm">
+                    Approve Live
+                </a>
+            </div>
+        @endif
     </div>
 </div>
 
-{{-- Filtered Results Table (Only shows if dates are selected) --}}
-@if(request('from_date') || request('to_date'))
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-8 overflow-hidden">
-        <div class="p-6 border-b border-gray-100 bg-gray-50/30 flex justify-between items-center">
-            <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2">
-                <i class="fas fa-filter text-blue-500"></i> Filtered Applications
-            </h3>
-        </div>
-        <div class="overflow-x-auto max-h-[400px] overflow-y-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-white">
-                        <th class="px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">Candidate</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">Job Applied For</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">Date</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @forelse($recentApps as $app)
-                    <tr class="hover:bg-gray-50/80 transition-colors {{ $app->candidate ? 'cursor-pointer' : '' }}" 
-                        @if($app->candidate) onclick="window.location='{{ route('admin.crm.show', $app->candidate->id) }}'" @endif>
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-gray-900 text-sm">{{ $app->candidate->name ?? 'Unknown' }}</div>
-                            <div class="text-xs text-gray-500 mt-0.5">{{ $app->candidate->email ?? 'N/A' }}</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-gray-800 text-sm">{{ $app->jobPost->title ?? 'Teacher' }}</div>
-                            <div class="text-xs text-gray-500 mt-0.5">{{ $app->jobPost->school_name ?? 'School' }}</div>
-                        </td>
-                        <td class="px-6 py-4 text-gray-600 text-sm font-medium">{{ $app->created_at->diffForHumans() }}</td>
-                        <td class="px-6 py-4">
-                            @if($app->status === 'applied')
-                                <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-md text-xs font-bold border border-blue-100">Applied</span>
-                            @elseif($app->status === 'hired')
-                                <span class="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-md text-xs font-bold border border-emerald-100">Hired</span>
-                            @else
-                                <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-md text-xs font-bold border border-gray-200">Waitlisted</span>
-                            @endif
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="4" class="py-12 text-center">
-                            <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 text-xl mx-auto mb-3">
-                                <i class="fas fa-folder-open"></i>
-                            </div>
-                            <p class="text-gray-500 text-sm font-medium">No applications found for this date range.</p>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-@endif
-
-{{-- Secondary Stats Row (White backgrounds with colored underlines) --}}
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <!-- Total Received -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border-b-[3px] border-blue-500 hover:-translate-y-1 transition-transform">
-        <div class="flex justify-between items-start mb-4">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-lg"><i class="fas fa-file-signature"></i></div>
-            <span class="text-emerald-500 text-xs font-bold flex items-center gap-1"><i class="fas fa-arrow-up"></i> 10.5%</span>
-        </div>
-        <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ number_format($totalApplications) }}</h3>
-        <p class="text-gray-500 text-sm font-medium">Total Received</p>
-    </div>
-    
-    <!-- Transferred -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border-b-[3px] border-emerald-500 hover:-translate-y-1 transition-transform">
-        <div class="flex justify-between items-start mb-4">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-lg"><i class="fas fa-share-square"></i></div>
-            <span class="text-emerald-500 text-xs font-bold flex items-center gap-1"><i class="fas fa-arrow-up"></i> 4.3%</span>
-        </div>
-        <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ number_format($transferredApplications) }}</h3>
-        <p class="text-gray-500 text-sm font-medium">Transferred to School</p>
-    </div>
-    
-    <!-- Rejected -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border-b-[3px] border-amber-500 hover:-translate-y-1 transition-transform">
-         <div class="flex justify-between items-start mb-4">
-            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg"><i class="fas fa-times-circle"></i></div>
-            <span class="text-rose-500 text-xs font-bold flex items-center gap-1"><i class="fas fa-arrow-up"></i> 2.1%</span>
-        </div>
-        <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ number_format($rejectedApplications) }}</h3>
-        <p class="text-gray-500 text-sm font-medium">Rejected Apps</p>
-    </div>
-    
-    <!-- Placements -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border-b-[3px] border-purple-500 hover:-translate-y-1 transition-transform">
-        <div class="flex justify-between items-start mb-4">
-            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center text-lg"><i class="fas fa-award"></i></div>
-            <span class="text-emerald-500 text-xs font-bold flex items-center gap-1"><i class="fas fa-arrow-up"></i> 8.2%</span>
-        </div>
-        <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ number_format($placements) }}</h3>
-        <p class="text-gray-500 text-sm font-medium">Total Placements</p>
-    </div>
-</div>
-
-{{-- Middle Section (Chart and Live Activity) --}}
+{{-- 3. Revenue Analytics & Live Activity Stream --}}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
     
-    <!-- Left Column (Revenue Analytics & Sub-stats) -->
-    <div class="lg:col-span-2 flex flex-col gap-8">
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex-1">
-            <div class="flex justify-between items-center mb-8">
+    <!-- Left 2 Cols: Revenue Graph & Breakdown -->
+    <div class="lg:col-span-2 flex flex-col gap-6">
+        <div class="bg-card-bg rounded-3xl p-6 sm:p-7 shadow-sm border border-card-border flex-1">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-3">
                 <div>
-                    <h3 class="font-bold text-gray-900 text-lg">Revenue Analytics</h3>
-                    <p class="text-gray-500 text-xs mt-1">Overview of your earnings performance</p>
+                    <h3 class="font-black text-text-main text-lg flex items-center gap-2">
+                        <i class="fas fa-chart-line text-accent-blue"></i> Platform Revenue & Collections
+                    </h3>
+                    <p class="text-text-dark/50 text-xs mt-0.5">Track placement commissions, tuition service charges, and payments</p>
                 </div>
-                <div class="flex bg-blue-50 p-1 rounded-lg border border-blue-100 shadow-inner">
-                    <button type="button" onclick="updateChart('days')" id="btn-chart-days" class="px-4 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow-sm transition-all">This Month</button>
-                    <button type="button" onclick="updateChart('months')" id="btn-chart-months" class="px-4 py-1.5 text-xs font-bold rounded-md text-blue-600 hover:bg-blue-100 transition-all">Yearly</button>
+                <div class="flex bg-secondary-bg p-1 rounded-xl border border-card-border self-start">
+                    <button type="button" onclick="updateChart('days')" id="btn-chart-days" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-accent-blue text-white shadow-sm transition-all">Last 30 Days</button>
+                    <button type="button" onclick="updateChart('months')" id="btn-chart-months" class="px-3.5 py-1.5 text-xs font-bold rounded-lg text-text-dark/60 hover:text-text-main transition-all">Monthly View</button>
                 </div>
             </div>
             
-            <div class="w-full h-[300px]">
+            <div class="w-full h-[280px]">
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
         
-        <!-- Small Revenue Stats Below Chart -->
+        <!-- Financial Breakdown Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-             <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center hover:border-blue-200 transition-colors">
-                 <div class="w-10 h-10 mx-auto rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mb-3 text-lg"><i class="fas fa-wallet"></i></div>
-                 <h4 class="font-bold text-gray-900 text-xl">₹{{ number_format($totalCollections) }}</h4>
-                 <p class="text-xs font-medium text-gray-500 mt-1">Total Collected</p>
+             <div class="bg-card-bg rounded-2xl p-4 border border-card-border shadow-sm flex items-center gap-3.5">
+                 <div class="w-11 h-11 rounded-2xl bg-blue-500/10 text-accent-blue flex items-center justify-center text-lg shrink-0"><i class="fas fa-school"></i></div>
+                 <div>
+                     <span class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider block">Job Placement Fees</span>
+                     <h4 class="font-black text-text-main text-lg">₹{{ number_format($jobServiceRevenue) }}</h4>
+                 </div>
              </div>
-             <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center hover:border-emerald-200 transition-colors">
-                 <div class="w-10 h-10 mx-auto rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mb-3 text-lg"><i class="fas fa-check-double"></i></div>
-                 <h4 class="font-bold text-gray-900 text-xl">₹{{ number_format($registrationRevenue) }}</h4>
-                 <p class="text-xs font-medium text-gray-500 mt-1">Registration Fees</p>
+             <div class="bg-card-bg rounded-2xl p-4 border border-card-border shadow-sm flex items-center gap-3.5">
+                 <div class="w-11 h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-lg shrink-0"><i class="fas fa-chalkboard-teacher"></i></div>
+                 <div>
+                     <span class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider block">Tuition Charges</span>
+                     <h4 class="font-black text-emerald-600 text-lg">₹{{ number_format($tuitionServiceRevenue) }}</h4>
+                 </div>
              </div>
-             <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center hover:border-amber-200 transition-colors">
-                 <div class="w-10 h-10 mx-auto rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mb-3 text-lg"><i class="fas fa-receipt"></i></div>
-                 <h4 class="font-bold text-gray-900 text-xl">₹{{ number_format($serviceChargeRevenue) }}</h4>
-                 <p class="text-xs font-medium text-gray-500 mt-1">Service Charges</p>
+             <div class="bg-card-bg rounded-2xl p-4 border border-card-border shadow-sm flex items-center gap-3.5">
+                 <div class="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg shrink-0"><i class="fas fa-file-invoice-dollar"></i></div>
+                 <div>
+                     <span class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider block">Pending Dues</span>
+                     <h4 class="font-black text-amber-600 text-lg">₹{{ number_format($pendingDues) }}</h4>
+                 </div>
              </div>
         </div>
     </div>
     
-    <!-- Right Column (Live Activity) -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-        <div class="flex justify-between items-center mb-8">
-            <h3 class="font-bold text-gray-900 text-lg">Live Activity</h3>
-            <span class="text-[10px] text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md font-bold flex items-center gap-1.5 uppercase tracking-wide border border-emerald-100">
-                <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> Live
+    <!-- Right Col: Real-time Live Activity Feed -->
+    <div class="bg-card-bg rounded-3xl p-6 shadow-sm border border-card-border flex flex-col">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-black text-text-main text-base">Real-time Activity</h3>
+            <span class="text-[10px] text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5 uppercase tracking-wide border border-emerald-500/20">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live Stream
             </span>
         </div>
         
-        <div class="space-y-6 flex-1 overflow-y-auto max-h-[460px] pr-2 custom-scrollbar">
-            @forelse($recentApps as $app)
-            <div class="flex gap-4 relative">
-                <!-- Line connector -->
-                @if(!$loop->last)
-                <div class="absolute top-10 left-5 w-px h-[calc(100%-8px)] bg-gray-100"></div>
-                @endif
-                
-                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 border-4 border-white shadow-sm z-10 text-sm">
-                    <i class="fas fa-paper-plane"></i>
+        <div class="space-y-4 flex-1 overflow-y-auto max-h-[420px] pr-2 custom-scrollbar">
+            @forelse($activityFeed as $act)
+            <a href="{{ $act['link'] }}" class="flex gap-3 p-3 bg-secondary-bg/60 hover:bg-secondary-bg rounded-2xl border border-card-border transition-all group">
+                <div class="w-9 h-9 rounded-xl {{ $act['badge_color'] }} flex items-center justify-center shrink-0 text-sm shadow-sm">
+                    <i class="{{ $act['icon'] }}"></i>
                 </div>
                 
-                <div class="pt-2 pb-4">
-                    <p class="text-sm text-gray-700 leading-tight">
-                        <span class="font-bold text-gray-900">{{ $app->candidate->name ?? 'Unknown' }}</span> applied for 
-                        <span class="font-bold text-gray-900">{{ $app->jobPost->title ?? 'a job' }}</span>
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs font-bold text-text-main leading-tight group-hover:text-accent-blue transition-colors truncate">
+                        {{ $act['title'] }}
                     </p>
-                    <p class="text-xs font-medium text-gray-400 mt-1.5">{{ $app->created_at->diffForHumans() }}</p>
+                    <p class="text-[11px] text-text-dark/60 truncate mt-0.5">{{ $act['subtitle'] }}</p>
+                    <span class="text-[10px] text-text-dark/40 mt-1 block">{{ \Carbon\Carbon::parse($act['time'])->diffForHumans() }}</span>
                 </div>
-            </div>
+            </a>
             @empty
             <div class="text-center py-12">
-                <i class="fas fa-inbox text-4xl text-gray-200 mb-3"></i>
-                <p class="text-sm font-medium text-gray-500">No recent activity.</p>
+                <i class="fas fa-inbox text-3xl text-text-dark/20 mb-2"></i>
+                <p class="text-xs text-text-dark/50">No recent activity logged.</p>
             </div>
             @endforelse
         </div>
         
-        <div class="mt-6 pt-4 border-t border-gray-100 text-center">
-            <a href="{{ route('admin.applications.index') }}" class="text-blue-500 text-sm font-bold hover:text-blue-600 transition-colors">View all activities <i class="fas fa-arrow-right text-[10px] ml-1"></i></a>
+        <div class="mt-4 pt-3 border-t border-card-border text-center">
+            <a href="{{ route('admin.applications.index') }}" class="text-accent-blue text-xs font-bold hover:underline">
+                View All Activity Logs &rarr;
+            </a>
         </div>
     </div>
 </div>
 
-{{-- Bottom Section (Quick Actions & Plan Purchases) --}}
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+{{-- 4. Quick Action Command Hub & Urgent Approvals --}}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
     
-    <!-- Quick Actions -->
-    <div>
-        <h3 class="font-bold text-gray-900 text-lg mb-4">Quick Actions</h3>
-        <div class="grid grid-cols-2 gap-4">
-             <a href="{{ route('admin.jobs.create') }}" class="bg-blue-600 rounded-2xl p-6 text-white shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group overflow-hidden relative">
-                 <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:bg-white/20 transition-all"></div>
-                 <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-4 text-xl backdrop-blur-sm"><i class="fas fa-plus"></i></div>
-                 <h4 class="font-bold text-lg tracking-tight">Add Job</h4>
-                 <p class="text-blue-100 text-xs mt-1">Create new listing</p>
+    <!-- Quick Actions Cards -->
+    <div class="lg:col-span-1">
+        <h3 class="font-black text-text-main text-base mb-4 flex items-center gap-2">
+            <i class="fas fa-bolt text-amber-500"></i> Quick Actions
+        </h3>
+        <div class="grid grid-cols-2 gap-3">
+             <a href="{{ route('admin.jobs.create') }}" class="bg-accent-blue hover:bg-blue-700 rounded-2xl p-4 text-white shadow-sm transition-all group flex flex-col justify-between">
+                 <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2 text-sm"><i class="fas fa-plus"></i></div>
+                 <div>
+                     <h4 class="font-bold text-sm">Post Job</h4>
+                     <p class="text-blue-100 text-[10px]">New school listing</p>
+                 </div>
              </a>
              
-             <a href="{{ route('admin.jobs.index', ['status' => 'pending']) }}" class="bg-emerald-500 rounded-2xl p-6 text-white shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group overflow-hidden relative">
-                 <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:bg-white/20 transition-all"></div>
-                 <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-4 text-xl backdrop-blur-sm"><i class="fas fa-clipboard-check"></i></div>
-                 <h4 class="font-bold text-lg tracking-tight">Approve Jobs</h4>
-                 <p class="text-emerald-100 text-xs mt-1">Review pending</p>
+             <a href="{{ route('admin.tuition-leads.create') }}" class="bg-emerald-600 hover:bg-emerald-700 rounded-2xl p-4 text-white shadow-sm transition-all group flex flex-col justify-between">
+                 <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2 text-sm"><i class="fas fa-chalkboard-teacher"></i></div>
+                 <div>
+                     <h4 class="font-bold text-sm">Add Tuition</h4>
+                     <p class="text-emerald-100 text-[10px]">Parent requirement</p>
+                 </div>
              </a>
              
-             <a href="{{ route('admin.categories.index') }}" class="bg-amber-500 rounded-2xl p-6 text-white shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group overflow-hidden relative">
-                 <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:bg-white/20 transition-all"></div>
-                 <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-4 text-xl backdrop-blur-sm"><i class="fas fa-layer-group"></i></div>
-                 <h4 class="font-bold text-lg tracking-tight">Categories</h4>
-                 <p class="text-amber-100 text-xs mt-1">Manage listings</p>
+             <a href="{{ route('admin.crm.create') }}" class="bg-purple-600 hover:bg-purple-700 rounded-2xl p-4 text-white shadow-sm transition-all group flex flex-col justify-between">
+                 <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2 text-sm"><i class="fas fa-user-plus"></i></div>
+                 <div>
+                     <h4 class="font-bold text-sm">Onboard Teacher</h4>
+                     <p class="text-purple-100 text-[10px]">Manual candidate</p>
+                 </div>
              </a>
              
-             <a href="#" class="bg-purple-600 rounded-2xl p-6 text-white shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group overflow-hidden relative">
-                 <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:bg-white/20 transition-all"></div>
-                 <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-4 text-xl backdrop-blur-sm"><i class="fas fa-cog"></i></div>
-                 <h4 class="font-bold text-lg tracking-tight">Settings</h4>
-                 <p class="text-purple-100 text-xs mt-1">Configure system</p>
+             <a href="{{ route('admin.reminders.index') }}" class="bg-amber-600 hover:bg-amber-700 rounded-2xl p-4 text-white shadow-sm transition-all group flex flex-col justify-between">
+                 <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2 text-sm"><i class="fas fa-bell"></i></div>
+                 <div>
+                     <h4 class="font-bold text-sm">Reminders</h4>
+                     <p class="text-amber-100 text-[10px]">Fee followups</p>
+                 </div>
              </a>
         </div>
     </div>
     
-    <!-- Top Sellers / Plan Purchases -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-         <div class="flex justify-between items-center mb-6">
-            <h3 class="font-bold text-gray-900 text-lg">Top Plans</h3>
-            <a href="{{ route('admin.crm.index') }}" class="text-blue-500 text-sm font-bold hover:text-blue-600 transition-colors">View all</a>
+    <!-- Urgent Approvals Lists -->
+    <div class="lg:col-span-2 bg-card-bg rounded-3xl p-6 shadow-sm border border-card-border">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-black text-text-main text-base flex items-center gap-2">
+                <i class="fas fa-clipboard-check text-indigo-600"></i> Pending Review Hub
+            </h3>
+            <span class="text-xs text-text-dark/50 font-bold">Requires Admin Decision</span>
         </div>
-        
-        <div class="space-y-3">
-            <a href="{{ route('admin.crm.index', ['plan_amount' => 500]) }}" class="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 border border-gray-100 rounded-xl transition-colors group">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform"><i class="fas fa-star"></i></div>
-                    <div>
-                        <h4 class="font-bold text-gray-900">₹500 Starter Plan</h4>
-                        <p class="text-xs font-medium text-gray-500 mt-0.5">Basic access plan</p>
-                    </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Pending Jobs Box -->
+            <div class="bg-secondary-bg p-4 rounded-2xl border border-card-border">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-xs font-bold text-text-main flex items-center gap-1.5"><i class="fas fa-school text-accent-blue"></i> Pending Jobs</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-accent-blue/10 text-accent-blue rounded-full">{{ $pendingJobsList->count() }} Waiting</span>
                 </div>
-                <div class="text-right">
-                    <span class="font-bold text-gray-900 block text-lg">{{ number_format($plan500Count) }}</span>
-                    <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Users</span>
+                <div class="space-y-2">
+                    @forelse($pendingJobsList as $pJob)
+                        <div class="p-2.5 bg-card-bg rounded-xl border border-card-border flex items-center justify-between text-xs">
+                            <div class="truncate mr-2">
+                                <span class="font-bold text-text-main block truncate">{{ $pJob->title }}</span>
+                                <span class="text-[10px] text-text-dark/50">{{ $pJob->school_name }} • {{ $pJob->city->name ?? '' }}</span>
+                            </div>
+                            <a href="{{ route('admin.jobs.show', $pJob->id) }}" class="px-2.5 py-1 bg-accent-blue hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold shrink-0 transition-colors">
+                                Review
+                            </a>
+                        </div>
+                    @empty
+                        <p class="text-xs text-text-dark/40 py-4 text-center">All jobs approved! No pending jobs.</p>
+                    @endforelse
                 </div>
-            </a>
-            
-            <a href="{{ route('admin.crm.index', ['plan_amount' => 1000]) }}" class="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 border border-gray-100 rounded-xl transition-colors group">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform"><i class="fas fa-crown"></i></div>
-                    <div>
-                        <h4 class="font-bold text-gray-900">₹1000 Premium Plan</h4>
-                        <p class="text-xs font-medium text-gray-500 mt-0.5">Full access plan</p>
-                    </div>
+            </div>
+
+            <!-- Pending Tuitions Box -->
+            <div class="bg-secondary-bg p-4 rounded-2xl border border-card-border">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-xs font-bold text-text-main flex items-center gap-1.5"><i class="fas fa-chalkboard-teacher text-emerald-600"></i> Pending Tuitions</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-emerald-500/10 text-emerald-600 rounded-full">{{ $pendingTuitionsList->count() }} Waiting</span>
                 </div>
-                <div class="text-right">
-                    <span class="font-bold text-gray-900 block text-lg">{{ number_format($plan1000Count) }}</span>
-                    <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Users</span>
+                <div class="space-y-2">
+                    @forelse($pendingTuitionsList as $pTui)
+                        <div class="p-2.5 bg-card-bg rounded-xl border border-card-border flex items-center justify-between text-xs">
+                            <div class="truncate mr-2">
+                                <span class="font-bold text-text-main block truncate">Class {{ $pTui->class }} ({{ $pTui->subjects }})</span>
+                                <span class="text-[10px] text-text-dark/50">{{ $pTui->location }} • {{ $pTui->parent_name }}</span>
+                            </div>
+                            <form action="{{ route('admin.tuition-leads.approve', $pTui->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold shrink-0 transition-colors">
+                                    Approve
+                                </button>
+                            </form>
+                        </div>
+                    @empty
+                        <p class="text-xs text-text-dark/40 py-4 text-center">All tuition leads approved! Clean state.</p>
+                    @endforelse
                 </div>
-            </a>
-            
-            <a href="{{ route('admin.subjects.index') }}" class="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 border border-gray-100 rounded-xl transition-colors group">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform"><i class="fas fa-book"></i></div>
-                    <div>
-                        <h4 class="font-bold text-gray-900">Manage Subjects</h4>
-                        <p class="text-xs font-medium text-gray-500 mt-0.5">Configure platform subjects</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <div class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 group-hover:text-emerald-500 group-hover:border-emerald-200 transition-colors">
-                        <i class="fas fa-chevron-right text-xs"></i>
-                    </div>
-                </div>
-            </a>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Custom scrollbar for live activity */
     .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-        background: #f1f5f9; 
-        border-radius: 4px;
+        background: transparent;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #cbd5e1; 
+        background: rgba(148, 163, 184, 0.4); 
         border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8; 
     }
 </style>
 
@@ -383,35 +424,31 @@
     let currentChart = null;
 
     function updateChart(period) {
-        // Update buttons UI
         const btnDays = document.getElementById('btn-chart-days');
         const btnMonths = document.getElementById('btn-chart-months');
         
         if (period === 'days') {
-            btnDays.className = 'px-4 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow-sm transition-all';
-            btnMonths.className = 'px-4 py-1.5 text-xs font-bold rounded-md text-blue-600 hover:bg-blue-100 transition-all';
+            btnDays.className = 'px-3.5 py-1.5 text-xs font-bold rounded-lg bg-accent-blue text-white shadow-sm transition-all';
+            btnMonths.className = 'px-3.5 py-1.5 text-xs font-bold rounded-lg text-text-dark/60 hover:text-text-main transition-all';
         } else {
-            btnMonths.className = 'px-4 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow-sm transition-all';
-            btnDays.className = 'px-4 py-1.5 text-xs font-bold rounded-md text-blue-600 hover:bg-blue-100 transition-all';
+            btnMonths.className = 'px-3.5 py-1.5 text-xs font-bold rounded-lg bg-accent-blue text-white shadow-sm transition-all';
+            btnDays.className = 'px-3.5 py-1.5 text-xs font-bold rounded-lg text-text-dark/60 hover:text-text-main transition-all';
         }
 
         const canvas = document.getElementById('revenueChart');
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        
-        // If data is missing for period, fallback to empty
         const data = chartData[period] || { labels: [], data: [] };
         
         if (currentChart) {
             currentChart.destroy();
         }
 
-        // Create elegant gradient for chart fill
-        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(37, 99, 235, 0.2)'); // blue-600
-        gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+        let gradient = ctx.createLinearGradient(0, 0, 0, 280);
+        gradient.addColorStop(0, 'rgba(14, 165, 233, 0.25)');
+        gradient.addColorStop(1, 'rgba(14, 165, 233, 0.0)');
 
-        // Set global font settings for Chart.js
-        Chart.defaults.color = '#9ca3af'; // Tailwind gray-400
+        Chart.defaults.color = '#94a3b8';
         Chart.defaults.font.family = "'Instrument Sans', sans-serif";
         Chart.defaults.font.weight = '600';
 
@@ -420,19 +457,19 @@
             data: {
                 labels: data.labels,
                 datasets: [{
-                    label: 'Revenue',
+                    label: 'Revenue (₹)',
                     data: data.data,
-                    borderColor: '#2563eb', // blue-600
+                    borderColor: '#0284c7',
                     backgroundColor: gradient,
                     borderWidth: 3,
                     fill: true,
-                    tension: 0.4, // Smooth curve
-                    pointBackgroundColor: '#ffffff', // white
-                    pointBorderColor: '#2563eb',
+                    tension: 0.35,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#0284c7',
                     pointBorderWidth: 2,
-                    pointRadius: 4,
+                    pointRadius: 3.5,
                     pointHoverRadius: 6,
-                    pointHoverBackgroundColor: '#2563eb',
+                    pointHoverBackgroundColor: '#0284c7',
                     pointHoverBorderColor: '#ffffff',
                     pointHoverBorderWidth: 2,
                 }]
@@ -447,18 +484,16 @@
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#1f2937', // gray-800
-                        titleColor: '#f9fafb', // gray-50
-                        bodyColor: '#f9fafb', // gray-50
-                        borderColor: 'transparent',
+                        backgroundColor: '#0f172a',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#38bdf8',
                         padding: 12,
-                        displayColors: false,
-                        cornerRadius: 8,
-                        titleFont: { size: 12, weight: 'bold' },
-                        bodyFont: { size: 14, weight: 'bold' },
+                        cornerRadius: 12,
+                        titleFont: { size: 11, weight: 'bold' },
+                        bodyFont: { size: 13, weight: '900' },
                         callbacks: {
                             label: function(context) {
-                                return '₹' + context.parsed.y.toLocaleString();
+                                return '₹' + Number(context.parsed.y).toLocaleString('en-IN');
                             }
                         }
                     }
@@ -467,29 +502,26 @@
                     y: {
                         beginAtZero: true,
                         grid: { 
-                            color: '#f3f4f6', // gray-100
+                            color: 'rgba(148, 163, 184, 0.1)',
                             drawBorder: false,
-                            borderDash: [5, 5]
+                            borderDash: [4, 4]
                         },
                         border: { display: false },
                         ticks: {
                             callback: function(value) {
-                                return '₹' + value.toLocaleString();
+                                return '₹' + Number(value).toLocaleString('en-IN');
                             },
-                            font: { size: 11 },
-                            padding: 10
+                            font: { size: 10 },
+                            padding: 8
                         }
                     },
                     x: {
-                        grid: { 
-                            display: false,
-                            drawBorder: false,
-                        },
+                        grid: { display: false, drawBorder: false },
                         border: { display: false },
                         ticks: {
-                            font: { size: 11 },
-                            padding: 10,
-                            maxTicksLimit: 8
+                            font: { size: 10 },
+                            padding: 6,
+                            maxTicksLimit: 10
                         }
                     }
                 }
@@ -497,7 +529,6 @@
         });
     }
 
-    // Initialize with days
     document.addEventListener("DOMContentLoaded", function() {
         updateChart('days');
     });

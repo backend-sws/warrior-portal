@@ -7,15 +7,16 @@ use App\Helpers\NotificationHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
-use App\Services\PhonePeService;
+use App\Services\Payment\PaymentGatewayManager;
+use App\Models\PaymentTransaction;
 
 class RegistrationWizardController extends Controller
 {
-    private PhonePeService $phonePe;
+    private PaymentGatewayManager $paymentManager;
 
-    public function __construct()
+    public function __construct(PaymentGatewayManager $paymentManager)
     {
-        $this->phonePe = new PhonePeService();
+        $this->paymentManager = $paymentManager;
     }
 
     public function show()
@@ -252,112 +253,97 @@ class RegistrationWizardController extends Controller
             return response()->json(['success' => false, 'message' => 'You have already paid the registration fee.']);
         }
 
-        // Don't save plan_type yet — only save after payment confirmation
         $planType = $request->plan_type;
         $amount = $planType === 'standard' ? 500 : 1000;
-        $transactionId = 'TXN_' . $user->id . '_' . time();
+        $receipt = 'TXN_' . $user->id . '_' . time();
 
-        // Store plan choice in session for callback
-        session([
-            'last_txn_id' => $transactionId,
-            'pending_plan_type' => $planType
+        $gateway = $this->paymentManager->driver();
+        $order = $gateway->createOrder([
+            'amount'   => $amount,
+            'receipt'  => $receipt,
+            'notes'    => [
+                'user_id'    => (string)$user->id,
+                'user_name'  => (string)$user->name,
+                'user_email' => (string)$user->email,
+                'user_phone' => (string)$user->phone,
+                'plan_type'  => $planType,
+                'type'       => 'registration_fee',
+            ]
         ]);
 
-        $redirectUrl = route('candidate.wizard.callback');
-
-        // Initiate payment via PhonePe V2
-        $result = $this->phonePe->initiatePay($transactionId, $amount, $redirectUrl);
-
-        if ($result['success']) {
+        if (!$order['success']) {
             return response()->json([
-                'success' => true,
-                'redirect_url' => $result['redirect_url']
-            ]);
+                'success' => false,
+                'message' => 'Failed to initiate payment: ' . ($order['error'] ?? 'Please try again.')
+            ], 400);
         }
 
-        \Illuminate\Support\Facades\Log::error('PhonePe Wizard Pay Initiation Failed', [
-            'error' => $result['error'],
-            'raw' => $result['raw'],
+        session([
+            'active_wizard_order_id' => $order['order_id'],
+            'pending_plan_type'      => $planType
+        ]);
+
+        PaymentTransaction::create([
+            'candidate_id'   => $user->id,
+            'amount'         => $amount,
+            'currency'       => 'INR',
+            'transaction_id' => $receipt,
+            'order_id'       => $order['order_id'],
+            'type'           => 'registration_fee',
+            'status'         => 'pending',
+            'gateway'        => $gateway->getGatewayName(),
+            'ip_address'     => request()->ip(),
         ]);
 
         return response()->json([
-            'success' => false,
-            'message' => 'Failed to initiate payment: ' . $result['error']
-        ], 400);
+            'success' => true,
+            'order'   => $order,
+        ]);
     }
 
     public function callback(Request $request)
     {
-        $transactionId = $request->merchantOrderId ?? $request->transactionId ?? session('last_txn_id');
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Session expired. Please log in.');
+        }
+
+        $orderId   = $request->input('razorpay_order_id', session('active_wizard_order_id'));
+        $paymentId = $request->input('razorpay_payment_id');
+        $signature = $request->input('razorpay_signature');
         $pendingPlanType = session('pending_plan_type', 'standard');
 
-        $user = auth()->user();
-
-        // Guard: If transactionId or user is missing, abort
-        if (!$transactionId || !$user) {
-            return redirect()->route('candidate.dashboard')->with('error', 'Payment session expired. Please try again.');
+        if (empty($paymentId) || empty($orderId)) {
+            return redirect()->route('candidate.dashboard')->with('error', 'Payment was cancelled or failed.');
         }
 
-        // Guard: Prevent duplicate processing for the same transaction
-        $existingTxn = \App\Models\PaymentTransaction::where('transaction_id', $transactionId)->first();
-        if ($existingTxn) {
-            if ($existingTxn->status === 'success') {
-                return redirect()->route('candidate.dashboard')->with('success', 'Payment already processed successfully.');
+        $gateway = $this->paymentManager->driver();
+        $verification = $gateway->verifyPayment([
+            'order_id'   => $orderId,
+            'payment_id' => $paymentId,
+            'signature'  => $signature,
+        ]);
+
+        $txn = PaymentTransaction::where('order_id', $orderId)->first();
+
+        if (!$verification['success']) {
+            if ($txn) {
+                $txn->update(['status' => 'failed', 'payment_id' => $paymentId, 'signature' => $signature]);
             }
-            return redirect()->route('candidate.dashboard')->with('error', 'Payment failed or was already processed.');
+            return redirect()->route('candidate.dashboard')->with('error', 'Payment verification failed.');
         }
 
-        // Verify status with PhonePe V2
-        $statusResult = $this->phonePe->checkStatus($transactionId);
-        
-        \Illuminate\Support\Facades\Log::info('PhonePe V2 Wizard Callback', [
-            'result' => $statusResult, 
-            'txn' => $transactionId, 
-            'plan' => $pendingPlanType
-        ]);
+        $amountPaid = $txn ? $txn->amount : ($pendingPlanType === 'standard' ? 500 : 1000);
 
-        $isSuccess = $statusResult['success'];
-        $amountPaid = $statusResult['amount'] / 100; // Convert paise to rupees
-
-        // Always record transaction
-        \App\Models\PaymentTransaction::create([
-            'candidate_id' => $user->id,
-            'amount' => $amountPaid,
-            'transaction_id' => $transactionId,
-            'type' => 'registration_fee',
-            'status' => $isSuccess ? 'success' : 'failed',
-            'gateway_response' => $statusResult['raw']
-        ]);
-
-        // If payment failed — notify candidate and admin, then stop
-        if (!$isSuccess) {
-            // DB Notification to Candidate
-            NotificationHelper::notifyUser(
-                $user->id,
-                'Payment Failed ❌',
-                'Your registration payment could not be processed. Transaction ID: ' . $transactionId . '. Please try again from your dashboard.',
-                null,
-                'fas fa-times-circle'
-            );
-
-            // DB Notification to Admin
-            NotificationHelper::notifyAdmin(
-                'Payment Failed',
-                $user->name . ' attempted payment (TXN: ' . $transactionId . ') but it failed or was cancelled.',
-                null,
-                'fas fa-exclamation-circle'
-            );
-
-            // Email to Candidate
-            try {
-                \Illuminate\Support\Facades\Mail::to($user->email)->send(
-                    new \App\Mail\PaymentFailedMail($user, $transactionId, $amountPaid)
-                );
-            } catch (\Exception $e) {
-                \Log::error('PaymentFailed Email Error: ' . $e->getMessage());
-            }
-
-            return redirect()->route('candidate.dashboard')->with('error', 'Payment failed or cancelled. Please try again.');
+        if ($txn) {
+            $txn->update([
+                'payment_id'       => $paymentId,
+                'signature'        => $signature,
+                'status'           => 'success',
+                'payment_method'   => $verification['payment_method'] ?? 'online',
+                'gateway'          => 'razorpay',
+                'gateway_response' => $verification['raw'] ?? [],
+            ]);
         }
 
         $profile = $user->profile;

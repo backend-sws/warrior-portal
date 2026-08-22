@@ -15,16 +15,26 @@ class ApplicationController extends Controller
         return null;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         if ($redirect = $this->ensureRegistrationComplete()) return $redirect;
+
+        $activeTab = $request->input('tab', 'jobs');
 
         $applications = JobApplication::with(['jobPost.category', 'jobPost.city', 'jobPost.state'])
             ->where('candidate_id', auth()->id())
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10, ['*'], 'jobs_page');
 
-        return view('candidate.applications.index', compact('applications'));
+        $tuitionApplications = \App\Models\TuitionApplication::with(['tuitionLead'])
+            ->where('candidate_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(10, ['*'], 'tuitions_page');
+
+        $jobCount = JobApplication::where('candidate_id', auth()->id())->count();
+        $tuitionCount = \App\Models\TuitionApplication::where('candidate_id', auth()->id())->count();
+
+        return view('candidate.applications.index', compact('applications', 'tuitionApplications', 'activeTab', 'jobCount', 'tuitionCount'));
     }
 
     public function available()
@@ -73,6 +83,10 @@ class ApplicationController extends Controller
         $user = auth()->user();
         $profile = $user->profile;
 
+        if (!$profile || !$profile->gender || !$profile->date_of_birth || !$profile->address || !$profile->preferred_state_id || !$profile->preferred_city_id || !$profile->highest_qualification_id || !$profile->subject_id || !$profile->category_id || !$profile->resume_path) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your Professional Teaching Profile (Category, Subject, Qualification & Resume Upload) before applying for school jobs.');
+        }
+
         // Calculate score again for saving
         $score = 0;
         if ($job->subject_id == $profile->subject_id) $score += 40;
@@ -94,11 +108,6 @@ class ApplicationController extends Controller
             return back()->with('error', 'Congratulations on being selected! Your current plan has successfully ended. You cannot apply for new jobs at this time.');
         }
 
-        // Limit Check (Applies to all plans)
-        if ($profile->used_applications >= $profile->total_allowed_applications) {
-            return back()->with('error', 'You have reached your maximum allowed applications for your current plan.');
-        }
-
         JobApplication::create([
             'job_post_id' => $job->id,
             'candidate_id' => $user->id,
@@ -108,62 +117,14 @@ class ApplicationController extends Controller
 
         $profile->increment('used_applications');
 
-        $remaining = $profile->total_allowed_applications - $profile->used_applications;
-
         // --- Confirm application to candidate ---
         NotificationHelper::notifyUser(
             $user->id,
             'Application Submitted ✅',
-            'You have successfully applied for "' . $job->title . '" at ' . $job->school_name . '. You have ' . $remaining . ' application(s) remaining.',
+            'You have successfully applied for "' . $job->title . '" at ' . $job->school_name . '.',
             route('candidate.applications.index'),
             'fas fa-briefcase'
         );
-
-        // Check if they need a warning (1 remaining)
-        if ($remaining === 1) {
-            // DB Notification
-            \Illuminate\Support\Facades\DB::table('notifications')->insert([
-                'id'              => \Illuminate\Support\Str::uuid(),
-                'type'            => 'App\Notifications\RegistrationExpiryWarning',
-                'notifiable_type' => 'App\Models\User',
-                'notifiable_id'   => $user->id,
-                'data'            => json_encode([
-                    'title'   => 'Almost Out of Applications! ⚠️',
-                    'message' => 'You only have 1 application remaining on your current plan. Use it wisely!',
-                ]),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-            // Email Notification
-            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\RegistrationExpiryMail($user, $remaining));
-        }
-
-        // Check if plan is now expired (0 remaining)
-        if ($remaining <= 0) {
-            NotificationHelper::notifyUser(
-                $user->id,
-                'Registration Plan Expired 🔄',
-                'You have used all your application opportunities. Your registration plan has expired. Please renew to continue applying.',
-                route('candidate.dashboard'),
-                'fas fa-exclamation-triangle'
-            );
-
-            // Email
-            try {
-                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\RenewalReminderMail($user));
-            } catch (\Exception $e) {
-                \Log::error('RenewalReminder Email Error: ' . $e->getMessage());
-            }
-
-            // Notify Admin
-            NotificationHelper::notifyAdmin(
-                'Candidate Plan Expired',
-                $user->name . '\'s registration plan has expired (all ' . $profile->total_allowed_applications . ' applications used).',
-                null,
-                'fas fa-user-times'
-            );
-        }
 
         // Notify Admin of new application
         $adminUser = \App\Models\User::where('role', 'admin')->first();

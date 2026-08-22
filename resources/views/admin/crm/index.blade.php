@@ -12,49 +12,54 @@
 
 @section('content')
 
-{{-- Analytics Cards --}}
+{{-- Analytics Cards (Clickable Filters) --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-gradient-to-br from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 border border-white/20 rounded-xl p-4 shadow-[0_0_20px_rgba(52,211,153,0.5)] flex flex-col items-center justify-center relative overflow-hidden group transition-all">
-        <p class="text-[10px] text-white/80 font-bold uppercase tracking-wider mb-1 relative z-10">Total Candidates</p>
-        <h4 class="text-2xl font-extrabold text-white relative z-10">{{ $stats['total'] }}</h4>
-    </div>
-    <div class="bg-gradient-to-br from-violet-600 to-indigo-500 hover:from-violet-700 hover:to-indigo-600 border border-white/20 rounded-xl p-4 shadow-[0_0_20px_rgba(139,92,246,0.5)] flex flex-col items-center justify-center relative overflow-hidden group transition-all">
-        <p class="text-[10px] text-white/80 font-bold uppercase tracking-wider mb-1 relative z-10">Active / Paid</p>
-        <h4 class="text-2xl font-extrabold text-white relative z-10">{{ $stats['active_paid'] }}</h4>
-    </div>
-    <div class="bg-gradient-to-br from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 border border-white/20 rounded-xl p-4 shadow-[0_0_20px_rgba(6,182,212,0.5)] flex flex-col items-center justify-center relative overflow-hidden group transition-all">
-        <p class="text-[10px] text-white/80 font-bold uppercase tracking-wider mb-1 relative z-10">Signed Agreement</p>
-        <h4 class="text-2xl font-extrabold text-white relative z-10">{{ $stats['signed'] }}</h4>
-    </div>
-    <div class="bg-gradient-to-br from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 border border-white/20 rounded-xl p-4 shadow-[0_0_20px_rgba(249,115,22,0.5)] flex flex-col items-center justify-center relative overflow-hidden group transition-all">
-        <p class="text-[10px] text-white/80 font-bold uppercase tracking-wider mb-1 relative z-10">Incomplete</p>
-        <h4 class="text-2xl font-extrabold text-white relative z-10">{{ $stats['incomplete'] }}</h4>
-    </div>
+    <a href="{{ route('admin.crm.index', ['crm_status' => '', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ !request('crm_status') ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-card-border hover:border-emerald-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Total Candidates</p>
+        <h4 class="text-2xl font-black text-emerald-600 relative z-10">{{ $stats['total'] }}</h4>
+        <span class="text-[10px] text-slate-400 mt-0.5">All Registrations</span>
+    </a>
+
+    <a href="{{ route('admin.crm.index', ['crm_status' => 'active_paid', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('crm_status') === 'active_paid' ? 'border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/10' : 'border-card-border hover:border-purple-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Active / Paid</p>
+        <h4 class="text-2xl font-black text-purple-600 relative z-10">{{ $stats['active_paid'] }}</h4>
+        <span class="text-[10px] text-purple-600 font-bold mt-0.5">Verified & Paid</span>
+    </a>
+
+    <a href="{{ route('admin.crm.index', ['crm_status' => 'signed', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('crm_status') === 'signed' ? 'border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/10' : 'border-card-border hover:border-sky-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-sky-500/5 group-hover:bg-sky-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Signed Agreement</p>
+        <h4 class="text-2xl font-black text-sky-600 relative z-10">{{ $stats['signed'] }}</h4>
+        <span class="text-[10px] text-sky-600 font-bold mt-0.5">Agreement Verified</span>
+    </a>
+
+    <a href="{{ route('admin.crm.index', ['crm_status' => 'incomplete', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('crm_status') === 'incomplete' ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/10' : 'border-card-border hover:border-amber-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors"></div>
+        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Incomplete</p>
+        <h4 class="text-2xl font-black text-amber-600 relative z-10">{{ $stats['incomplete'] }}</h4>
+        <span class="text-[10px] text-amber-600 font-bold mt-0.5">Pending Details</span>
+    </a>
 </div>
 
 {{-- Filter/Search Bar --}}
 <div class="bg-card-bg rounded-t-2xl border-x border-t border-card-border p-4">
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex gap-2 w-full sm:w-auto overflow-x-auto">
-                <a href="{{ route('admin.crm.index', ['role' => 'candidate']) }}" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 {{ request('role', 'candidate') === 'candidate' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Candidates CRM</a>
-                <a href="{{ route('admin.crm.index', ['role' => 'parent']) }}" class="px-4 py-2 text-sm font-semibold rounded-xl transition-colors shrink-0 {{ request('role') === 'parent' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Parents CRM</a>
+        <div class="flex justify-between items-center gap-4">
+            <div class="text-sm text-text-dark/70 font-semibold">
+                Showing {{ $candidates->firstItem() ?? 0 }} to {{ $candidates->lastItem() ?? 0 }} of {{ $candidates->total() }} candidates
             </div>
             
-            <div class="flex justify-between items-center w-full sm:w-auto">
-                <div class="text-sm text-text-dark/50 font-medium sm:hidden">
-                    Showing {{ $candidates->firstItem() ?? 0 }} to {{ $candidates->lastItem() ?? 0 }} of {{ $candidates->total() }} entries
-                </div>
-                <button type="button" onclick="document.getElementById('advanced-filters').classList.toggle('hidden')" class="text-sm font-semibold text-accent-blue flex items-center gap-2 hover:text-accent-blue-hover transition-colors">
-                    <i class="fas fa-filter"></i> Advanced Filters
-                </button>
-            </div>
-        </div>
-        <div class="text-sm text-text-dark/50 font-medium hidden sm:block mt-2 mb-4">
-            Showing {{ $candidates->firstItem() ?? 0 }} to {{ $candidates->lastItem() ?? 0 }} of {{ $candidates->total() }} entries
+            <button type="button" onclick="document.getElementById('advanced-filters').classList.toggle('hidden')" class="text-sm font-semibold text-accent-blue flex items-center gap-2 hover:text-accent-blue-hover transition-colors">
+                <i class="fas fa-filter"></i> Advanced Filters
+            </button>
         </div>
 
-    <form action="{{ route('admin.crm.index') }}" method="GET" class="space-y-4">
-        <input type="hidden" name="role" value="{{ request('role', 'candidate') }}">
+    <form action="{{ route('admin.crm.index') }}" method="GET" class="space-y-4 mt-3">
         <div class="flex items-center relative">
             <i class="fas fa-search absolute left-3 text-text-dark/40 text-sm"></i>
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, email, phone..." 
@@ -123,18 +128,17 @@
 </div>
 
 {{-- Data Table --}}
-<div class="bg-card-bg rounded-b-2xl border border-card-border overflow-x-auto shadow-xl">
+<div class="bg-card-bg rounded-b-2xl border border-card-border overflow-x-auto shadow-sm">
     <table class="w-full text-left border-collapse admin-table">
         <thead>
             <tr>
                 @php
                     $route = 'admin.crm.index';
                     $order = request('order') === 'asc' ? 'desc' : 'asc';
-                    $isCandidate = request('role', 'candidate') === 'candidate';
                 @endphp
-                <th>
+                <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">
                     <a href="{{ route($route, array_merge(request()->query(), ['sort_by' => 'name', 'order' => $order])) }}" class="flex items-center gap-2 hover:text-accent-blue transition-colors">
-                        {{ $isCandidate ? 'Candidate' : 'Parent' }}
+                        Candidate
                         @if(request('sort_by') === 'name')
                             <i class="fas fa-sort-{{ request('order') === 'asc' ? 'up' : 'down' }} text-accent-blue"></i>
                         @else
@@ -142,16 +146,12 @@
                         @endif
                     </a>
                 </th>
-                @if($isCandidate)
-                    <th>Registration Status</th>
-                    <th>Hired Roles</th>
-                @else
-                    <th>Location</th>
-                    <th>Tuitions Posted</th>
-                @endif
-                <th>
+                <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">Teaching Profile</th>
+                <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">Service Readiness</th>
+                <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">Agreement Status</th>
+                <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">
                     <a href="{{ route($route, array_merge(request()->query(), ['sort_by' => 'created_at', 'order' => $order])) }}" class="flex items-center gap-2 hover:text-accent-blue transition-colors">
-                        Joined
+                        Registered
                         @if(request('sort_by') === 'created_at' || !request('sort_by'))
                             <i class="fas fa-sort-{{ request('order') === 'asc' ? 'up' : 'down' }} text-accent-blue"></i>
                         @else
@@ -159,90 +159,73 @@
                         @endif
                     </a>
                 </th>
-                @if($isCandidate)
-                    <th>Admin Rating</th>
-                @endif
-                <th class="text-right">Actions</th>
+                <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase text-right">Actions</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-card-border">
             @forelse($candidates as $candidate)
-            <tr class="group">
-                <td>
-                    <div class="font-semibold text-text-main group-hover:text-accent-blue transition-colors">{{ $candidate->name }}</div>
-                    <div class="text-xs text-text-dark/50 flex flex-col gap-0.5 mt-1">
-                        <span><i class="fas fa-envelope text-[10px] w-3"></i> {{ $candidate->email }}</span>
-                        <span><i class="fas fa-phone-alt text-[10px] w-3"></i> {{ $candidate->phone }}</span>
+            @php
+                $prof = $candidate->profile;
+                $isTuitionReady = ($prof && $prof->date_of_birth && $prof->gender && $prof->address && $prof->preferred_state_id && $prof->preferred_city_id && $prof->highest_qualification_id && $prof->subject_id);
+                $isJobReady = ($isTuitionReady && $prof->category_id && $prof->resume_path);
+            @endphp
+            <tr class="group hover:bg-secondary-bg/50 transition-colors">
+                <td class="py-3.5 px-4">
+                    <div class="font-bold text-sm text-text-main group-hover:text-accent-blue transition-colors flex items-center gap-1.5">
+                        <span>{{ $candidate->name }}</span>
+                        @if($prof && $prof->is_verified)
+                            <i class="fas fa-check-circle text-accent-blue text-xs" title="Verified Candidate"></i>
+                        @endif
                     </div>
-                    @if($isCandidate && $candidate->profile && $candidate->profile->plan_type === 'standard' && !$candidate->profile->is_fee_paid)
-                        <div class="mt-2">
-                            <span class="bg-red-500/10 text-red-500 px-2 py-0.5 rounded flex items-center gap-1 text-[10px] font-bold w-max" title="Standard Plan Placement Fee Pending">
-                                <i class="fas fa-exclamation-triangle"></i> ₹500 Due
-                            </span>
-                        </div>
+                    <div class="text-xs text-text-dark/50 flex flex-col gap-0.5 mt-0.5">
+                        <span><i class="fas fa-phone-alt text-[10px] w-3.5"></i> {{ $candidate->phone }}</span>
+                        <span><i class="fas fa-envelope text-[10px] w-3.5"></i> {{ $candidate->email }}</span>
+                    </div>
+                </td>
+
+                <td class="py-3.5 px-4">
+                    <div class="text-xs font-bold text-text-main">
+                        {{ $prof?->subject?->name ?? 'Subject N/A' }}
+                    </div>
+                    <div class="text-[11px] text-text-dark/60 mt-0.5">
+                        {{ $prof?->highestQualification?->name ?? 'N/A' }} • {{ $prof?->experience_years ?? 0 }} Yrs Exp
+                    </div>
+                    <div class="text-[10px] text-text-dark/40">
+                        📍 {{ $prof?->preferredCity?->name ?? 'City N/A' }}
+                    </div>
+                </td>
+
+                <td class="py-3.5 px-4">
+                    <div class="flex flex-col gap-1 w-max">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold {{ $isJobReady ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-secondary-bg text-text-dark/50 border border-card-border' }}">
+                            <i class="fas fa-school text-[9px]"></i> {{ $isJobReady ? 'School Ready' : 'School Incomplete' }}
+                        </span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold {{ $isTuitionReady ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-secondary-bg text-text-dark/50 border border-card-border' }}">
+                            <i class="fas fa-chalkboard-teacher text-[9px]"></i> {{ $isTuitionReady ? 'Tuition Ready' : 'Tuition Incomplete' }}
+                        </span>
+                    </div>
+                </td>
+
+                <td class="py-3.5 px-4">
+                    @if($prof && ($prof->is_agreement_signed || $prof->agreement_pdf_path))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-blue-50 text-accent-blue border border-accent-blue/20">
+                            <i class="fas fa-file-signature text-[9px]"></i> Signed
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                            <i class="fas fa-clock text-[9px]"></i> Pending
+                        </span>
                     @endif
                 </td>
-                @if($isCandidate)
-                    <td>
-                        @if($candidate->profile && $candidate->profile->is_fee_paid)
-                            <span class="bg-green-500/10 text-green-400 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-green-500/20 uppercase tracking-wider flex items-center gap-1 w-max">
-                                <i class="fas fa-check-circle"></i> Active / Paid
-                            </span>
-                        @elseif($candidate->profile && $candidate->profile->is_agreement_signed)
-                            <span class="bg-accent-blue/10 text-accent-blue px-2.5 py-1 rounded-lg text-[10px] font-bold border border-accent-blue/20 uppercase tracking-wider flex items-center gap-1 w-max">
-                                <i class="fas fa-signature"></i> Signed
-                            </span>
-                        @else
-                            <span class="bg-card-border/50 text-text-dark/60 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-card-border uppercase tracking-wider flex items-center gap-1 w-max">
-                                <i class="fas fa-exclamation-circle"></i> Incomplete
-                            </span>
-                        @endif
-                    </td>
-                    <td>
-                        @php
-                            $hired = $candidate->applications->where('status', 'hired');
-                        @endphp
-                        @if($hired->count() > 0)
-                            <span class="text-green-400 font-bold bg-green-500/10 px-2.5 py-1 rounded-lg text-xs">{{ $hired->count() }} Role(s)</span>
-                        @else
-                            <span class="text-text-dark/30 text-xs font-semibold">None</span>
-                        @endif
-                    </td>
-                @else
-                    <td>
-                        <span class="text-sm font-semibold text-text-dark/80">
-                            {{ $candidate->parentProfile->city ?? 'N/A' }}
-                        </span>
-                    </td>
-                    <td>
-                        @php
-                            $tuitionsCount = \App\Models\HomeTuitionLead::where('user_id', $candidate->id)->count();
-                        @endphp
-                        <span class="text-sm font-bold text-text-main">{{ $tuitionsCount }}</span>
-                    </td>
-                @endif
-                <td class="text-text-dark/60 text-sm">
-                    {{ $candidate->created_at->format('M d, Y') }}
+
+                <td class="py-3.5 px-4 text-text-dark/60 text-xs">
+                    {{ $candidate->created_at->format('d M, Y') }}
                 </td>
-                @if($isCandidate)
-                    <td>
-                        @if($candidate->rating)
-                            <div class="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity" onclick="openRatingModal({{ $candidate->id }}, {{ $candidate->rating->communication }}, {{ $candidate->rating->subject_knowledge }}, {{ $candidate->rating->demo_performance }}, {{ $candidate->rating->english_fluency }}, {{ $candidate->rating->discipline }}, '{{ addslashes($candidate->rating->remarks ?? '') }}')">
-                                <span class="bg-yellow-500/10 text-yellow-500 text-xs font-bold px-2 py-1 rounded border border-yellow-500/20">
-                                    <i class="fas fa-star text-yellow-500 mr-1"></i> {{ number_format($candidate->rating->overall_rating, 1) }}
-                                </span>
-                            </div>
-                        @else
-                            <button type="button" onclick="openRatingModal({{ $candidate->id }}, 3, 3, 3, 3, 3, '')" class="text-[10px] uppercase font-bold text-text-dark/50 hover:text-accent-blue transition-colors px-2 py-1 border border-dashed border-card-border rounded">
-                                <i class="far fa-star"></i> Rate
-                            </button>
-                        @endif
-                    </td>
-                @endif
-                <td>
+
+                <td class="py-3.5 px-4 text-right">
                     <div class="flex items-center justify-end gap-2">
-                        <a href="{{ route('admin.crm.show', $candidate->id) }}" class="px-3 py-1.5 rounded-lg bg-accent-blue/10 text-accent-blue hover:bg-accent-blue hover:text-white text-xs font-semibold transition-colors flex items-center gap-1">
-                            Manage CRM <i class="fas fa-arrow-right text-[10px]"></i>
+                        <a href="{{ route('admin.crm.show', $candidate->id) }}" class="px-3.5 py-1.5 rounded-xl bg-accent-blue hover:bg-blue-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
+                            <span>Manage</span> <i class="fas fa-arrow-right text-[10px]"></i>
                         </a>
                     </div>
                 </td>
@@ -250,11 +233,11 @@
             @empty
             <tr>
                 <td colspan="6" class="py-16 text-center">
-                    <div class="w-16 h-16 bg-secondary-bg rounded-2xl flex items-center justify-center text-text-dark/20 text-3xl mx-auto mb-4 border border-card-border">
+                    <div class="w-14 h-14 bg-secondary-bg rounded-2xl flex items-center justify-center text-text-dark/20 text-2xl mx-auto mb-3 border border-card-border">
                         <i class="fas fa-users-slash"></i>
                     </div>
-                    <p class="text-text-main font-bold text-lg mb-1">No candidates found</p>
-                    <p class="text-text-dark/40 text-sm">Try adjusting your search criteria.</p>
+                    <p class="text-text-main font-bold text-base mb-1">No candidates found</p>
+                    <p class="text-text-dark/40 text-xs">Try adjusting your filters or onboard a new candidate.</p>
                 </td>
             </tr>
             @endforelse

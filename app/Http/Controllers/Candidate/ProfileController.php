@@ -17,35 +17,61 @@ class ProfileController extends Controller
         $user = auth()->user();
         $profile = $user->profile;
         
-        $categories = Category::where('is_active', true)->get();
-        $subjects = Subject::where('is_active', true)->get();
-        $qualifications = Qualification::where('is_active', true)->get();
-        $states = State::where('is_active', true)->get();
-        $cities = City::where('state_id', $profile->preferred_state_id)->where('is_active', true)->get();
+        $categories = Category::where('is_active', true)->orderBy('name')->get();
+        $subjects = Subject::where('is_active', true)->orderBy('name')->get();
+        $qualifications = Qualification::where('is_active', true)->orderBy('id')->get();
+        $states = State::where('is_active', true)->orderBy('name')->get();
+        $cities = City::where('state_id', $profile->preferred_state_id)->where('is_active', true)->orderBy('name')->get();
 
-        return view('candidate.profile.edit', compact('user', 'profile', 'categories', 'subjects', 'qualifications', 'states', 'cities'));
+        // Check readiness
+        $isTuitionProfileReady = !empty($profile->gender) 
+            && !empty($profile->date_of_birth) 
+            && !empty($profile->address) 
+            && !empty($profile->preferred_state_id) 
+            && !empty($profile->preferred_city_id) 
+            && !empty($profile->subject_id) 
+            && !empty($profile->highest_qualification_id);
+
+        $isJobProfileReady = $isTuitionProfileReady 
+            && !empty($profile->category_id) 
+            && !empty($profile->resume_path);
+
+        return view('candidate.profile.edit', compact(
+            'user', 
+            'profile', 
+            'categories', 
+            'subjects', 
+            'qualifications', 
+            'states', 
+            'cities',
+            'isTuitionProfileReady',
+            'isJobProfileReady'
+        ));
     }
 
     public function update(Request $request)
     {
         $request->validate([
+            // Basic & Tuition Requirements
             'date_of_birth' => 'required|date',
             'gender' => 'required|in:Male,Female,Other',
             'address' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'highest_qualification_id' => 'required|exists:qualifications,id',
             'preferred_state_id' => 'required|exists:states,id',
             'preferred_city_id' => 'required|exists:cities,id',
-            'experience_years' => 'required|integer|min:0',
+            'highest_qualification_id' => 'required|exists:qualifications,id',
+            'subject_id' => 'required|exists:subjects,id',
+
+            // School Job Requirements (Optional for 11th/12th home tutors, required when applying for school jobs)
+            'category_id' => 'nullable|exists:categories,id',
+            'experience_years' => 'nullable|integer|min:0',
             'current_salary' => 'nullable|string',
-            'expected_salary' => 'required|string',
+            'expected_salary' => 'nullable|string',
             'current_school' => 'nullable|string',
             'english_fluency' => 'nullable|in:beginner,intermediate,fluent',
             'residential_preference' => 'nullable|in:residential,day,both',
             'availability_to_join' => 'nullable|string',
-            'resume' => 'nullable|mimes:pdf,doc,docx|max:2048',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'resume' => 'nullable|mimes:pdf,doc,docx|max:3072',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
         ]);
 
         $user = auth()->user();
@@ -65,12 +91,12 @@ class ProfileController extends Controller
             'date_of_birth' => $request->date_of_birth,
             'gender' => $request->gender,
             'address' => $request->address,
-            'category_id' => $request->category_id,
-            'subject_id' => $request->subject_id,
-            'highest_qualification_id' => $request->highest_qualification_id,
             'preferred_state_id' => $request->preferred_state_id,
             'preferred_city_id' => $request->preferred_city_id,
-            'experience_years' => $request->experience_years,
+            'highest_qualification_id' => $request->highest_qualification_id,
+            'subject_id' => $request->subject_id,
+            'category_id' => $request->category_id,
+            'experience_years' => $request->experience_years ?? 0,
             'current_salary' => $request->current_salary,
             'expected_salary' => $request->expected_salary,
             'current_school' => $request->current_school,
@@ -80,7 +106,7 @@ class ProfileController extends Controller
             'is_profile_complete' => true,
         ]);
 
-        return redirect()->route('candidate.profile.edit')->with('success', 'Profile updated successfully.');
+        return redirect()->route('candidate.profile.edit')->with('success', 'Profile details updated successfully.');
     }
 
     public function updatePassword(Request $request)
@@ -100,6 +126,6 @@ class ProfileController extends Controller
             'password' => \Illuminate\Support\Facades\Hash::make($request->new_password),
         ]);
 
-        return back()->with('password_success', 'Password updated successfully!');
+        return back()->with('password_success', 'Password updated successfully.');
     }
 }

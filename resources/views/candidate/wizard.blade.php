@@ -654,8 +654,8 @@
                                 <p class="text-xs text-[#031b4e]/60 uppercase tracking-wider font-semibold">Total to Pay</p>
                                 <p class="text-xl font-bold text-[#031b4e]" x-text="selectedPlan === 'premium' ? '₹1000' : '₹500'"></p>
                             </div>
-                            <button type="button" @click="submitPayment" class="bg-[#5f259f] text-white px-8 py-3.5 rounded-xl font-semibold shadow-lg hover:brightness-110 transition-all hover:-translate-y-0.5 flex items-center gap-2">
-                                Pay via PhonePe <i class="fas fa-lock text-xs opacity-70"></i>
+                            <button type="button" @click="submitPayment" class="bg-gradient-to-r from-blue-700 to-indigo-700 text-white px-8 py-3.5 rounded-xl font-semibold shadow-lg hover:brightness-110 transition-all hover:-translate-y-0.5 flex items-center gap-2">
+                                Pay via Razorpay <i class="fas fa-lock text-xs opacity-70"></i>
                             </button>
                         </div>
                     </div>
@@ -1206,7 +1206,7 @@
 
             async submitPayment() {
                 this.error = '';
-                this.loadingMessage = 'Initiating Secure Payment...';
+                this.loadingMessage = 'Connecting to Razorpay...';
                 this.loading = true;
 
                 try {
@@ -1222,9 +1222,70 @@
                     });
 
                     const data = await response.json();
+                    this.loading = false;
                     
-                    if (response.ok && data.success && data.redirect_url) {
-                        window.location.href = data.redirect_url;
+                    if (response.ok && data.success && data.order) {
+                        const order = data.order;
+                        const self = this;
+
+                        const options = {
+                            "key": order.key,
+                            "amount": order.amount_paisa,
+                            "currency": order.currency || "INR",
+                            "name": order.name || "Warriors Educare",
+                            "description": "Teacher Registration Fee",
+                            "order_id": order.order_id,
+                            "handler": function (rzpResponse) {
+                                self.loadingMessage = 'Verifying Payment...';
+                                self.loading = true;
+
+                                // Submit to callback
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = '{{ route("candidate.wizard.callback") }}';
+
+                                const csrfInput = document.createElement('input');
+                                csrfInput.type = 'hidden';
+                                csrfInput.name = '_token';
+                                csrfInput.value = '{{ csrf_token() }}';
+                                form.appendChild(csrfInput);
+
+                                const payIdInput = document.createElement('input');
+                                payIdInput.type = 'hidden';
+                                payIdInput.name = 'razorpay_payment_id';
+                                payIdInput.value = rzpResponse.razorpay_payment_id;
+                                form.appendChild(payIdInput);
+
+                                const orderIdInput = document.createElement('input');
+                                orderIdInput.type = 'hidden';
+                                orderIdInput.name = 'razorpay_order_id';
+                                orderIdInput.value = rzpResponse.razorpay_order_id;
+                                form.appendChild(orderIdInput);
+
+                                const sigInput = document.createElement('input');
+                                sigInput.type = 'hidden';
+                                sigInput.name = 'razorpay_signature';
+                                sigInput.value = rzpResponse.razorpay_signature;
+                                form.appendChild(sigInput);
+
+                                document.body.appendChild(form);
+                                form.submit();
+                            },
+                            "prefill": {
+                                "name": "{{ $user->name ?? '' }}",
+                                "email": "{{ $user->email ?? '' }}",
+                                "contact": "{{ $user->phone ?? '' }}"
+                            },
+                            "theme": {
+                                "color": "#0a2558"
+                            }
+                        };
+
+                        const rzp = new Razorpay(options);
+                        rzp.on('payment.failed', function(resp) {
+                            self.error = "Payment failed: " + resp.error.description;
+                        });
+                        rzp.open();
                     } else {
                         this.error = data.message || 'Failed to connect to payment gateway.';
                         this.loading = false;
@@ -1237,6 +1298,7 @@
         }));
     });
 </script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <style>
     select option {

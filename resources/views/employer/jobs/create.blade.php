@@ -83,51 +83,61 @@
                             </div>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Category -->
                                 <div>
                                     <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Job Category <span class="text-red-500">*</span></label>
-                                    <select :name="`jobs[${index}][category_id]`" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
+                                    <select :name="`jobs[${index}][category_id]`" x-model="job.category_id" @change="fetchSubjects(job)" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors cursor-pointer">
                                         <option value="">Select Category</option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+
+                                <!-- Subject (Dynamic based on Category) -->
                                 <div>
                                     <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Subject <span class="text-red-500">*</span></label>
-                                    <select :name="`jobs[${index}][subject_id]`" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
-                                        <option value="">Select Subject</option>
-                                        @foreach($subjects as $subject)
-                                            <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                                        @endforeach
+                                    <select :name="`jobs[${index}][subject_id]`" x-model="job.subject_id" :disabled="!job.category_id || job.loadingSubjects" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors disabled:opacity-50 disabled:bg-slate-100 cursor-pointer">
+                                        <option value="" x-text="!job.category_id ? '— First Select Category —' : (job.loadingSubjects ? 'Loading subjects...' : 'Select Subject')"></option>
+                                        <template x-for="subject in job.subjects" :key="subject.id">
+                                            <option :value="subject.id" x-text="subject.name"></option>
+                                        </template>
                                     </select>
                                 </div>
+
+                                <!-- Qualification (Enabled once Subject is selected) -->
                                 <div>
                                     <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Required Qualification <span class="text-red-500">*</span></label>
-                                    <select :name="`jobs[${index}][qualification_id]`" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
-                                        <option value="">Select Qualification</option>
+                                    <select :name="`jobs[${index}][qualification_id]`" x-model="job.qualification_id" :disabled="!job.subject_id" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors disabled:opacity-50 disabled:bg-slate-100 cursor-pointer">
+                                        <option value="" x-text="!job.subject_id ? '— First Select Subject —' : 'Select Qualification'"></option>
                                         @foreach($qualifications as $qualification)
                                             <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+
+                                <!-- State -->
                                 <div>
                                     <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">State <span class="text-red-500">*</span></label>
-                                    <select :name="`jobs[${index}][state_id]`" x-model="job.state_id" @change="fetchCities(job)" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
+                                    <select :name="`jobs[${index}][state_id]`" x-model="job.state_id" @change="fetchCities(job)" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors cursor-pointer">
                                         <option value="">Select State</option>
                                         @foreach($states as $state)
                                             <option value="{{ $state->id }}">{{ $state->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+
+                                <!-- City (Dynamic based on State) -->
                                 <div>
                                     <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">City <span class="text-red-500">*</span></label>
-                                    <select :name="`jobs[${index}][city_id]`" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
-                                        <option value="">Select City</option>
+                                    <select :name="`jobs[${index}][city_id]`" x-model="job.city_id" :disabled="!job.state_id || job.loadingCities" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors disabled:opacity-50 disabled:bg-slate-100 cursor-pointer">
+                                        <option value="" x-text="!job.state_id ? '— First Select State —' : (job.loadingCities ? 'Loading cities...' : 'Select City')"></option>
                                         <template x-for="city in job.cities" :key="city.id">
                                             <option :value="city.id" x-text="city.name"></option>
                                         </template>
                                     </select>
                                 </div>
+
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Salary Range (Monthly)</label>
                                     <input type="text" :name="`jobs[${index}][salary_range]`" class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors" placeholder="e.g. 40,000 - 60,000">
@@ -160,20 +170,74 @@
 <script>
     function jobRepeater() {
         return {
-            jobs: [ { id: Date.now(), state_id: '', cities: [] } ],
+            jobs: [
+                {
+                    id: Date.now(),
+                    category_id: '',
+                    subject_id: '',
+                    qualification_id: '',
+                    state_id: '',
+                    city_id: '',
+                    subjects: [],
+                    cities: [],
+                    loadingSubjects: false,
+                    loadingCities: false
+                }
+            ],
             
             addJob() {
-                this.jobs.push({ id: Date.now(), state_id: '', cities: [] });
+                this.jobs.push({
+                    id: Date.now(),
+                    category_id: '',
+                    subject_id: '',
+                    qualification_id: '',
+                    state_id: '',
+                    city_id: '',
+                    subjects: [],
+                    cities: [],
+                    loadingSubjects: false,
+                    loadingCities: false
+                });
+            },
+            
+            fetchSubjects(job) {
+                job.subject_id = '';
+                job.qualification_id = '';
+                if(job.category_id) {
+                    job.loadingSubjects = true;
+                    fetch(`/api/categories/${job.category_id}/subjects`)
+                        .then(response => response.json())
+                        .then(data => {
+                            job.subjects = data;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching subjects:', error);
+                            job.subjects = [];
+                        })
+                        .finally(() => {
+                            job.loadingSubjects = false;
+                        });
+                } else {
+                    job.subjects = [];
+                }
             },
             
             fetchCities(job) {
+                job.city_id = '';
                 if(job.state_id) {
+                    job.loadingCities = true;
                     fetch(`/api/states/${job.state_id}/cities`)
                         .then(response => response.json())
                         .then(data => {
                             job.cities = data;
                         })
-                        .catch(error => console.error('Error fetching cities:', error));
+                        .catch(error => {
+                            console.error('Error fetching cities:', error);
+                            job.cities = [];
+                        })
+                        .finally(() => {
+                            job.loadingCities = false;
+                        });
                 } else {
                     job.cities = [];
                 }

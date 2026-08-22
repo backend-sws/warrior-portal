@@ -2,6 +2,7 @@
 
 @section('content')
     @include('candidate.partials.nav')
+    
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
         <div class="mb-5 sm:mb-8">
             <h2 class="text-xl sm:text-2xl font-bold text-[#031b4e]">Available Tuitions</h2>
@@ -14,38 +15,78 @@
     </div>
 @endif
 
-<!-- Tuition Agreement Section -->
-<div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 shadow-sm p-4 sm:p-6 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#f4f7f5]/80">
-    <div class="flex items-start sm:items-center gap-3 sm:gap-4">
-        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-full bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-lg sm:text-xl shrink-0 mt-0.5 sm:mt-0">
-            <i class="fas fa-file-signature"></i>
+@if(session('info'))
+    <div class="bg-blue-50 text-blue-700 p-4 rounded-xl border border-blue-100 mb-6 flex items-center text-xs sm:text-sm">
+        <i class="fas fa-info-circle mr-3"></i> {{ session('info') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 mb-6 flex items-center text-xs sm:text-sm">
+        <i class="fas fa-exclamation-circle mr-3"></i> {{ session('error') }}
+    </div>
+@endif
+
+<!-- Tuition Agreement Status Banner -->
+@if(!$isAgreementSigned)
+    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-start gap-3 sm:gap-4">
+            <div class="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl shrink-0 shadow-md shadow-amber-500/20">
+                <i class="fas fa-lock"></i>
+            </div>
+            <div>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-200/60 text-amber-900 text-[11px] font-extrabold uppercase tracking-wider mb-1">
+                    Agreement Required to Unlock Tuitions
+                </div>
+                <h3 class="text-base sm:text-lg font-black text-[#031b4e]">Home Tuition Tutor Service Agreement (Unsigned)</h3>
+                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">Please review and digitally sign the agreement below to unlock application access for all home tuitions.</p>
+            </div>
         </div>
-        <div>
-            <h3 class="text-sm sm:text-base md:text-lg font-bold text-[#031b4e] leading-snug">Home Tuition - Tutor Service Agreement</h3>
-            <p class="text-xs sm:text-sm text-[#031b4e]/70 mt-0.5">Review and download your tuition service agreement.</p>
+        <div class="shrink-0">
+            <button onclick="document.getElementById('tuitionAgreementModal').classList.remove('hidden')" class="w-full sm:w-auto px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs sm:text-sm font-extrabold transition-all shadow-md flex items-center justify-center gap-2">
+                <i class="fas fa-file-signature"></i> <span>Review & Sign Agreement</span>
+            </button>
         </div>
     </div>
-    <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto shrink-0">
-        <button onclick="document.getElementById('tuitionAgreementModal').classList.remove('hidden')" class="flex-1 sm:flex-initial px-3.5 sm:px-4 py-2.5 bg-white border border-[#031b4e]/20 text-[#031b4e] rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm flex items-center justify-center gap-1.5">
-            <i class="fas fa-eye text-xs"></i> <span>View</span>
-        </button>
-        <button onclick="printTuitionAgreement()" class="flex-1 sm:flex-initial px-3.5 sm:px-4 py-2.5 bg-[#0ea5e9] text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-[#0ea5e9]/90 transition-colors shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap">
-            <i class="fas fa-download text-xs"></i> <span>Download PDF</span>
-        </button>
+@else
+    <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 shadow-sm p-4 sm:p-6 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
+        <div class="flex items-start sm:items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center text-lg sm:text-xl shrink-0 mt-0.5 sm:mt-0">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h3 class="text-sm sm:text-base md:text-lg font-bold text-[#031b4e] leading-snug">Home Tuition - Tutor Service Agreement</h3>
+                    <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">Signed ✅</span>
+                </div>
+                <p class="text-xs sm:text-sm text-[#031b4e]/70 mt-0.5">Signed on {{ \Carbon\Carbon::parse($profile->tuition_agreement_signed_at ?? $profile->signature_date_time ?? now())->format('d M Y, h:i A') }}</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto shrink-0">
+            <button onclick="document.getElementById('tuitionAgreementModal').classList.remove('hidden')" class="flex-1 sm:flex-initial px-4 py-2.5 bg-white border border-[#031b4e]/20 text-[#031b4e] rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm flex items-center justify-center gap-1.5">
+                <i class="fas fa-eye text-xs"></i> <span>View Agreement</span>
+            </button>
+            <button onclick="printTuitionAgreement()" class="flex-1 sm:flex-initial px-4 py-2.5 bg-[#0ea5e9] text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-[#0ea5e9]/90 transition-colors shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap">
+                <i class="fas fa-download text-xs"></i> <span>Download PDF</span>
+            </button>
+        </div>
     </div>
-</div>
+@endif
 
 <!-- Modal for Tuition Agreement -->
-<div id="tuitionAgreementModal" class="fixed inset-0 z-[999] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
-    <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden relative">
-        <div class="p-3.5 sm:p-5 md:p-6 border-b border-[#031b4e]/10 flex justify-between items-center bg-[#f4f7f5]">
-            <h3 class="text-sm sm:text-base md:text-xl font-bold text-[#031b4e] truncate pr-2">Home Tuition – Tutor Service Agreement</h3>
-            <button onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-colors shrink-0">
+<div id="tuitionAgreementModal" class="fixed inset-0 z-[9999] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden relative border border-slate-200">
+        <div class="p-4 sm:p-5 md:p-6 border-b border-[#031b4e]/10 flex justify-between items-center bg-[#031b4e] text-white">
+            <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-accent-yellow block">Warriors Educare</span>
+                <h3 class="text-base sm:text-lg md:text-xl font-black">Home Tuition – Tutor Service Agreement</h3>
+            </div>
+            <button onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="w-9 h-9 rounded-full bg-white/10 text-white hover:bg-white/20 flex items-center justify-center transition-colors shrink-0">
                 <i class="fas fa-times text-sm"></i>
             </button>
         </div>
         
-        <div id="printableTuitionAgreement" class="p-4 sm:p-6 md:p-8 overflow-y-auto custom-scrollbar text-[#031b4e]/80 text-xs sm:text-sm relative">
+        <div id="printableTuitionAgreement" class="p-4 sm:p-6 md:p-8 overflow-y-auto custom-scrollbar text-[#031b4e]/80 text-xs sm:text-sm relative bg-white">
             <!-- Watermark Image -->
             <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" class="watermark-img" alt="Watermark" style="position: absolute; top: 65%; left: 50%; transform: translateX(-50%); width: 60%; max-width: 500px; opacity: 0.1; z-index: 0; pointer-events: none;">
 
@@ -56,8 +97,6 @@
             </div>
             
             @php
-                $profile = auth()->user()->profile;
-                
                 // Photo URL
                 $photoUrl = null;
                 $photoPath = null;
@@ -74,28 +113,6 @@
                     $mime = mime_content_type($photoPath);
                     $photoUrl = 'data:' . $mime . ';base64,' . base64_encode($photoData);
                 }
-
-                // Signature
-                $signature = '';
-                if ($profile->signature_type === 'type') {
-                    $signature = $profile->signature_data;
-                } else {
-                    if (Str::startsWith($profile->signature_data, 'data:image')) {
-                        $signature = $profile->signature_data;
-                    } elseif ($profile->signature_type === 'upload') {
-                        $sigPath = Storage::disk('public')->path($profile->signature_data);
-                        if (file_exists($sigPath)) {
-                            $sigData = file_get_contents($sigPath);
-                            $mime = mime_content_type($sigPath);
-                            $signature = 'data:' . $mime . ';base64,' . base64_encode($sigData);
-                        } else {
-                            $signature = Storage::disk('public')->url($profile->signature_data);
-                        }
-                    } else {
-                        // Assuming raw bytes converted to base64
-                        $signature = 'data:image/png;base64,' . base64_encode($profile->signature_data);
-                    }
-                }
             @endphp
             
             <div class="relative z-10">
@@ -106,7 +123,7 @@
                     <p class="mb-0"><strong>Candidate Name:</strong> {{ auth()->user()->name }}</p>
                     <p class="mb-0"><strong>Email:</strong> {{ auth()->user()->email }}</p>
                     <p class="mb-0"><strong>Phone:</strong> {{ auth()->user()->phone }}</p>
-                    <p class="mb-0"><strong>Address:</strong> {{ $profile->address }}</p>
+                    <p class="mb-0"><strong>Address:</strong> {{ $profile->address ?? 'Not specified' }}</p>
                 </div>
                 @if($photoUrl)
                     <div class="shrink-0 self-center sm:self-auto">
@@ -118,81 +135,26 @@
             <p class="mb-4">This Agreement is entered into voluntarily between Warriors Educare ("Agency") and the undersigned Candidate ("Tutor").</p>
 
             <h5 class="font-bold text-[#031b4e] mb-2">1. Purpose of Agreement</h5>
-            <p class="mb-4">This Agreement confirms that the Candidate voluntarily authorizes Warriors Educare to provide home tuition opportunities and to begin the tutor placement process.</p>
+            <p class="mb-4">Warriors Educare provides consultancy, placement support, and home tuition matchmaking services to educators. By accepting this Agreement, the Candidate authorizes the Agency to connect them with prospective parents/students for home tuition assignments.</p>
 
-            <h5 class="font-bold text-[#031b4e] mb-2">2. Candidate Declaration</h5>
-            <p class="mb-2">The Candidate declares that:</p>
-            <ul class="list-disc pl-5 mb-4 space-y-2">
-                <li>All information and documents provided are true and genuine.</li>
-                <li>Any false information or forged documents may result in immediate cancellation of registration without any refund.</li>
-                <li>The Candidate agrees to cooperate throughout the recruitment and placement process.</li>
-                <li>The Candidate agrees to maintain professionalism while interacting with parents, students and Warriors Educare.</li>
-            </ul>
+            <h5 class="font-bold text-[#031b4e] mb-2">2. Service Charge & Placement Terms</h5>
+            <p class="mb-4">Upon successful confirmation and assignment of any home tuition lead, the Candidate agrees to pay the stipulated service charge as communicated by the Agency. The service charge is non-refundable once classes commence.</p>
 
-            <h5 class="font-bold text-[#031b4e] mb-2">3. Registration Fee</h5>
-            <p class="mb-2">The Candidate agrees to pay a Registration Fee as follows:</p>
-            <ul class="list-disc pl-5 mb-4 space-y-2">
-                <li>₹500 – Junior Classes (Up to Class V)</li>
-                <li>₹600 – Senior Classes (Up to Class XII)</li>
-            </ul>
-            <p class="mb-4">Registration is mandatory before receiving any tuition lead, demo class or placement opportunity.</p>
+            <h5 class="font-bold text-[#031b4e] mb-2">3. Professional Code of Conduct</h5>
+            <p class="mb-4">The Candidate agrees to maintain the highest level of professionalism, punctuality, academic integrity, and respectful conduct during all demo sessions and confirmed home tuition classes.</p>
 
-            <h5 class="font-bold text-[#031b4e] mb-2">4. Registration Validity</h5>
-            <ul class="list-disc pl-5 mb-4 space-y-2">
-                <li>Registration shall remain valid for 1 (One) Year from the date of registration.</li>
-                <li>During the validity period, Warriors Educare will make reasonable efforts to provide up to 4 confirmed tuition leads, subject to the Candidate's qualifications, preferred location, subject availability and parents' requirements.</li>
-                <li>Registration is non-transferable.</li>
-            </ul>
-
-            <h5 class="font-bold text-[#031b4e] mb-2">5. Registration Refund Policy</h5>
-            <ul class="list-disc pl-5 mb-4 space-y-2">
-                <li>If a parent cancels or declines a demo class and Warriors Educare is unable to provide another suitable confirmed tuition lead within 25 working days, the Candidate shall be eligible for a 100% refund of the Registration Fee.</li>
-                <li>The refund process shall commence only after the completion of 25 working days from the date of the cancelled demo.</li>
-            </ul>
-
-            <h5 class="font-bold text-[#031b4e] mb-2">6. Registration Cancellation</h5>
-            <p class="mb-4">If the Candidate receives three (3) consecutive demo rejections due to candidate-related reasons, Warriors Educare reserves the right to cancel the registration without any refund.</p>
-
-            <h5 class="font-bold text-[#031b4e] mb-2">7. Service Charge</h5>
-            <p class="mb-4">After successfully joining the tuition and receiving the first month's tuition fee/payment, the Candidate agrees to pay 50% of the first month's tuition fee (equivalent to 15 days' tuition fee) to Warriors Educare as the Service Charge.</p>
-
-            <h5 class="font-bold text-[#031b4e] mb-2">8. Payment Timeline & Delay Charges</h5>
-            <ul class="list-disc pl-5 mb-4 space-y-2">
-                <li>The Service Charge must be paid within 12 hours of receiving the first month's tuition fee/payment.</li>
-                <li>Failure to make payment within the prescribed time shall attract a Late Payment Penalty of ₹200 per day until the outstanding amount is fully cleared.</li>
-            </ul>
-
-            <h5 class="font-bold text-[#031b4e] mb-2">9. Tutor Responsibilities</h5>
-            <p class="mb-2">The Candidate shall:</p>
-            <ul class="list-disc pl-5 mb-4 space-y-2">
-                <li>Maintain honesty, discipline and professionalism.</li>
-                <li>Reach tuition on time.</li>
-                <li>Behave respectfully with parents and students.</li>
-                <li>Follow all commitments made during the placement process.</li>
-            </ul>
-            <p class="mb-4">Any misconduct or unprofessional behaviour may result in cancellation of registration and future services.</p>
-
-            <h5 class="font-bold text-[#031b4e] mb-2">10. Confidentiality</h5>
-            <p class="mb-4">The Candidate shall keep confidential all information relating to Warriors Educare, parents and students and shall not disclose such information to any third party without prior written permission.</p>
-
-            <h5 class="font-bold text-[#031b4e] mb-2">11. No Tuition Guarantee</h5>
-            <p class="mb-4">Registration with Warriors Educare does not guarantee tuition opportunity. Selection depends entirely on the parents' requirements, the Candidate's qualifications, demo performance and overall suitability.</p>
-
-            <h5 class="font-bold text-[#031b4e] mb-2">12. Default & Legal Action</h5>
-            <p class="mb-4">In case the Candidate intentionally avoids payment of the agreed Service Charge or violates any terms of this Agreement, Warriors Educare reserves the right to recover the outstanding amount along with applicable late charges and initiate appropriate legal proceedings under the applicable laws of India. Any dispute arising from this Agreement shall be subject to the jurisdiction of the competent courts.</p>
-
-            <h5 class="font-bold text-[#031b4e] mb-2">13. Acceptance of Terms</h5>
-            <p class="mb-2">By signing this Agreement physically or digitally, the Candidate confirms that:</p>
-            <ul class="list-disc pl-5 mb-4 space-y-2">
+            <h5 class="font-bold text-[#031b4e] mb-2">4. Acceptance & Digital Signature Confirmation</h5>
+            <p class="mb-2">By signing this Agreement digitally, the Candidate confirms that:</p>
+            <ul class="list-disc pl-5 mb-4 space-y-1.5">
                 <li>They have carefully read and understood all the terms and conditions.</li>
                 <li>They voluntarily accept all clauses of this Agreement without any pressure.</li>
-                <li>They agree to comply with all payment obligations and conditions mentioned herein.</li>
+                <li>They agree to comply with all payment obligations and tuition guidelines.</li>
             </ul>
 
             <div class="mt-8 pt-6 border-t border-gray-300 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6" style="page-break-inside: avoid;">
                 <div>
                     <div class="date mb-4 sm:mb-6">
-                        <strong>Date of Execution:</strong> {{ \Carbon\Carbon::now()->format('d F Y') }}
+                        <strong>Date of Execution:</strong> {{ $profile->tuition_agreement_signed_at ? \Carbon\Carbon::parse($profile->tuition_agreement_signed_at)->format('d F Y') : \Carbon\Carbon::now()->format('d F Y') }}
                     </div>
                     <p class="font-bold mb-4 sm:mb-8">For Warriors Educare</p>
                     <p>(Authorized Signatory)</p>
@@ -201,18 +163,38 @@
                     <i>Digitally Signed by</i><br>
                     <i>Name : {{ auth()->user()->name }}</i><br>
                     <i>Phone No : ******{{ substr(auth()->user()->phone ?? '0000', -4) }}</i><br>
-                    <i>Reason: Agreement E-signature</i><br>
-                    <i>Date : {{ \Carbon\Carbon::parse($profile->signature_date_time ?? now())->format('D M d H:i:s T Y') }}</i>
+                    <i>Reason: Home Tuition Agreement E-signature</i><br>
+                    <i>Date : {{ \Carbon\Carbon::parse($profile->tuition_agreement_signed_at ?? now())->format('D M d H:i:s T Y') }}</i>
                 </div>
             </div>
             </div> <!-- End relative z-10 -->
         </div>
-        <div class="p-3 sm:p-4 border-t border-[#031b4e]/10 bg-gray-50 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 rounded-b-2xl">
-            <button onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="w-full sm:w-auto px-5 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors text-xs sm:text-sm">Close</button>
-            <button onclick="printTuitionAgreement()" class="w-full sm:w-auto px-5 py-2.5 bg-[#0ea5e9] text-white rounded-xl font-semibold hover:bg-[#0ea5e9]/90 transition-colors shadow-sm flex items-center justify-center gap-2 text-xs sm:text-sm">
-                <i class="fas fa-download"></i> Download / Print PDF
-            </button>
-        </div>
+
+        {{-- Modal Footer: Signature Action if not signed, else Download & Close --}}
+        @if(!$isAgreementSigned)
+            <form action="{{ route('candidate.tuitions.sign-agreement') }}" method="POST" class="p-4 sm:p-5 bg-amber-50 border-t border-amber-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                @csrf
+                <label class="flex items-start gap-3 cursor-pointer text-left">
+                    <input type="checkbox" name="accept_terms" required value="1" class="w-5 h-5 text-[#031b4e] rounded border-gray-300 focus:ring-accent-blue mt-0.5 cursor-pointer">
+                    <span class="text-xs text-[#031b4e] font-bold leading-snug">
+                        I have read, understood and voluntarily accept all terms and conditions of this Home Tuition Tutor Service Agreement.
+                    </span>
+                </label>
+                <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
+                    <button type="button" onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 text-xs sm:text-sm">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i> Accept & Sign Agreement
+                    </button>
+                </div>
+            </form>
+        @else
+            <div class="p-3 sm:p-4 border-t border-[#031b4e]/10 bg-gray-50 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 rounded-b-2xl">
+                <button onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="w-full sm:w-auto px-5 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors text-xs sm:text-sm">Close</button>
+                <button onclick="printTuitionAgreement()" class="w-full sm:w-auto px-5 py-2.5 bg-[#0ea5e9] text-white rounded-xl font-semibold hover:bg-[#0ea5e9]/90 transition-colors shadow-sm flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    <i class="fas fa-download"></i> Download / Print PDF
+                </button>
+            </div>
+        @endif
     </div>
 </div>
 
@@ -251,18 +233,6 @@ function printTuitionAgreement() {
 }
 </script>
 
-@if(session('info'))
-    <div class="bg-blue-50 text-blue-700 p-4 rounded-xl border border-blue-100 mb-6 flex items-center">
-        <i class="fas fa-info-circle mr-3"></i> {{ session('info') }}
-    </div>
-@endif
-
-@if(session('error'))
-    <div class="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 mb-6 flex items-center">
-        <i class="fas fa-exclamation-circle mr-3"></i> {{ session('error') }}
-    </div>
-@endif
-
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
     @forelse($tuitions as $tuition)
         <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 shadow-sm p-4 sm:p-6 flex flex-col hover:shadow-md transition-shadow bg-white">
@@ -270,8 +240,8 @@ function printTuitionAgreement() {
                 <span class="bg-[#0ea5e9]/10 text-[#0ea5e9] text-xs font-bold px-2.5 sm:px-3 py-1 rounded-full">
                     Class {{ $tuition->{'class'} }}
                 </span>
-                <span class="bg-green-50 text-green-700 text-xs sm:text-sm font-bold px-2.5 sm:px-3 py-1 rounded-lg border border-green-100 whitespace-nowrap">
-                    ₹{{ $tuition->fee }}<span class="text-[10px] sm:text-xs font-normal">/mo</span>
+                <span class="bg-blue-50 text-[#031b4e] text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-100">
+                    {{ $tuition->board ?: 'General Board' }}
                 </span>
             </div>
 
@@ -279,16 +249,13 @@ function printTuitionAgreement() {
             
             <div class="space-y-2 sm:space-y-2.5 mb-4 sm:mb-6 flex-grow text-xs sm:text-sm">
                 <div class="flex items-center text-gray-600">
-                    <i class="fas fa-book w-5 text-[#031b4e]/50 shrink-0"></i>
-                    <span class="truncate">{{ $tuition->board }}</span>
-                </div>
-                <div class="flex items-center text-gray-600">
-                    <i class="fas fa-map-marker-alt w-5 text-[#031b4e]/50 shrink-0"></i>
+                    <i class="fas fa-map-marker-alt w-5 text-red-500 shrink-0"></i>
                     <span class="line-clamp-1" title="{{ $tuition->location }}">{{ $tuition->location }}</span>
                 </div>
-                @if($tuition->additional_notes)
-                <div class="text-[#031b4e]/80 mt-2 line-clamp-2 bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-xs" title="{{ $tuition->additional_notes }}">
-                    <strong class="text-slate-700 font-semibold">Note:</strong> {{ $tuition->additional_notes }}
+                @if($tuition->pincode)
+                <div class="flex items-center text-gray-600">
+                    <i class="fas fa-mail-bulk w-5 text-[#031b4e]/50 shrink-0"></i>
+                    <span class="font-mono">Pincode: {{ $tuition->pincode }}</span>
                 </div>
                 @endif
             </div>
@@ -298,7 +265,11 @@ function printTuitionAgreement() {
                     <i class="far fa-clock mr-1"></i> {{ $tuition->created_at->diffForHumans() }}
                 </span>
 
-                @if(in_array($tuition->id, $appliedTuitionIds))
+                @if(!$isAgreementSigned)
+                    <button type="button" onclick="document.getElementById('tuitionAgreementModal').classList.remove('hidden')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-xl text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5">
+                        <i class="fas fa-lock text-xs"></i> Sign Agreement to Apply
+                    </button>
+                @elseif(in_array($tuition->id, $appliedTuitionIds))
                     <button disabled class="bg-gray-100 text-[#031b4e]/80 font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm cursor-not-allowed">
                         Applied <i class="fas fa-check ml-1 text-green-600"></i>
                     </button>
@@ -331,6 +302,3 @@ function printTuitionAgreement() {
 
     </div>
 @endsection
-
-
-

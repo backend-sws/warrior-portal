@@ -61,10 +61,32 @@ class HomeTuitionLeadController extends Controller
 
         $leads = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
         
+        $baseQuery = HomeTuitionLead::query();
+        if ($search) {
+            $baseQuery->where(function($q) use ($search) {
+                $q->where('parent_name', 'like', "%{$search}%")
+                  ->orWhere('parent_mobile', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+        $stats = [
+            'total'     => (clone $baseQuery)->count(),
+            'new_lead'  => (clone $baseQuery)->where('status', 'New Lead')->count(),
+            'approved'  => (clone $baseQuery)->where('status', 'Approved')->count(),
+            'confirmed' => (clone $baseQuery)->where('status', 'Confirmed')->count(),
+            'cancelled' => (clone $baseQuery)->where('status', 'Cancelled')->count(),
+        ];
+
+        $candidates = \App\Models\User::where('role', 'candidate')
+            ->where('is_active', true)
+            ->with('profile.subject')
+            ->orderBy('name')
+            ->get(['id', 'name', 'phone', 'email']);
+
         $viewName = 'admin.home_tuition_leads.index';
-        $title = $filterStatus === 'All' ? 'All Home Tuition Leads' : $filterStatus . ' Home Tuition Leads';
+        $title = $filterStatus === 'All' ? 'All Home Tuitions' : $filterStatus . ' Home Tuitions';
         
-        return view($viewName, compact('leads', 'title', 'filterStatus'));
+        return view($viewName, compact('leads', 'candidates', 'title', 'filterStatus', 'stats'));
     }
 
     public function create()
@@ -77,18 +99,12 @@ class HomeTuitionLeadController extends Controller
         $validated = $request->validate([
             'parent_name' => 'required|string|max:255',
             'parent_mobile' => 'required|string|max:20',
-            'teacher_contact' => 'nullable|string|max:20',
-            'location' => 'required|string|max:255',
             'class' => 'required|string|max:255',
+            'board' => 'required|string|max:255',
             'subjects' => 'required|string|max:255',
-            'fee' => 'nullable|string|max:255',
-            'preferred_timing' => 'nullable|string|max:255',
-            'enquiry_date' => 'nullable|date',
-            'tutor_preference' => 'required|in:Male,Female,Any',
-            'dues' => 'nullable|string|max:255',
-            'additional_notes' => 'nullable|string',
-            'status' => 'required|in:New Lead,Demo Scheduled,Demo Completed,Confirmed,Pending,Cancelled',
-            'follow_up_date' => 'nullable|date',
+            'location' => 'required|string|max:255',
+            'pincode' => 'nullable|string|max:20',
+            'status' => 'required|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
         ]);
 
         $user = \App\Models\User::where('phone', $validated['parent_mobile'])->first();
@@ -108,15 +124,7 @@ class HomeTuitionLeadController extends Controller
 
         $lead = HomeTuitionLead::create($validated);
 
-        if ($request->filled('additional_notes')) {
-            $lead->followUps()->create([
-                'admin_id' => auth()->id(),
-                'note' => 'Initial Enquiry Note: ' . $validated['additional_notes'],
-                'follow_up_date' => $validated['follow_up_date'] ?? null,
-            ]);
-        }
-
-        return redirect()->route('admin.tuition-leads.index')->with('success', 'Lead created successfully.');
+        return redirect()->route('admin.tuition-leads.index')->with('success', 'Tuition lead created successfully.');
     }
 
     public function show($id)
@@ -139,21 +147,75 @@ class HomeTuitionLeadController extends Controller
         $validated = $request->validate([
             'parent_name' => 'required|string|max:255',
             'parent_mobile' => 'required|string|max:20',
-            'teacher_contact' => 'nullable|string|max:20',
-            'location' => 'required|string|max:255',
             'class' => 'required|string|max:255',
+            'board' => 'required|string|max:255',
             'subjects' => 'required|string|max:255',
-            'fee' => 'nullable|string|max:255',
-            'preferred_timing' => 'nullable|string|max:255',
-            'enquiry_date' => 'nullable|date',
-            'tutor_preference' => 'required|in:Male,Female,Any',
-            'dues' => 'nullable|string|max:255',
-            'additional_notes' => 'nullable|string',
+            'location' => 'required|string|max:255',
+            'pincode' => 'nullable|string|max:20',
+            'status' => 'nullable|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
         ]);
 
         $lead->update($validated);
 
-        return redirect()->route('admin.tuition-leads.show', $lead->id)->with('success', 'Lead updated successfully.');
+        return redirect()->route('admin.tuition-leads.index')->with('success', 'Tuition lead updated successfully.');
+    }
+
+    public function approve(Request $request, $id)
+    {
+        $lead = HomeTuitionLead::findOrFail($id);
+        $lead->update([
+            'status' => 'Approved'
+        ]);
+
+        $lead->followUps()->create([
+            'admin_id' => auth()->id(),
+            'note' => 'Tuition requirement approved and published live for candidates/tutors.',
+        ]);
+
+        return redirect()->back()->with('success', 'Tuition requirement approved and posted live on the portal!');
+    }
+
+    public function assignTeacher(Request $request, $id)
+    {
+        $request->validate([
+            'candidate_id' => 'required|exists:users,id',
+        ]);
+
+        $lead = HomeTuitionLead::findOrFail($id);
+        $candidate = \App\Models\User::with('profile')->findOrFail($request->candidate_id);
+
+        $lead->update([
+            'teacher_name' => $candidate->name,
+            'teacher_contact' => $candidate->phone,
+            'status' => 'Confirmed',
+        ]);
+
+        // Create or update TuitionApplication record
+        \App\Models\TuitionApplication::updateOrCreate(
+            [
+                'home_tuition_lead_id' => $lead->id,
+                'candidate_id' => $candidate->id,
+            ],
+            [
+                'status' => 'Assigned',
+            ]
+        );
+
+        $lead->followUps()->create([
+            'admin_id' => auth()->id(),
+            'note' => "Teacher \"{$candidate->name}\" (Ph: {$candidate->phone}) assigned to this tuition requirement.",
+        ]);
+
+        // Notify Candidate
+        \App\Helpers\NotificationHelper::notifyUser(
+            $candidate->id,
+            'Tuition Assigned to You!',
+            "You have been assigned as teacher for {$lead->class} ({$lead->subjects}) at {$lead->location}.",
+            route('candidate.tuitions.index'),
+            'fas fa-chalkboard-teacher'
+        );
+
+        return redirect()->back()->with('success', "Teacher \"{$candidate->name}\" assigned successfully to {$lead->parent_name}'s tuition!");
     }
 
     public function updateStatus(Request $request, $id)
@@ -161,7 +223,7 @@ class HomeTuitionLeadController extends Controller
         $lead = HomeTuitionLead::findOrFail($id);
         
         $request->validate([
-            'status' => 'required|in:New Lead,Demo Scheduled,Demo Completed,Confirmed,Pending,Cancelled',
+            'status' => 'required|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
             'follow_up_date' => 'nullable|date',
             'teacher_contact' => 'nullable|string|max:20',
             'teacher_name' => 'nullable|string|max:255'

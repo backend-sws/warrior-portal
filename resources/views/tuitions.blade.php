@@ -122,12 +122,25 @@
                 <h3 class="text-lg font-bold text-slate-900 mb-1 group-hover:text-accent-blue transition-colors line-clamp-1">
                     {{ $tuition->subjects ?? 'Tuition Requirement' }}
                 </h3>
-                <p class="text-sm text-slate-500 font-medium mb-3 line-clamp-1">{{ $tuition->location }}</p>
-                
-                <p class="text-sm text-slate-600 leading-relaxed mb-5 line-clamp-3">
-                    Class: {{ $tuition->class }} <br>
-                    Timing: {{ $tuition->preferred_timing ?? 'Not specified' }}
+                <p class="text-sm text-slate-500 font-medium mb-3 flex items-center gap-1.5">
+                    <i class="fas fa-map-marker-alt text-red-400 text-xs"></i> 
+                    <span>{{ $tuition->location }}@if($tuition->pincode) - (Pincode: {{ $tuition->pincode }})@endif</span>
                 </p>
+                
+                <div class="bg-slate-50 rounded-xl p-3 text-xs text-slate-700 space-y-1.5 mb-5 border border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 font-medium">Class:</span>
+                        <span class="font-bold text-[#031b4e]">{{ $tuition->class }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 font-medium">Board:</span>
+                        <span class="font-bold text-accent-blue">{{ $tuition->board ?: 'General' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 font-medium">Subjects:</span>
+                        <span class="font-bold text-slate-800">{{ $tuition->subjects }}</span>
+                    </div>
+                </div>
             </div>
             
             <div>
@@ -161,12 +174,13 @@
         <div class="bg-gradient-to-br from-[#f0f7ff] to-blue-50 rounded-2xl shadow-lg border border-blue-200 p-8 sticky top-24">
             <div class="text-center mb-8">
                 <h3 class="text-2xl font-bold text-[#031b4e] mb-2">Need a Tutor for Your Child?</h3>
-                <p class="text-sm text-slate-500">Fill this quick form and we'll match you with the best verified tutor.</p>
+                <p class="text-sm text-slate-500">Fill this quick form and our team will verify, approve and match you with the best verified tutor.</p>
             </div>
 
             @if(session('tuition_success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6 text-sm" role="alert">
-                    <span class="block sm:inline">{{ session('tuition_success') }}</span>
+                <div class="bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-xl relative mb-6 text-sm flex items-start gap-2.5 shadow-sm" role="alert">
+                    <i class="fas fa-check-circle text-emerald-600 mt-0.5"></i>
+                    <span class="block sm:inline font-medium">{{ session('tuition_success') }}</span>
                 </div>
             @endif
 
@@ -190,13 +204,13 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Board *</label>
-                        <input type="text" name="board" placeholder="Select Board" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
+                        <input type="text" name="board" placeholder="e.g. CBSE / ICSE / State" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Subjects Needed *</label>
-                    <input type="text" name="subjects" placeholder="e.g., Math, Science" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
+                    <input type="text" name="subjects" placeholder="e.g., Math, Science, English" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                 </div>
 
                 <div>
@@ -211,7 +225,7 @@
                 
                 <div class="mt-4 flex justify-center">
                     <button type="submit" class="bg-[#031b4e] text-white rounded-full px-8 py-3.5 font-bold hover:bg-[#021133] transition-colors shadow-lg flex items-center justify-center gap-2 w-auto min-w-[200px]">
-                        Post Requirement <i class="fas fa-paper-plane"></i>
+                        Submit Request for Review <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
             </form>

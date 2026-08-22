@@ -1,146 +1,158 @@
 @extends('layouts.admin')
 
-@section('title', 'Add New Home Tuition Lead')
-@section('subtitle', 'Enter details for a new home tuition enquiry.')
+@section('title', 'Post Tuition Requirement')
+@section('subtitle', 'Enter tuition requirement details to post live or save as draft.')
+
+@section('actions')
+    <a href="{{ route('admin.tuition-leads.index') }}" class="px-4 py-2 bg-secondary-bg border border-card-border hover:border-accent-blue/40 text-text-main rounded-xl text-sm font-semibold transition-all inline-flex items-center gap-2">
+        <i class="fas fa-arrow-left"></i> Back to Tuition Leads
+    </a>
+@endsection
 
 @section('content')
-<div class="mb-4">
-    <a href="{{ route('admin.tuition-leads.index') }}" class="text-sm text-text-dark/60 hover:text-accent-blue transition-colors flex items-center gap-2">
-        <i class="fas fa-arrow-left"></i> Back to Leads
-    </a>
-</div>
-
-<div class="bg-card-bg rounded-2xl border border-card-border p-6 shadow-sm">
-    <form action="{{ route('admin.tuition-leads.store') }}" method="POST" class="space-y-6">
-        @csrf
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {{-- Parent Info --}}
-            <div class="space-y-4 col-span-1 lg:col-span-3 pb-4 border-b border-card-border">
-                <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
-                    <i class="fas fa-user-circle text-accent-blue"></i> Parent & Student Info
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Parent Name *</label>
-                        <input type="text" name="parent_name" value="{{ old('parent_name') }}" required
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('parent_name') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Parent Mobile *</label>
-                        <input type="text" name="parent_mobile" value="{{ old('parent_mobile') }}" required
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('parent_mobile') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Location/Address *</label>
-                        <input type="text" name="location" value="{{ old('location') }}" required
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('location') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
+<div class="max-w-4xl mx-auto">
+    <div class="bg-card-bg border border-card-border rounded-2xl shadow-xl overflow-hidden">
+        
+        <!-- Header Card Ribbon -->
+        <div class="p-6 border-b border-card-border bg-secondary-bg/40 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 font-bold text-lg">
+                    <i class="fas fa-plus"></i>
                 </div>
-            </div>
-
-            {{-- Tuition Details --}}
-            <div class="space-y-4 col-span-1 lg:col-span-3 pb-4 border-b border-card-border">
-                <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
-                    <i class="fas fa-book text-accent-blue"></i> Tuition Requirements
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Class *</label>
-                        <input type="text" name="class" value="{{ old('class') }}" required
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('class') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="col-span-1 md:col-span-2 lg:col-span-1">
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Subject(s) *</label>
-                        <input type="text" name="subjects" value="{{ old('subjects') }}" required placeholder="e.g., Math, Science"
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('subjects') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Tutor Preference *</label>
-                        <select name="tutor_preference" required class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                            <option value="Any" {{ old('tutor_preference') == 'Any' ? 'selected' : '' }}>Any</option>
-                            <option value="Male" {{ old('tutor_preference') == 'Male' ? 'selected' : '' }}>Male</option>
-                            <option value="Female" {{ old('tutor_preference') == 'Female' ? 'selected' : '' }}>Female</option>
-                        </select>
-                        @error('tutor_preference') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Preferred Timing</label>
-                        <input type="text" name="preferred_timing" value="{{ old('preferred_timing') }}" placeholder="e.g., 4 PM to 6 PM"
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('preferred_timing') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                </div>
-            </div>
-
-            {{-- Administrative --}}
-            <div class="space-y-4 col-span-1 lg:col-span-3">
-                <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
-                    <i class="fas fa-clipboard-list text-accent-blue"></i> Management Details
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Lead Status *</label>
-                        <select name="status" required class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                            <option value="New Lead" {{ old('status') == 'New Lead' ? 'selected' : '' }}>New Lead</option>
-                            <option value="Demo Scheduled" {{ old('status') == 'Demo Scheduled' ? 'selected' : '' }}>Demo Scheduled</option>
-                            <option value="Demo Completed" {{ old('status') == 'Demo Completed' ? 'selected' : '' }}>Demo Completed</option>
-                            <option value="Confirmed" {{ old('status') == 'Confirmed' ? 'selected' : '' }}>Confirmed</option>
-                            <option value="Pending" {{ old('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="Cancelled" {{ old('status') == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
-                        </select>
-                        @error('status') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Enquiry Date</label>
-                        <input type="date" name="enquiry_date" value="{{ old('enquiry_date', date('Y-m-d')) }}"
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('enquiry_date') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Follow-up Date</label>
-                        <input type="date" name="follow_up_date" value="{{ old('follow_up_date') }}"
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('follow_up_date') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Fee Quoted</label>
-                        <input type="text" name="fee" value="{{ old('fee') }}" placeholder="e.g., 3000/month"
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('fee') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Teacher Contact No.</label>
-                        <input type="text" name="teacher_contact" value="{{ old('teacher_contact') }}" placeholder="If assigned"
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('teacher_contact') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="col-span-1 md:col-span-2 lg:col-span-3">
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Dues Information</label>
-                        <input type="text" name="dues" value="{{ old('dues') }}" placeholder="e.g., Paid by tutor, Parent successful"
-                               class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                        @error('dues') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="col-span-1 lg:col-span-4">
-                        <label class="block text-sm font-semibold text-text-dark mb-1">Additional Notes</label>
-                        <textarea name="additional_notes" rows="3" placeholder="Any extra information..."
-                                  class="w-full px-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">{{ old('additional_notes') }}</textarea>
-                        @error('additional_notes') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
+                <div>
+                    <h3 class="text-lg font-bold text-text-main">New Tuition Requirement</h3>
+                    <p class="text-xs text-text-dark/60 mt-0.5">Fill in requirement details to publish to the tutor network.</p>
                 </div>
             </div>
         </div>
 
-        <div class="flex justify-end pt-6 border-t border-card-border">
-            <button type="submit" class="bg-accent-blue text-white px-8 py-2.5 rounded-xl font-bold hover:bg-accent-blue-hover transition-colors shadow-lg shadow-accent-blue/20">
-                Save Lead
-            </button>
-        </div>
-    </form>
+        <form action="{{ route('admin.tuition-leads.store') }}" method="POST" class="p-8 space-y-8">
+            @csrf
+
+            <!-- Section 1: Parent & Contact Info -->
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-user-circle text-accent-blue text-sm"></i>
+                    <h4 class="text-xs font-bold text-text-dark/80 uppercase tracking-wider">Parent / Client Information</h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Parent / Client Name <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                            <input type="text" name="parent_name" value="{{ old('parent_name') }}" required placeholder="Enter full name"
+                                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
+                        </div>
+                        @error('parent_name') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Phone Number <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="fas fa-phone-alt absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                            <input type="text" name="parent_mobile" value="{{ old('parent_mobile') }}" required placeholder="Enter 10-digit mobile"
+                                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
+                        </div>
+                        @error('parent_mobile') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-px w-full bg-card-border"></div>
+
+            <!-- Section 2: Academic Requirements -->
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-graduation-cap text-accent-blue text-sm"></i>
+                    <h4 class="text-xs font-bold text-text-dark/80 uppercase tracking-wider">Tuition Academic Details</h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Student's Class / Grade <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="fas fa-chalkboard absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                            <input type="text" name="class" value="{{ old('class') }}" required placeholder="e.g. Class 10"
+                                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
+                        </div>
+                        @error('class') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Board <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="fas fa-university absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                            <input type="text" name="board" value="{{ old('board') }}" required placeholder="e.g. CBSE / ICSE / State Board"
+                                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
+                        </div>
+                        @error('board') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Subjects Needed <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="fas fa-book-open absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                            <input type="text" name="subjects" value="{{ old('subjects') }}" required placeholder="e.g. Mathematics, Physics, Chemistry"
+                                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
+                        </div>
+                        @error('subjects') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-px w-full bg-card-border"></div>
+
+            <!-- Section 3: Location Details -->
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-map-marked-alt text-accent-blue text-sm"></i>
+                    <h4 class="text-xs font-bold text-text-dark/80 uppercase tracking-wider">Location & Address</h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Complete Location / Address <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="fas fa-map-marker-alt absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                            <input type="text" name="location" value="{{ old('location') }}" required placeholder="Enter full address or area (e.g. Kankarbagh, Patna)"
+                                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
+                        </div>
+                        @error('location') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Pincode</label>
+                        <div class="relative">
+                            <i class="fas fa-mail-bulk absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                            <input type="text" name="pincode" value="{{ old('pincode') }}" placeholder="6-digit Pincode"
+                                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all font-mono">
+                        </div>
+                        @error('pincode') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-px w-full bg-card-border"></div>
+
+            <!-- Section 4: Publishing Status -->
+            <div class="bg-secondary-bg/30 p-5 rounded-2xl border border-card-border">
+                <label class="block text-xs font-bold text-text-dark/80 uppercase tracking-wider mb-2">Publishing Status <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <select name="status" required class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm font-semibold text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
+                        <option value="Approved" {{ old('status') == 'Approved' ? 'selected' : '' }}>✅ Approved (Publish Live Directly on Website)</option>
+                        <option value="New Lead" {{ old('status', 'New Lead') == 'New Lead' ? 'selected' : '' }}>⏳ New Lead (Save as Draft / Awaiting Review)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-card-border">
+                <a href="{{ route('admin.tuition-leads.index') }}" class="px-5 py-2.5 bg-secondary-bg text-text-main border border-card-border rounded-xl text-sm font-semibold hover:bg-card-border/50 transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" class="bg-emerald-500 text-white px-7 py-2.5 rounded-xl font-bold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                    <i class="fas fa-paper-plane"></i> Post Tuition Lead
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 @endsection

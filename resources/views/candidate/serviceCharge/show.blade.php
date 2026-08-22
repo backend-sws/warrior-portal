@@ -31,11 +31,23 @@
                     </div>
                 @endif
                 <div class="p-4 sm:p-6 md:p-8">
-                    @if(!empty($invoice->description))
-                        <div class="mb-4 text-xs font-bold text-[#0ea5e9] bg-[#0ea5e9]/10 px-3 py-1.5 rounded-lg border border-[#0ea5e9]/20 w-max">
-                            <i class="fas fa-info-circle mr-1"></i> {{ $invoice->description }}
-                        </div>
-                    @endif
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        @if($invoice->home_tuition_lead_id || str_contains(strtolower($invoice->description ?? ''), 'tuition'))
+                            <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-lg text-xs font-bold border border-purple-200 flex items-center gap-1.5">
+                                <i class="fas fa-chalkboard-teacher text-purple-600"></i> Home Tuition Placement
+                            </span>
+                        @else
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-lg text-xs font-bold border border-blue-200 flex items-center gap-1.5">
+                                <i class="fas fa-school text-blue-600"></i> School Job Placement
+                            </span>
+                        @endif
+
+                        @if(!empty($invoice->description))
+                            <span class="text-xs font-bold text-[#031b4e]/80 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">
+                                {{ $invoice->description }}
+                            </span>
+                        @endif
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
                         
                         {{-- Service Charge Amount --}}

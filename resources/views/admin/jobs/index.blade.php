@@ -15,28 +15,39 @@
 
 @section('content')
 
-{{-- Analytics Cards --}}
+{{-- Analytics Cards (Clickable Filters) --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-card-bg border border-card-border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+    <a href="{{ route('admin.jobs.index', ['status' => 'all', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ (!request('status') || request('status') === 'all') ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/10' : 'border-card-border hover:border-blue-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Total Jobs</p>
-        <h4 class="text-2xl font-extrabold text-blue-500 relative z-10">{{ $stats['total'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
-        <div class="absolute inset-0 bg-green-500/5 group-hover:bg-green-500/10 transition-colors"></div>
+        <h4 class="text-2xl font-black text-blue-600 relative z-10">{{ $stats['total'] }}</h4>
+        <span class="text-[10px] text-slate-400 mt-0.5">All Vacancies</span>
+    </a>
+
+    <a href="{{ route('admin.jobs.index', ['status' => 'approved', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'approved' ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-card-border hover:border-emerald-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Live (Approved)</p>
-        <h4 class="text-2xl font-extrabold text-green-500 relative z-10">{{ $stats['live'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
-        <div class="absolute inset-0 bg-yellow-500/5 group-hover:bg-yellow-500/10 transition-colors"></div>
+        <h4 class="text-2xl font-black text-emerald-600 relative z-10">{{ $stats['live'] }}</h4>
+        <span class="text-[10px] text-emerald-600 font-bold mt-0.5">Active on Portal</span>
+    </a>
+
+    <a href="{{ route('admin.jobs.index', ['status' => 'pending', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'pending' ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/10' : 'border-card-border hover:border-amber-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Pending Review</p>
-        <h4 class="text-2xl font-extrabold text-yellow-500 relative z-10">{{ $stats['pending'] }}</h4>
-    </div>
-    <div class="bg-card-bg border border-card-border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+        <h4 class="text-2xl font-black text-amber-500 relative z-10">{{ $stats['pending'] }}</h4>
+        <span class="text-[10px] text-amber-600 font-bold mt-0.5">Needs Approval</span>
+    </a>
+
+    <a href="{{ route('admin.jobs.index', ['status' => 'rejected', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'rejected' ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50/10' : 'border-card-border hover:border-red-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors"></div>
         <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Rejected</p>
-        <h4 class="text-2xl font-extrabold text-red-500 relative z-10">{{ $stats['rejected'] }}</h4>
-    </div>
+        <h4 class="text-2xl font-black text-red-500 relative z-10">{{ $stats['rejected'] }}</h4>
+        <span class="text-[10px] text-red-400 font-bold mt-0.5">Closed / Rejected</span>
+    </a>
 </div>
 
 {{-- Filter/Search Bar --}}

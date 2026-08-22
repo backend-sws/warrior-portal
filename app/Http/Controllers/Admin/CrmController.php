@@ -3,18 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Helpers\NotificationHelper;
-use App\Models\CrmFollowUp;
-use App\Models\JobApplication;
-use App\Models\ServiceChargeInvoice;
 use App\Models\User;
 use App\Models\CandidateProfile;
-use App\Models\CandidateRating;
 use App\Models\PaymentTransaction;
+use App\Models\CrmFollowUp;
+use App\Models\ServiceChargeInvoice;
+use App\Models\CandidateRating;
+use App\Models\HomeTuitionLead;
+use App\Models\TuitionApplication;
+use App\Models\JobPost;
+use App\Helpers\NotificationHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class CrmController extends Controller
 {
@@ -32,45 +35,44 @@ class CrmController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string|max:20|unique:users,phone',
-            'password' => 'required|string|min:6',
-            'gender' => 'required|in:Male,Female,Other',
-            'date_of_birth' => 'required|date',
-            'address' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
-            'subject_id' => 'required|exists:subjects,id',
+            'name'                     => 'required|string|max:255',
+            'email'                    => 'required|email|unique:users,email',
+            'phone'                    => 'required|string|max:20|unique:users,phone',
+            'password'                 => 'required|string|min:6',
+            'gender'                   => 'required|in:Male,Female,Other',
+            'date_of_birth'            => 'required|date',
+            'address'                  => 'required|string',
             'highest_qualification_id' => 'required|exists:qualifications,id',
-            'experience_years' => 'required|integer|min:0',
-            'current_salary' => 'nullable|string',
-            'expected_salary' => 'nullable|string',
-            'preferred_state_id' => 'required|exists:states,id',
-            'preferred_city_id' => 'required|exists:cities,id',
-            'english_fluency' => 'nullable|string',
-            'residential_preference' => 'nullable|string',
-            'availability_to_join' => 'nullable|string',
-            'current_school' => 'nullable|string',
-            'plan_type' => 'required|string',
-            'payment_method' => 'required|string',
-            'payment_amount' => 'required|numeric|min:0',
-            'payment_notes' => 'nullable|string',
-            'resume' => 'nullable|mimes:pdf,doc,docx|max:5120',
-            'profile_photo' => 'nullable|image|max:5120',
-            'live_photo' => 'nullable|image|max:5120',
-            'salary_slip' => 'nullable|mimes:pdf,jpg,png,jpeg|max:5120',
-            'offer_letter' => 'nullable|mimes:pdf,jpg,png,jpeg|max:5120',
-            'agreement_pdf' => 'nullable|mimes:pdf|max:5120',
+            'subject_id'               => 'required|exists:subjects,id',
+            'category_id'              => 'nullable|exists:categories,id',
+            'experience_years'         => 'nullable|integer|min:0',
+            'preferred_state_id'       => 'required|exists:states,id',
+            'preferred_city_id'        => 'required|exists:cities,id',
+            'current_salary'           => 'nullable|string',
+            'expected_salary'          => 'nullable|string',
+            'english_fluency'          => 'nullable|string',
+            'residential_preference'   => 'nullable|string',
+            'availability_to_join'     => 'nullable|string',
+            'current_school'           => 'nullable|string',
+            'resume'                   => 'nullable|mimes:pdf,doc,docx|max:5120',
+            'profile_photo'            => 'nullable|image|max:5120',
+            'live_photo'               => 'nullable|image|max:5120',
+            'salary_slip'              => 'nullable|mimes:pdf,jpg,png,jpeg|max:5120',
+            'offer_letter'             => 'nullable|mimes:pdf,jpg,png,jpeg|max:5120',
+            'agreement_pdf'            => 'nullable|mimes:pdf|max:5120',
+            'payment_amount'           => 'nullable|numeric|min:0',
+            'payment_method'           => 'nullable|string',
+            'payment_notes'            => 'nullable|string',
         ]);
 
         try {
             // 1. Create User
             $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'role' => 'candidate',
-                'password' => Hash::make($request->password),
+                'name'              => $request->name,
+                'email'             => $request->email,
+                'phone'             => $request->phone,
+                'role'              => 'candidate',
+                'password'          => Hash::make($request->password),
                 'email_verified_at' => now(),
             ]);
 
@@ -82,66 +84,75 @@ class CrmController extends Controller
             $offerLetterPath = $request->hasFile('offer_letter') ? $request->file('offer_letter')->store('offer_letters', 'public') : null;
             $agreementPdfPath = $request->hasFile('agreement_pdf') ? $request->file('agreement_pdf')->store('agreements', 'public') : null;
 
-            $paymentId = $request->payment_method . '-ADMIN-' . strtoupper(uniqid());
+            $isJobAgreementSigned = ($agreementPdfPath || $request->boolean('is_agreement_signed'));
+            $isTuitionAgreementSigned = $request->boolean('is_tuition_agreement_signed');
+
+            $paymentId = $request->payment_method ? ($request->payment_method . '-ADMIN-' . strtoupper(uniqid())) : null;
 
             // 3. Create Candidate Profile
             $profile = CandidateProfile::create([
-                'user_id' => $user->id,
-                'gender' => $request->gender,
-                'date_of_birth' => $request->date_of_birth,
-                'address' => $request->address,
-                'category_id' => $request->category_id,
-                'subject_id' => $request->subject_id,
-                'highest_qualification_id' => $request->highest_qualification_id,
-                'experience_years' => $request->experience_years,
-                'current_salary' => $request->current_salary,
-                'expected_salary' => $request->expected_salary,
-                'preferred_state_id' => $request->preferred_state_id,
-                'preferred_city_id' => $request->preferred_city_id,
-                'english_fluency' => $request->english_fluency,
-                'residential_preference' => $request->residential_preference,
-                'availability_to_join' => $request->availability_to_join,
-                'current_school' => $request->current_school,
+                'user_id'                    => $user->id,
+                'gender'                     => $request->gender,
+                'date_of_birth'              => $request->date_of_birth,
+                'address'                    => $request->address,
+                'category_id'                => $request->category_id,
+                'subject_id'                 => $request->subject_id,
+                'highest_qualification_id'   => $request->highest_qualification_id,
+                'experience_years'           => $request->experience_years ?? 0,
+                'current_salary'             => $request->current_salary,
+                'expected_salary'            => $request->expected_salary,
+                'preferred_state_id'         => $request->preferred_state_id,
+                'preferred_city_id'          => $request->preferred_city_id,
+                'english_fluency'            => $request->english_fluency,
+                'residential_preference'     => $request->residential_preference,
+                'availability_to_join'       => $request->availability_to_join,
+                'current_school'             => $request->current_school,
                 
-                'resume_path' => $resumePath,
-                'profile_photo_path' => $profilePhotoPath,
-                'live_photo_path' => $livePhotoPath,
-                'salary_slip_path' => $salarySlipPath,
-                'offer_letter_path' => $offerLetterPath,
-                'agreement_pdf_path' => $agreementPdfPath,
+                'resume_path'                => $resumePath,
+                'profile_photo_path'         => $profilePhotoPath,
+                'live_photo_path'            => $livePhotoPath,
+                'salary_slip_path'           => $salarySlipPath,
+                'offer_letter_path'          => $offerLetterPath,
+                'agreement_pdf_path'         => $agreementPdfPath,
 
-                'is_profile_complete' => true,
-                'is_fee_paid' => true,
-                'paid_amount' => $request->payment_amount,
-                'plan_type' => $request->plan_type,
-                'total_allowed_applications' => $request->plan_type === 'standard' ? 2 : 3,
-                'plan_started_at' => now(),
-                'payment_id' => $paymentId,
-                'registration_completed_at' => now(),
+                'is_profile_complete'        => true,
+                'is_fee_paid'                => true,
+                'paid_amount'                => $request->payment_amount ?? 0,
+                'plan_type'                  => 'standard',
+                'total_allowed_applications' => 9999, // Unlimited applications
+                'plan_started_at'            => now(),
+                'payment_id'                 => $paymentId,
+                'registration_completed_at'  => now(),
                 
-                'is_terms_agreed' => true,
-                'is_agreement_signed' => $agreementPdfPath ? true : false,
+                'is_terms_agreed'            => true,
+                'is_agreement_signed'        => $isJobAgreementSigned,
+                'agreement_status'           => $isJobAgreementSigned ? 'signed' : 'pending_signature',
+                'signature_date_time'        => $isJobAgreementSigned ? now() : null,
+                'is_tuition_agreement_signed'=> $isTuitionAgreementSigned,
+                'tuition_agreement_signed_at'=> $isTuitionAgreementSigned ? now() : null,
             ]);
 
-            // 4. Create Payment Transaction
-            PaymentTransaction::create([
-                'candidate_id' => $user->id,
-                'transaction_id' => $paymentId,
-                'amount' => $request->payment_amount,
-                'type' => 'registration_fee',
-                'status' => 'success',
-                'gateway_response' => [
-                    'note' => 'Manually collected by Admin', 
-                    'admin_notes' => $request->payment_notes,
-                    'payment_method' => $request->payment_method
-                ],
-            ]);
+            // 4. Create Payment Transaction if fee was collected
+            if ($request->filled('payment_amount') && $request->payment_amount > 0 && $request->payment_method) {
+                PaymentTransaction::create([
+                    'candidate_id'     => $user->id,
+                    'transaction_id'   => $paymentId,
+                    'amount'           => $request->payment_amount,
+                    'type'             => 'registration_fee',
+                    'status'           => 'success',
+                    'gateway_response' => [
+                        'note'           => 'Manually collected by Admin', 
+                        'admin_notes'    => $request->payment_notes,
+                        'payment_method' => $request->payment_method
+                    ],
+                ]);
+            }
 
             // Welcome DB notification to candidate
             NotificationHelper::notifyUser(
                 $user->id,
                 'Welcome to Warriors Educare! 🎉',
-                'Your profile has been created by our team. Log in to your dashboard to view your details and start your placement journey.',
+                'Your teacher profile has been registered by our team. Log in to your portal to explore school jobs and home tuitions.',
                 null,
                 'fas fa-user-plus'
             );
@@ -151,19 +162,19 @@ class CrmController extends Controller
                 \Illuminate\Support\Facades\Mail::to($user->email)->send(
                     new \App\Mail\WelcomeCandidateMail($user, $request->password)
                 );
-            } catch (\Exception $emailEx) {
+            } catch (\Throwable $emailEx) {
                 \Log::error('WelcomeCandidate Email Error: ' . $emailEx->getMessage());
             }
 
             // Admin confirmation notify
             NotificationHelper::notifyAdmin(
                 'New Candidate Onboarded',
-                $user->name . ' has been manually registered with ' . ucfirst($request->plan_type) . ' plan by admin.',
+                $user->name . ' has been onboarded successfully by admin.',
                 null,
                 'fas fa-user-plus'
             );
 
-            return redirect()->route('admin.crm.show', $user->id)->with('success', 'Candidate manually onboarded successfully.');
+            return redirect()->route('admin.crm.show', $user->id)->with('success', 'Candidate onboarded successfully.');
             
         } catch (\Exception $e) {
             \Log::error('Manual Onboard Error: ' . $e->getMessage());
@@ -173,7 +184,7 @@ class CrmController extends Controller
 
     public function edit($id)
     {
-        $user = User::whereIn('role', ['candidate', 'parent'])->findOrFail($id);
+        $user = User::where('role', 'candidate')->findOrFail($id);
         $profile = $user->profile;
 
         $categories = \App\Models\Category::all();
@@ -187,41 +198,38 @@ class CrmController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user = User::whereIn('role', ['candidate', 'parent'])->findOrFail($id);
-        $profile = $user->profile;
-
+        $user = User::where('role', 'candidate')->findOrFail($id);
+        
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone' => 'required|string|max:20|unique:users,phone,' . $user->id,
-            'password' => 'nullable|string|min:6',
-            'gender' => 'required|in:Male,Female,Other',
-            'date_of_birth' => 'required|date',
-            'address' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
-            'subject_id' => 'required|exists:subjects,id',
+            'name'                     => 'required|string|max:255',
+            'email'                    => 'required|email|unique:users,email,' . $id,
+            'phone'                    => 'required|string|max:20|unique:users,phone,' . $id,
+            'gender'                   => 'required|in:Male,Female,Other',
+            'date_of_birth'            => 'required|date',
+            'address'                  => 'required|string',
             'highest_qualification_id' => 'required|exists:qualifications,id',
-            'experience_years' => 'required|integer|min:0',
-            'current_salary' => 'nullable|string',
-            'expected_salary' => 'nullable|string',
-            'preferred_state_id' => 'required|exists:states,id',
-            'preferred_city_id' => 'required|exists:cities,id',
-            'english_fluency' => 'nullable|string',
-            'residential_preference' => 'nullable|string',
-            'availability_to_join' => 'nullable|string',
-            'current_school' => 'nullable|string',
-            'resume' => 'nullable|mimes:pdf,doc,docx|max:5120',
-            'profile_photo' => 'nullable|image|max:5120',
-            'live_photo' => 'nullable|image|max:5120',
-            'salary_slip' => 'nullable|mimes:pdf,jpg,png,jpeg|max:5120',
-            'offer_letter' => 'nullable|mimes:pdf,jpg,png,jpeg|max:5120',
-            'agreement_pdf' => 'nullable|mimes:pdf|max:5120',
+            'subject_id'               => 'required|exists:subjects,id',
+            'category_id'              => 'nullable|exists:categories,id',
+            'experience_years'         => 'nullable|integer|min:0',
+            'preferred_state_id'       => 'required|exists:states,id',
+            'preferred_city_id'        => 'required|exists:cities,id',
+            'current_salary'           => 'nullable|string',
+            'expected_salary'          => 'nullable|string',
+            'english_fluency'          => 'nullable|string',
+            'residential_preference'   => 'nullable|string',
+            'availability_to_join'     => 'nullable|string',
+            'current_school'           => 'nullable|string',
+            'resume'                   => 'nullable|mimes:pdf,doc,docx|max:5120',
+            'profile_photo'            => 'nullable|image|max:5120',
+            'live_photo'               => 'nullable|image|max:5120',
+            'salary_slip'              => 'nullable|mimes:pdf,jpg,png,jpeg|max:5120',
+            'offer_letter'             => 'nullable|mimes:pdf,jpg,png,jpeg|max:5120',
+            'agreement_pdf'            => 'nullable|mimes:pdf|max:5120',
         ]);
 
         try {
-            // Update User
             $userData = [
-                'name' => $request->name,
+                'name'  => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
             ];
@@ -232,29 +240,24 @@ class CrmController extends Controller
             
             $user->update($userData);
 
-            // Handle File Uploads (only update if a new file is provided)
             $updates = [
-                'gender' => $request->gender,
-                'date_of_birth' => $request->date_of_birth,
-                'address' => $request->address,
-                'category_id' => $request->category_id,
-                'subject_id' => $request->subject_id,
+                'gender'                   => $request->gender,
+                'date_of_birth'            => $request->date_of_birth,
+                'address'                  => $request->address,
+                'category_id'              => $request->category_id,
+                'subject_id'               => $request->subject_id,
                 'highest_qualification_id' => $request->highest_qualification_id,
-                'experience_years' => $request->experience_years,
-                'current_salary' => $request->current_salary,
-                'expected_salary' => $request->expected_salary,
-                'preferred_state_id' => $request->preferred_state_id,
-                'preferred_city_id' => $request->preferred_city_id,
-                'english_fluency' => $request->english_fluency,
-                'residential_preference' => $request->residential_preference,
-                'availability_to_join' => $request->availability_to_join,
-                'current_school' => $request->current_school,
+                'experience_years'         => $request->experience_years ?? 0,
+                'current_salary'           => $request->current_salary,
+                'expected_salary'          => $request->expected_salary,
+                'preferred_state_id'       => $request->preferred_state_id,
+                'preferred_city_id'        => $request->preferred_city_id,
+                'english_fluency'          => $request->english_fluency,
+                'residential_preference'   => $request->residential_preference,
+                'availability_to_join'     => $request->availability_to_join,
+                'current_school'           => $request->current_school,
+                'total_allowed_applications' => 9999,
             ];
-
-            if ($request->has('plan_type')) {
-                $updates['plan_type'] = $request->plan_type;
-                $updates['total_allowed_applications'] = $request->plan_type === 'standard' ? 2 : 3;
-            }
 
             if ($request->hasFile('resume')) {
                 $updates['resume_path'] = $request->file('resume')->store('resumes', 'public');
@@ -274,15 +277,20 @@ class CrmController extends Controller
             if ($request->hasFile('agreement_pdf')) {
                 $updates['agreement_pdf_path'] = $request->file('agreement_pdf')->store('agreements', 'public');
                 $updates['is_agreement_signed'] = true;
+                $updates['agreement_status'] = 'signed';
             }
 
-            $profile->update($updates);
+            if ($user->profile) {
+                $user->profile->update($updates);
+            } else {
+                $updates['user_id'] = $user->id;
+                CandidateProfile::create($updates);
+            }
 
-            // Notify candidate of profile update
             NotificationHelper::notifyUser(
                 $user->id,
-                'Your Profile Has Been Updated',
-                'Your candidate profile has been updated by the Warriors Educare team. Log in to view the changes.',
+                'Profile Updated',
+                'Your candidate profile has been updated by the Warriors Educare team.',
                 null,
                 'fas fa-user-edit'
             );
@@ -297,20 +305,15 @@ class CrmController extends Controller
 
     public function index(Request $request)
     {
-        $role = $request->input('role', 'candidate');
-        
-        $relations = ['applications.jobPost', 'applications' => function($q) {
-            $q->where('status', 'hired');
-        }];
-        
-        if ($role === 'parent') {
-            $relations[] = 'parentProfile';
-        } else {
-            $relations[] = 'profile';
-        }
-
-        $query = User::where('role', $role)
-            ->with($relations);
+        $query = User::where('role', 'candidate')
+            ->with([
+                'profile.highestQualification',
+                'profile.subject',
+                'profile.category',
+                'profile.preferredState',
+                'profile.preferredCity',
+                'applications.jobPost',
+            ]);
 
         // Search text
         if ($search = $request->input('search')) {
@@ -358,29 +361,18 @@ class CrmController extends Controller
             });
         }
 
-        if ($englishFluency = $request->input('english_fluency')) {
-            $query->whereHas('profile', function($q) use ($englishFluency) {
-                $q->where('english_fluency', $englishFluency);
-            });
-        }
-
-        if ($availability = $request->input('availability')) {
-            $query->whereHas('profile', function($q) use ($availability) {
-                $q->where('availability', $availability);
-            });
-        }
-
-        if ($salary = $request->input('salary')) {
-            $query->whereHas('profile', function($q) use ($salary) {
-                $q->where('expected_salary', 'like', "%{$salary}%")
-                  ->orWhere('current_salary', 'like', "%{$salary}%");
-            });
-        }
-
-        if ($planAmount = $request->input('plan_amount')) {
-            $query->whereHas('profile', function($q) use ($planAmount) {
-                $q->where('paid_amount', $planAmount);
-            });
+        // Status filter from analytics cards
+        if ($crmStatus = $request->input('crm_status')) {
+            if ($crmStatus === 'active_paid') {
+                $query->whereHas('profile', fn($q) => $q->where('is_fee_paid', true));
+            } elseif ($crmStatus === 'signed') {
+                $query->whereHas('profile', fn($q) => $q->where('is_fee_paid', false)->where('is_agreement_signed', true));
+            } elseif ($crmStatus === 'incomplete') {
+                $query->where(function($subQ) {
+                    $subQ->whereDoesntHave('profile')
+                         ->orWhereHas('profile', fn($q) => $q->where('is_fee_paid', false)->where('is_agreement_signed', false));
+                });
+            }
         }
 
         // Sorting
@@ -396,17 +388,22 @@ class CrmController extends Controller
 
         $candidates = $query->with('rating')->paginate(15)->withQueryString();
 
-        // Analytics based on current filtered query
+        // Accurate Analytics based on search/base
+        $baseQuery = User::where('role', 'candidate');
+        if ($search) {
+            $baseQuery->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
         $stats = [
-            'total' => (clone $query)->count(),
-            'active_paid' => (clone $query)->whereHas('profile', function($q) {
-                $q->where('is_fee_paid', true);
-            })->count(),
-            'signed' => (clone $query)->whereHas('profile', function($q) {
-                $q->where('is_fee_paid', false)->where('is_agreement_signed', true);
-            })->count(),
+            'total'       => (clone $baseQuery)->count(),
+            'active_paid' => (clone $baseQuery)->whereHas('profile', fn($q) => $q->where('is_fee_paid', true))->count(),
+            'signed'      => (clone $baseQuery)->whereHas('profile', fn($q) => $q->where('is_fee_paid', false)->where('is_agreement_signed', true))->count(),
         ];
-        $stats['incomplete'] = $stats['total'] - $stats['active_paid'] - $stats['signed'];
+        $stats['incomplete'] = max(0, $stats['total'] - $stats['active_paid'] - $stats['signed']);
 
         // Pass master data for filters
         $subjects = \App\Models\Subject::all();
@@ -419,379 +416,101 @@ class CrmController extends Controller
 
     public function show($id)
     {
-        $candidate = User::whereIn('role', ['candidate', 'parent'])->with(['profile', 'parentProfile', 'applications.jobPost', 'applications' => function($q) {
-            $q->orderBy('created_at', 'desc');
-        }])->findOrFail($id);
+        $candidate = User::where('role', 'candidate')->with([
+            'profile.highestQualification',
+            'profile.category',
+            'profile.subject',
+            'profile.preferredState',
+            'profile.preferredCity',
+            'applications.jobPost.category',
+            'applications.jobPost.city',
+            'rating'
+        ])->findOrFail($id);
 
-        $tuitions = [];
-        if ($candidate->role === 'parent') {
-            $tuitions = \App\Models\HomeTuitionLead::where('user_id', $candidate->id)->latest()->get();
-        }
+        $tuitionApplications = TuitionApplication::with('tuitionLead')
+            ->where('candidate_id', $id)
+            ->latest()
+            ->get();
+
+        $availableJobs = JobPost::where('status', 'approved')->orderBy('created_at', 'desc')->get();
+        $availableTuitionLeads = HomeTuitionLead::whereIn('status', ['New Lead', 'Approved'])->orderBy('created_at', 'desc')->get();
 
         $followUps = CrmFollowUp::where('candidate_id', $id)->with('admin')->orderBy('created_at', 'desc')->get();
-        $invoices = ServiceChargeInvoice::where('candidate_id', $id)->with('jobApplication.jobPost')->orderBy('created_at', 'desc')->get();
+        $invoices = ServiceChargeInvoice::where('candidate_id', $id)->with(['jobApplication.jobPost', 'tuitionLead'])->orderBy('created_at', 'desc')->get();
         $rating = CandidateRating::where('candidate_id', $id)->first();
-        $payments = \App\Models\PaymentTransaction::where('candidate_id', $id)->where('status', 'success')->get();
+        $payments = PaymentTransaction::where('candidate_id', $id)->latest()->get();
 
-        $availableJobs = \App\Models\JobPost::where('status', 'approved')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Calculate Profile Readiness
+        $profile = $candidate->profile;
+        $isTuitionReady = ($profile && $profile->date_of_birth && $profile->gender && $profile->address && $profile->preferred_state_id && $profile->preferred_city_id && $profile->highest_qualification_id && $profile->subject_id);
+        $isJobReady = ($isTuitionReady && $profile->category_id && $profile->resume_path);
 
         $history = collect();
 
         // 1. Profile Creation
         $history->push([
-            'date' => $candidate->created_at,
-            'type' => 'profile_created',
-            'title' => 'Profile Created',
-            'description' => 'Candidate registered on the platform.',
-            'icon' => 'fas fa-user-plus',
-            'color' => 'bg-blue-500'
+            'date'        => $candidate->created_at,
+            'type'        => 'profile_created',
+            'title'       => 'Candidate Registered',
+            'description' => 'Account created on Warriors Educare portal.',
+            'icon'        => 'fas fa-user-plus',
+            'color'       => 'bg-blue-500'
         ]);
 
         // 2. Payments
         foreach ($payments as $payment) {
             $history->push([
-                'date' => $payment->created_at,
-                'type' => 'payment',
-                'title' => 'Payment Received',
-                'description' => 'Payment of ₹' . number_format($payment->amount, 2) . ' was successful.',
-                'icon' => 'fas fa-rupee-sign',
-                'color' => 'bg-green-500'
+                'date'        => $payment->created_at,
+                'type'        => 'payment',
+                'title'       => 'Payment Recorded',
+                'description' => 'Payment of ₹' . number_format($payment->amount, 2) . ' received (' . $payment->type . ').',
+                'icon'        => 'fas fa-rupee-sign',
+                'color'       => 'bg-emerald-500'
             ]);
         }
 
         // 3. Job Applications
         foreach ($candidate->applications as $app) {
             $history->push([
-                'date' => $app->created_at,
-                'type' => 'job_applied',
-                'title' => 'Applied for Job',
-                'description' => 'Applied for ' . ($app->jobPost->title ?? 'a job') . ' at ' . ($app->jobPost->school_name ?? 'a school') . '.',
-                'icon' => 'fas fa-briefcase',
-                'color' => 'bg-indigo-500'
+                'date'        => $app->created_at,
+                'type'        => 'job_applied',
+                'title'       => 'Applied for School Job',
+                'description' => 'Applied for ' . ($app->jobPost->title ?? 'Teacher') . ' at ' . ($app->jobPost->school_name ?? 'School') . ' (Status: ' . ucfirst($app->status) . ').',
+                'icon'        => 'fas fa-briefcase',
+                'color'       => 'bg-indigo-500'
             ]);
-            
-            if ($app->status === 'hired') {
-                 $history->push([
-                    'date' => $app->updated_at,
-                    'type' => 'job_hired',
-                    'title' => 'Hired',
-                    'description' => 'Candidate was hired for ' . ($app->jobPost->title ?? 'a job') . '.',
-                    'icon' => 'fas fa-check-circle',
-                    'color' => 'bg-emerald-500'
-                ]);
-            } elseif ($app->status === 'waitlisted') {
-                $history->push([
-                    'date' => $app->updated_at,
-                    'type' => 'job_waitlisted',
-                    'title' => 'Waitlisted',
-                    'description' => 'Candidate was waitlisted for ' . ($app->jobPost->title ?? 'a job') . '.',
-                    'icon' => 'fas fa-hourglass-half',
-                    'color' => 'bg-amber-500'
-                ]);
-            }
         }
 
-        // 4. Follow-ups
-        foreach ($followUps as $fu) {
+        // 4. Tuition Applications
+        foreach ($tuitionApplications as $tApp) {
             $history->push([
-                'date' => $fu->created_at,
-                'type' => 'follow_up',
-                'title' => 'Follow-up Added',
-                'description' => 'Notes: ' . $fu->notes,
-                'icon' => 'fas fa-phone-alt',
-                'color' => 'bg-yellow-500'
+                'date'        => $tApp->created_at,
+                'type'        => 'tuition_applied',
+                'title'       => 'Applied for Home Tuition',
+                'description' => 'Applied for Class ' . ($tApp->tuitionLead->class ?? 'N/A') . ' (' . ($tApp->tuitionLead->subjects ?? '') . ') in ' . ($tApp->tuitionLead->location ?? '') . ' (Status: ' . $tApp->status . ').',
+                'icon'        => 'fas fa-chalkboard-teacher',
+                'color'       => 'bg-purple-500'
             ]);
         }
 
-        // 5. Invoices
-        foreach ($invoices as $invoice) {
-            $history->push([
-                'date' => $invoice->created_at,
-                'type' => 'invoice_generated',
-                'title' => 'Invoice Generated',
-                'description' => 'Invoice for ₹' . number_format($invoice->amount, 2) . ' generated.',
-                'icon' => 'fas fa-file-invoice-dollar',
-                'color' => 'bg-purple-500'
-            ]);
-            if ($invoice->status === 'paid' && $invoice->payment_date) {
-                $history->push([
-                    'date' => $invoice->payment_date,
-                    'type' => 'invoice_paid',
-                    'title' => 'Invoice Paid',
-                    'description' => 'Service charge invoice for ₹' . number_format($invoice->amount, 2) . ' was paid.',
-                    'icon' => 'fas fa-check-double',
-                    'color' => 'bg-green-600'
-                ]);
-            }
-        }
+        // Sort timeline
+        $history = $history->sortByDesc('date');
 
-        $history = $history->sortByDesc('date')->values();
-
-        return view('admin.crm.show', compact('candidate', 'followUps', 'invoices', 'rating', 'history', 'availableJobs', 'tuitions'));
+        return view('admin.crm.show', compact(
+            'candidate',
+            'profile',
+            'tuitionApplications',
+            'availableJobs',
+            'availableTuitionLeads',
+            'followUps',
+            'invoices',
+            'rating',
+            'payments',
+            'history',
+            'isTuitionReady',
+            'isJobReady'
+        ));
     }
-
-    public function updateAgreementStatus(Request $request, $id)
-    {
-        $request->validate([
-            'agreement_status' => 'required|in:not_required,pending_signature,signed',
-        ]);
-
-        $candidate = User::whereIn('role', ['candidate', 'parent'])->findOrFail($id);
-        
-        if ($candidate->profile) {
-            $updates = [
-                'agreement_status' => $request->agreement_status,
-            ];
-
-            $candidate->profile->update($updates);
-
-            // Notify candidate when admin requests signature
-            if ($request->agreement_status === 'pending_signature') {
-                NotificationHelper::notifyUser(
-                    $candidate->id,
-                    'Action Required: Sign Your Agreement ✍️',
-                    'The Warriors Educare team has requested you to sign your registration agreement. Please log in to complete this step.',
-                    null,
-                    'fas fa-file-signature'
-                );
-
-                try {
-                    \Illuminate\Support\Facades\Mail::to($candidate->email)->send(
-                        new \App\Mail\AgreementPendingMail($candidate)
-                    );
-                } catch (\Exception $e) {
-                    \Log::error('AgreementPending Email Error: ' . $e->getMessage());
-                }
-            }
-        }
-
-        return back()->with('success', 'Agreement status updated successfully.');
-    }
-
-    public function uploadAgreement(Request $request, $id)
-    {
-        $request->validate([
-            'agreement_pdf' => 'required|mimes:pdf|max:5120',
-        ]);
-
-        $candidate = User::whereIn('role', ['candidate', 'parent'])->findOrFail($id);
-        $profile = $candidate->profile;
-
-        if (!$profile) {
-            return back()->with('error', 'Candidate profile not found.');
-        }
-
-        if ($request->hasFile('agreement_pdf')) {
-            $file     = $request->file('agreement_pdf');
-            $fileName = 'agreements/admin_uploaded_' . $candidate->id . '_' . time() . '.pdf';
-            
-            \Illuminate\Support\Facades\Storage::disk('public')->put($fileName, file_get_contents($file));
-
-            $profile->update([
-                'is_agreement_signed' => true,
-                'agreement_pdf_path'  => $fileName,
-                'agreement_status'    => 'signed'
-            ]);
-
-            // Notify candidate that agreement PDF is available
-            NotificationHelper::notifyUser(
-                $candidate->id,
-                'Agreement PDF Uploaded 📄',
-                'Your signed Registration Agreement has been uploaded by the Warriors Educare team. You can now download it from your dashboard.',
-                null,
-                'fas fa-file-pdf'
-            );
-
-            try {
-                \Illuminate\Support\Facades\Mail::to($candidate->email)->send(
-                    new \App\Mail\AgreementPendingMail($candidate)
-                );
-            } catch (\Exception $e) {
-                \Log::error('AgreementUploaded Email Error: ' . $e->getMessage());
-            }
-
-            return back()->with('success', 'Agreement PDF uploaded successfully. The candidate can now view and download it.');
-        }
-
-        return back()->with('error', 'Failed to upload agreement.');
-    }
-
-    public function storeFollowUp(Request $request, $id)
-    {
-        $request->validate([
-            'notes' => 'required|string',
-            'follow_up_date' => 'nullable|date',
-            'status' => 'required|in:open,closed'
-        ]);
-
-        CrmFollowUp::create([
-            'candidate_id' => $id,
-            'notes' => $request->notes,
-            'follow_up_date' => $request->follow_up_date,
-            'status' => $request->status,
-            'created_by' => auth()->id()
-        ]);
-
-        return back()->with('success', 'Follow-up added successfully.');
-    }
-
-    public function storeInvoice(Request $request, $id)
-    {
-        $request->validate([
-            'job_application_id' => 'required|exists:job_applications,id',
-            'amount' => 'required|numeric|min:0',
-            'due_date' => 'required|date'
-        ]);
-
-        $invoice = ServiceChargeInvoice::create([
-            'candidate_id' => $id,
-            'job_application_id' => $request->job_application_id,
-            'amount' => $request->amount,
-            'due_date' => $request->due_date,
-            'status' => 'pending'
-        ]);
-
-        $candidate = User::findOrFail($id);
-        $candidate->profile->increment('pending_amount', $request->amount);
-
-        // Notify Candidate
-        \Illuminate\Support\Facades\DB::table('notifications')->insert([
-            'id' => \Illuminate\Support\Str::uuid()->toString(),
-            'type' => 'App\Notifications\ServiceChargeInvoiceGenerated',
-            'notifiable_type' => 'App\Models\User',
-            'notifiable_id' => $id,
-            'data' => json_encode([
-                'title' => 'New Service Charge Invoice',
-                'message' => 'An invoice for ₹' . number_format($request->amount, 2) . ' has been generated for your recent job placement.',
-                'amount' => $request->amount,
-                'invoice_id' => $invoice->id
-            ]),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        // Send Email
-        \Illuminate\Support\Facades\Mail::to($candidate->email)->send(new \App\Mail\ServiceChargeInvoiceMail($invoice));
-
-        return back()->with('success', 'Invoice created successfully.');
-    }
-
-    public function updateInvoiceStatus(Request $request, $invoiceId)
-    {
-        $invoice = ServiceChargeInvoice::findOrFail($invoiceId);
-        
-        $request->validate([
-            'status' => 'required|in:pending,paid,overdue'
-        ]);
-
-        $invoice->update([
-            'status' => $request->status,
-            'payment_date' => $request->status === 'paid' ? now() : null
-        ]);
-
-        if ($request->status === 'paid' && $invoice->getOriginal('status') !== 'paid') {
-            $candidate = User::find($invoice->candidate_id);
-            if ($candidate && $candidate->profile) {
-                $candidate->profile->decrement('pending_amount', $invoice->amount);
-                $candidate->profile->increment('paid_amount', $invoice->amount);
-
-                // Notify candidate that invoice was marked paid
-                NotificationHelper::notifyUser(
-                    $candidate->id,
-                    'Invoice Marked as Paid ✅',
-                    'Your service charge invoice of ₹' . number_format($invoice->amount, 2) . ' has been marked as paid by the team.',
-                    route('candidate.serviceCharge.show'),
-                    'fas fa-check-circle'
-                );
-
-                // Email
-                try {
-                    \Illuminate\Support\Facades\Mail::to($candidate->email)->send(
-                        new \App\Mail\InvoicePaidByAdminMail($invoice, $candidate)
-                    );
-                } catch (\Exception $e) {
-                    \Log::error('InvoicePaidByAdmin Email Error: ' . $e->getMessage());
-                }
-            }
-        }
-        $invoice->save();
-
-        return back()->with('success', 'Invoice status updated.');
-    }
-
-    public function adjustInvoice(Request $request, $invoiceId)
-    {
-        $invoice = ServiceChargeInvoice::findOrFail($invoiceId);
-         $request->validate([
-            'deduction' => 'required|numeric|min:0|max:' . $invoice->late_fee
-        ]);
-
-        $deduction = $request->deduction;
-        
-        if ($deduction > 0) {
-            $invoice->update([
-                'late_fee' => $invoice->late_fee - $deduction
-            ]);
-
-            $candidate = User::find($invoice->candidate_id);
-            if ($candidate && $candidate->profile) {
-                $candidate->profile->decrement('pending_amount', $deduction);
-
-                // Notify candidate of late fee waiver/adjustment
-                NotificationHelper::notifyUser(
-                    $candidate->id,
-                    'Late Fee Adjusted 👍',
-                    'Good news! A late fee of ₹' . number_format($deduction, 2) . ' has been waived/adjusted on your invoice by the Warriors Educare team.',
-                    route('candidate.serviceCharge.show'),
-                    'fas fa-hand-holding-usd'
-                );
-            }
-        }
-
-        return back()->with('success', 'Late fee adjusted successfully.');
-    }
-
-    public function toggleVerification($id)
-    {
-        $candidate = User::where('role', 'candidate')->findOrFail($id);
-        $profile = $candidate->profile;
-
-        if (!$profile) {
-            return back()->with('error', 'Profile not found.');
-        }
-
-        $profile->is_verified = !$profile->is_verified;
-        $profile->save();
-
-        if ($profile->is_verified) {
-            // DB Notification
-            \App\Helpers\NotificationHelper::notifyUser(
-                $candidate->id,
-                'Profile Verified! ✅',
-                'Congratulations! Your profile has been officially verified by our team. You now have the Verified Badge.',
-                null,
-                'fas fa-check-circle'
-            );
-
-            // Email Notification
-            \Illuminate\Support\Facades\Mail::to($candidate->email)->send(new \App\Mail\ProfileApprovedMail($candidate));
-            return back()->with('success', 'Candidate profile has been verified and notified.');
-        }
-
-        // Verification removed — notify candidate
-        \App\Helpers\NotificationHelper::notifyUser(
-            $candidate->id,
-            'Profile Verification Removed ⚠️',
-            'Your profile verification badge has been removed by the Warriors Educare team. Please contact us if you have any questions.',
-            null,
-            'fas fa-user-times'
-        );
-
-        return back()->with('success', 'Candidate verification removed and candidate notified.');
-    }
-
 
     public function assignJob(Request $request, $id)
     {
@@ -800,77 +519,280 @@ class CrmController extends Controller
         ]);
 
         $candidate = User::findOrFail($id);
+        
+        $existing = \App\Models\JobApplication::where('candidate_id', $id)
+            ->where('job_post_id', $request->job_post_id)
+            ->first();
 
-        if (\App\Models\JobApplication::where('job_post_id', $request->job_post_id)->where('candidate_id', $candidate->id)->exists()) {
-            return back()->with('error', 'Candidate is already applied to this job.');
+        if ($existing) {
+            return back()->with('info', 'Candidate is already applied/assigned to this job.');
         }
 
-        \App\Models\JobApplication::create([
+        $app = \App\Models\JobApplication::create([
+            'candidate_id' => $id,
             'job_post_id'  => $request->job_post_id,
-            'candidate_id' => $candidate->id,
             'status'       => 'applied',
-            'match_score'  => 0 // Manually assigned by admin
+            'match_score'  => 85,
         ]);
 
-        // Notify candidate that a job was assigned
-        $job = \App\Models\JobPost::find($request->job_post_id);
         NotificationHelper::notifyUser(
             $candidate->id,
-            'New Job Assigned to You 💼',
-            'The Warriors Educare team has assigned you to apply for "' . ($job->title ?? 'a job') . '" at ' . ($job->school_name ?? 'a school') . '. Check your applications.',
-            route('candidate.applications.index'),
+            'New Job Assigned by Admin! 💼',
+            'You have been mapped to a new teaching opportunity. Check your application tracker for details.',
+            route('candidate.applications.index', ['tab' => 'jobs']),
             'fas fa-briefcase'
         );
 
-        return back()->with('success', 'Job application assigned successfully.');
+        return back()->with('success', 'Job opportunity assigned to candidate successfully.');
+    }
+
+    public function assignTuition(Request $request, $candidateId)
+    {
+        $request->validate([
+            'home_tuition_lead_id'   => 'required|exists:home_tuition_leads,id',
+            'status'                 => 'required|in:Applied,Shortlisted,Assigned',
+            'remarks'                => 'nullable|string|max:500',
+            'demo_date'              => 'nullable|date',
+            'create_service_charge'  => 'nullable|boolean',
+            'service_charge_amount'  => 'nullable|numeric|min:0',
+        ]);
+
+        $candidate = User::with('profile')->findOrFail($candidateId);
+        $lead = HomeTuitionLead::findOrFail($request->home_tuition_lead_id);
+
+        $tuitionApp = TuitionApplication::updateOrCreate(
+            ['candidate_id' => $candidateId, 'home_tuition_lead_id' => $lead->id],
+            [
+                'status'    => $request->status,
+                'remarks'   => $request->remarks,
+                'demo_date' => $request->demo_date,
+            ]
+        );
+
+        if ($request->status === 'Assigned') {
+            $lead->update([
+                'teacher_name'    => $candidate->name,
+                'teacher_contact' => $candidate->phone,
+                'status'          => 'Confirmed',
+            ]);
+
+            if ($request->boolean('create_service_charge') && $request->filled('service_charge_amount') && $request->service_charge_amount > 0) {
+                $amount = (float) $request->service_charge_amount;
+                $dueDate = now()->addDays(7)->toDateString();
+                $desc = "Service Charge for Home Tuition (Class {$lead->class} - {$lead->subjects})";
+
+                $invoice = ServiceChargeInvoice::create([
+                    'candidate_id'           => $candidate->id,
+                    'job_application_id'     => null,
+                    'home_tuition_lead_id'   => $lead->id,
+                    'tuition_application_id' => $tuitionApp->id,
+                    'amount'                 => $amount,
+                    'due_date'               => $dueDate,
+                    'status'                 => 'pending',
+                    'description'            => $desc,
+                ]);
+
+                if ($candidate->profile) {
+                    $candidate->profile->increment('pending_amount', $amount);
+                }
+
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    'Tuition Service Charge Generated 🧾',
+                    "An invoice for ₹" . number_format($amount, 2) . " has been issued for your tuition placement.",
+                    route('candidate.serviceCharge.show'),
+                    'fas fa-file-invoice-dollar'
+                );
+            }
+
+            NotificationHelper::notifyUser(
+                $candidate->id,
+                'Tuition Assigned! 🎉',
+                "You have been assigned to Class {$lead->class} ({$lead->subjects}) in {$lead->location}. Parent: {$lead->parent_name} ({$lead->parent_mobile}).",
+                route('candidate.applications.index', ['tab' => 'tuitions']),
+                'fas fa-chalkboard-teacher'
+            );
+        }
+
+        return back()->with('success', "Home tuition mapped to {$candidate->name} successfully.");
+    }
+
+    public function storeFollowUp(Request $request, $id)
+    {
+        $request->validate([
+            'notes'          => 'required|string',
+            'follow_up_date' => 'nullable|date',
+            'status'         => 'required|in:pending,completed,cancelled'
+        ]);
+
+        CrmFollowUp::create([
+            'candidate_id'   => $id,
+            'admin_id'       => Auth::id(),
+            'notes'          => $request->notes,
+            'follow_up_date' => $request->follow_up_date,
+            'status'         => $request->status
+        ]);
+
+        return back()->with('success', 'Follow-up note logged successfully.');
+    }
+
+    public function storeInvoice(Request $request, $id)
+    {
+        $request->validate([
+            'job_application_id'   => 'nullable|exists:job_applications,id',
+            'home_tuition_lead_id' => 'nullable|exists:home_tuition_leads,id',
+            'amount'               => 'required|numeric|min:0',
+            'due_date'             => 'required|date',
+            'description'          => 'nullable|string|max:255',
+        ]);
+
+        $candidate = User::with('profile')->findOrFail($id);
+
+        $invoice = ServiceChargeInvoice::create([
+            'candidate_id'         => $id,
+            'job_application_id'   => $request->job_application_id,
+            'home_tuition_lead_id' => $request->home_tuition_lead_id,
+            'amount'               => $request->amount,
+            'due_date'             => $request->due_date,
+            'status'               => 'pending',
+            'description'          => $request->description ?: 'Placement Service Charge',
+        ]);
+
+        if ($candidate->profile) {
+            $candidate->profile->increment('pending_amount', $request->amount);
+        }
+
+        NotificationHelper::notifyUser(
+            $id,
+            'New Service Charge Invoice 🧾',
+            'An invoice of ₹' . number_format($request->amount, 2) . ' has been generated for your placement. Due Date: ' . Carbon::parse($request->due_date)->format('d M Y') . '.',
+            route('candidate.serviceCharge.show'),
+            'fas fa-file-invoice-dollar'
+        );
+
+        return back()->with('success', 'Invoice created successfully.');
+    }
+
+    public function toggleVerification(Request $request, $id)
+    {
+        $user = User::with('profile')->findOrFail($id);
+        if ($user->profile) {
+            $user->profile->is_verified = !$user->profile->is_verified;
+            $user->profile->save();
+            
+            $msg = $user->profile->is_verified ? 'Candidate profile verified successfully.' : 'Verification revoked.';
+            return back()->with('success', $msg);
+        }
+        return back()->with('error', 'Profile not found.');
+    }
+
+    public function magicLogin($id)
+    {
+        $user = User::findOrFail($id);
+        Auth::login($user);
+        return redirect()->route('candidate.dashboard');
+    }
+
+    public function uploadAgreement(Request $request, $id)
+    {
+        $request->validate([
+            'agreement_pdf' => 'required|mimes:pdf|max:5120',
+        ]);
+
+        $user = User::with('profile')->findOrFail($id);
+        if ($user->profile) {
+            $path = $request->file('agreement_pdf')->store('agreements', 'public');
+            $user->profile->update([
+                'agreement_pdf_path'  => $path,
+                'is_agreement_signed' => true,
+                'agreement_status'    => 'signed',
+                'signature_date_time' => now(),
+            ]);
+
+            return back()->with('success', 'Signed agreement PDF uploaded successfully.');
+        }
+
+        return back()->with('error', 'Candidate profile not found.');
+    }
+
+    public function updateAgreementStatus(Request $request, $id)
+    {
+        $request->validate([
+            'agreement_status'            => 'nullable|in:not_required,pending_signature,signed',
+            'is_tuition_agreement_signed' => 'nullable|boolean',
+        ]);
+
+        $user = User::with('profile')->findOrFail($id);
+        if ($user->profile) {
+            $updates = [];
+            
+            if ($request->filled('agreement_status')) {
+                $status = $request->agreement_status;
+                $updates['agreement_status'] = $status;
+                $updates['is_agreement_signed'] = ($status === 'signed');
+                if ($status === 'signed') {
+                    $updates['signature_date_time'] = now();
+                }
+
+                if ($status === 'pending_signature') {
+                    NotificationHelper::notifyUser(
+                        $user->id,
+                        'Action Required: Sign Candidate Agreement ✍️',
+                        'Warriors Educare admin has activated your Placement Agreement. Please visit your dashboard to review and sign it.',
+                        route('candidate.agreement.show'),
+                        'fas fa-file-signature'
+                    );
+                } elseif ($status === 'signed') {
+                    NotificationHelper::notifyUser(
+                        $user->id,
+                        'Agreement Approved & Verified! ✅',
+                        'Your Teacher Placement Service Agreement is verified. You can now apply for all eligible school jobs.',
+                        route('candidate.dashboard'),
+                        'fas fa-check-circle'
+                    );
+                }
+            }
+
+            if ($request->has('is_tuition_agreement_signed')) {
+                $isTuitionSigned = $request->boolean('is_tuition_agreement_signed');
+                $updates['is_tuition_agreement_signed'] = $isTuitionSigned;
+                $updates['tuition_agreement_signed_at'] = $isTuitionSigned ? now() : null;
+
+                if ($isTuitionSigned) {
+                    NotificationHelper::notifyUser(
+                        $user->id,
+                        'Tuition Agreement Approved! 🏠',
+                        'Your Home Tuition Agreement is verified. You can now apply for home tuition assignments.',
+                        route('tuitions.index'),
+                        'fas fa-chalkboard-teacher'
+                    );
+                }
+            }
+
+            $user->profile->update($updates);
+
+            return back()->with('success', 'Agreement settings updated successfully.');
+        }
+
+        return back()->with('error', 'Candidate profile not found.');
     }
 
     public function rateCandidate(Request $request, $id)
     {
         $request->validate([
-            'communication' => 'required|integer|min:1|max:5',
-            'subject_knowledge' => 'required|integer|min:1|max:5',
-            'demo_performance' => 'required|integer|min:1|max:5',
-            'english_fluency' => 'required|integer|min:1|max:5',
-            'discipline' => 'required|integer|min:1|max:5',
-            'remarks' => 'nullable|string'
+            'rating'   => 'required|integer|min:1|max:5',
+            'feedback' => 'nullable|string|max:500',
         ]);
-
-        $overall = ($request->communication + $request->subject_knowledge + $request->demo_performance + $request->english_fluency + $request->discipline) / 5;
 
         CandidateRating::updateOrCreate(
             ['candidate_id' => $id],
             [
-                'communication' => $request->communication,
-                'subject_knowledge' => $request->subject_knowledge,
-                'demo_performance' => $request->demo_performance,
-                'english_fluency' => $request->english_fluency,
-                'discipline' => $request->discipline,
-                'overall_rating' => $overall,
-                'remarks' => $request->remarks,
-                'rated_by' => auth()->id()
+                'admin_id' => Auth::id(),
+                'rating'   => $request->rating,
+                'feedback' => $request->feedback,
             ]
         );
 
-        \App\Helpers\NotificationHelper::notifyUser(
-            $id,
-            'Profile Rating Updated',
-            'Your profile rating has been updated by the admin team. Keep up the good work!',
-            route('candidate.dashboard'),
-            'fas fa-star'
-        );
-
-        return back()->with('success', 'Candidate rating updated successfully.');
-    }
-
-    public function magicLogin($id)
-    {
-        $candidate = User::where('role', 'candidate')->findOrFail($id);
-        
-        // Store admin id in session so they can switch back if needed (optional)
-        session(['admin_id' => auth()->id()]);
-        
-        Auth::login($candidate);
-        return redirect()->route('candidate.dashboard');
+        return back()->with('success', 'Candidate rating saved successfully.');
     }
 }

@@ -13,6 +13,12 @@ class TuitionApplication extends Model
         'home_tuition_lead_id',
         'candidate_id',
         'status',
+        'remarks',
+        'demo_date',
+    ];
+
+    protected $casts = [
+        'demo_date' => 'datetime',
     ];
 
     public function candidate()

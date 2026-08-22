@@ -15,16 +15,15 @@
         <div id="candidateNavScroll" class="flex items-center justify-between gap-3 py-2.5 overflow-x-auto hide-scrollbar scroll-smooth w-full px-1">
             @php
                 $appCount = auth()->user()->applications()->count();
+                $tuitionCount = \App\Models\TuitionApplication::where('candidate_id', auth()->id())->count();
                 $navItems = [
                     ['route' => 'candidate.dashboard', 'routeIs' => 'candidate.dashboard', 'icon' => 'fa-th-large', 'label' => 'Dashboard'],
-                    ['route' => 'candidate.tuitions.index', 'routeIs' => 'candidate.tuitions.*', 'icon' => 'fa-book-reader', 'label' => 'Tuitions'],
+                    ['route' => 'candidate.applications.available', 'routeIs' => 'candidate.applications.available', 'icon' => 'fa-briefcase', 'label' => 'School Jobs'],
+                    ['route' => 'candidate.tuitions.index', 'routeIs' => 'candidate.tuitions.*', 'icon' => 'fa-book-reader', 'label' => 'Home Tuitions'],
+                    ['route' => 'candidate.applications.index', 'routeIs' => 'candidate.applications.index', 'icon' => 'fa-paper-plane', 'label' => 'My Applications', 'badge' => ($appCount + $tuitionCount)],
                     ['route' => 'candidate.profile.edit', 'routeIs' => 'candidate.profile.*', 'icon' => 'fa-user-circle', 'label' => 'My Profile'],
-                    ['route' => 'candidate.applications.index', 'routeIs' => 'candidate.applications.*', 'icon' => 'fa-paper-plane', 'label' => 'Applications', 'badge' => $appCount],
-                    ['route' => 'candidate.payment.show', 'routeIs' => 'candidate.payment.*', 'icon' => 'fa-credit-card', 'label' => 'Payment & Plan'],
                     ['route' => 'candidate.agreement.show', 'routeIs' => 'candidate.agreement.*', 'icon' => 'fa-file-signature', 'label' => 'My Agreement'],
-                    ['route' => 'candidate.registration.show', 'routeIs' => 'candidate.registration.*', 'icon' => 'fa-clipboard-check', 'label' => 'Registration'],
                     ['route' => 'candidate.serviceCharge.show', 'routeIs' => 'candidate.servicecharge.*', 'icon' => 'fa-file-invoice-dollar', 'label' => 'Service Charge'],
-                    // ['route' => 'candidate.aditionalFeature.show', 'routeIs' => 'candidate.aditional.*', 'icon' => 'fa-puzzle-piece', 'label' => 'Additional Features'],
                 ];
             @endphp
 
