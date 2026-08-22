@@ -229,6 +229,14 @@
                     class="sidebar-link {{ (request()->routeIs('admin.tuition-leads.*') && request('status') !== 'New Lead') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-list-alt w-5 text-center"></i> All Tuitions
                 </a>
+                <a href="{{ route('admin.tuition-applications.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.tuition-applications.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-file-signature w-5 text-center"></i> Tuition Applications
+                    @php $tuitionAppCount = \App\Models\TuitionApplication::where('status', 'Applied')->count(); @endphp
+                    @if($tuitionAppCount > 0)
+                        <span class="ml-auto bg-sky-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $tuitionAppCount }}</span>
+                    @endif
+                </a>
                 <a href="{{ route('admin.candidate-tuition.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.candidate-tuition.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-user-graduate w-5 text-center"></i> Assign Teachers

@@ -263,7 +263,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/tuition-leads/service-charge-invoice/{invoiceId}/status', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'updateInvoiceStatus'])->name('tuition-leads.invoice.status');
     Route::post('/tuition-leads/{id}/upload-documents', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'uploadTeacherDocuments'])->name('tuition-leads.upload-documents');
 
-    // Candidate Tuition Appointment
+    // Candidate Tuition Appointment & Applications
+    Route::get('/tuition-applications', [\App\Http\Controllers\Admin\TuitionApplicationController::class, 'index'])->name('tuition-applications.index');
+    Route::post('/tuition-applications/{id}/status', [\App\Http\Controllers\Admin\TuitionApplicationController::class, 'updateStatus'])->name('tuition-applications.status.update');
     Route::get('/candidate-tuition', [\App\Http\Controllers\Admin\CandidateTuitionController::class, 'index'])->name('candidate-tuition.index');
     Route::post('/candidate-tuition/{candidateId}/appoint', [\App\Http\Controllers\Admin\CandidateTuitionController::class, 'appoint'])->name('candidate-tuition.appoint');
 
