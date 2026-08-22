@@ -71,7 +71,7 @@
             </div>
 
             <div class="p-6">
-                @if($candidate->profile)
+                @if($candidate->profile && $candidate->role === 'candidate')
                     <!-- Personal Info -->
                     <div class="mb-6">
                         <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Personal Details</h4>
@@ -273,6 +273,20 @@
                                 @endif
                             </button>
                         </form>
+                    </div>
+                @elseif($candidate->role === 'parent')
+                    <div class="mb-6">
+                        <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Parent Details</h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
+                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Address</div>
+                                <div class="text-sm font-medium text-gray-800">{{ $candidate->parentProfile->address ?? 'N/A' }}</div>
+                            </div>
+                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
+                                <div class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">City</div>
+                                <div class="text-sm font-medium text-gray-800">{{ $candidate->parentProfile->city ?? 'N/A' }}</div>
+                            </div>
+                        </div>
                     </div>
                 @elseif($candidate->role === 'candidate')
                     <div class="py-10 flex flex-col items-center justify-center text-gray-500">

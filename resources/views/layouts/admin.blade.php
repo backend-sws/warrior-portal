@@ -201,7 +201,7 @@
                     <i class="fas fa-briefcase w-5 text-center"></i> All Jobs
                 </a>
                 <a href="{{ route('admin.crm.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.crm.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    class="sidebar-link {{ request()->routeIs('admin.crm.*') && request('role') !== 'parent' ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-users-cog w-5 text-center"></i> Candidates CRM
                 </a>
                 <a href="{{ route('admin.applications.index') }}"
@@ -227,6 +227,11 @@
 
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Tuitions & Parents
                 </div>
+
+                <a href="{{ route('admin.crm.index', ['role' => 'parent']) }}"
+                    class="sidebar-link {{ request()->routeIs('admin.crm.index') && request('role') === 'parent' ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-user-friends w-5 text-center"></i> Parent CRM
+                </a>
 
                 <a href="{{ route('admin.tuitions.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.tuitions.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
