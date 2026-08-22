@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Candidate;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\NotificationHelper;
 use App\Models\ServiceChargeInvoice;
 use App\Models\PaymentTransaction;
 use Illuminate\Http\Request;
@@ -141,19 +142,39 @@ class ServiceChargeController extends Controller
                 $adminUser = \App\Models\User::where('role', 'admin')->first();
                 if ($adminUser) {
                     \Illuminate\Support\Facades\DB::table('notifications')->insert([
-                        'id' => \Illuminate\Support\Str::uuid(),
-                        'type' => 'App\Notifications\ServiceChargePaid',
+                        'id'              => \Illuminate\Support\Str::uuid(),
+                        'type'            => 'App\Notifications\ServiceChargePaid',
                         'notifiable_type' => 'App\Models\User',
-                        'notifiable_id' => $adminUser->id,
-                        'data' => json_encode([
-                            'title' => 'Service Charge Received',
-                            'message' => '₹' . $request->amount . ' was received from ' . $user->name . ' for Service Charge.',
+                        'notifiable_id'   => $adminUser->id,
+                        'data'            => json_encode([
+                            'title'        => 'Service Charge Received',
+                            'message'      => '₹' . $request->amount . ' was received from ' . $user->name . ' for Service Charge.',
                             'candidate_id' => $user->id,
-                            'amount' => $request->amount
+                            'amount'       => $request->amount
                         ]),
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+                }
+
+                // Notify Candidate — payment receipt
+                NotificationHelper::notifyUser(
+                    $user->id,
+                    'Service Charge Payment Received ✅',
+                    '₹' . number_format($request->amount, 2) . ' service charge payment received successfully. Thank you!',
+                    route('candidate.serviceCharge.show'),
+                    'fas fa-check-circle'
+                );
+
+                // Email receipt to Candidate
+                try {
+                    if ($invoice) {
+                        \Illuminate\Support\Facades\Mail::to($user->email)->send(
+                            new \App\Mail\ServiceChargePaymentReceiptMail($invoice, $user, $request->amount)
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('ServiceChargeReceipt Email Error: ' . $e->getMessage());
                 }
             }
             return redirect()->route('candidate.serviceCharge.show')->with('success', 'Service charge paid successfully! (Local Bypass)');
@@ -248,19 +269,40 @@ class ServiceChargeController extends Controller
         $adminUser = \App\Models\User::where('role', 'admin')->first();
         if ($adminUser) {
             \Illuminate\Support\Facades\DB::table('notifications')->insert([
-                'id' => \Illuminate\Support\Str::uuid(),
-                'type' => 'App\Notifications\ServiceChargePaid',
+                'id'              => \Illuminate\Support\Str::uuid(),
+                'type'            => 'App\Notifications\ServiceChargePaid',
                 'notifiable_type' => 'App\Models\User',
-                'notifiable_id' => $adminUser->id,
-                'data' => json_encode([
-                    'title' => 'Service Charge Received',
-                    'message' => '₹' . $amountPaid . ' was received from ' . $user->name . ' for Service Charge.',
+                'notifiable_id'   => $adminUser->id,
+                'data'            => json_encode([
+                    'title'        => 'Service Charge Received',
+                    'message'      => '₹' . $amountPaid . ' was received from ' . $user->name . ' for Service Charge.',
                     'candidate_id' => $user->id,
-                    'amount' => $amountPaid
+                    'amount'       => $amountPaid
                 ]),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+        }
+
+        // Notify Candidate — payment receipt DB notification
+        NotificationHelper::notifyUser(
+            $user->id,
+            'Service Charge Payment Received ✅',
+            '₹' . number_format($amountPaid, 2) . ' service charge payment received successfully. Your invoice has been updated.',
+            route('candidate.serviceCharge.show'),
+            'fas fa-check-circle'
+        );
+
+        // Email receipt to Candidate
+        $paidInvoice = $invoiceId ? ServiceChargeInvoice::find($invoiceId) : ($latestInvoice ?? null);
+        if ($paidInvoice) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(
+                    new \App\Mail\ServiceChargePaymentReceiptMail($paidInvoice, $user, $amountPaid)
+                );
+            } catch (\Exception $e) {
+                \Log::error('ServiceChargeReceipt Email Error: ' . $e->getMessage());
+            }
         }
 
         return redirect()->route('candidate.serviceCharge.show')->with('success', 'Service charge paid successfully!');

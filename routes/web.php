@@ -290,5 +290,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('services', \App\Http\Controllers\Admin\ServiceController::class)->except(['create', 'show', 'edit']);
     Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class)->except(['create', 'show', 'edit']);
     Route::resource('clients', \App\Http\Controllers\Admin\ClientLogoController::class)->except(['create', 'show', 'edit'])->parameters(['clients' => 'clientLogo']);
+
+    // ── Admin Manual Reminder System ──────────────────────────────────────
+    Route::prefix('reminders')->name('reminders.')->group(function () {
+        Route::get('/',                 [\App\Http\Controllers\Admin\ReminderController::class, 'index'])->name('index');
+        Route::post('/service-charge',  [\App\Http\Controllers\Admin\ReminderController::class, 'sendServiceChargeReminder'])->name('service-charge');
+        Route::post('/renewal',         [\App\Http\Controllers\Admin\ReminderController::class, 'sendRenewalReminder'])->name('renewal');
+        Route::post('/payment-pending', [\App\Http\Controllers\Admin\ReminderController::class, 'sendPaymentPendingReminder'])->name('payment-pending');
+        Route::post('/interview',       [\App\Http\Controllers\Admin\ReminderController::class, 'sendInterviewReminder'])->name('interview');
+        Route::post('/profile',         [\App\Http\Controllers\Admin\ReminderController::class, 'sendProfileCompletionReminder'])->name('profile');
+        Route::post('/plan-expiry',     [\App\Http\Controllers\Admin\ReminderController::class, 'sendPlanExpiryReminder'])->name('plan-expiry');
+        Route::post('/late-fee',        [\App\Http\Controllers\Admin\ReminderController::class, 'sendLateFeeAlert'])->name('late-fee');
+        Route::post('/custom',          [\App\Http\Controllers\Admin\ReminderController::class, 'sendCustomMessage'])->name('custom');
+    });
 });
+
 Route::post('/submit-tuition-request', [\App\Http\Controllers\FrontendLeadController::class, 'storeTuitionLead'])->name('submit-tuition-request');

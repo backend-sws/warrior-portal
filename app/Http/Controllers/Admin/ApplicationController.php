@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\NotificationHelper;
 use App\Models\JobApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ApplicationForwarded;
+use App\Mail\InterviewScheduledMail;
 
 class ApplicationController extends Controller
 {
@@ -81,6 +83,24 @@ class ApplicationController extends Controller
         } elseif ($request->status !== $oldStatus) {
             // For other status changes, send the generic ApplicationStatusMail
             Mail::to($application->candidate->email)->send(new \App\Mail\ApplicationStatusMail($application));
+        }
+
+        // Interview Scheduled — send dedicated notification + email
+        if (!empty($request->interview_date) && $request->interview_date !== $application->getOriginal('interview_date')) {
+            NotificationHelper::notifyUser(
+                $application->candidate_id,
+                'Interview Scheduled! 🎯',
+                'Your interview for "' . $application->jobPost->title . '" at ' . $application->jobPost->school_name . ' has been scheduled on ' . \Carbon\Carbon::parse($request->interview_date)->format('d M Y, h:i A') . '.',
+                route('candidate.applications.index'),
+                'fas fa-calendar-check'
+            );
+
+            // Email
+            try {
+                Mail::to($application->candidate->email)->send(new InterviewScheduledMail($application));
+            } catch (\Exception $e) {
+                \Log::error('InterviewScheduled Email Error: ' . $e->getMessage());
+            }
         }
 
         if ($request->status !== $oldStatus) {

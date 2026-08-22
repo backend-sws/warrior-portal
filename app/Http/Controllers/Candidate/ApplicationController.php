@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Candidate;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\NotificationHelper;
 use App\Models\JobApplication;
 use App\Models\JobPost;
 use Illuminate\Http\Request;
@@ -107,18 +108,28 @@ class ApplicationController extends Controller
 
         $profile->increment('used_applications');
 
-        // Check if they need a warning (1 remaining)
         $remaining = $profile->total_allowed_applications - $profile->used_applications;
+
+        // --- Confirm application to candidate ---
+        NotificationHelper::notifyUser(
+            $user->id,
+            'Application Submitted ✅',
+            'You have successfully applied for "' . $job->title . '" at ' . $job->school_name . '. You have ' . $remaining . ' application(s) remaining.',
+            route('candidate.applications.index'),
+            'fas fa-briefcase'
+        );
+
+        // Check if they need a warning (1 remaining)
         if ($remaining === 1) {
             // DB Notification
             \Illuminate\Support\Facades\DB::table('notifications')->insert([
-                'id' => \Illuminate\Support\Str::uuid(),
-                'type' => 'App\Notifications\RegistrationExpiryWarning',
+                'id'              => \Illuminate\Support\Str::uuid(),
+                'type'            => 'App\Notifications\RegistrationExpiryWarning',
                 'notifiable_type' => 'App\Models\User',
-                'notifiable_id' => $user->id,
-                'data' => json_encode([
-                    'title' => 'Almost Out of Applications!',
-                    'message' => 'You only have 1 application remaining on your current plan.',
+                'notifiable_id'   => $user->id,
+                'data'            => json_encode([
+                    'title'   => 'Almost Out of Applications! ⚠️',
+                    'message' => 'You only have 1 application remaining on your current plan. Use it wisely!',
                 ]),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -126,6 +137,32 @@ class ApplicationController extends Controller
 
             // Email Notification
             \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\RegistrationExpiryMail($user, $remaining));
+        }
+
+        // Check if plan is now expired (0 remaining)
+        if ($remaining <= 0) {
+            NotificationHelper::notifyUser(
+                $user->id,
+                'Registration Plan Expired 🔄',
+                'You have used all your application opportunities. Your registration plan has expired. Please renew to continue applying.',
+                route('candidate.dashboard'),
+                'fas fa-exclamation-triangle'
+            );
+
+            // Email
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\RenewalReminderMail($user));
+            } catch (\Exception $e) {
+                \Log::error('RenewalReminder Email Error: ' . $e->getMessage());
+            }
+
+            // Notify Admin
+            NotificationHelper::notifyAdmin(
+                'Candidate Plan Expired',
+                $user->name . '\'s registration plan has expired (all ' . $profile->total_allowed_applications . ' applications used).',
+                null,
+                'fas fa-user-times'
+            );
         }
 
         // Notify Admin of new application
