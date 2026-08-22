@@ -7,6 +7,7 @@ use App\Helpers\NotificationHelper;
 use App\Models\User;
 use App\Models\ServiceChargeInvoice;
 use App\Models\JobApplication;
+use App\Models\TuitionApplication;
 use App\Models\CandidateProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -22,76 +23,128 @@ class ReminderController extends Controller
      */
     public function index()
     {
-        // Stats for the dashboard cards
+        // Stats for the analytics cards
         $stats = [
-            'service_charge_pending' => ServiceChargeInvoice::whereIn('status', ['pending', 'overdue'])->count(),
-            'renewal_needed'         => User::where('role', 'candidate')
-                ->whereHas('profile', fn($q) => $q->whereColumn('used_applications', '>=', 'total_allowed_applications')->where('total_allowed_applications', '>', 0))
+            'job_service_pending'     => ServiceChargeInvoice::whereNull('home_tuition_lead_id')->whereIn('status', ['pending', 'overdue'])->count(),
+            'tuition_service_pending' => ServiceChargeInvoice::whereNotNull('home_tuition_lead_id')->whereIn('status', ['pending', 'overdue'])->count(),
+            'agreement_pending'       => User::where('role', 'candidate')
+                ->whereHas('profile', fn($q) => $q->where('is_agreement_signed', false)->orWhere('is_tuition_agreement_signed', false))
                 ->count(),
-            'payment_pending'        => User::where('role', 'candidate')
-                ->whereHas('profile', fn($q) => $q->where('plan_type', 'standard')->where('pending_amount', '>', 0))
-                ->count(),
-            'upcoming_interviews'    => JobApplication::whereNotNull('interview_date')
+            'upcoming_interviews'     => JobApplication::whereNotNull('interview_date')
                 ->where('interview_date', '>', now())
-                ->where('interview_date', '<=', now()->addDays(3))
+                ->where('interview_date', '<=', now()->addDays(5))
                 ->count(),
-            'incomplete_profiles'    => User::where('role', 'candidate')
-                ->whereHas('profile', fn($q) => $q->where(function($q2) {
-                    $q2->whereNull('resume_path')
-                       ->orWhereNull('profile_photo_path')
-                       ->orWhereNull('preferred_city_id');
-                })->where('is_fee_paid', true))
+            'upcoming_demos'          => TuitionApplication::whereNotNull('demo_date')
+                ->where('demo_date', '>', now())
+                ->where('demo_date', '<=', now()->addDays(5))
                 ->count(),
-            'plan_expiring'          => User::where('role', 'candidate')
-                ->whereHas('profile', fn($q) => $q->whereRaw('(total_allowed_applications - used_applications) <= 1')->where('total_allowed_applications', '>', 0))
+            'incomplete_profiles'     => User::where('role', 'candidate')
+                ->whereHas('profile', fn($q) => $q->whereNull('resume_path')
+                    ->orWhereNull('subject_id')
+                    ->orWhereNull('highest_qualification_id')
+                    ->orWhereNull('preferred_city_id')
+                )
                 ->count(),
-            'late_fees'              => ServiceChargeInvoice::where('late_fee', '>', 0)->whereIn('status', ['pending', 'overdue'])->count(),
-            'total_candidates'       => User::where('role', 'candidate')->count(),
+            'late_fees'               => ServiceChargeInvoice::where('late_fee', '>', 0)->whereIn('status', ['pending', 'overdue'])->count(),
+            'total_candidates'        => User::where('role', 'candidate')->count(),
         ];
 
-        // Recent reminder logs (last 20 reminders sent by admin)
-        $recentLogs = DB::table('admin_reminder_logs')
-            ->orderBy('created_at', 'desc')
-            ->limit(20)
+        // Recent reminder logs
+        $recentLogs = collect();
+        try {
+            $recentLogs = DB::table('admin_reminder_logs')
+                ->orderBy('created_at', 'desc')
+                ->limit(20)
+                ->get();
+        } catch (\Exception $e) {
+            // If table doesn't exist, ignore
+        }
+
+        // Targeted Candidate Lists for UI forms
+        $jobInvoices = ServiceChargeInvoice::whereNull('home_tuition_lead_id')
+            ->whereIn('status', ['pending', 'overdue'])
+            ->with(['candidate', 'jobApplication.jobPost'])
             ->get();
 
-        // Candidates for individual targeting
-        $candidates = User::where('role', 'candidate')
+        $tuitionInvoices = ServiceChargeInvoice::whereNotNull('home_tuition_lead_id')
+            ->whereIn('status', ['pending', 'overdue'])
+            ->with(['candidate', 'tuitionLead'])
+            ->get();
+
+        $pendingAgreementCandidates = User::where('role', 'candidate')
+            ->whereHas('profile', fn($q) => $q->where('is_agreement_signed', false)->orWhere('is_tuition_agreement_signed', false))
             ->with('profile')
             ->orderBy('name')
-            ->get(['id', 'name', 'email', 'phone']);
+            ->get();
 
-        // Applications with upcoming interviews (for individual interview reminder)
+        $incompleteCandidates = User::where('role', 'candidate')
+            ->whereHas('profile', fn($q) => $q->whereNull('resume_path')
+                ->orWhereNull('subject_id')
+                ->orWhereNull('highest_qualification_id')
+                ->orWhereNull('preferred_city_id')
+            )
+            ->with('profile')
+            ->orderBy('name')
+            ->get();
+
         $upcomingInterviews = JobApplication::whereNotNull('interview_date')
             ->where('interview_date', '>', now())
             ->with(['candidate', 'jobPost'])
             ->orderBy('interview_date')
             ->get();
 
-        return view('admin.reminders.index', compact('stats', 'recentLogs', 'candidates', 'upcomingInterviews'));
+        $upcomingDemos = TuitionApplication::whereNotNull('demo_date')
+            ->where('demo_date', '>', now())
+            ->with(['candidate', 'tuitionLead'])
+            ->orderBy('demo_date')
+            ->get();
+
+        $lateFeeInvoices = ServiceChargeInvoice::where('late_fee', '>', 0)
+            ->whereIn('status', ['pending', 'overdue'])
+            ->with('candidate')
+            ->get();
+
+        $allCandidates = User::where('role', 'candidate')
+            ->with('profile')
+            ->orderBy('name')
+            ->get(['id', 'name', 'email', 'phone']);
+
+        return view('admin.reminders.index', compact(
+            'stats',
+            'recentLogs',
+            'jobInvoices',
+            'tuitionInvoices',
+            'pendingAgreementCandidates',
+            'incompleteCandidates',
+            'upcomingInterviews',
+            'upcomingDemos',
+            'lateFeeInvoices',
+            'allCandidates'
+        ));
     }
 
     /**
-     * Send Service Charge Reminder
+     * Send School Job Placement Service Charge Reminder
      */
     public function sendServiceChargeReminder(Request $request)
     {
-        $sendToAll = $request->input('send_to_all');
-        $candidateIds = $request->input('candidate_ids', []);
+        $sendToAll = $request->boolean('send_to_all');
+        $invoiceIds = $request->input('invoice_ids', []);
 
-        if (!$sendToAll && empty($candidateIds)) {
-            return back()->with('error', 'Please select at least one candidate.');
-        } // null = all
+        if (!$sendToAll && empty($invoiceIds)) {
+            return back()->with('error', 'Please select at least one invoice or choose Send to All.');
+        }
 
-        $query = ServiceChargeInvoice::whereIn('status', ['pending', 'overdue'])
-            ->with('candidate');
+        $query = ServiceChargeInvoice::whereNull('home_tuition_lead_id')
+            ->whereIn('status', ['pending', 'overdue'])
+            ->with(['candidate', 'jobApplication.jobPost']);
 
         if (!$sendToAll) {
-            $query->whereIn('candidate_id', $candidateIds);
+            $query->whereIn('id', $invoiceIds);
         }
 
         $invoices = $query->get();
-        $count    = 0;
+        $count = 0;
 
         foreach ($invoices as $invoice) {
             $candidate = $invoice->candidate;
@@ -99,80 +152,89 @@ class ReminderController extends Controller
 
             $dueDate  = Carbon::parse($invoice->due_date)->format('d M Y');
             $totalAmt = number_format($invoice->amount + $invoice->late_fee, 2);
+            $jobTitle = $invoice->jobApplication?->jobPost?->title ?? 'School Placement';
 
             NotificationHelper::notifyUser(
                 $candidate->id,
-                '💳 Service Charge Payment Reminder',
-                'Admin reminder: Your service charge of ₹' . $totalAmt . ' is due by ' . $dueDate . '. Please pay immediately to avoid late fees.',
+                '💼 School Placement Service Charge Due: ₹' . $totalAmt,
+                "Admin reminder: Your placement fee for '{$jobTitle}' is ₹{$totalAmt}, due by {$dueDate}. Please pay to keep your account active.",
                 route('candidate.serviceCharge.show'),
-                'fas fa-rupee-sign'
+                'fas fa-file-invoice-dollar'
             );
 
             try {
                 Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
             } catch (\Exception $e) {
-                Log::error("ServiceChargeReminder (admin) email failed: " . $e->getMessage());
+                Log::error("School Placement Fee Reminder email failed for {$candidate->email}: " . $e->getMessage());
             }
 
             $count++;
         }
 
-        $this->logReminderAction('service_charge', $count, null);
+        $this->logReminderAction('job_service_charge', $count, null);
 
-        return back()->with('success', "✅ Service charge reminders sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Placement fee reminders sent to {$count} candidate(s).");
     }
 
     /**
-     * Send Registration Renewal Reminder
+     * Send Home Tuition Service Fee Reminder
      */
-    public function sendRenewalReminder(Request $request)
+    public function sendTuitionServiceReminder(Request $request)
     {
-        $sendToAll = $request->input('send_to_all');
-        $candidateIds = $request->input('candidate_ids', []);
+        $sendToAll = $request->boolean('send_to_all');
+        $invoiceIds = $request->input('invoice_ids', []);
 
-        if (!$sendToAll && empty($candidateIds)) {
-            return back()->with('error', 'Please select at least one candidate.');
+        if (!$sendToAll && empty($invoiceIds)) {
+            return back()->with('error', 'Please select at least one tuition invoice or choose Send to All.');
         }
 
-        $query = User::where('role', 'candidate')
-            ->whereHas('profile', fn($q) => $q->whereColumn('used_applications', '>=', 'total_allowed_applications')->where('total_allowed_applications', '>', 0));
+        $query = ServiceChargeInvoice::whereNotNull('home_tuition_lead_id')
+            ->whereIn('status', ['pending', 'overdue'])
+            ->with(['candidate', 'tuitionLead']);
 
         if (!$sendToAll) {
-            $query->whereIn('id', $candidateIds);
+            $query->whereIn('id', $invoiceIds);
         }
 
-        $candidates = $query->with('profile')->get();
-        $count      = 0;
+        $invoices = $query->get();
+        $count = 0;
 
-        foreach ($candidates as $candidate) {
+        foreach ($invoices as $invoice) {
+            $candidate = $invoice->candidate;
+            if (!$candidate) continue;
+
+            $dueDate  = Carbon::parse($invoice->due_date)->format('d M Y');
+            $totalAmt = number_format($invoice->amount + $invoice->late_fee, 2);
+            $tuitionDesc = $invoice->tuitionLead ? ("Class " . $invoice->tuitionLead->class . " in " . $invoice->tuitionLead->location) : "Home Tuition Assignment";
+
             NotificationHelper::notifyUser(
                 $candidate->id,
-                '🔄 Renewal Reminder from Admin',
-                'Admin message: Your registration plan has expired. Please renew your plan to get new placement opportunities from Warriors Educare.',
-                route('candidate.dashboard'),
-                'fas fa-redo-alt'
+                '🏠 Tuition Service Charge Due: ₹' . $totalAmt,
+                "Admin reminder: Your service charge for tuition ({$tuitionDesc}) is ₹{$totalAmt}, due by {$dueDate}. Please pay immediately.",
+                route('candidate.serviceCharge.show'),
+                'fas fa-chalkboard-teacher'
             );
 
             try {
-                Mail::to($candidate->email)->send(new \App\Mail\RenewalReminderMail($candidate));
+                Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
             } catch (\Exception $e) {
-                Log::error("RenewalReminder (admin) email failed: " . $e->getMessage());
+                Log::error("Tuition Service Charge Reminder email failed for {$candidate->email}: " . $e->getMessage());
             }
 
             $count++;
         }
 
-        $this->logReminderAction('renewal', $count, null);
+        $this->logReminderAction('tuition_service_charge', $count, null);
 
-        return back()->with('success', "✅ Renewal reminders sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Tuition service charge reminders sent to {$count} tutor(s).");
     }
 
     /**
-     * Send Pending Payment Reminder (Standard Plan ₹500 pending)
+     * Send Digital Agreement Signing Reminder
      */
-    public function sendPaymentPendingReminder(Request $request)
+    public function sendAgreementReminder(Request $request)
     {
-        $sendToAll = $request->input('send_to_all');
+        $sendToAll = $request->boolean('send_to_all');
         $candidateIds = $request->input('candidate_ids', []);
 
         if (!$sendToAll && empty($candidateIds)) {
@@ -180,41 +242,44 @@ class ReminderController extends Controller
         }
 
         $query = User::where('role', 'candidate')
-            ->whereHas('profile', fn($q) => $q->where('plan_type', 'standard')->where('pending_amount', '>', 0));
+            ->whereHas('profile', fn($q) => $q->where('is_agreement_signed', false)->orWhere('is_tuition_agreement_signed', false));
 
         if (!$sendToAll) {
             $query->whereIn('id', $candidateIds);
         }
 
         $candidates = $query->with('profile')->get();
-        $count      = 0;
+        $count = 0;
 
         foreach ($candidates as $candidate) {
-            $pending = $candidate->profile->pending_amount;
-
             NotificationHelper::notifyUser(
                 $candidate->id,
-                '💰 Registration Payment Pending',
-                'Admin reminder: You have ₹' . number_format($pending, 2) . ' registration fee pending. Please complete your payment to activate all features.',
-                route('candidate.dashboard'),
-                'fas fa-wallet'
+                '✍️ Action Required: Sign Candidate Agreement',
+                'Admin reminder: Please review and digitally sign your Teacher Placement & Tuition Agreement to unlock direct applications and hiring.',
+                route('candidate.agreement.show'),
+                'fas fa-file-signature'
             );
+
+            // Update status so banner shows on candidate dashboard
+            if ($candidate->profile && $candidate->profile->agreement_status !== 'signed') {
+                $candidate->profile->update(['agreement_status' => 'pending_signature']);
+            }
 
             $count++;
         }
 
-        $this->logReminderAction('payment_pending', $count, null);
+        $this->logReminderAction('agreement_signing', $count, null);
 
-        return back()->with('success', "✅ Payment pending reminders sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Agreement signing reminders sent to {$count} candidate(s).");
     }
 
     /**
-     * Send Interview Reminder
+     * Send School Job Interview Reminder
      */
     public function sendInterviewReminder(Request $request)
     {
-        $sendToAll = $request->input('send_to_all');
-        $applicationIds = $request->input('candidate_ids', []);
+        $sendToAll = $request->boolean('send_to_all');
+        $applicationIds = $request->input('application_ids', []);
 
         if (!$sendToAll && empty($applicationIds)) {
             return back()->with('error', 'Please select at least one interview.');
@@ -227,22 +292,24 @@ class ReminderController extends Controller
         if (!$sendToAll) {
             $query->whereIn('id', $applicationIds);
         } else {
-            $query->where('interview_date', '<=', now()->addDays(3));
+            $query->where('interview_date', '<=', now()->addDays(5));
         }
 
         $applications = $query->get();
-        $count        = 0;
+        $count = 0;
 
         foreach ($applications as $application) {
             $candidate   = $application->candidate;
-            $interviewDt = Carbon::parse($application->interview_date)->format('d M Y, h:i A');
-
             if (!$candidate) continue;
+
+            $interviewDt = Carbon::parse($application->interview_date)->format('d M Y, h:i A');
+            $jobTitle    = $application->jobPost->title ?? 'Teacher Position';
+            $schoolName  = $application->jobPost->school_name ?? 'School';
 
             NotificationHelper::notifyUser(
                 $candidate->id,
-                '🎯 Interview Reminder from Admin',
-                'Admin reminder: You have an interview scheduled for "' . ($application->jobPost->title ?? 'a position') . '" at ' . ($application->jobPost->school_name ?? 'school') . ' on ' . $interviewDt . '. Please be prepared!',
+                '🎯 Upcoming School Interview Reminder',
+                "Admin reminder: Your interview for '{$jobTitle}' at {$schoolName} is scheduled on {$interviewDt}. Please ensure you are prepared.",
                 route('candidate.applications.index'),
                 'fas fa-calendar-check'
             );
@@ -250,7 +317,7 @@ class ReminderController extends Controller
             try {
                 Mail::to($candidate->email)->send(new \App\Mail\InterviewScheduledMail($application));
             } catch (\Exception $e) {
-                Log::error("InterviewReminder (admin) email failed: " . $e->getMessage());
+                Log::error("Interview reminder email failed: " . $e->getMessage());
             }
 
             $count++;
@@ -262,11 +329,59 @@ class ReminderController extends Controller
     }
 
     /**
+     * Send Home Tuition Demo Class Reminder
+     */
+    public function sendTuitionDemoReminder(Request $request)
+    {
+        $sendToAll = $request->boolean('send_to_all');
+        $applicationIds = $request->input('application_ids', []);
+
+        if (!$sendToAll && empty($applicationIds)) {
+            return back()->with('error', 'Please select at least one tuition demo.');
+        }
+
+        $query = TuitionApplication::whereNotNull('demo_date')
+            ->where('demo_date', '>', now())
+            ->with(['candidate', 'tuitionLead']);
+
+        if (!$sendToAll) {
+            $query->whereIn('id', $applicationIds);
+        } else {
+            $query->where('demo_date', '<=', now()->addDays(5));
+        }
+
+        $tuitionApps = $query->get();
+        $count = 0;
+
+        foreach ($tuitionApps as $app) {
+            $candidate = $app->candidate;
+            if (!$candidate) continue;
+
+            $demoDt = Carbon::parse($app->demo_date)->format('d M Y, h:i A');
+            $leadInfo = $app->tuitionLead ? ("Class " . $app->tuitionLead->class . " in " . $app->tuitionLead->location) : "Home Tuition";
+
+            NotificationHelper::notifyUser(
+                $candidate->id,
+                '🎓 Home Tuition Demo Class Reminder',
+                "Admin reminder: Your trial demo session for {$leadInfo} is scheduled on {$demoDt}. Please contact parent and arrive on time.",
+                route('candidate.tuitions.index'),
+                'fas fa-chalkboard-teacher'
+            );
+
+            $count++;
+        }
+
+        $this->logReminderAction('tuition_demo', $count, null);
+
+        return back()->with('success', "✅ Tuition demo reminders sent to {$count} tutor(s).");
+    }
+
+    /**
      * Send Profile Completion Reminder
      */
     public function sendProfileCompletionReminder(Request $request)
     {
-        $sendToAll = $request->input('send_to_all');
+        $sendToAll = $request->boolean('send_to_all');
         $candidateIds = $request->input('candidate_ids', []);
 
         if (!$sendToAll && empty($candidateIds)) {
@@ -274,30 +389,31 @@ class ReminderController extends Controller
         }
 
         $query = User::where('role', 'candidate')
-            ->whereHas('profile', fn($q) => $q->where(function($q2) {
-                $q2->whereNull('resume_path')
-                   ->orWhereNull('profile_photo_path')
-                   ->orWhereNull('preferred_city_id');
-            })->where('is_fee_paid', true));
+            ->whereHas('profile', fn($q) => $q->whereNull('resume_path')
+                ->orWhereNull('subject_id')
+                ->orWhereNull('highest_qualification_id')
+                ->orWhereNull('preferred_city_id')
+            );
 
         if (!$sendToAll) {
             $query->whereIn('id', $candidateIds);
         }
 
         $candidates = $query->with('profile')->get();
-        $count      = 0;
+        $count = 0;
 
         foreach ($candidates as $candidate) {
             $profile = $candidate->profile;
             $missing = [];
+            if (!$profile?->highest_qualification_id) $missing[] = 'Qualification';
+            if (!$profile?->subject_id) $missing[] = 'Primary Subject';
+            if (!$profile?->preferred_city_id) $missing[] = 'Preferred City';
             if (!$profile?->resume_path) $missing[] = 'Resume';
-            if (!$profile?->profile_photo_path)  $missing[]  = 'Photo';
-            if (!$profile?->preferred_city_id) $missing[] = 'Location';
 
             NotificationHelper::notifyUser(
                 $candidate->id,
-                '📝 Complete Your Profile',
-                'Admin reminder: Your profile is incomplete. Missing: ' . implode(', ', $missing) . '. Complete your profile to increase your chances of placement.',
+                '📝 Complete Your Teaching Profile',
+                'Admin reminder: Your profile is missing: ' . (implode(', ', $missing) ?: 'details') . '. Complete it now to get shortlisted for teaching jobs and home tuitions.',
                 route('candidate.profile.edit'),
                 'fas fa-user-edit'
             );
@@ -311,57 +427,15 @@ class ReminderController extends Controller
     }
 
     /**
-     * Send Plan Expiry Warning (1 application remaining)
-     */
-    public function sendPlanExpiryReminder(Request $request)
-    {
-        $sendToAll = $request->input('send_to_all');
-        $candidateIds = $request->input('candidate_ids', []);
-
-        if (!$sendToAll && empty($candidateIds)) {
-            return back()->with('error', 'Please select at least one candidate.');
-        }
-
-        $query = User::where('role', 'candidate')
-            ->whereHas('profile', fn($q) => $q->whereRaw('(total_allowed_applications - used_applications) <= 1')
-                ->where('total_allowed_applications', '>', 0));
-
-        if (!$sendToAll) {
-            $query->whereIn('id', $candidateIds);
-        }
-
-        $candidates = $query->with('profile')->get();
-        $count      = 0;
-
-        foreach ($candidates as $candidate) {
-            $remaining = max(0, $candidate->profile->total_allowed_applications - $candidate->profile->used_applications);
-
-            NotificationHelper::notifyUser(
-                $candidate->id,
-                '⚠️ Plan Expiry Warning',
-                'Admin reminder: You only have ' . $remaining . ' application(s) remaining on your current plan. Consider renewing to keep getting placement opportunities.',
-                route('candidate.dashboard'),
-                'fas fa-exclamation-triangle'
-            );
-
-            $count++;
-        }
-
-        $this->logReminderAction('plan_expiry', $count, null);
-
-        return back()->with('success', "✅ Plan expiry warnings sent to {$count} candidate(s).");
-    }
-
-    /**
-     * Send Late Fee Alert
+     * Send Late Fee & Overdue Alert
      */
     public function sendLateFeeAlert(Request $request)
     {
-        $sendToAll = $request->input('send_to_all');
-        $candidateIds = $request->input('candidate_ids', []);
+        $sendToAll = $request->boolean('send_to_all');
+        $invoiceIds = $request->input('invoice_ids', []);
 
-        if (!$sendToAll && empty($candidateIds)) {
-            return back()->with('error', 'Please select at least one candidate.');
+        if (!$sendToAll && empty($invoiceIds)) {
+            return back()->with('error', 'Please select at least one overdue invoice.');
         }
 
         $query = ServiceChargeInvoice::where('late_fee', '>', 0)
@@ -369,20 +443,22 @@ class ReminderController extends Controller
             ->with('candidate');
 
         if (!$sendToAll) {
-            $query->whereIn('candidate_id', $candidateIds);
+            $query->whereIn('id', $invoiceIds);
         }
 
         $invoices = $query->get();
-        $count    = 0;
+        $count = 0;
 
         foreach ($invoices as $invoice) {
             $candidate = $invoice->candidate;
             if (!$candidate) continue;
 
+            $totalAmt = number_format($invoice->amount + $invoice->late_fee, 2);
+
             NotificationHelper::notifyUser(
                 $candidate->id,
-                '🚨 Late Fee Alert',
-                'Admin alert: A late fee of ₹' . number_format($invoice->late_fee, 2) . ' has been added to your service charge invoice. Total due: ₹' . number_format($invoice->amount + $invoice->late_fee, 2) . '. Please pay immediately.',
+                '🚨 Urgent: Late Fee Applied on Service Charge',
+                'Admin alert: A late fee of ₹' . number_format($invoice->late_fee, 2) . ' is applied. Total due: ₹' . $totalAmt . '. Clear your dues immediately to avoid legal hold.',
                 route('candidate.serviceCharge.show'),
                 'fas fa-exclamation-circle'
             );
@@ -390,7 +466,7 @@ class ReminderController extends Controller
             try {
                 Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
             } catch (\Exception $e) {
-                Log::error("LateFeeAlert (admin) email failed: " . $e->getMessage());
+                Log::error("LateFeeAlert email failed: " . $e->getMessage());
             }
 
             $count++;
@@ -402,21 +478,21 @@ class ReminderController extends Controller
     }
 
     /**
-     * Send Custom Message
+     * Send Custom Broadcast Message
      */
     public function sendCustomMessage(Request $request)
     {
         $request->validate([
-            'title'        => 'required|string|max:100',
-            'message'      => 'required|string|max:500',
-            'target'       => 'required|in:all,specific',
-            'candidate_ids' => 'required_if:target,specific|array',
+            'title'           => 'required|string|max:100',
+            'message'         => 'required|string|max:600',
+            'target'          => 'required|in:all,specific',
+            'candidate_ids'   => 'required_if:target,specific|array',
             'candidate_ids.*' => 'exists:users,id',
-            'send_email'   => 'boolean',
+            'send_email'      => 'boolean',
         ]);
 
         if ($request->target === 'specific') {
-            if(empty($request->candidate_ids)) return back()->with('error', 'Please select at least one candidate.');
+            if (empty($request->candidate_ids)) return back()->with('error', 'Please select at least one candidate.');
             $candidates = User::whereIn('id', $request->candidate_ids)->get();
         } else {
             $candidates = User::where('role', 'candidate')->get();
@@ -425,30 +501,28 @@ class ReminderController extends Controller
         $count = 0;
 
         foreach ($candidates as $candidate) {
-            // DB Notification
             NotificationHelper::notifyUser(
                 $candidate->id,
                 $request->title,
                 $request->message,
-                null,
+                route('candidate.dashboard'),
                 'fas fa-bullhorn'
             );
 
-            // Email (optional)
             if ($request->boolean('send_email') && $candidate->email) {
                 try {
                     Mail::to($candidate->email)->send(
                         new \App\Mail\CustomAdminMessageMail($candidate, $request->title, $request->message)
                     );
                 } catch (\Exception $e) {
-                    Log::error("CustomMessage email failed for {$candidate->email}: " . $e->getMessage());
+                    Log::error("Custom broadcast email failed for {$candidate->email}: " . $e->getMessage());
                 }
             }
 
             $count++;
         }
 
-        $this->logReminderAction('custom', $count, null, $request->title . ' (Multiple)');
+        $this->logReminderAction('custom', $count, null, $request->title);
 
         return back()->with('success', "✅ Custom message sent to {$count} candidate(s).");
     }
@@ -460,16 +534,16 @@ class ReminderController extends Controller
     {
         try {
             DB::table('admin_reminder_logs')->insert([
-                'admin_id'     => auth()->id(),
-                'type'         => $type,
-                'target'       => $candidateId ? "Candidate #{$candidateId}" : 'All',
-                'count_sent'   => $count,
-                'note'         => $note,
-                'created_at'   => now(),
-                'updated_at'   => now(),
+                'admin_id'   => auth()->id(),
+                'type'       => $type,
+                'target'     => $candidateId ? "Candidate #{$candidateId}" : 'All Matching',
+                'count_sent' => $count,
+                'note'       => $note,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         } catch (\Exception $e) {
-            // Logging table might not exist yet, ignore
+            // Ignore if table not present
         }
     }
 }

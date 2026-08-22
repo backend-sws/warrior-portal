@@ -1,528 +1,519 @@
 @extends('layouts.admin')
 
-@section('title', 'Reminder Center')
-@section('subtitle', 'Send targeted notifications & emails to candidates with one click')
+@section('title', 'Teacher & Tutor Reminder Center')
+@section('subtitle', 'Send targeted DB dashboard notifications and emails to candidates, tutors, and teachers with one click.')
 
 @section('content')
-<div class="space-y-6" x-data="reminderCenter()">
+<div class="space-y-6">
 
-    {{-- Flash Message --}}
-    @if(session('success'))
-    <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-4 rounded-2xl shadow-sm"
-         x-data="{show: true}" x-show="show" x-transition>
-        <i class="fas fa-check-circle text-emerald-500 text-lg"></i>
-        <span class="font-semibold">{{ session('success') }}</span>
-        <button @click="show=false" class="ml-auto text-emerald-400 hover:text-emerald-600"><i class="fas fa-times"></i></button>
-    </div>
-    @endif
-    
-    @if(session('error'))
-    <div class="flex items-center gap-3 bg-red-50 border border-red-200 text-red-800 px-5 py-4 rounded-2xl shadow-sm"
-         x-data="{show: true}" x-show="show" x-transition>
-        <i class="fas fa-exclamation-circle text-red-500 text-lg"></i>
-        <span class="font-semibold">{{ session('error') }}</span>
-        <button @click="show=false" class="ml-auto text-red-400 hover:text-red-600"><i class="fas fa-times"></i></button>
-    </div>
-    @endif
-
-    {{-- Page Header --}}
-    <div class="bg-gradient-to-r from-[#041346] to-[#2a62bb] rounded-2xl p-6 text-white shadow-xl">
-        <div class="flex items-start justify-between">
-            <div>
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                        <i class="fas fa-paper-plane text-white"></i>
-                    </div>
-                    <h1 class="text-xl font-bold">Reminder Center</h1>
-                </div>
-                <p class="text-blue-200 text-sm max-w-lg">Send targeted DB dashboard notifications and emails to candidates. Choose a reminder type, select individual or all candidates, and click send.</p>
-            </div>
-            <div class="hidden md:flex gap-4 text-center">
-                <div class="bg-white/10 rounded-xl px-4 py-3 backdrop-blur-sm">
-                    <p class="text-2xl font-black">{{ $stats['total_candidates'] }}</p>
-                    <p class="text-xs text-blue-200">Total Candidates</p>
-                </div>
-                <div class="bg-orange-500/30 rounded-xl px-4 py-3 backdrop-blur-sm border border-orange-400/30">
-                    <p class="text-2xl font-black text-orange-300">{{ array_sum([$stats['service_charge_pending'], $stats['renewal_needed'], $stats['late_fees']]) }}</p>
-                    <p class="text-xs text-orange-200">Need Attention</p>
+    {{-- 1. Analytics KPI Metrics Grid --}}
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+        <!-- Card 1: Job Placement Dues -->
+        <div class="bg-card-bg rounded-2xl border border-card-border p-3.5 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Job Fees</span>
+                <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center text-xs">
+                    <i class="fas fa-school"></i>
                 </div>
             </div>
+            <p class="text-xl font-black text-blue-600">{{ $stats['job_service_pending'] }}</p>
+            <p class="text-[10px] text-text-dark/50 leading-tight">Pending Invoices</p>
+        </div>
+
+        <!-- Card 2: Tuition Service Dues -->
+        <div class="bg-card-bg rounded-2xl border border-card-border p-3.5 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Tuition Fees</span>
+                <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-xs">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+            </div>
+            <p class="text-xl font-black text-emerald-600">{{ $stats['tuition_service_pending'] }}</p>
+            <p class="text-[10px] text-text-dark/50 leading-tight">Pending Invoices</p>
+        </div>
+
+        <!-- Card 3: Agreement Needed -->
+        <div class="bg-card-bg rounded-2xl border border-card-border p-3.5 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Agreements</span>
+                <div class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-600 flex items-center justify-center text-xs">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+            </div>
+            <p class="text-xl font-black text-indigo-600">{{ $stats['agreement_pending'] }}</p>
+            <p class="text-[10px] text-text-dark/50 leading-tight">Pending Signature</p>
+        </div>
+
+        <!-- Card 4: Incomplete Profiles -->
+        <div class="bg-card-bg rounded-2xl border border-card-border p-3.5 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Incomplete</span>
+                <div class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center text-xs">
+                    <i class="fas fa-user-edit"></i>
+                </div>
+            </div>
+            <p class="text-xl font-black text-amber-600">{{ $stats['incomplete_profiles'] }}</p>
+            <p class="text-[10px] text-text-dark/50 leading-tight">Missing Info</p>
+        </div>
+
+        <!-- Card 5: Upcoming Interviews -->
+        <div class="bg-card-bg rounded-2xl border border-card-border p-3.5 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-bold text-sky-600 uppercase tracking-wider">Interviews</span>
+                <div class="w-7 h-7 rounded-lg bg-sky-500/10 text-sky-600 flex items-center justify-center text-xs">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+            </div>
+            <p class="text-xl font-black text-sky-600">{{ $stats['upcoming_interviews'] }}</p>
+            <p class="text-[10px] text-text-dark/50 leading-tight">In Next 5 Days</p>
+        </div>
+
+        <!-- Card 6: Upcoming Demos -->
+        <div class="bg-card-bg rounded-2xl border border-card-border p-3.5 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-bold text-teal-600 uppercase tracking-wider">Demos</span>
+                <div class="w-7 h-7 rounded-lg bg-teal-500/10 text-teal-600 flex items-center justify-center text-xs">
+                    <i class="fas fa-person-chalkboard"></i>
+                </div>
+            </div>
+            <p class="text-xl font-black text-teal-600">{{ $stats['upcoming_demos'] }}</p>
+            <p class="text-[10px] text-text-dark/50 leading-tight">Tuition Trials</p>
+        </div>
+
+        <!-- Card 7: Late Fees Active -->
+        <div class="bg-card-bg rounded-2xl border border-card-border p-3.5 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Late Fees</span>
+                <div class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-600 flex items-center justify-center text-xs">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+            </div>
+            <p class="text-xl font-black text-rose-600">{{ $stats['late_fees'] }}</p>
+            <p class="text-[10px] text-text-dark/50 leading-tight">Overdue Fees</p>
+        </div>
+
+        <!-- Card 8: Total Candidates -->
+        <div class="bg-card-bg rounded-2xl border border-card-border p-3.5 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-bold text-text-dark/60 uppercase tracking-wider">Candidates</span>
+                <div class="w-7 h-7 rounded-lg bg-secondary-bg text-text-dark/60 flex items-center justify-center text-xs">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+            <p class="text-xl font-black text-text-main">{{ $stats['total_candidates'] }}</p>
+            <p class="text-[10px] text-text-dark/50 leading-tight">Total Pool</p>
         </div>
     </div>
 
-    {{-- Stats Row --}}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        @php
-        $statCards = [
-            ['label' => 'Service Charge Pending', 'value' => $stats['service_charge_pending'], 'icon' => 'fa-rupee-sign', 'color' => 'red'],
-            ['label' => 'Renewal Needed', 'value' => $stats['renewal_needed'], 'icon' => 'fa-redo-alt', 'color' => 'purple'],
-            ['label' => 'Payment Pending', 'value' => $stats['payment_pending'], 'icon' => 'fa-wallet', 'color' => 'amber'],
-            ['label' => 'Upcoming Interviews', 'value' => $stats['upcoming_interviews'], 'icon' => 'fa-calendar-check', 'color' => 'blue'],
-            ['label' => 'Incomplete Profiles', 'value' => $stats['incomplete_profiles'], 'icon' => 'fa-user-edit', 'color' => 'indigo'],
-            ['label' => 'Plan Expiring Soon', 'value' => $stats['plan_expiring'], 'icon' => 'fa-exclamation-triangle', 'color' => 'orange'],
-            ['label' => 'Late Fees Applied', 'value' => $stats['late_fees'], 'icon' => 'fa-exclamation-circle', 'color' => 'rose'],
-            ['label' => 'Total Candidates', 'value' => $stats['total_candidates'], 'icon' => 'fa-users', 'color' => 'green'],
-        ];
-        $colorMap = [
-            'red'    => 'bg-red-50 text-red-600 border-red-100',
-            'purple' => 'bg-purple-50 text-purple-600 border-purple-100',
-            'amber'  => 'bg-amber-50 text-amber-600 border-amber-100',
-            'blue'   => 'bg-blue-50 text-blue-600 border-blue-100',
-            'indigo' => 'bg-indigo-50 text-indigo-600 border-indigo-100',
-            'orange' => 'bg-orange-50 text-orange-600 border-orange-100',
-            'rose'   => 'bg-rose-50 text-rose-600 border-rose-100',
-            'green'  => 'bg-green-50 text-green-600 border-green-100',
-        ];
-        @endphp
-
-        @foreach($statCards as $card)
-        <div class="bg-white rounded-2xl border {{ $colorMap[$card['color']] }} p-4 flex items-center gap-3 shadow-sm">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center {{ $colorMap[$card['color']] }} flex-shrink-0">
-                <i class="fas {{ $card['icon'] }}"></i>
-            </div>
-            <div>
-                <p class="text-xl font-black text-gray-800">{{ $card['value'] }}</p>
-                <p class="text-xs text-gray-500 leading-tight">{{ $card['label'] }}</p>
-            </div>
-        </div>
-        @endforeach
-    </div>
-    
-    @php
-        $baseCandidates = $candidates->map(fn($c) => ['id' => $c->id, 'name' => $c->name]);
-        $interviewItems = $upcomingInterviews->map(fn($a) => [
-            'id' => $a->id, 
-            'name' => ($a->candidate->name ?? 'N/A') . ' - ' . \Carbon\Carbon::parse($a->interview_date)->format('d M')
-        ]);
-    @endphp
-
-    {{-- Reminder Cards Grid --}}
+    {{-- 2. Reminder Dispatch Modules Grid --}}
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
 
-        {{-- 1. Service Charge Reminder --}}
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible hover:shadow-md transition-shadow">
-            <div class="bg-gradient-to-r from-red-500 to-rose-600 p-4 rounded-t-2xl text-white">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-rupee-sign"></i>
+        {{-- 1. School Job Placement Fee Reminder --}}
+        <div class="bg-card-bg rounded-3xl border border-card-border shadow-sm flex flex-col justify-between overflow-hidden">
+            <div class="p-5 border-b border-card-border bg-blue-500/5">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center text-xs">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <h3 class="font-black text-text-main text-sm">School Placement Fee Reminder</h3>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-sm">Service Charge Reminder</h3>
-                        <p class="text-red-100 text-xs">{{ $stats['service_charge_pending'] }} pending invoices</p>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">{{ $jobInvoices->count() }} Due</span>
+                </div>
+                <p class="text-xs text-text-dark/60">Sends DB notification & email to teachers with pending school placement invoices.</p>
+            </div>
+
+            <form action="{{ route('admin.reminders.service-charge') }}" method="POST" class="p-5 space-y-4" x-data="{ mode: 'all' }">
+                @csrf
+                <div>
+                    <label class="block text-[11px] font-bold text-text-dark/70 mb-1.5">Target Candidates:</label>
+                    <div class="flex gap-2 mb-2">
+                        <button type="button" @click="mode = 'all'" :class="mode === 'all' ? 'bg-blue-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            All Pending ({{ $jobInvoices->count() }})
+                        </button>
+                        <button type="button" @click="mode = 'specific'" :class="mode === 'specific' ? 'bg-blue-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            Select Specific
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="send_to_all" :value="mode === 'all' ? '1' : '0'">
+
+                    <div x-show="mode === 'specific'" class="space-y-1.5 max-h-32 overflow-y-auto p-2 bg-secondary-bg rounded-xl border border-card-border">
+                        @forelse($jobInvoices as $inv)
+                            <label class="flex items-center gap-2 text-xs text-text-main cursor-pointer hover:bg-card-bg p-1 rounded-lg">
+                                <input type="checkbox" name="invoice_ids[]" value="{{ $inv->id }}" class="rounded text-blue-600 border-card-border focus:ring-blue-500">
+                                <span class="truncate">{{ $inv->candidate->name ?? 'Candidate' }} — ₹{{ number_format($inv->amount) }}</span>
+                            </label>
+                        @empty
+                            <p class="text-[11px] text-text-dark/40 py-1 text-center">No pending placement invoices.</p>
+                        @endforelse
                     </div>
                 </div>
-            </div>
-            <div class="p-4 space-y-3">
-                <p class="text-xs text-gray-500">Sends DB notification + email to candidates with pending or overdue service charge invoices.</p>
-                <form method="POST" action="{{ route('admin.reminders.service-charge') }}">
-                    @csrf
-                    <div x-data="multiSelectDropdown({{ Js::from($baseCandidates) }}, {{ $stats['service_charge_pending'] }})" class="relative mb-3">
-                        <div @click="open = !open" class="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 cursor-pointer text-xs">
-                            <span x-text="sendToAll ? '📢 Send to All (' + totalCount + ')' : '👤 Selected (' + selected.length + ')'"></span>
-                            <i class="fas fa-chevron-down text-gray-400"></i>
-                        </div>
-                        <div x-show="open" @click.away="open = false" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 flex flex-col" style="display: none;">
-                            <div class="p-2 border-b border-gray-100">
-                                <input type="text" x-model="search" placeholder="Search candidate..." class="w-full text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-blue-400">
-                            </div>
-                            <div class="overflow-y-auto p-2 space-y-1">
-                                <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs font-semibold">
-                                    <input type="checkbox" name="send_to_all" value="1" x-model="sendToAll" @change="toggleAll()" class="rounded border-gray-300">
-                                    📢 Send to All Target Candidates
-                                </label>
-                                <hr class="my-1 border-gray-100">
-                                <template x-for="c in filteredItems" :key="c.id">
-                                    <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs" :class="{'opacity-50': sendToAll}">
-                                        <input type="checkbox" name="candidate_ids[]" :value="c.id" x-model="selected" :disabled="sendToAll" class="rounded border-gray-300">
-                                        <span x-text="c.name"></span>
-                                    </label>
-                                </template>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95">
-                        <i class="fas fa-paper-plane"></i> Send Service Charge Reminder
-                    </button>
-                </form>
-            </div>
+
+                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane text-xs"></i> <span>Send Placement Reminders</span>
+                </button>
+            </form>
         </div>
 
-        {{-- 2. Renewal Reminder --}}
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible hover:shadow-md transition-shadow">
-            <div class="bg-gradient-to-r from-purple-500 to-violet-600 p-4 rounded-t-2xl text-white">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-redo-alt"></i>
+        {{-- 2. Home Tuition Service Fee Reminder --}}
+        <div class="bg-card-bg rounded-3xl border border-card-border shadow-sm flex flex-col justify-between overflow-hidden">
+            <div class="p-5 border-b border-card-border bg-emerald-500/5">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-xs">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h3 class="font-black text-text-main text-sm">Tuition Service Charge Reminder</h3>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-sm">Registration Renewal</h3>
-                        <p class="text-purple-100 text-xs">{{ $stats['renewal_needed'] }} plans expired</p>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">{{ $tuitionInvoices->count() }} Due</span>
+                </div>
+                <p class="text-xs text-text-dark/60">Reminds home tutors with pending tuition service charge invoices.</p>
+            </div>
+
+            <form action="{{ route('admin.reminders.tuition-service') }}" method="POST" class="p-5 space-y-4" x-data="{ mode: 'all' }">
+                @csrf
+                <div>
+                    <label class="block text-[11px] font-bold text-text-dark/70 mb-1.5">Target Tutors:</label>
+                    <div class="flex gap-2 mb-2">
+                        <button type="button" @click="mode = 'all'" :class="mode === 'all' ? 'bg-emerald-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            All Pending ({{ $tuitionInvoices->count() }})
+                        </button>
+                        <button type="button" @click="mode = 'specific'" :class="mode === 'specific' ? 'bg-emerald-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            Select Specific
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="send_to_all" :value="mode === 'all' ? '1' : '0'">
+
+                    <div x-show="mode === 'specific'" class="space-y-1.5 max-h-32 overflow-y-auto p-2 bg-secondary-bg rounded-xl border border-card-border">
+                        @forelse($tuitionInvoices as $tInv)
+                            <label class="flex items-center gap-2 text-xs text-text-main cursor-pointer hover:bg-card-bg p-1 rounded-lg">
+                                <input type="checkbox" name="invoice_ids[]" value="{{ $tInv->id }}" class="rounded text-emerald-600 border-card-border focus:ring-emerald-500">
+                                <span class="truncate">{{ $tInv->candidate->name ?? 'Tutor' }} — ₹{{ number_format($tInv->amount) }}</span>
+                            </label>
+                        @empty
+                            <p class="text-[11px] text-text-dark/40 py-1 text-center">No pending tuition invoices.</p>
+                        @endforelse
                     </div>
                 </div>
-            </div>
-            <div class="p-4 space-y-3">
-                <p class="text-xs text-gray-500">Reminds candidates whose registration plan has expired (all applications used) to renew.</p>
-                <form method="POST" action="{{ route('admin.reminders.renewal') }}">
-                    @csrf
-                    <div x-data="multiSelectDropdown({{ Js::from($baseCandidates) }}, {{ $stats['renewal_needed'] }})" class="relative mb-3">
-                        <div @click="open = !open" class="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 cursor-pointer text-xs">
-                            <span x-text="sendToAll ? '📢 Send to All Expired (' + totalCount + ')' : '👤 Selected (' + selected.length + ')'"></span>
-                            <i class="fas fa-chevron-down text-gray-400"></i>
-                        </div>
-                        <div x-show="open" @click.away="open = false" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 flex flex-col" style="display: none;">
-                            <div class="p-2 border-b border-gray-100"><input type="text" x-model="search" placeholder="Search candidate..." class="w-full text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-blue-400"></div>
-                            <div class="overflow-y-auto p-2 space-y-1">
-                                <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs font-semibold"><input type="checkbox" name="send_to_all" value="1" x-model="sendToAll" @change="toggleAll()" class="rounded border-gray-300">📢 Send to All Expired</label><hr class="my-1 border-gray-100">
-                                <template x-for="c in filteredItems" :key="c.id">
-                                    <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs" :class="{'opacity-50': sendToAll}"><input type="checkbox" name="candidate_ids[]" :value="c.id" x-model="selected" :disabled="sendToAll" class="rounded border-gray-300"><span x-text="c.name"></span></label>
-                                </template>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95">
-                        <i class="fas fa-paper-plane"></i> Send Renewal Reminder
-                    </button>
-                </form>
-            </div>
+
+                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane text-xs"></i> <span>Send Tuition Reminders</span>
+                </button>
+            </form>
         </div>
 
-        {{-- 3. Payment Pending --}}
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible hover:shadow-md transition-shadow">
-            <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-4 rounded-t-2xl text-white">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-wallet"></i>
+        {{-- 3. Digital Agreement Signing Reminder --}}
+        <div class="bg-card-bg rounded-3xl border border-card-border shadow-sm flex flex-col justify-between overflow-hidden">
+            <div class="p-5 border-b border-card-border bg-indigo-500/5">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center text-xs">
+                            <i class="fas fa-file-signature"></i>
+                        </div>
+                        <h3 class="font-black text-text-main text-sm">Agreement Signing Reminder</h3>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-sm">Payment Pending</h3>
-                        <p class="text-amber-100 text-xs">{{ $stats['payment_pending'] }} with ₹500 due</p>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700">{{ $pendingAgreementCandidates->count() }} Pending</span>
+                </div>
+                <p class="text-xs text-text-dark/60">Reminds candidates whose school or tuition agreement is unsigned.</p>
+            </div>
+
+            <form action="{{ route('admin.reminders.agreement') }}" method="POST" class="p-5 space-y-4" x-data="{ mode: 'all' }">
+                @csrf
+                <div>
+                    <label class="block text-[11px] font-bold text-text-dark/70 mb-1.5">Target Candidates:</label>
+                    <div class="flex gap-2 mb-2">
+                        <button type="button" @click="mode = 'all'" :class="mode === 'all' ? 'bg-indigo-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            All Pending ({{ $pendingAgreementCandidates->count() }})
+                        </button>
+                        <button type="button" @click="mode = 'specific'" :class="mode === 'specific' ? 'bg-indigo-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            Select Specific
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="send_to_all" :value="mode === 'all' ? '1' : '0'">
+
+                    <div x-show="mode === 'specific'" class="space-y-1.5 max-h-32 overflow-y-auto p-2 bg-secondary-bg rounded-xl border border-card-border">
+                        @forelse($pendingAgreementCandidates as $cand)
+                            <label class="flex items-center gap-2 text-xs text-text-main cursor-pointer hover:bg-card-bg p-1 rounded-lg">
+                                <input type="checkbox" name="candidate_ids[]" value="{{ $cand->id }}" class="rounded text-indigo-600 border-card-border focus:ring-indigo-500">
+                                <span class="truncate">{{ $cand->name }} ({{ $cand->phone ?? $cand->email }})</span>
+                            </label>
+                        @empty
+                            <p class="text-[11px] text-text-dark/40 py-1 text-center">All candidates have signed agreements.</p>
+                        @endforelse
                     </div>
                 </div>
-            </div>
-            <div class="p-4 space-y-3">
-                <p class="text-xs text-gray-500">Reminds standard plan candidates who have ₹500 pending registration fee.</p>
-                <form method="POST" action="{{ route('admin.reminders.payment-pending') }}">
-                    @csrf
-                    <div x-data="multiSelectDropdown({{ Js::from($baseCandidates) }}, {{ $stats['payment_pending'] }})" class="relative mb-3">
-                        <div @click="open = !open" class="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 cursor-pointer text-xs">
-                            <span x-text="sendToAll ? '📢 Send to All (' + totalCount + ')' : '👤 Selected (' + selected.length + ')'"></span>
-                            <i class="fas fa-chevron-down text-gray-400"></i>
-                        </div>
-                        <div x-show="open" @click.away="open = false" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 flex flex-col" style="display: none;">
-                            <div class="p-2 border-b border-gray-100"><input type="text" x-model="search" placeholder="Search candidate..." class="w-full text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-blue-400"></div>
-                            <div class="overflow-y-auto p-2 space-y-1">
-                                <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs font-semibold"><input type="checkbox" name="send_to_all" value="1" x-model="sendToAll" @change="toggleAll()" class="rounded border-gray-300">📢 Send to All Pending</label><hr class="my-1 border-gray-100">
-                                <template x-for="c in filteredItems" :key="c.id"><label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs" :class="{'opacity-50': sendToAll}"><input type="checkbox" name="candidate_ids[]" :value="c.id" x-model="selected" :disabled="sendToAll" class="rounded border-gray-300"><span x-text="c.name"></span></label></template>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95">
-                        <i class="fas fa-paper-plane"></i> Send Payment Reminder
-                    </button>
-                </form>
-            </div>
+
+                <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+                    <i class="fas fa-file-signature text-xs"></i> <span>Send Agreement Reminders</span>
+                </button>
+            </form>
         </div>
 
-        {{-- 4. Interview Reminder --}}
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible hover:shadow-md transition-shadow">
-            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 rounded-t-2xl text-white">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-calendar-check"></i>
+        {{-- 4. School Job Interview Reminder --}}
+        <div class="bg-card-bg rounded-3xl border border-card-border shadow-sm flex flex-col justify-between overflow-hidden">
+            <div class="p-5 border-b border-card-border bg-sky-500/5">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-600 flex items-center justify-center text-xs">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h3 class="font-black text-text-main text-sm">School Interview Reminder</h3>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-sm">Interview Reminder</h3>
-                        <p class="text-blue-100 text-xs">{{ $stats['upcoming_interviews'] }} in next 3 days</p>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-700">{{ $upcomingInterviews->count() }} Upcoming</span>
+                </div>
+                <p class="text-xs text-text-dark/60">Reminds teachers with scheduled interviews in the next 5 days.</p>
+            </div>
+
+            <form action="{{ route('admin.reminders.interview') }}" method="POST" class="p-5 space-y-4" x-data="{ mode: 'all' }">
+                @csrf
+                <div>
+                    <label class="block text-[11px] font-bold text-text-dark/70 mb-1.5">Target Interviews:</label>
+                    <div class="flex gap-2 mb-2">
+                        <button type="button" @click="mode = 'all'" :class="mode === 'all' ? 'bg-sky-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            All Next 5 Days ({{ $upcomingInterviews->count() }})
+                        </button>
+                        <button type="button" @click="mode = 'specific'" :class="mode === 'specific' ? 'bg-sky-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            Select Specific
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="send_to_all" :value="mode === 'all' ? '1' : '0'">
+
+                    <div x-show="mode === 'specific'" class="space-y-1.5 max-h-32 overflow-y-auto p-2 bg-secondary-bg rounded-xl border border-card-border">
+                        @forelse($upcomingInterviews as $app)
+                            <label class="flex items-center gap-2 text-xs text-text-main cursor-pointer hover:bg-card-bg p-1 rounded-lg">
+                                <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" class="rounded text-sky-600 border-card-border focus:ring-sky-500">
+                                <span class="truncate">{{ $app->candidate->name ?? 'Candidate' }} — {{ \Carbon\Carbon::parse($app->interview_date)->format('d M, h:i A') }}</span>
+                            </label>
+                        @empty
+                            <p class="text-[11px] text-text-dark/40 py-1 text-center">No upcoming interviews scheduled.</p>
+                        @endforelse
                     </div>
                 </div>
-            </div>
-            <div class="p-4 space-y-3">
-                <p class="text-xs text-gray-500">Sends reminder to candidates with interviews in next 3 days. Or target specific interviews.</p>
-                <form method="POST" action="{{ route('admin.reminders.interview') }}">
-                    @csrf
-                    <div x-data="multiSelectDropdown({{ Js::from($interviewItems) }}, {{ $stats['upcoming_interviews'] }})" class="relative mb-3">
-                        <div @click="open = !open" class="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 cursor-pointer text-xs">
-                            <span x-text="sendToAll ? '📢 All Upcoming (' + totalCount + ')' : '👤 Selected (' + selected.length + ')'"></span>
-                            <i class="fas fa-chevron-down text-gray-400"></i>
-                        </div>
-                        <div x-show="open" @click.away="open = false" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 flex flex-col" style="display: none;">
-                            <div class="p-2 border-b border-gray-100"><input type="text" x-model="search" placeholder="Search interview..." class="w-full text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-blue-400"></div>
-                            <div class="overflow-y-auto p-2 space-y-1">
-                                <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs font-semibold"><input type="checkbox" name="send_to_all" value="1" x-model="sendToAll" @change="toggleAll()" class="rounded border-gray-300">📢 Send to All Upcoming</label><hr class="my-1 border-gray-100">
-                                <template x-for="c in filteredItems" :key="c.id"><label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs" :class="{'opacity-50': sendToAll}"><input type="checkbox" name="candidate_ids[]" :value="c.id" x-model="selected" :disabled="sendToAll" class="rounded border-gray-300"><span x-text="c.name"></span></label></template>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95">
-                        <i class="fas fa-paper-plane"></i> Send Interview Reminder
-                    </button>
-                </form>
-            </div>
+
+                <button type="submit" class="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+                    <i class="fas fa-calendar-check text-xs"></i> <span>Send Interview Alerts</span>
+                </button>
+            </form>
         </div>
 
-        {{-- 5. Profile Completion --}}
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible hover:shadow-md transition-shadow">
-            <div class="bg-gradient-to-r from-indigo-500 to-blue-600 p-4 rounded-t-2xl text-white">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-user-edit"></i>
+        {{-- 5. Home Tuition Demo Reminder --}}
+        <div class="bg-card-bg rounded-3xl border border-card-border shadow-sm flex flex-col justify-between overflow-hidden">
+            <div class="p-5 border-b border-card-border bg-teal-500/5">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-600 flex items-center justify-center text-xs">
+                            <i class="fas fa-person-chalkboard"></i>
+                        </div>
+                        <h3 class="font-black text-text-main text-sm">Tuition Demo Class Reminder</h3>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-sm">Profile Completion</h3>
-                        <p class="text-indigo-100 text-xs">{{ $stats['incomplete_profiles'] }} incomplete profiles</p>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-700">{{ $upcomingDemos->count() }} Upcoming</span>
+                </div>
+                <p class="text-xs text-text-dark/60">Reminds tutors with upcoming parent trial demo sessions.</p>
+            </div>
+
+            <form action="{{ route('admin.reminders.tuition-demo') }}" method="POST" class="p-5 space-y-4" x-data="{ mode: 'all' }">
+                @csrf
+                <div>
+                    <label class="block text-[11px] font-bold text-text-dark/70 mb-1.5">Target Demos:</label>
+                    <div class="flex gap-2 mb-2">
+                        <button type="button" @click="mode = 'all'" :class="mode === 'all' ? 'bg-teal-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            All Next 5 Days ({{ $upcomingDemos->count() }})
+                        </button>
+                        <button type="button" @click="mode = 'specific'" :class="mode === 'specific' ? 'bg-teal-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            Select Specific
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="send_to_all" :value="mode === 'all' ? '1' : '0'">
+
+                    <div x-show="mode === 'specific'" class="space-y-1.5 max-h-32 overflow-y-auto p-2 bg-secondary-bg rounded-xl border border-card-border">
+                        @forelse($upcomingDemos as $tApp)
+                            <label class="flex items-center gap-2 text-xs text-text-main cursor-pointer hover:bg-card-bg p-1 rounded-lg">
+                                <input type="checkbox" name="application_ids[]" value="{{ $tApp->id }}" class="rounded text-teal-600 border-card-border focus:ring-teal-500">
+                                <span class="truncate">{{ $tApp->candidate->name ?? 'Tutor' }} — {{ \Carbon\Carbon::parse($tApp->demo_date)->format('d M, h:i A') }}</span>
+                            </label>
+                        @empty
+                            <p class="text-[11px] text-text-dark/40 py-1 text-center">No upcoming tuition demos scheduled.</p>
+                        @endforelse
                     </div>
                 </div>
-            </div>
-            <div class="p-4 space-y-3">
-                <p class="text-xs text-gray-500">Reminds registered candidates who haven't uploaded resume, photo, or location yet.</p>
-                <form method="POST" action="{{ route('admin.reminders.profile') }}">
-                    @csrf
-                    <div x-data="multiSelectDropdown({{ Js::from($baseCandidates) }}, {{ $stats['incomplete_profiles'] }})" class="relative mb-3">
-                        <div @click="open = !open" class="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 cursor-pointer text-xs">
-                            <span x-text="sendToAll ? '📢 All Incomplete (' + totalCount + ')' : '👤 Selected (' + selected.length + ')'"></span>
-                            <i class="fas fa-chevron-down text-gray-400"></i>
-                        </div>
-                        <div x-show="open" @click.away="open = false" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 flex flex-col" style="display: none;">
-                            <div class="p-2 border-b border-gray-100"><input type="text" x-model="search" placeholder="Search candidate..." class="w-full text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-blue-400"></div>
-                            <div class="overflow-y-auto p-2 space-y-1">
-                                <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs font-semibold"><input type="checkbox" name="send_to_all" value="1" x-model="sendToAll" @change="toggleAll()" class="rounded border-gray-300">📢 Send to All Incomplete</label><hr class="my-1 border-gray-100">
-                                <template x-for="c in filteredItems" :key="c.id"><label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs" :class="{'opacity-50': sendToAll}"><input type="checkbox" name="candidate_ids[]" :value="c.id" x-model="selected" :disabled="sendToAll" class="rounded border-gray-300"><span x-text="c.name"></span></label></template>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95">
-                        <i class="fas fa-paper-plane"></i> Send Profile Reminder
-                    </button>
-                </form>
-            </div>
+
+                <button type="submit" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+                    <i class="fas fa-person-chalkboard text-xs"></i> <span>Send Demo Reminders</span>
+                </button>
+            </form>
         </div>
 
-        {{-- 6. Plan Expiry Warning --}}
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible hover:shadow-md transition-shadow">
-            <div class="bg-gradient-to-r from-orange-500 to-amber-600 p-4 rounded-t-2xl text-white">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-exclamation-triangle"></i>
+        {{-- 6. Profile Completion Reminder --}}
+        <div class="bg-card-bg rounded-3xl border border-card-border shadow-sm flex flex-col justify-between overflow-hidden">
+            <div class="p-5 border-b border-card-border bg-amber-500/5">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-xs">
+                            <i class="fas fa-user-edit"></i>
+                        </div>
+                        <h3 class="font-black text-text-main text-sm">Profile Completion Reminder</h3>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-sm">Plan Expiry Warning</h3>
-                        <p class="text-orange-100 text-xs">{{ $stats['plan_expiring'] }} with 0–1 left</p>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">{{ $incompleteCandidates->count() }} Incomplete</span>
+                </div>
+                <p class="text-xs text-text-dark/60">Reminds registered candidates missing Subject, Qualification, or Resume.</p>
+            </div>
+
+            <form action="{{ route('admin.reminders.profile') }}" method="POST" class="p-5 space-y-4" x-data="{ mode: 'all' }">
+                @csrf
+                <div>
+                    <label class="block text-[11px] font-bold text-text-dark/70 mb-1.5">Target Candidates:</label>
+                    <div class="flex gap-2 mb-2">
+                        <button type="button" @click="mode = 'all'" :class="mode === 'all' ? 'bg-amber-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            All Incomplete ({{ $incompleteCandidates->count() }})
+                        </button>
+                        <button type="button" @click="mode = 'specific'" :class="mode === 'specific' ? 'bg-amber-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            Select Specific
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="send_to_all" :value="mode === 'all' ? '1' : '0'">
+
+                    <div x-show="mode === 'specific'" class="space-y-1.5 max-h-32 overflow-y-auto p-2 bg-secondary-bg rounded-xl border border-card-border">
+                        @forelse($incompleteCandidates as $inCand)
+                            <label class="flex items-center gap-2 text-xs text-text-main cursor-pointer hover:bg-card-bg p-1 rounded-lg">
+                                <input type="checkbox" name="candidate_ids[]" value="{{ $inCand->id }}" class="rounded text-amber-600 border-card-border focus:ring-amber-500">
+                                <span class="truncate">{{ $inCand->name }} ({{ $inCand->email }})</span>
+                            </label>
+                        @empty
+                            <p class="text-[11px] text-text-dark/40 py-1 text-center">All candidate profiles are complete!</p>
+                        @endforelse
                     </div>
                 </div>
-            </div>
-            <div class="p-4 space-y-3">
-                <p class="text-xs text-gray-500">Warns candidates who have 1 or 0 applications remaining on their current plan.</p>
-                <form method="POST" action="{{ route('admin.reminders.plan-expiry') }}">
-                    @csrf
-                    <div x-data="multiSelectDropdown({{ Js::from($baseCandidates) }}, {{ $stats['plan_expiring'] }})" class="relative mb-3">
-                        <div @click="open = !open" class="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 cursor-pointer text-xs">
-                            <span x-text="sendToAll ? '📢 All At Risk (' + totalCount + ')' : '👤 Selected (' + selected.length + ')'"></span>
-                            <i class="fas fa-chevron-down text-gray-400"></i>
-                        </div>
-                        <div x-show="open" @click.away="open = false" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 flex flex-col" style="display: none;">
-                            <div class="p-2 border-b border-gray-100"><input type="text" x-model="search" placeholder="Search candidate..." class="w-full text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-blue-400"></div>
-                            <div class="overflow-y-auto p-2 space-y-1">
-                                <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs font-semibold"><input type="checkbox" name="send_to_all" value="1" x-model="sendToAll" @change="toggleAll()" class="rounded border-gray-300">📢 Send to All At Risk</label><hr class="my-1 border-gray-100">
-                                <template x-for="c in filteredItems" :key="c.id"><label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs" :class="{'opacity-50': sendToAll}"><input type="checkbox" name="candidate_ids[]" :value="c.id" x-model="selected" :disabled="sendToAll" class="rounded border-gray-300"><span x-text="c.name"></span></label></template>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95">
-                        <i class="fas fa-paper-plane"></i> Send Plan Warning
-                    </button>
-                </form>
-            </div>
+
+                <button type="submit" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+                    <i class="fas fa-user-edit text-xs"></i> <span>Send Completion Reminders</span>
+                </button>
+            </form>
         </div>
 
         {{-- 7. Late Fee Alert --}}
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible hover:shadow-md transition-shadow">
-            <div class="bg-gradient-to-r from-rose-500 to-red-700 p-4 rounded-t-2xl text-white">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-exclamation-circle"></i>
+        <div class="bg-card-bg rounded-3xl border border-card-border shadow-sm flex flex-col justify-between overflow-hidden">
+            <div class="p-5 border-b border-card-border bg-rose-500/5">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center text-xs">
+                            <i class="fas fa-triangle-exclamation"></i>
+                        </div>
+                        <h3 class="font-black text-text-main text-sm">Late Fee & Overdue Alert</h3>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-sm">Late Fee Alert</h3>
-                        <p class="text-rose-100 text-xs">{{ $stats['late_fees'] }} with late fees</p>
-                    </div>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700">{{ $lateFeeInvoices->count() }} Overdue</span>
                 </div>
+                <p class="text-xs text-text-dark/60">Urgent penalty notification for invoices that passed due date.</p>
             </div>
-            <div class="p-4 space-y-3">
-                <p class="text-xs text-gray-500">Sends urgent alert to candidates who have accumulated late fees on their service charge invoices.</p>
-                <form method="POST" action="{{ route('admin.reminders.late-fee') }}">
-                    @csrf
-                    <div x-data="multiSelectDropdown({{ Js::from($baseCandidates) }}, {{ $stats['late_fees'] }})" class="relative mb-3">
-                        <div @click="open = !open" class="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 cursor-pointer text-xs">
-                            <span x-text="sendToAll ? '📢 All with Late Fees (' + totalCount + ')' : '👤 Selected (' + selected.length + ')'"></span>
-                            <i class="fas fa-chevron-down text-gray-400"></i>
-                        </div>
-                        <div x-show="open" @click.away="open = false" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 flex flex-col" style="display: none;">
-                            <div class="p-2 border-b border-gray-100"><input type="text" x-model="search" placeholder="Search candidate..." class="w-full text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-blue-400"></div>
-                            <div class="overflow-y-auto p-2 space-y-1">
-                                <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs font-semibold"><input type="checkbox" name="send_to_all" value="1" x-model="sendToAll" @change="toggleAll()" class="rounded border-gray-300">📢 Send to All</label><hr class="my-1 border-gray-100">
-                                <template x-for="c in filteredItems" :key="c.id"><label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs" :class="{'opacity-50': sendToAll}"><input type="checkbox" name="candidate_ids[]" :value="c.id" x-model="selected" :disabled="sendToAll" class="rounded border-gray-300"><span x-text="c.name"></span></label></template>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-rose-500 to-red-700 hover:from-rose-600 hover:to-red-800 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95">
-                        <i class="fas fa-paper-plane"></i> Send Late Fee Alert
-                    </button>
-                </form>
-            </div>
-        </div>
 
-        {{-- 8. Custom Message (Full Width) --}}
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible hover:shadow-md transition-shadow md:col-span-2 xl:col-span-2">
-            <div class="bg-gradient-to-r from-gray-700 to-gray-900 p-4 rounded-t-2xl text-white">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-bullhorn"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-sm">Custom Message</h3>
-                        <p class="text-gray-300 text-xs">Write your own notification message to any or all candidates</p>
-                    </div>
-                </div>
-            </div>
-            <div class="p-5">
-                <form method="POST" action="{{ route('admin.reminders.custom') }}" class="space-y-4">
-                    @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1.5">Notification Title *</label>
-                            <input type="text" name="title" required maxlength="100"
-                                placeholder="e.g., Important Update from Warriors Educare"
-                                class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-gray-400 bg-gray-50">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1.5">Send To</label>
-                            <div class="flex gap-3">
-                                <div class="flex-1">
-                                    <select name="target" x-model="customTarget"
-                                        class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-gray-400 bg-gray-50">
-                                        <option value="all">📢 All Candidates ({{ $stats['total_candidates'] }})</option>
-                                        <option value="specific">👤 Specific Candidates (Multi-Select)</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div x-show="customTarget === 'specific'" x-transition x-data="multiSelectDropdown({{ Js::from($baseCandidates) }}, {{ $stats['total_candidates'] }})" x-init="sendToAll = false">
-                        <label class="block text-xs font-bold text-gray-600 mb-1.5">Select Candidates *</label>
-                        <div class="relative">
-                            <div @click="open = !open" class="flex items-center justify-between border border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 cursor-pointer text-sm">
-                                <span x-text="selected.length > 0 ? selected.length + ' Candidates Selected' : '— Select Candidates —'"></span>
-                                <i class="fas fa-chevron-down text-gray-400"></i>
-                            </div>
-                            <div x-show="open" @click.away="open = false" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 flex flex-col" style="display: none;">
-                                <div class="p-2 border-b border-gray-100"><input type="text" x-model="search" placeholder="Search candidate..." class="w-full text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-blue-400"></div>
-                                <div class="overflow-y-auto p-2 space-y-1">
-                                    <template x-for="c in filteredItems" :key="c.id"><label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-xs"><input type="checkbox" name="candidate_ids[]" :value="c.id" x-model="selected" class="rounded border-gray-300"><span x-text="c.name"></span></label></template>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1.5">Message *</label>
-                        <textarea name="message" required maxlength="500" rows="3"
-                            placeholder="Write your message here..."
-                            class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-gray-400 bg-gray-50 resize-none"></textarea>
-                        <p class="text-xs text-gray-400 mt-1">Max 500 characters</p>
-                    </div>
-
-                    <div class="flex items-center gap-6">
-                        <label class="flex items-center gap-2 text-sm font-semibold text-gray-600 cursor-pointer select-none">
-                            <input type="checkbox" name="send_email" value="1"
-                                class="w-4 h-4 rounded border-gray-300 text-gray-700 focus:ring-gray-400">
-                            Also send Email (in addition to dashboard notification)
-                        </label>
-                        <button type="submit"
-                            class="ml-auto bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-black text-white text-sm font-bold px-6 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95">
-                            <i class="fas fa-bullhorn"></i> Send Custom Message
+            <form action="{{ route('admin.reminders.late-fee') }}" method="POST" class="p-5 space-y-4" x-data="{ mode: 'all' }">
+                @csrf
+                <div>
+                    <label class="block text-[11px] font-bold text-text-dark/70 mb-1.5">Target Overdue Accounts:</label>
+                    <div class="flex gap-2 mb-2">
+                        <button type="button" @click="mode = 'all'" :class="mode === 'all' ? 'bg-rose-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            All Overdue ({{ $lateFeeInvoices->count() }})
+                        </button>
+                        <button type="button" @click="mode = 'specific'" :class="mode === 'specific' ? 'bg-rose-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all">
+                            Select Specific
                         </button>
                     </div>
-                </form>
-            </div>
+
+                    <input type="hidden" name="send_to_all" :value="mode === 'all' ? '1' : '0'">
+
+                    <div x-show="mode === 'specific'" class="space-y-1.5 max-h-32 overflow-y-auto p-2 bg-secondary-bg rounded-xl border border-card-border">
+                        @forelse($lateFeeInvoices as $lfInv)
+                            <label class="flex items-center gap-2 text-xs text-text-main cursor-pointer hover:bg-card-bg p-1 rounded-lg">
+                                <input type="checkbox" name="invoice_ids[]" value="{{ $lfInv->id }}" class="rounded text-rose-600 border-card-border focus:ring-rose-500">
+                                <span class="truncate">{{ $lfInv->candidate->name ?? 'Candidate' }} — Fee: ₹{{ number_format($lfInv->amount + $lfInv->late_fee) }}</span>
+                            </label>
+                        @empty
+                            <p class="text-[11px] text-text-dark/40 py-1 text-center">No overdue accounts with late fees.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+                    <i class="fas fa-triangle-exclamation text-xs"></i> <span>Send Urgent Late Fee Alerts</span>
+                </button>
+            </form>
         </div>
 
-    </div>{{-- End Grid --}}
+        {{-- 8. Custom Direct Broadcast Message --}}
+        <div class="bg-card-bg rounded-3xl border border-card-border shadow-sm flex flex-col justify-between overflow-hidden md:col-span-2 xl:col-span-2">
+            <div class="p-5 border-b border-card-border bg-purple-500/5">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-xs">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <h3 class="font-black text-text-main text-sm">Direct Broadcast & Notification Dispatch</h3>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700">Custom Alert</span>
+                </div>
+                <p class="text-xs text-text-dark/60">Send custom DB dashboard notification and email to specific candidates or all registered teachers.</p>
+            </div>
 
-    {{-- Recent Activity Log --}}
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="p-5 border-b border-gray-50 flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500">
-                <i class="fas fa-history text-sm"></i>
-            </div>
-            <h2 class="font-bold text-gray-800">Recent Reminder Activity</h2>
-            <span class="ml-auto text-xs text-gray-400">Last 20 actions</span>
-        </div>
-        <div class="divide-y divide-gray-50">
-            @forelse($recentLogs as $log)
-            <div class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50 transition-colors">
-                @php
-                $typeConfig = [
-                    'service_charge'    => ['icon' => 'fa-rupee-sign', 'color' => 'text-red-500 bg-red-50', 'label' => 'Service Charge'],
-                    'renewal'           => ['icon' => 'fa-redo-alt', 'color' => 'text-purple-500 bg-purple-50', 'label' => 'Renewal'],
-                    'payment_pending'   => ['icon' => 'fa-wallet', 'color' => 'text-amber-500 bg-amber-50', 'label' => 'Payment Pending'],
-                    'interview'         => ['icon' => 'fa-calendar-check', 'color' => 'text-blue-500 bg-blue-50', 'label' => 'Interview'],
-                    'profile_completion'=> ['icon' => 'fa-user-edit', 'color' => 'text-indigo-500 bg-indigo-50', 'label' => 'Profile Completion'],
-                    'plan_expiry'       => ['icon' => 'fa-exclamation-triangle', 'color' => 'text-orange-500 bg-orange-50', 'label' => 'Plan Expiry'],
-                    'late_fee'          => ['icon' => 'fa-exclamation-circle', 'color' => 'text-rose-500 bg-rose-50', 'label' => 'Late Fee'],
-                    'custom'            => ['icon' => 'fa-bullhorn', 'color' => 'text-gray-600 bg-gray-100', 'label' => 'Custom Message'],
-                ];
-                $cfg = $typeConfig[$log->type] ?? ['icon' => 'fa-bell', 'color' => 'text-gray-400 bg-gray-50', 'label' => $log->type];
-                @endphp
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center {{ $cfg['color'] }} flex-shrink-0 text-xs">
-                    <i class="fas {{ $cfg['icon'] }}"></i>
+            <form action="{{ route('admin.reminders.custom') }}" method="POST" class="p-5 space-y-4" x-data="{ target: 'specific' }">
+                @csrf
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-text-main mb-1">Notification Title *</label>
+                        <input type="text" name="title" required placeholder="e.g. Urgent Walk-in Drive for PGT Maths" 
+                               class="w-full px-3 py-2 text-xs bg-secondary-bg border border-card-border rounded-xl text-text-main focus:ring-1 focus:ring-purple-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-text-main mb-1">Recipient Mode *</label>
+                        <div class="flex gap-2">
+                            <button type="button" @click="target = 'specific'" :class="target === 'specific' ? 'bg-purple-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all">
+                                Specific Candidates
+                            </button>
+                            <button type="button" @click="target = 'all'" :class="target === 'all' ? 'bg-purple-600 text-white' : 'bg-secondary-bg text-text-dark/70'" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all">
+                                Broadcast to All ({{ $allCandidates->count() }})
+                            </button>
+                        </div>
+                        <input type="hidden" name="target" :value="target">
+                    </div>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-gray-800">{{ $cfg['label'] }} Reminder</p>
-                    <p class="text-xs text-gray-400">To: {{ $log->target }} · {{ $log->count_sent }} sent
-                        @if($log->note) · "{{ Str::limit($log->note, 40) }}" @endif
-                    </p>
+
+                <div x-show="target === 'specific'">
+                    <label class="block text-[11px] font-bold text-text-dark/70 mb-1.5">Select Candidates:</label>
+                    <div class="space-y-1.5 max-h-32 overflow-y-auto p-2 bg-secondary-bg rounded-xl border border-card-border">
+                        @foreach($allCandidates as $c)
+                            <label class="flex items-center gap-2 text-xs text-text-main cursor-pointer hover:bg-card-bg p-1 rounded-lg">
+                                <input type="checkbox" name="candidate_ids[]" value="{{ $c->id }}" class="rounded text-purple-600 border-card-border focus:ring-purple-500">
+                                <span class="truncate font-semibold">{{ $c->name }}</span>
+                                <span class="text-[10px] text-text-dark/40 truncate">({{ $c->email ?? $c->phone }})</span>
+                            </label>
+                        @endforeach
+                    </div>
                 </div>
-                <span class="text-xs text-gray-300 flex-shrink-0">
-                    {{ \Carbon\Carbon::parse($log->created_at)->diffForHumans() }}
-                </span>
-            </div>
-            @empty
-            <div class="py-12 text-center">
-                <div class="text-4xl text-gray-200 mb-3"><i class="fas fa-history"></i></div>
-                <p class="text-gray-400 text-sm font-semibold">No reminders sent yet</p>
-                <p class="text-gray-300 text-xs mt-1">Use the cards above to send your first reminder</p>
-            </div>
-            @endforelse
+
+                <div>
+                    <label class="block text-xs font-bold text-text-main mb-1">Message Body *</label>
+                    <textarea name="message" rows="3" required placeholder="Type your notification message here..." 
+                              class="w-full px-3 py-2 text-xs bg-secondary-bg border border-card-border rounded-xl text-text-main focus:ring-1 focus:ring-purple-500 outline-none"></textarea>
+                </div>
+
+                <div class="flex items-center justify-between pt-2">
+                    <label class="flex items-center gap-2 text-xs text-text-dark/70 font-semibold cursor-pointer">
+                        <input type="checkbox" name="send_email" value="1" checked class="rounded text-purple-600 border-card-border focus:ring-purple-500">
+                        <span>Also deliver via Email</span>
+                    </label>
+
+                    <button type="submit" class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center gap-2">
+                        <i class="fas fa-paper-plane text-xs"></i> <span>Send Broadcast</span>
+                    </button>
+                </div>
+            </form>
         </div>
+
     </div>
 
 </div>
-
-<script>
-function reminderCenter() {
-    return {
-        customTarget: 'all',
-    }
-}
-function multiSelectDropdown(items, totalCount) {
-    return {
-        open: false,
-        sendToAll: true,
-        selected: [],
-        search: '',
-        items: items,
-        totalCount: totalCount,
-        get filteredItems() {
-            if (this.search === '') return this.items;
-            return this.items.filter(i => i.name.toLowerCase().includes(this.search.toLowerCase()));
-        },
-        toggleAll() {
-            if (this.sendToAll) {
-                this.selected = []; // clear individual selections if send to all is checked
-            }
-        }
-    }
-}
-</script>
 @endsection

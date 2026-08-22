@@ -316,11 +316,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::prefix('reminders')->name('reminders.')->group(function () {
         Route::get('/',                 [\App\Http\Controllers\Admin\ReminderController::class, 'index'])->name('index');
         Route::post('/service-charge',  [\App\Http\Controllers\Admin\ReminderController::class, 'sendServiceChargeReminder'])->name('service-charge');
-        Route::post('/renewal',         [\App\Http\Controllers\Admin\ReminderController::class, 'sendRenewalReminder'])->name('renewal');
-        Route::post('/payment-pending', [\App\Http\Controllers\Admin\ReminderController::class, 'sendPaymentPendingReminder'])->name('payment-pending');
+        Route::post('/tuition-service', [\App\Http\Controllers\Admin\ReminderController::class, 'sendTuitionServiceReminder'])->name('tuition-service');
+        Route::post('/agreement',       [\App\Http\Controllers\Admin\ReminderController::class, 'sendAgreementReminder'])->name('agreement');
+        Route::post('/tuition-demo',    [\App\Http\Controllers\Admin\ReminderController::class, 'sendTuitionDemoReminder'])->name('tuition-demo');
         Route::post('/interview',       [\App\Http\Controllers\Admin\ReminderController::class, 'sendInterviewReminder'])->name('interview');
         Route::post('/profile',         [\App\Http\Controllers\Admin\ReminderController::class, 'sendProfileCompletionReminder'])->name('profile');
-        Route::post('/plan-expiry',     [\App\Http\Controllers\Admin\ReminderController::class, 'sendPlanExpiryReminder'])->name('plan-expiry');
         Route::post('/late-fee',        [\App\Http\Controllers\Admin\ReminderController::class, 'sendLateFeeAlert'])->name('late-fee');
         Route::post('/custom',          [\App\Http\Controllers\Admin\ReminderController::class, 'sendCustomMessage'])->name('custom');
     });
