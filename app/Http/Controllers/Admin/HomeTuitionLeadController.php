@@ -77,18 +77,12 @@ class HomeTuitionLeadController extends Controller
         $validated = $request->validate([
             'parent_name' => 'required|string|max:255',
             'parent_mobile' => 'required|string|max:20',
-            'teacher_contact' => 'nullable|string|max:20',
-            'location' => 'required|string|max:255',
             'class' => 'required|string|max:255',
+            'board' => 'required|string|max:255',
             'subjects' => 'required|string|max:255',
-            'fee' => 'nullable|string|max:255',
-            'preferred_timing' => 'nullable|string|max:255',
-            'enquiry_date' => 'nullable|date',
-            'tutor_preference' => 'required|in:Male,Female,Any',
-            'dues' => 'nullable|string|max:255',
-            'additional_notes' => 'nullable|string',
+            'location' => 'required|string|max:255',
+            'pincode' => 'nullable|string|max:20',
             'status' => 'required|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
-            'follow_up_date' => 'nullable|date',
         ]);
 
         $user = \App\Models\User::where('phone', $validated['parent_mobile'])->first();
@@ -108,15 +102,7 @@ class HomeTuitionLeadController extends Controller
 
         $lead = HomeTuitionLead::create($validated);
 
-        if ($request->filled('additional_notes')) {
-            $lead->followUps()->create([
-                'admin_id' => auth()->id(),
-                'note' => 'Initial Enquiry Note: ' . $validated['additional_notes'],
-                'follow_up_date' => $validated['follow_up_date'] ?? null,
-            ]);
-        }
-
-        return redirect()->route('admin.tuition-leads.index')->with('success', 'Lead created successfully.');
+        return redirect()->route('admin.tuition-leads.index')->with('success', 'Tuition lead created successfully.');
     }
 
     public function show($id)
@@ -139,22 +125,17 @@ class HomeTuitionLeadController extends Controller
         $validated = $request->validate([
             'parent_name' => 'required|string|max:255',
             'parent_mobile' => 'required|string|max:20',
-            'teacher_contact' => 'nullable|string|max:20',
-            'location' => 'required|string|max:255',
             'class' => 'required|string|max:255',
+            'board' => 'required|string|max:255',
             'subjects' => 'required|string|max:255',
-            'fee' => 'nullable|string|max:255',
-            'preferred_timing' => 'nullable|string|max:255',
-            'enquiry_date' => 'nullable|date',
-            'tutor_preference' => 'required|in:Male,Female,Any',
-            'dues' => 'nullable|string|max:255',
-            'additional_notes' => 'nullable|string',
+            'location' => 'required|string|max:255',
+            'pincode' => 'nullable|string|max:20',
             'status' => 'nullable|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
         ]);
 
         $lead->update($validated);
 
-        return redirect()->route('admin.tuition-leads.show', $lead->id)->with('success', 'Lead updated successfully.');
+        return redirect()->route('admin.tuition-leads.index')->with('success', 'Tuition lead updated successfully.');
     }
 
     public function approve(Request $request, $id)

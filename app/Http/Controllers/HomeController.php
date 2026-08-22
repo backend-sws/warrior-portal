@@ -53,29 +53,16 @@ class HomeController extends Controller
             'description' => 'nullable|string|max:1000',
         ]);
 
-        $locationWithPincode = $validated['location'];
-        if (!empty($validated['pincode'])) {
-            $locationWithPincode .= ' - Pincode: ' . $validated['pincode'];
-        }
-
-        $validated['fee'] = 'Not Specified';
-        $validated['status'] = 'New Lead';
-        if (auth()->check()) {
-            $validated['user_id'] = auth()->id();
-        }
-
         \App\Models\HomeTuitionLead::create([
             'parent_name' => $validated['guest_name'],
             'parent_mobile' => $validated['guest_phone'],
             'class' => $validated['student_class'],
             'board' => $validated['board'],
             'subjects' => $validated['subjects'],
-            'location' => $locationWithPincode,
-            'fee' => $validated['fee'],
-            'additional_notes' => 'Guest Tuition Request: ' . ($validated['description'] ?? 'None'),
-            'status' => $validated['status'],
-            'tutor_preference' => 'Any',
-            'user_id' => $validated['user_id'] ?? null,
+            'location' => $validated['location'],
+            'pincode' => $validated['pincode'] ?? null,
+            'status' => 'New Lead',
+            'user_id' => auth()->check() ? auth()->id() : null,
         ]);
 
         \App\Helpers\NotificationHelper::notifyAdmin(

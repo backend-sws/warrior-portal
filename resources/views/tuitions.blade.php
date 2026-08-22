@@ -122,12 +122,25 @@
                 <h3 class="text-lg font-bold text-slate-900 mb-1 group-hover:text-accent-blue transition-colors line-clamp-1">
                     {{ $tuition->subjects ?? 'Tuition Requirement' }}
                 </h3>
-                <p class="text-sm text-slate-500 font-medium mb-3 line-clamp-1">{{ $tuition->location }}</p>
-                
-                <p class="text-sm text-slate-600 leading-relaxed mb-5 line-clamp-3">
-                    Class: {{ $tuition->class }} <br>
-                    Timing: {{ $tuition->preferred_timing ?? 'Not specified' }}
+                <p class="text-sm text-slate-500 font-medium mb-3 flex items-center gap-1.5">
+                    <i class="fas fa-map-marker-alt text-red-400 text-xs"></i> 
+                    <span>{{ $tuition->location }}@if($tuition->pincode) - (Pincode: {{ $tuition->pincode }})@endif</span>
                 </p>
+                
+                <div class="bg-slate-50 rounded-xl p-3 text-xs text-slate-700 space-y-1.5 mb-5 border border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 font-medium">Class:</span>
+                        <span class="font-bold text-[#031b4e]">{{ $tuition->class }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 font-medium">Board:</span>
+                        <span class="font-bold text-accent-blue">{{ $tuition->board ?: 'General' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 font-medium">Subjects:</span>
+                        <span class="font-bold text-slate-800">{{ $tuition->subjects }}</span>
+                    </div>
+                </div>
             </div>
             
             <div>

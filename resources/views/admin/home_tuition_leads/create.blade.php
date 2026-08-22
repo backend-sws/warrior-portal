@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Add New Tuition Requirement')
-@section('subtitle', 'Enter details to create and publish a new tuition requirement.')
+@section('subtitle', 'Enter details to post a new tuition requirement.')
 
 @section('content')
 <div class="mb-4">
@@ -17,60 +17,58 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {{-- Parent Name --}}
             <div>
-                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Parent / Student Name *</label>
-                <input type="text" name="parent_name" value="{{ old('parent_name') }}" required placeholder="e.g. Rakesh Sharma"
+                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Your Name / Parent Name *</label>
+                <input type="text" name="parent_name" value="{{ old('parent_name') }}" required placeholder="Enter full name"
                        class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
                 @error('parent_name') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
             {{-- Parent Mobile --}}
             <div>
-                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Contact Mobile Number *</label>
-                <input type="text" name="parent_mobile" value="{{ old('parent_mobile') }}" required placeholder="Enter 10-digit mobile"
+                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Phone Number *</label>
+                <input type="text" name="parent_mobile" value="{{ old('parent_mobile') }}" required placeholder="Enter phone number"
                        class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
                 @error('parent_mobile') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
             {{-- Class / Grade --}}
             <div>
-                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Student's Class / Grade *</label>
-                <input type="text" name="class" value="{{ old('class') }}" required placeholder="e.g. Class 10 / Class 12"
+                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Student's Class *</label>
+                <input type="text" name="class" value="{{ old('class') }}" required placeholder="e.g. Class 10"
                        class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
                 @error('class') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
-            {{-- Subjects --}}
+            {{-- Board --}}
             <div>
-                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Subject(s) Needed *</label>
-                <input type="text" name="subjects" value="{{ old('subjects') }}" required placeholder="e.g. Mathematics, Physics"
+                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Board *</label>
+                <input type="text" name="board" value="{{ old('board') }}" required placeholder="e.g. CBSE / ICSE / State Board"
+                       class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                @error('board') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- Subjects --}}
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Subjects Needed *</label>
+                <input type="text" name="subjects" value="{{ old('subjects') }}" required placeholder="e.g., Math, Science, English"
                        class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
                 @error('subjects') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
             {{-- Complete Location --}}
-            <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Location / Area Address *</label>
-                <input type="text" name="location" value="{{ old('location') }}" required placeholder="e.g. Kankarbagh, Patna"
+            <div>
+                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Complete Location / Address *</label>
+                <input type="text" name="location" value="{{ old('location') }}" required placeholder="Enter full address or area"
                        class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
                 @error('location') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
-            {{-- Monthly Budget / Fee --}}
+            {{-- Pincode --}}
             <div>
-                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Monthly Fee / Budget</label>
-                <input type="text" name="fee" value="{{ old('fee') }}" placeholder="e.g. ₹3,500 / month"
+                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Pincode *</label>
+                <input type="text" name="pincode" value="{{ old('pincode') }}" placeholder="Enter 6-digit Pincode"
                        class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-                @error('fee') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-            </div>
-
-            {{-- Tutor Gender Preference --}}
-            <div>
-                <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Tutor Preference</label>
-                <select name="tutor_preference" class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
-                    <option value="Any" {{ old('tutor_preference') == 'Any' ? 'selected' : '' }}>Any Preference</option>
-                    <option value="Male" {{ old('tutor_preference') == 'Male' ? 'selected' : '' }}>Male Tutor</option>
-                    <option value="Female" {{ old('tutor_preference') == 'Female' ? 'selected' : '' }}>Female Tutor</option>
-                </select>
+                @error('pincode') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
             {{-- Status --}}
@@ -88,7 +86,7 @@
                 Cancel
             </a>
             <button type="submit" class="bg-accent-blue text-white px-8 py-3 rounded-xl font-bold hover:bg-accent-blue-hover transition-colors shadow-lg shadow-accent-blue/20 flex items-center gap-2">
-                <i class="fas fa-paper-plane"></i> Save & Post Lead
+                <i class="fas fa-paper-plane"></i> Post Tuition Lead
             </button>
         </div>
     </form>
