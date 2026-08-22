@@ -32,7 +32,7 @@
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 pb-4">
                 <!-- Card 1: Parents -->
-                <a href="{{ route('parent.register') }}" class="group relative rounded-2xl p-8 text-center transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 hover:border-[#031b4e] overflow-hidden isolate">
+                <a href="{{ route('contact') }}" class="group relative rounded-2xl p-8 text-center transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 hover:border-[#031b4e] overflow-hidden isolate">
                     <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 z-0" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop');"></div>
                     <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
                     
@@ -46,7 +46,7 @@
                 </a>
                 
                 <!-- Card 2: Schools -->
-                <a href="{{ route('parent.register') }}" class="group relative rounded-2xl p-8 text-center transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 hover:border-[#031b4e] overflow-hidden isolate">
+                <a href="{{ route('contact') }}" class="group relative rounded-2xl p-8 text-center transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 hover:border-[#031b4e] overflow-hidden isolate">
                     <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 z-0" style="background-image: url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=600&auto=format&fit=crop');"></div>
                     <div class="absolute inset-0 bg-white/70 backdrop-blur-sm group-hover:bg-[#031b4e]/90 transition-colors duration-300 z-0"></div>
                     
@@ -215,7 +215,7 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="{{ route('parent.register') }}" id="btn-hire" class="bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] transition shadow-lg flex items-center justify-center">Hire a Teacher / Tutor</a>
+                    <a href="{{ route('contact') }}" id="btn-hire" class="bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] transition shadow-lg flex items-center justify-center">Hire a Teacher / Tutor</a>
                     <a href="{{ route('candidate.register') }}" id="btn-join" class="bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 transition border border-gray-200 shadow-sm flex items-center justify-center gap-2">Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
@@ -736,7 +736,7 @@
                                 <div class="flex justify-between items-center mt-auto relative z-20">
                                     <div class="absolute -top-3 left-0 w-full h-[1px] bg-slate-200 z-10"></div>
                                     <span class="text-[11px] font-medium text-slate-500 bg-white/60 backdrop-blur-sm border border-slate-200/50 px-2 py-1 rounded flex items-center gap-1 shadow-sm relative z-20 mt-1"><i class="far fa-clock"></i> {{ $tuition->created_at->diffForHumans() }}</span>
-                                    <a href="{{ auth()->check() ? route('candidate.tuitions.index') : route('parent.register') }}" class="inline-flex items-center gap-2 bg-[#031b4e] text-white hover:bg-blue-900 px-5 py-2.5 rounded-lg font-bold text-sm transition-colors shadow-lg relative z-20">Apply Now <i class="fas fa-arrow-right"></i></a>
+                                    <a href="{{ auth()->check() ? route('candidate.tuitions.index') : route('contact') }}" class="inline-flex items-center gap-2 bg-[#031b4e] text-white hover:bg-blue-900 px-5 py-2.5 rounded-lg font-bold text-sm transition-colors shadow-lg relative z-20">Apply Now <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div>
