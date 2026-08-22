@@ -188,7 +188,7 @@
                 </div>
 
                 <a href="{{ route('admin.jobs.index', ['status' => 'pending']) }}"
-                    class="sidebar-link {{ request('status') === 'pending' ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    class="sidebar-link {{ (request()->routeIs('admin.jobs.*') && request('status') === 'pending') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-clipboard-check w-5 text-center"></i> Job Approvals
                     @php $pendingCount = \App\Models\JobPost::where('status', 'pending')->count(); @endphp
                     @if($pendingCount > 0)
@@ -197,7 +197,7 @@
                     @endif
                 </a>
                 <a href="{{ route('admin.jobs.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.jobs.*') && request('status') !== 'pending' ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    class="sidebar-link {{ (request()->routeIs('admin.jobs.*') && request('status') !== 'pending') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-briefcase w-5 text-center"></i> All Jobs
                 </a>
                 <a href="{{ route('admin.crm.index') }}"
@@ -212,6 +212,35 @@
                     class="sidebar-link {{ request()->routeIs('admin.candidate-payments.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-wallet w-5 text-center"></i> Candidate Payments
                 </a>
+
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Home Tuitions
+                </div>
+
+                <a href="{{ route('admin.tuition-leads.index', ['status' => 'New Lead']) }}"
+                    class="sidebar-link {{ (request()->routeIs('admin.tuition-leads.*') && request('status') === 'New Lead') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Tuition Approvals
+                    @php $pendingTuitionsCount = \App\Models\HomeTuitionLead::where('status', 'New Lead')->count(); @endphp
+                    @if($pendingTuitionsCount > 0)
+                        <span
+                            class="ml-auto bg-emerald-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingTuitionsCount }}</span>
+                    @endif
+                </a>
+                <a href="{{ route('admin.tuition-leads.index') }}"
+                    class="sidebar-link {{ (request()->routeIs('admin.tuition-leads.*') && request('status') !== 'New Lead') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-list-alt w-5 text-center"></i> All Tuition Leads
+                </a>
+                <a href="{{ route('admin.candidate-tuition.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.candidate-tuition.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-user-graduate w-5 text-center"></i> Appointed Tutors
+                </a>
+                <a href="{{ route('admin.tuition-fees.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.tuition-fees.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-money-check-alt w-5 text-center"></i> Tuition Fee Accounts
+                </a>
+
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-6 mb-2 px-4">Support & Leads
+                </div>
+
                 <a href="{{ route('admin.leads.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-headset w-5 text-center"></i> Support Leads

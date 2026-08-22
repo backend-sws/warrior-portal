@@ -130,21 +130,10 @@ class HomeController extends Controller
             'status' => 'pending',
         ]);
 
-        // 2. Also log in Contact Leads for CRM follow-up
-        $catName = \App\Models\Category::find($validated['category_id'])?->name ?? 'General';
-        $subjName = \App\Models\Subject::find($validated['subject_id'])?->name ?? 'Subject';
-        \App\Models\ContactLead::create([
-            'name' => $validated['contact_person'] . ' [' . $validated['school_name'] . ']',
-            'email' => $validated['email'] ?? null,
-            'phone' => $validated['phone'],
-            'message' => "🏫 School Job Requirement (Pending Approval - Job #{$jobPost->id}):\n• Title: {$validated['title']}\n• Category: {$catName}\n• Subject: {$subjName}\n• Salary: " . ($validated['salary_range'] ?? 'Negotiable') . "\n• Extra Notes: " . ($validated['description'] ?? 'None'),
-            'status' => 'new',
-        ]);
-
-        // 3. Notify Admin to review and approve
+        // 2. Notify Admin to review and approve in Job Approvals
         \App\Helpers\NotificationHelper::notifyAdmin(
             'New Job Requirement Awaiting Approval',
-            $validated['school_name'] . ' submitted a new job: "' . $validated['title'] . '". Review and approve in Job Management.',
+            $validated['school_name'] . ' submitted a new job: "' . $validated['title'] . '". Review and approve in Job Approvals.',
             route('admin.jobs.index', ['status' => 'pending']),
             'fas fa-briefcase'
         );
