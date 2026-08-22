@@ -248,7 +248,7 @@
     </div>
 
     {{-- Professional Dual-Tab Requirement Modal (Mobile-First & High Aesthetic) --}}
-    <div x-show="openPostModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-md p-3 sm:p-6 overflow-y-auto" x-transition.opacity>
+    <div x-show="openPostModal" style="display: none;" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-3 sm:p-6 overflow-y-auto" x-transition.opacity>
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden my-auto border border-slate-100 relative" @click.away="openPostModal = false" x-transition.scale>
             
             <!-- Modal Header -->
