@@ -27,6 +27,50 @@
 
 @section('content')
 
+{{-- PAYMENT COLLECTION ALERT BANNER --}}
+@if(($feeDueToday + $feeOverdueCount + $feeFollowUpToday) > 0)
+<div class="mb-6 bg-gradient-to-r from-amber-50 via-orange-50 to-red-50 border border-amber-200/70 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-40 h-40 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative">
+        <div>
+            <div class="flex items-center gap-2 mb-2">
+                <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/30">
+                    <i class="fas fa-bell text-sm animate-pulse"></i>
+                </div>
+                <h3 class="text-lg font-black text-[#031b4e]">Today's Payment Alerts</h3>
+            </div>
+            <div class="flex flex-wrap items-center gap-4 text-sm">
+                @if($feeDueToday > 0)
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span class="font-bold text-amber-700">{{ $feeDueToday }} payments due today</span>
+                    <span class="text-amber-600 font-black">(₹{{ number_format($feeDueTodayAmount) }})</span>
+                </div>
+                @endif
+                @if($feeOverdueCount > 0)
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span class="font-bold text-red-600">{{ $feeOverdueCount }} overdue</span>
+                    <span class="text-red-500 font-black">(₹{{ number_format($feeOverdueAmount) }})</span>
+                </div>
+                @endif
+                @if($feeFollowUpToday > 0)
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    <span class="font-bold text-indigo-600">{{ $feeFollowUpToday }} follow-up collections today</span>
+                </div>
+                @endif
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('admin.tuition-fees.index', ['tab' => 'today']) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors shadow-lg shadow-amber-500/30 flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fas fa-rupee-sign"></i> View Collections <i class="fas fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
+    </div>
+</div>
+@endif
+
 {{-- 1. Primary KPI Metric Cards (Clean, Clickable, No Duplicate Hero Box) --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
     <!-- Card 1: School Jobs -->

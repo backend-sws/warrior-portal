@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Payment Gateway & Transaction Logs')
-@section('subtitle', 'Real-time audit log of all Razorpay payments, webhooks, and gateway settlements.')
+@section('subtitle', 'Real-time audit log of all PhonePe payments, webhooks, and gateway settlements.')
 
 @section('content')
 <div class="space-y-6" x-data="{ activePayload: null, modalOpen: false }">
@@ -151,8 +151,8 @@
                         </td>
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-1.5">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-600">
-                                    {{ $txn->gateway ?: 'Razorpay' }}
+                                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-purple-500/10 text-purple-700">
+                                    {{ $txn->gateway ?: 'PhonePe' }}
                                 </span>
                                 @if($txn->payment_method)
                                     <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase bg-slate-100 text-slate-700">

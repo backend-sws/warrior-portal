@@ -97,7 +97,7 @@
                 </div>
                 <div class="relative z-10">
                     <h4 class="text-[#031b4e] font-bold mb-2">Our Location</h4>
-                    <p class="text-sm text-[#031b4e]/70 leading-relaxed">Career Point Building, 2nd floor,<br>Patna,800001, Bihar</p>
+                    <p class="text-sm text-[#031b4e]/70 leading-relaxed">Sardar Patel Colony, Sandalpur Rd,<br>Kumhrar, Patna, Bihar</p>
                 </div>
             </div>
 

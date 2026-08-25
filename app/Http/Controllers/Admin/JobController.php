@@ -19,9 +19,14 @@ class JobController extends Controller
         // Search
         if ($search = $request->input('search')) {
             $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
+                $q->where('job_id', 'like', "%{$search}%")
+                  ->orWhere('title', 'like', "%{$search}%")
                   ->orWhere('school_name', 'like', "%{$search}%")
-                  ->orWhere('contact_person', 'like', "%{$search}%");
+                  ->orWhere('contact_person', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+                if (is_numeric($search)) {
+                    $q->orWhere('id', $search);
+                }
             });
         }
 
@@ -35,7 +40,7 @@ class JobController extends Controller
         $sortField = $request->input('sort_by', 'created_at');
         $sortDirection = $request->input('order', 'desc');
         
-        $allowedFields = ['id', 'title', 'school_name', 'status', 'created_at'];
+        $allowedFields = ['id', 'job_id', 'title', 'school_name', 'status', 'created_at'];
         if (in_array($sortField, $allowedFields)) {
             $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
         } else {
@@ -48,9 +53,14 @@ class JobController extends Controller
         $baseQuery = JobPost::query();
         if ($search) {
             $baseQuery->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
+                $q->where('job_id', 'like', "%{$search}%")
+                  ->orWhere('title', 'like', "%{$search}%")
                   ->orWhere('school_name', 'like', "%{$search}%")
-                  ->orWhere('contact_person', 'like', "%{$search}%");
+                  ->orWhere('contact_person', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+                if (is_numeric($search)) {
+                    $q->orWhere('id', $search);
+                }
             });
         }
 

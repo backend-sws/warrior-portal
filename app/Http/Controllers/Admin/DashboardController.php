@@ -12,6 +12,8 @@ use App\Models\TuitionApplication;
 use App\Models\CandidateProfile;
 use App\Models\ServiceChargeInvoice;
 use App\Models\PaymentTransaction;
+use App\Models\TuitionFeeAccount;
+use App\Models\TuitionFeePayment;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -104,6 +106,21 @@ class DashboardController extends Controller
         $pendingJobsList = JobPost::where('status', 'pending')->with(['category', 'city'])->latest()->limit(5)->get();
         $pendingTuitionsList = HomeTuitionLead::where('status', 'New Lead')->latest()->limit(5)->get();
 
+        // 8. TUITION FEE PAYMENT ALERTS (for dashboard banner)
+        // Auto-update statuses
+        TuitionFeeAccount::where('status', 'active')
+            ->where('next_due_date', '<', Carbon::today())
+            ->where('payment_status', '!=', 'paid')
+            ->update(['payment_status' => 'overdue']);
+
+        $feeDueToday = TuitionFeeAccount::dueToday()->count();
+        $feeDueTodayAmount = TuitionFeeAccount::dueToday()->sum('monthly_fee');
+        $feeOverdueCount = TuitionFeeAccount::overdue()->count();
+        $feeOverdueAmount = TuitionFeeAccount::overdue()->sum('monthly_fee');
+        $feeFollowUpToday = TuitionFeeAccount::followUpToday()->count();
+        $feeCollectedThisMonth = TuitionFeePayment::whereMonth('payment_date', Carbon::now()->month)
+            ->whereYear('payment_date', Carbon::now()->year)->sum('amount');
+
         // 7. COMBINED LIVE ACTIVITY FEED
         $recentJobApps = JobApplication::with(['candidate', 'jobPost'])->latest()->limit(10)->get();
         $recentTuitionApps = TuitionApplication::with(['candidate', 'tuitionLead'])->latest()->limit(10)->get();
@@ -165,7 +182,13 @@ class DashboardController extends Controller
             'pendingTuitionsList',
             'activityFeed',
             'fromDate',
-            'toDate'
+            'toDate',
+            'feeDueToday',
+            'feeDueTodayAmount',
+            'feeOverdueCount',
+            'feeOverdueAmount',
+            'feeFollowUpToday',
+            'feeCollectedThisMonth'
         ));
     }
 }

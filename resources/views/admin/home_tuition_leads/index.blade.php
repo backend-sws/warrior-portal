@@ -66,9 +66,9 @@
         Showing {{ $leads->firstItem() ?? 0 }} to {{ $leads->lastItem() ?? 0 }} of {{ $leads->total() }} entries
     </div>
     <form action="{{ url()->current() }}" method="GET" class="w-full flex flex-col sm:flex-row items-center justify-end gap-3 flex-wrap">
-        <div class="relative w-full sm:w-56">
+        <div class="relative w-full sm:w-64">
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-text-dark/40 text-sm"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, phone, area..." 
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Tuition ID (e.g. TUI-0001), name, phone..." 
                    class="w-full pl-9 pr-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
         </div>
         
@@ -95,6 +95,7 @@
     <table class="w-full text-left border-collapse admin-table">
         <thead>
             <tr>
+                <th class="w-28">Tuition ID</th>
                 <th>Parent Info</th>
                 <th>Class & Board</th>
                 <th>Subjects Needed</th>
@@ -106,6 +107,11 @@
         <tbody class="divide-y divide-card-border">
             @forelse($leads as $lead)
             <tr class="group hover:bg-secondary-bg/30 transition-colors">
+                <td class="align-middle">
+                    <span class="inline-flex items-center gap-1 font-mono text-xs font-bold text-accent-blue bg-accent-blue/10 px-2 py-0.5 rounded border border-accent-blue/20">
+                        <i class="fas fa-hashtag text-[9px] opacity-70"></i>{{ $lead->tuition_id ?: 'TUI-' . str_pad($lead->id, 4, '0', STR_PAD_LEFT) }}
+                    </span>
+                </td>
                 <td class="align-middle">
                     <div class="font-bold text-text-main group-hover:text-accent-blue transition-colors">{{ $lead->parent_name }}</div>
                     <div class="text-xs text-text-dark/60 mt-0.5 flex items-center gap-1.5">
@@ -139,9 +145,16 @@
                         ];
                         $colorClass = $statusColors[$lead->status] ?? 'bg-gray-500/10 text-gray-500 border-gray-500/20';
                     @endphp
-                    <span class="{{ $colorClass }} px-2.5 py-1 rounded-lg text-[10px] font-bold border uppercase tracking-wider inline-block">
-                        {{ $lead->status === 'New Lead' ? '⏳ Pending Approval' : ($lead->status === 'Approved' ? '✅ Live on Website' : ($lead->status === 'Confirmed' ? '🎉 Teacher Assigned' : $lead->status)) }}
-                    </span>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="{{ $colorClass }} px-2.5 py-1 rounded-lg text-[10px] font-bold border uppercase tracking-wider inline-block">
+                            {{ $lead->status === 'New Lead' ? '⏳ Pending Approval' : ($lead->status === 'Approved' ? '✅ Live on Website' : ($lead->status === 'Confirmed' ? '🎉 Teacher Assigned' : $lead->status)) }}
+                        </span>
+                        @if($lead->is_featured)
+                            <span class="bg-amber-500 text-white px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 shadow-xs" title="Featured on Welcome Page">
+                                <i class="fas fa-star text-[8px]"></i> Homepage
+                            </span>
+                        @endif
+                    </div>
 
                     @if($lead->teacher_name)
                         <div class="text-xs font-semibold text-text-main mt-1 flex items-center gap-1">
@@ -157,6 +170,14 @@
                 </td>
                 <td class="align-middle text-right">
                     <div class="flex items-center justify-end gap-2 flex-wrap">
+                        {{-- Toggle Featured on Home --}}
+                        <form action="{{ route('admin.tuition-leads.toggle-featured', $lead->id) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 {{ $lead->is_featured ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white border border-amber-500/20' }} rounded-lg text-xs font-bold transition-all whitespace-nowrap" title="{{ $lead->is_featured ? 'Click to Remove from Home Featured' : 'Click to Feature on Welcome Page' }}">
+                                <i class="fas fa-star text-[10px]"></i> {{ $lead->is_featured ? 'Featured' : 'Feature' }}
+                            </button>
+                        </form>
+
                         @if($lead->status === 'New Lead')
                             <form action="{{ route('admin.tuition-leads.approve', $lead->id) }}" method="POST" class="inline">
                                 @csrf
@@ -170,6 +191,22 @@
                         <button type="button" @click="openAssignModal({{ $lead->id }}, '{{ addslashes($lead->parent_name) }}', '{{ addslashes($lead->class . ' - ' . $lead->subjects) }}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-500/10 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-500/20 rounded-lg text-xs font-bold transition-colors whitespace-nowrap" title="Assign Teacher / Candidate">
                             <i class="fas fa-user-plus text-xs"></i> Assign Teacher
                         </button>
+
+                        {{-- Track Fees in Payment System (Only when Teacher is Assigned) --}}
+                        @if(!empty($lead->teacher_name) || $lead->status === 'Confirmed')
+                            <a href="{{ route('admin.tuition-fees.create', [
+                                'student_name' => $lead->parent_name . ' (Student)',
+                                'parent_name' => $lead->parent_name,
+                                'mobile_number' => $lead->parent_mobile,
+                                'address' => $lead->location,
+                                'class' => $lead->class,
+                                'subject' => $lead->subjects,
+                                'teacher_name' => $lead->teacher_name,
+                                'monthly_fee' => $lead->fee ?? 0
+                            ]) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-500/20 rounded-lg text-xs font-bold transition-colors whitespace-nowrap" title="Add to Fee Collection System">
+                                <i class="fas fa-rupee-sign text-xs"></i> Track Fees
+                            </a>
+                        @endif
 
                         <a href="{{ route('admin.tuition-leads.edit', $lead->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue rounded-lg text-xs font-bold transition-colors" title="Edit Tuition Requirement">
                             <i class="fas fa-edit text-xs"></i> Edit

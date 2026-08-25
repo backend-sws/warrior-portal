@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\TuitionApplication;
 use App\Models\HomeTuitionLead;
 use App\Models\ServiceChargeInvoice;
+use App\Models\TuitionFeeAccount;
 use App\Helpers\NotificationHelper;
+use App\Mail\TuitionApplicationStatusMail;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class TuitionApplicationController extends Controller
 {
@@ -98,7 +101,7 @@ class TuitionApplicationController extends Controller
         $lead = $application->tuitionLead;
         $candidate = $application->candidate;
 
-        // If status changed to Assigned, update HomeTuitionLead teacher assignment
+        // ─── 1. STATUS: ASSIGNED ─────────────────────────────────────
         if ($request->status === 'Assigned' && $lead) {
             $lead->update([
                 'teacher_name'    => $candidate->name,
@@ -109,9 +112,29 @@ class TuitionApplicationController extends Controller
             // Add follow-up record to lead
             $lead->followUps()->create([
                 'admin_id'       => auth()->id(),
-                'note'           => "Teacher assigned via Tuition Application: {$candidate->name} (Ph: {$candidate->phone})",
+                'note'           => "Teacher assigned: {$candidate->name} (Ph: {$candidate->phone}). Remarks: " . ($request->remarks ?: 'None'),
                 'follow_up_date' => now()->addDays(2)->toDateString(),
             ]);
+
+            // Auto-Sync with Parent Tuition Fee Account for collection tracking
+            if ($lead->fee && $lead->fee > 0) {
+                TuitionFeeAccount::firstOrCreate(
+                    ['mobile_number' => $lead->parent_mobile],
+                    [
+                        'parent_name'          => $lead->parent_name,
+                        'student_name'         => $lead->parent_name . ' (Student)',
+                        'address'              => $lead->location,
+                        'class'                => $lead->class,
+                        'subject'              => $lead->subjects,
+                        'teacher_name'         => $candidate->name,
+                        'teacher_joining_date' => now()->toDateString(),
+                        'monthly_fee'          => $lead->fee,
+                        'status'               => 'active',
+                        'payment_status'       => 'pending',
+                        'next_due_date'        => now()->addMonth()->toDateString(),
+                    ]
+                );
+            }
 
             // Generate Service Charge Invoice for Candidate if requested
             if ($request->boolean('create_service_charge') && $request->filled('service_charge_amount') && $request->service_charge_amount > 0) {
@@ -137,8 +160,8 @@ class TuitionApplicationController extends Controller
                 // Notify Candidate for invoice
                 NotificationHelper::notifyUser(
                     $candidate->id,
-                    'Service Charge Invoice Generated 🧾',
-                    "An invoice for ₹" . number_format($amount, 2) . " has been created for your Home Tuition assignment. Please pay by " . Carbon::parse($dueDate)->format('d M Y') . ".",
+                    '🧾 Service Charge Invoice Generated',
+                    "An invoice for ₹" . number_format($amount, 2) . " is generated for your Home Tuition assignment. Due Date: " . Carbon::parse($dueDate)->format('d M Y') . ". Please pay on time to avoid late fees.",
                     route('candidate.serviceCharge.show'),
                     'fas fa-file-invoice-dollar'
                 );
@@ -147,7 +170,7 @@ class TuitionApplicationController extends Controller
                 try {
                     Mail::to($candidate->email)->send(new \App\Mail\ServiceChargeInvoiceMail($invoice));
                 } catch (\Throwable $e) {
-                    // Ignore email failure
+                    Log::error("Invoice email failed for {$candidate->email}: " . $e->getMessage());
                 }
             }
 
@@ -155,35 +178,61 @@ class TuitionApplicationController extends Controller
             NotificationHelper::notifyUser(
                 $candidate->id,
                 'Tuition Assigned! 🎉',
-                "Congratulations! You have been assigned as the tutor for {$lead->class} ({$lead->subjects}) in {$lead->location}. Parent Contact: {$lead->parent_name} ({$lead->parent_mobile}).",
+                "Congratulations! You have been assigned as the tutor for Class {$lead->class} ({$lead->subjects}) in {$lead->location}. Parent Contact: {$lead->parent_name} ({$lead->parent_mobile}).",
                 route('candidate.applications.index', ['tab' => 'tuitions']),
                 'fas fa-chalkboard-teacher'
             );
-        } elseif ($request->status === 'Shortlisted' && $oldStatus !== 'Shortlisted') {
+
+            // Send full assignment status email
+            try {
+                Mail::to($candidate->email)->send(new TuitionApplicationStatusMail($application));
+            } catch (\Throwable $e) {
+                Log::error("Assignment email failed for {$candidate->email}: " . $e->getMessage());
+            }
+
+        // ─── 2. STATUS: SHORTLISTED ───────────────────────────────────
+        } elseif ($request->status === 'Shortlisted') {
             NotificationHelper::notifyUser(
                 $candidate->id,
                 'Shortlisted for Home Tuition ⭐',
-                "You have been shortlisted for {$lead?->class} ({$lead?->subjects}) in {$lead?->location}. Admin will contact you soon for the demo session.",
+                "You have been shortlisted for Class {$lead?->class} ({$lead?->subjects}) in {$lead?->location}. Admin will contact you soon for the trial demo session.",
                 route('candidate.applications.index', ['tab' => 'tuitions']),
                 'fas fa-star'
             );
-        } elseif ($request->status === 'Rejected' && $oldStatus !== 'Rejected') {
+
+            try {
+                Mail::to($candidate->email)->send(new TuitionApplicationStatusMail($application));
+            } catch (\Throwable $e) {
+                Log::error("Shortlist email failed for {$candidate->email}: " . $e->getMessage());
+            }
+
+        // ─── 3. STATUS: REJECTED ──────────────────────────────────────
+        } elseif ($request->status === 'Rejected') {
+            $reasonNote = $request->remarks ? " Reason: {$request->remarks}" : "";
+
             NotificationHelper::notifyUser(
                 $candidate->id,
-                'Tuition Application Update',
-                "Your application for {$lead?->class} ({$lead?->subjects}) was not shortlisted for this requirement.",
+                'Tuition Application Not Selected ❌',
+                "Your application for Class {$lead?->class} ({$lead?->subjects}) was not selected.{$reasonNote}",
                 route('candidate.applications.index', ['tab' => 'tuitions']),
-                'fas fa-info-circle'
+                'fas fa-times-circle'
             );
+
+            // Send rejection email with remarks/reason
+            try {
+                Mail::to($candidate->email)->send(new TuitionApplicationStatusMail($application));
+            } catch (\Throwable $e) {
+                Log::error("Rejection email failed for {$candidate->email}: " . $e->getMessage());
+            }
         }
 
-        // If Demo Date was scheduled
+        // ─── 4. DEMO DATE SCHEDULED ──────────────────────────────────
         if ($request->filled('demo_date') && $request->demo_date !== $application->getOriginal('demo_date')) {
             $formattedDemo = Carbon::parse($request->demo_date)->format('d M Y, h:i A');
             NotificationHelper::notifyUser(
                 $candidate->id,
                 'Demo Class Scheduled! 📅',
-                "Your demo session for {$lead?->class} ({$lead?->subjects}) is scheduled on {$formattedDemo}. Location: {$lead?->location}.",
+                "Your demo session for Class {$lead?->class} ({$lead?->subjects}) is scheduled on {$formattedDemo}. Location: {$lead?->location}.",
                 route('candidate.applications.index', ['tab' => 'tuitions']),
                 'fas fa-calendar-check'
             );

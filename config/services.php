@@ -35,12 +35,37 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Razorpay Payment Gateway (Commented Out)
+    |--------------------------------------------------------------------------
+    */
+    /*
     'razorpay' => [
         'key_id'         => env('RAZORPAY_KEY_ID', 'rzp_test_placeholder'),
         'key_secret'     => env('RAZORPAY_KEY_SECRET', 'secret_placeholder'),
         'webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET', ''),
         'currency'       => env('RAZORPAY_CURRENCY', 'INR'),
         'merchant_name'  => env('RAZORPAY_MERCHANT_NAME', 'Warriors Educare'),
+    ],
+    */
+
+    /*
+    |--------------------------------------------------------------------------
+    | PhonePe Payment Gateway (Active)
+    |--------------------------------------------------------------------------
+    */
+    'phonepe' => [
+        'merchant_id'    => env('PHONEPE_MERCHANT_ID', 'PGTESTPAYUAT86'),
+        'salt_key'       => env('PHONEPE_SALT_KEY', '96434309-7796-489d-8924-ab56988a6076'),
+        'salt_index'     => env('PHONEPE_SALT_INDEX', '1'),
+        'env'            => env('PHONEPE_ENV', 'UAT'), // 'UAT' or 'PRODUCTION'
+        'currency'       => env('PHONEPE_CURRENCY', 'INR'),
+        'merchant_name'  => env('PHONEPE_MERCHANT_NAME', 'Warriors Educare'),
+        // Base API URL
+        'base_url'       => env('PHONEPE_ENV', 'UAT') === 'PRODUCTION'
+                            ? 'https://api.phonepe.com/apis/hermes'
+                            : 'https://api-preprod.phonepe.com/apis/pg-sandbox',
     ],
 
 ];

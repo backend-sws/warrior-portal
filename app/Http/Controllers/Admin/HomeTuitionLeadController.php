@@ -39,9 +39,15 @@ class HomeTuitionLeadController extends Controller
         // Search
         if ($search = $request->input('search')) {
             $query->where(function($q) use ($search) {
-                $q->where('parent_name', 'like', "%{$search}%")
+                $q->where('tuition_id', 'like', "%{$search}%")
+                  ->orWhere('parent_name', 'like', "%{$search}%")
                   ->orWhere('parent_mobile', 'like', "%{$search}%")
+                  ->orWhere('teacher_name', 'like', "%{$search}%")
+                  ->orWhere('subjects', 'like', "%{$search}%")
                   ->orWhere('location', 'like', "%{$search}%");
+                if (is_numeric($search)) {
+                    $q->orWhere('id', $search);
+                }
             });
         }
 
@@ -64,9 +70,15 @@ class HomeTuitionLeadController extends Controller
         $baseQuery = HomeTuitionLead::query();
         if ($search) {
             $baseQuery->where(function($q) use ($search) {
-                $q->where('parent_name', 'like', "%{$search}%")
+                $q->where('tuition_id', 'like', "%{$search}%")
+                  ->orWhere('parent_name', 'like', "%{$search}%")
                   ->orWhere('parent_mobile', 'like', "%{$search}%")
+                  ->orWhere('teacher_name', 'like', "%{$search}%")
+                  ->orWhere('subjects', 'like', "%{$search}%")
                   ->orWhere('location', 'like', "%{$search}%");
+                if (is_numeric($search)) {
+                    $q->orWhere('id', $search);
+                }
             });
         }
         $stats = [
@@ -105,7 +117,10 @@ class HomeTuitionLeadController extends Controller
             'location' => 'required|string|max:255',
             'pincode' => 'nullable|string|max:20',
             'status' => 'required|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
+            'is_featured' => 'nullable|boolean',
         ]);
+
+        $validated['is_featured'] = $request->has('is_featured') ? true : false;
 
         $user = \App\Models\User::where('phone', $validated['parent_mobile'])->first();
 
@@ -153,11 +168,31 @@ class HomeTuitionLeadController extends Controller
             'location' => 'required|string|max:255',
             'pincode' => 'nullable|string|max:20',
             'status' => 'nullable|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
+            'is_featured' => 'nullable|boolean',
         ]);
+
+        $validated['is_featured'] = $request->has('is_featured') ? true : false;
 
         $lead->update($validated);
 
         return redirect()->route('admin.tuition-leads.index')->with('success', 'Tuition lead updated successfully.');
+    }
+
+    public function toggleFeatured($id)
+    {
+        $lead = HomeTuitionLead::findOrFail($id);
+        $lead->is_featured = !$lead->is_featured;
+        $lead->save();
+
+        $msg = $lead->is_featured 
+            ? 'Tuition requirement is now featured on the homepage!' 
+            : 'Tuition requirement removed from homepage featured list.';
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['success' => true, 'is_featured' => $lead->is_featured, 'message' => $msg]);
+        }
+
+        return redirect()->back()->with('success', $msg);
     }
 
     public function approve(Request $request, $id)

@@ -109,6 +109,15 @@ class ReminderController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'email', 'phone']);
 
+        $candidatesList = $allCandidates->map(function($c) {
+            return [
+                'id' => $c->id,
+                'name' => $c->name,
+                'email' => $c->email,
+                'phone' => $c->phone,
+            ];
+        });
+
         return view('admin.reminders.index', compact(
             'stats',
             'recentLogs',
@@ -119,7 +128,8 @@ class ReminderController extends Controller
             'upcomingInterviews',
             'upcomingDemos',
             'lateFeeInvoices',
-            'allCandidates'
+            'allCandidates',
+            'candidatesList'
         ));
     }
 
@@ -230,6 +240,48 @@ class ReminderController extends Controller
     }
 
     /**
+     * AJAX live search candidates for reminder center (Handles 10,000+ candidates efficiently)
+     */
+    public function searchCandidates(Request $request)
+    {
+        $q = trim($request->input('q', ''));
+        $category = $request->input('category', 'all');
+
+        $query = User::where('role', 'candidate')->with('profile');
+
+        if ($category === 'pending_agreement') {
+            $query->whereHas('profile', fn($sq) => $sq->where('is_agreement_signed', false)->orWhere('is_tuition_agreement_signed', false));
+        } elseif ($category === 'incomplete_profile') {
+            $query->whereHas('profile', fn($sq) => $sq->whereNull('resume_path')
+                ->orWhereNull('subject_id')
+                ->orWhereNull('highest_qualification_id')
+                ->orWhereNull('preferred_city_id')
+            );
+        }
+
+        if ($q !== '') {
+            $query->where(function($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%")
+                    ->orWhere('phone', 'like', "%{$q}%")
+                    ->orWhere('id', $q);
+            });
+        }
+
+        $candidates = $query->limit(50)->get(['id', 'name', 'email', 'phone'])->map(function($c) {
+            return [
+                'id' => $c->id,
+                'name' => $c->name,
+                'email' => $c->email,
+                'phone' => $c->phone,
+                'display' => "{$c->name} (" . ($c->phone ?: $c->email) . ") - #{$c->id}",
+            ];
+        });
+
+        return response()->json($candidates);
+    }
+
+    /**
      * Send Digital Agreement Signing Reminder
      */
     public function sendAgreementReminder(Request $request)
@@ -265,12 +317,20 @@ class ReminderController extends Controller
                 $candidate->profile->update(['agreement_status' => 'pending_signature']);
             }
 
+            try {
+                if ($candidate->email) {
+                    Mail::to($candidate->email)->send(new \App\Mail\AgreementPendingMail($candidate));
+                }
+            } catch (\Exception $e) {
+                Log::error("Agreement reminder email failed for {$candidate->email}: " . $e->getMessage());
+            }
+
             $count++;
         }
 
         $this->logReminderAction('agreement_signing', $count, null);
 
-        return back()->with('success', "✅ Agreement signing reminders sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Agreement signing reminders (Notification + Email) sent to {$count} candidate(s).");
     }
 
     /**
@@ -315,7 +375,9 @@ class ReminderController extends Controller
             );
 
             try {
-                Mail::to($candidate->email)->send(new \App\Mail\InterviewScheduledMail($application));
+                if ($candidate->email) {
+                    Mail::to($candidate->email)->send(new \App\Mail\InterviewReminderMail($application));
+                }
             } catch (\Exception $e) {
                 Log::error("Interview reminder email failed: " . $e->getMessage());
             }
@@ -325,7 +387,7 @@ class ReminderController extends Controller
 
         $this->logReminderAction('interview', $count, null);
 
-        return back()->with('success', "✅ Interview reminders sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Interview reminders (Notification + Email) sent to {$count} candidate(s).");
     }
 
     /**
@@ -368,12 +430,20 @@ class ReminderController extends Controller
                 'fas fa-chalkboard-teacher'
             );
 
+            try {
+                if ($candidate->email) {
+                    Mail::to($candidate->email)->send(new \App\Mail\TuitionDemoReminderMail($app));
+                }
+            } catch (\Exception $e) {
+                Log::error("Tuition demo reminder email failed for {$candidate->email}: " . $e->getMessage());
+            }
+
             $count++;
         }
 
         $this->logReminderAction('tuition_demo', $count, null);
 
-        return back()->with('success', "✅ Tuition demo reminders sent to {$count} tutor(s).");
+        return back()->with('success', "✅ Tuition demo reminders (Notification + Email) sent to {$count} tutor(s).");
     }
 
     /**
@@ -418,12 +488,20 @@ class ReminderController extends Controller
                 'fas fa-user-edit'
             );
 
+            try {
+                if ($candidate->email) {
+                    Mail::to($candidate->email)->send(new \App\Mail\ProfileCompletionReminderMail($candidate, $missing));
+                }
+            } catch (\Exception $e) {
+                Log::error("Profile completion reminder email failed for {$candidate->email}: " . $e->getMessage());
+            }
+
             $count++;
         }
 
         $this->logReminderAction('profile_completion', $count, null);
 
-        return back()->with('success', "✅ Profile completion reminders sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Profile completion reminders (Notification + Email) sent to {$count} candidate(s).");
     }
 
     /**

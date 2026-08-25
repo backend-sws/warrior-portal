@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', 'Login - Candidate, Parent & Institution Portal | Warriors Educare')
+@section('meta_description', 'Log in to your Warriors Educare account to access verified home tuition leads, school teaching jobs, and faculty recruitment services across India.')
+
 @section('content')
 <div x-data="loginRequirementModal()" class="min-h-[85vh] flex items-center justify-center bg-[#f4f7f5] py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
     <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden reveal">

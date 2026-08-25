@@ -4,64 +4,89 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-// 1. Create a dummy Employer User
-$employer = \App\Models\User::firstOrCreate(
+$employer = \App\Models\User::where('role', 'employer')->first() ?? \App\Models\User::firstOrCreate(
     ['email' => 'employer@example.com'],
     [
-        'name' => 'Dummy Employer',
+        'name' => 'Warrior Parent Partner',
         'password' => \Illuminate\Support\Facades\Hash::make('password'),
         'role' => 'employer'
     ]
 );
 
-// 2. Create Employer Tuitions (TuitionRequirement)
-$t1 = new App\Models\TuitionRequirement();
-$t1->employer_id = $employer->id;
-$t1->guest_name = 'Employer One';
-$t1->guest_phone = '1112223334';
-$t1->student_class = 'Class 8';
-$t1->board = 'CBSE';
-$t1->subjects = 'Mathematics';
-$t1->budget = '6000';
-$t1->location = 'Sector 14, Gurgaon';
-$t1->description = 'Looking for an experienced Mathematics tutor.';
-$t1->status = 'Pending';
-$t1->save();
+$tuitionsData = [
+    [
+        'guest_name' => 'Dr. Sunita Sharma',
+        'guest_phone' => '9876543210',
+        'student_class' => 'Class 10',
+        'board' => 'CBSE',
+        'subjects' => 'Mathematics & Science',
+        'budget' => '7,000',
+        'location' => 'Sector 56, Gurgaon',
+        'description' => 'Need an experienced tutor for Class 10 Board preparation.',
+        'status' => 'Pending'
+    ],
+    [
+        'guest_name' => 'Rajesh Verma',
+        'guest_phone' => '9811223344',
+        'student_class' => 'Class 12',
+        'board' => 'CBSE',
+        'subjects' => 'Physics & Chemistry',
+        'budget' => '9,500',
+        'location' => 'Indirapuram, Ghaziabad',
+        'description' => 'Require specialized teacher for competitive and board exam prep.',
+        'status' => 'Pending'
+    ],
+    [
+        'guest_name' => 'Anita Desai',
+        'guest_phone' => '9988776655',
+        'student_class' => 'Class 8',
+        'board' => 'ICSE',
+        'subjects' => 'English & Social Science',
+        'budget' => '5,500',
+        'location' => 'Koramangala, Bangalore',
+        'description' => 'Focus on grammar, comprehension and essay writing.',
+        'status' => 'Pending'
+    ],
+    [
+        'guest_name' => 'Vikram Malhotra',
+        'guest_phone' => '9765432109',
+        'student_class' => 'Class 9',
+        'board' => 'CBSE',
+        'subjects' => 'Mathematics',
+        'budget' => '6,000',
+        'location' => 'Bandra West, Mumbai',
+        'description' => 'Need home tutor for concept building and weekly tests.',
+        'status' => 'Pending'
+    ],
+    [
+        'guest_name' => 'Meenakshi Iyer',
+        'guest_phone' => '9123456789',
+        'student_class' => 'Class 11',
+        'board' => 'State Board',
+        'subjects' => 'Accountancy & Economics',
+        'budget' => '8,000',
+        'location' => 'Aliganj, Lucknow',
+        'description' => 'Looking for Commerce stream home tutor.',
+        'status' => 'Pending'
+    ],
+    [
+        'guest_name' => 'Pooja Agarwal',
+        'guest_phone' => '9871122334',
+        'student_class' => 'Class 6',
+        'board' => 'CBSE',
+        'subjects' => 'All Subjects',
+        'budget' => '4,500',
+        'location' => 'Rohini Sector 9, Delhi',
+        'description' => 'Daily homework assistance and foundational learning.',
+        'status' => 'Pending'
+    ]
+];
 
-$t2 = new App\Models\TuitionRequirement();
-$t2->employer_id = $employer->id;
-$t2->guest_name = 'Employer Two';
-$t2->guest_phone = '4443332221';
-$t2->student_class = 'Class 12';
-$t2->board = 'State Board';
-$t2->subjects = 'Biology';
-$t2->budget = '7500';
-$t2->location = 'Andheri West, Mumbai';
-$t2->description = 'Need an expert Biology tutor for board exams.';
-$t2->status = 'Pending';
-$t2->save();
+foreach ($tuitionsData as $t) {
+    \App\Models\TuitionRequirement::firstOrCreate(
+        ['guest_name' => $t['guest_name'], 'subjects' => $t['subjects']],
+        array_merge($t, ['employer_id' => $employer ? $employer->id : null])
+    );
+}
 
-// 3. Create Home Tuition Leads (HomeTuitionLead for tuitions page)
-$h1 = new App\Models\HomeTuitionLead();
-$h1->parent_name = 'Rajesh Kumar';
-$h1->parent_mobile = '9876501234';
-$h1->class = 'Class 10';
-$h1->board = 'ICSE';
-$h1->subjects = 'Science, Math';
-$h1->location = 'Koramangala, Bangalore';
-$h1->fee = '5000';
-$h1->status = 'New Lead';
-$h1->save();
-
-$h2 = new App\Models\HomeTuitionLead();
-$h2->parent_name = 'Sita Devi';
-$h2->parent_mobile = '9123456780';
-$h2->class = 'Class 5';
-$h2->board = 'CBSE';
-$h2->subjects = 'All Subjects';
-$h2->location = 'Vasant Kunj, New Delhi';
-$h2->fee = '3000';
-$h2->status = 'New Lead';
-$h2->save();
-
-echo "Dummy Tuition Posts & Leads created successfully!\n";
+echo "Added " . count($tuitionsData) . " Tuition posts successfully!\n";

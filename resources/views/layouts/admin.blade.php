@@ -211,6 +211,20 @@
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-5 mb-2 px-4">Payments & Finance
                 </div>
 
+                <a href="{{ route('admin.tuition-fees.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.tuition-fees.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-rupee-sign w-5 text-center"></i> Fee Collections
+                    @php
+                        $feeDueOverdueCount = \App\Models\TuitionFeeAccount::where('status', 'active')
+                            ->where(function($q) {
+                                $q->whereDate('next_due_date', today())
+                                  ->orWhere(function($q2) { $q2->where('next_due_date', '<', today())->where('payment_status', '!=', 'paid'); });
+                            })->count();
+                    @endphp
+                    @if($feeDueOverdueCount > 0)
+                        <span class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">{{ $feeDueOverdueCount }}</span>
+                    @endif
+                </a>
                 <a href="{{ route('admin.candidate-payments.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.candidate-payments.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-wallet w-5 text-center"></i> Candidate Payments

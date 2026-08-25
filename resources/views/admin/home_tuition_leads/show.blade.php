@@ -22,7 +22,12 @@
                     {{ strtoupper(substr($lead->parent_name, 0, 1)) }}
                 </div>
                 <div>
-                    <h2 class="text-xl font-bold text-text-main">{{ $lead->parent_name }}</h2>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-xl font-bold text-text-main">{{ $lead->parent_name }}</h2>
+                        <span class="font-mono text-xs font-bold text-accent-blue bg-accent-blue/10 px-2.5 py-0.5 rounded border border-accent-blue/20">
+                            {{ $lead->tuition_id ?: 'TUI-' . str_pad($lead->id, 4, '0', STR_PAD_LEFT) }}
+                        </span>
+                    </div>
                     <div class="text-sm text-text-dark/60 mt-1">Enquired {{ $lead->enquiry_date ? $lead->enquiry_date->format('M d, Y') : 'Unknown' }}</div>
                 </div>
             </div>

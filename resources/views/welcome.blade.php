@@ -1,6 +1,9 @@
-    @extends('layouts.app')
+@extends('layouts.app')
 
-    @section('content')
+@section('title', 'Warriors Educare — #1 Education Recruitment Agency & Verified Home Tutors in India')
+@section('meta_description', 'Connect with 10,000+ verified home tutors and certified school faculty across India. Fast matching, quality educators, and premium career placements.')
+
+@section('content')
     
     <!-- Welcome Modal -->
     <div x-data="{ 
@@ -28,7 +31,7 @@
          }" 
          x-init="setTimeout(() => { if(!sessionStorage.getItem('welcomeShown')) { showWelcomeModal = true; sessionStorage.setItem('welcomeShown', '1'); } }, 400);" 
          x-show="showWelcomeModal" 
-         class="fixed inset-0 z-[100] flex items-center justify-center bg-[#071520]/80 backdrop-blur-md p-4 sm:p-6"
+         class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-3 sm:p-6 overflow-y-auto"
          style="display: none;"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
@@ -37,93 +40,116 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
          
-        <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 max-w-4xl w-full relative overflow-hidden border border-slate-100" 
+        <div class="bg-white rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] p-5 sm:p-8 md:p-9 max-w-4xl w-full relative border border-slate-100 my-auto max-h-[92vh] flex flex-col justify-between overflow-y-auto" 
              @click.away="showWelcomeModal = false"
              x-show="showWelcomeModal"
              x-transition:enter="transition ease-out duration-400"
-             x-transition:enter-start="opacity-0 translate-y-6 scale-95"
+             x-transition:enter-start="opacity-0 translate-y-4 scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-             x-transition:leave-end="opacity-0 translate-y-6 scale-95">
+             x-transition:leave-end="opacity-0 translate-y-4 scale-95">
              
-            <!-- Close Button -->
+            <!-- Prominent Close Button -->
             <button @click="showWelcomeModal = false" 
-                    class="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 sm:w-10 sm:h-10 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 rounded-full flex items-center justify-center transition-all duration-200 z-20 shadow-sm">
-                <i class="fas fa-times text-sm sm:text-base"></i>
+                    type="button"
+                    title="Close Popup"
+                    aria-label="Close"
+                    class="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 sm:w-10 sm:h-10 bg-slate-100/90 hover:bg-red-50 hover:text-red-600 text-slate-600 rounded-full flex items-center justify-center transition-all duration-200 z-50 shadow-sm border border-slate-200/80 active:scale-90 cursor-pointer">
+                <i class="fas fa-times text-sm sm:text-base font-bold"></i>
             </button>
             
             <!-- Header -->
-            <div class="text-center mb-6 sm:mb-8 relative z-10">
-                <div class="inline-flex items-center gap-2 bg-blue-50 text-[#031b4e] px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border border-blue-100">
+            <div class="text-center mb-5 sm:mb-7 pr-8 sm:pr-0 relative z-10">
+                <div class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-900 px-3 py-1 rounded-full text-[10px] sm:text-xs font-extrabold uppercase tracking-wider mb-2 border border-blue-200/60 shadow-xs">
                     <i class="fas fa-sparkles text-amber-500"></i>
-                    <span>Educational Placement & Home Tutors</span>
+                    <span>India's Trusted Education Network</span>
                 </div>
-                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#031b4e] mb-1.5 tracking-tight">Welcome to Warriors Educare</h2>
-                <p class="text-slate-500 text-xs sm:text-sm md:text-base max-w-lg mx-auto">Please select what you are looking for today to get started.</p>
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-[#031b4e] mb-1 tracking-tight">Welcome to Warriors Educare</h2>
+                <p class="text-slate-500 text-xs sm:text-sm max-w-md mx-auto">Please select what you are looking for to get instant matching.</p>
             </div>
             
             <!-- 3 Interactive Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 relative z-10">
                 
                 <!-- Card 1: Hire a Home Tutor -->
                 <button type="button" 
                         @click="openTuitionRequirement()" 
-                        class="group relative rounded-2xl p-6 text-center transition-all duration-300 bg-gradient-to-b from-blue-50/60 to-white hover:from-[#031b4e] hover:to-[#0a2c7a] border-2 border-blue-100 hover:border-[#031b4e] shadow-md hover:shadow-2xl hover:-translate-y-1.5 flex flex-col items-center justify-between cursor-pointer">
-                    <div class="w-full flex flex-col items-center">
-                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white group-hover:bg-white/10 text-[#031b4e] group-hover:text-cyan-300 flex items-center justify-center text-2xl sm:text-3xl shadow-md group-hover:scale-110 transition-all duration-300 mb-4 border border-blue-100/80 group-hover:border-white/20">
+                        class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-br from-blue-50/80 via-blue-50/30 to-white hover:from-[#031b4e] hover:to-[#092b77] border-2 border-blue-100/90 hover:border-[#031b4e] shadow-sm hover:shadow-xl hover:-translate-y-1 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
+                    <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-blue-500/25 group-hover:scale-105 transition-all duration-300 md:mb-3.5 shrink-0">
                             <i class="fas fa-user-graduate"></i>
                         </div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-blue-600 group-hover:text-cyan-300 mb-1 transition-colors">For Parents & Students</span>
-                        <h3 class="text-base sm:text-lg font-black text-[#031b4e] group-hover:text-white mb-2 transition-colors">Hire a Home Tutor</h3>
-                        <p class="text-xs text-slate-500 group-hover:text-blue-100 leading-relaxed transition-colors">Find top rated verified home tutors in your city for all subjects & boards.</p>
+                        <div class="flex-grow text-left md:text-center">
+                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 group-hover:bg-white/20 group-hover:text-cyan-200 px-2 py-0.5 rounded-md mb-1 transition-colors">For Parents & Students</span>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-white mb-0.5 md:mb-1.5 transition-colors">Hire a Home Tutor</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-blue-100 leading-snug transition-colors hidden sm:block">Find verified & experienced home tutors for all classes & subjects.</p>
+                        </div>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-100 group-hover:border-white/10 w-full flex items-center justify-center gap-1.5 text-xs font-bold text-[#031b4e] group-hover:text-white transition-colors">
-                        <span>Fill Requirement</span>
-                        <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform"></i>
+                    <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 md:group-hover:border-white/15 w-auto md:w-full flex items-center justify-end md:justify-center gap-1.5 text-xs font-bold text-blue-700 group-hover:text-cyan-300 transition-colors shrink-0">
+                        <span class="hidden md:inline">Fill Requirement</span>
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-100 group-hover:bg-white/20 flex items-center justify-center text-blue-700 group-hover:text-white transition-colors">
+                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
+                        </div>
                     </div>
                 </button>
                 
                 <!-- Card 2: Hire Teachers & Staff -->
                 <button type="button" 
                         @click="openSchoolRequirement()" 
-                        class="group relative rounded-2xl p-6 text-center transition-all duration-300 bg-gradient-to-b from-indigo-50/60 to-white hover:from-[#031b4e] hover:to-[#0a2c7a] border-2 border-indigo-100 hover:border-[#031b4e] shadow-md hover:shadow-2xl hover:-translate-y-1.5 flex flex-col items-center justify-between cursor-pointer">
-                    <div class="w-full flex flex-col items-center">
-                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white group-hover:bg-white/10 text-indigo-700 group-hover:text-cyan-300 flex items-center justify-center text-2xl sm:text-3xl shadow-md group-hover:scale-110 transition-all duration-300 mb-4 border border-indigo-100/80 group-hover:border-white/20">
+                        class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-br from-indigo-50/80 via-purple-50/30 to-white hover:from-[#031b4e] hover:to-[#092b77] border-2 border-indigo-100/90 hover:border-[#031b4e] shadow-sm hover:shadow-xl hover:-translate-y-1 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
+                    <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-indigo-500/25 group-hover:scale-105 transition-all duration-300 md:mb-3.5 shrink-0">
                             <i class="fas fa-school"></i>
                         </div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 group-hover:text-cyan-300 mb-1 transition-colors">For Schools & Institutes</span>
-                        <h3 class="text-base sm:text-lg font-black text-[#031b4e] group-hover:text-white mb-2 transition-colors">Hire Teachers & Staff</h3>
-                        <p class="text-xs text-slate-500 group-hover:text-blue-100 leading-relaxed transition-colors">Access 10,000+ qualified PGT, TGT, PRT faculty & academic staff.</p>
+                        <div class="flex-grow text-left md:text-center">
+                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-indigo-100 text-indigo-800 group-hover:bg-white/20 group-hover:text-cyan-200 px-2 py-0.5 rounded-md mb-1 transition-colors">For Schools & Institutes</span>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-white mb-0.5 md:mb-1.5 transition-colors">Hire School Faculty</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-blue-100 leading-snug transition-colors hidden sm:block">Access 10,000+ pre-verified PGT, TGT, PRT teachers & staff.</p>
+                        </div>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-100 group-hover:border-white/10 w-full flex items-center justify-center gap-1.5 text-xs font-bold text-[#031b4e] group-hover:text-white transition-colors">
-                        <span>Post Faculty Need</span>
-                        <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform"></i>
+                    <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 md:group-hover:border-white/15 w-auto md:w-full flex items-center justify-end md:justify-center gap-1.5 text-xs font-bold text-indigo-700 group-hover:text-cyan-300 transition-colors shrink-0">
+                        <span class="hidden md:inline">Post Faculty Need</span>
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-100 group-hover:bg-white/20 flex items-center justify-center text-indigo-700 group-hover:text-white transition-colors">
+                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
+                        </div>
                     </div>
                 </button>
                 
                 <!-- Card 3: Join as Teacher / Tutor -->
                 <a href="{{ route('candidate.register') }}" 
-                   class="group relative rounded-2xl p-6 text-center transition-all duration-300 bg-gradient-to-b from-amber-50/60 to-white hover:from-[#031b4e] hover:to-[#0a2c7a] border-2 border-amber-100 hover:border-[#031b4e] shadow-md hover:shadow-2xl hover:-translate-y-1.5 flex flex-col items-center justify-between cursor-pointer">
-                    <div class="w-full flex flex-col items-center">
-                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white group-hover:bg-white/10 text-amber-600 group-hover:text-amber-300 flex items-center justify-center text-2xl sm:text-3xl shadow-md group-hover:scale-110 transition-all duration-300 mb-4 border border-amber-100/80 group-hover:border-white/20">
+                   class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-br from-amber-50/80 via-amber-50/30 to-white hover:from-[#031b4e] hover:to-[#092b77] border-2 border-amber-100/90 hover:border-[#031b4e] shadow-sm hover:shadow-xl hover:-translate-y-1 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
+                    <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-amber-500/25 group-hover:scale-105 transition-all duration-300 md:mb-3.5 shrink-0">
                             <i class="fas fa-chalkboard-teacher"></i>
                         </div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 group-hover:text-amber-300 mb-1 transition-colors">For Teachers & Tutors</span>
-                        <h3 class="text-base sm:text-lg font-black text-[#031b4e] group-hover:text-white mb-2 transition-colors">Join as Teacher / Tutor</h3>
-                        <p class="text-xs text-slate-500 group-hover:text-blue-100 leading-relaxed transition-colors">Find school teaching jobs & home tuition opportunities in your city.</p>
+                        <div class="flex-grow text-left md:text-center">
+                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-900 group-hover:bg-white/20 group-hover:text-amber-200 px-2 py-0.5 rounded-md mb-1 transition-colors">For Teachers & Tutors</span>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-white mb-0.5 md:mb-1.5 transition-colors">Join as Teacher / Tutor</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-blue-100 leading-snug transition-colors hidden sm:block">Find verified home tuitions & school teaching jobs in your city.</p>
+                        </div>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-100 group-hover:border-white/10 w-full flex items-center justify-center gap-1.5 text-xs font-bold text-[#031b4e] group-hover:text-white transition-colors">
-                        <span>Register Free</span>
-                        <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform"></i>
+                    <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 md:group-hover:border-white/15 w-auto md:w-full flex items-center justify-end md:justify-center gap-1.5 text-xs font-bold text-amber-700 group-hover:text-amber-300 transition-colors shrink-0">
+                        <span class="hidden md:inline">Register Free</span>
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-100 group-hover:bg-white/20 flex items-center justify-center text-amber-700 group-hover:text-white transition-colors">
+                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
+                        </div>
                     </div>
                 </a>
 
             </div>
             
+            <!-- Bottom Skip Button -->
+            <div class="mt-4 sm:mt-5 pt-3 text-center border-t border-slate-100 relative z-10">
+                <button type="button" @click="showWelcomeModal = false" class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer">
+                    <span>Continue to Website</span>
+                    <i class="fas fa-arrow-right text-[10px]"></i>
+                </button>
+            </div>
+            
             <!-- Decorative blurred backdrop circles -->
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-cyan-100/50 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-100/40 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-indigo-100/40 rounded-full blur-3xl pointer-events-none"></div>
         </div>
     </div>
     
@@ -234,10 +260,10 @@
                     <span class="text-[10px] font-extrabold text-gray-800 tracking-wider uppercase">Tutors & Mentors</span>
                 </div>
                 
-                <h1 id="hero-title" class="text-5xl lg:text-[4.5rem] xl:text-[5rem] leading-[1.1] font-extrabold tracking-tight text-[#0a1922] mb-8 relative z-20">
-                    Find the Right Tutor. Hire the Right Teacher. Build the Right <br>
-                    <div class="relative w-max mt-4 mb-2">
-                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">Team.</span>
+                <h1 id="hero-title" class="text-4xl sm:text-5xl lg:text-[4rem] xl:text-[4.4rem] leading-[1.15] font-extrabold tracking-tight text-[#0a1922] mb-8 relative z-20">
+                    School Staffing & Home Tuition Solutions <br>
+                    <div class="relative w-max mt-3 sm:mt-4 mb-2">
+                        <span class="bg-[#fbc043] text-[#1d2542] px-5 sm:px-6 py-2 md:py-2.5 rounded-full inline-block relative z-20 shadow-md">Under One Roof.</span>
                     </div>
                 </h1>
 
@@ -357,7 +383,7 @@
                             
                             <!-- Inner Box (Stats) -->
                             <div class="bg-gradient-to-r from-gray-100 to-gray-300 rounded-[1.5rem] p-6 lg:p-8 shadow-xl relative z-10 mr-6 w-[200px] lg:w-[240px]">
-                                <h3 class="text-[#031b4e] text-3xl lg:text-4xl font-black mb-1">12+</h3>
+                                <h3 class="text-[#031b4e] text-3xl lg:text-4xl font-black mb-1">7+</h3>
                                 <p class="text-[11px] lg:text-xs font-extrabold text-gray-700 uppercase tracking-widest">Years of<br>Experience</p>
                                 
                                 <!-- Overlapping Arrow Button -->
@@ -428,8 +454,9 @@
                             </div>
                         </div>
 
-                        <a href="#" class="inline-flex items-center justify-center bg-[#031b4e] hover:hover:bg-[#021030] text-white font-bold py-3 px-8 rounded-full transition-colors">
-                            Join Our Network <i class="fas fa-arrow-right ml-2"></i>
+                        <a href="{{ route('candidate.register') }}" class="inline-flex items-center justify-center bg-[#031b4e] hover:bg-[#092b77] text-white font-bold py-3.5 px-8 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 group">
+                            <span>Join Our Network</span>
+                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                         </a>
                     </div>
                 </div>
@@ -529,51 +556,79 @@
 
 
     <!-- Categories Section -->
-        <section class="py-16 px-6 lg:px-[5%] relative bg-slate-50">
+        <section class="py-12 sm:py-16 px-4 sm:px-6 lg:px-[5%] relative bg-slate-50">
             <style>
                 .category-card {
                     background: linear-gradient(135deg, #1e3a8a 0%, #031b4e 100%);
-                    border-radius: 1.2rem;
+                    border-radius: 1rem;
                     position: relative;
                     overflow: hidden;
-                    height: 140px;
-                    box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
+                    min-height: 115px;
+                    box-shadow: 0 6px 16px -4px rgba(3, 27, 78, 0.25);
                     transition: transform 0.3s ease, box-shadow 0.3s ease;
-                    transform: skewX(-10deg);
-                    margin: 0 5px; /* Add slight margin so they don't stick together due to skew */
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
                 }
-                .category-card:hover {
-                    transform: skewX(-10deg) translateY(-5px);
-                    box-shadow: 0 15px 25px -5px rgba(0,0,0,0.3);
+                
+                @media (min-width: 768px) {
+                    .category-card {
+                        border-radius: 1.2rem;
+                        min-height: 140px;
+                        height: 140px;
+                        transform: skewX(-10deg);
+                        margin: 0 4px;
+                    }
+                    .category-card:hover {
+                        transform: skewX(-10deg) translateY(-5px);
+                        box-shadow: 0 15px 25px -5px rgba(3, 27, 78, 0.35);
+                    }
+                    .category-inner {
+                        transform: skewX(10deg);
+                        margin: 0 -12px;
+                        padding: 1.25rem 22px !important;
+                    }
+                    .category-top-right-shape {
+                        top: -30px !important;
+                        right: 0px !important;
+                        width: 95px !important;
+                        height: 95px !important;
+                        border-radius: 24px !important;
+                    }
+                    .category-icon-container {
+                        top: 14px !important;
+                        right: 30px !important;
+                    }
                 }
+
                 .category-inner {
-                    transform: skewX(10deg);
                     height: 100%;
-                    padding: 1.25rem;
+                    padding: 0.875rem 0.75rem;
                     display: flex;
                     flex-direction: column;
                     justify-content: flex-end;
                     text-align: left;
                     position: relative;
-                    margin: 0 -15px; /* expand slightly to cover skewed corners properly */
-                    padding: 1.25rem 25px; /* adjust padding for the expanded margin */
+                    width: 100%;
                 }
+
                 .category-top-right-shape {
                     position: absolute;
-                    top: -30px;
-                    right: 0px;
-                    width: 100px;
-                    height: 100px;
+                    top: -18px;
+                    right: -10px;
+                    width: 58px;
+                    height: 58px;
                     background: white;
-                    border-radius: 24px;
+                    border-radius: 16px;
                     transform: rotate(45deg);
-                    box-shadow: -5px 5px 15px rgba(0,0,0,0.15);
+                    box-shadow: -3px 3px 10px rgba(0,0,0,0.12);
                     z-index: 1;
                 }
+
                 .category-icon-container {
                     position: absolute;
-                    top: 15px;
-                    right: 35px;
+                    top: 8px;
+                    right: 8px;
                     z-index: 2;
                     display: flex;
                     align-items: center;
@@ -581,7 +636,7 @@
                 }
             </style>
             
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 relative z-10">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6 relative z-10">
                 @foreach($categories as $category)
                 <a href="{{ route('category.jobs', $category->id) }}"
                     class="block category-card group reveal no-underline">
@@ -592,7 +647,7 @@
                         
                         <!-- Icon -->
                         <div class="category-icon-container group-hover:scale-110 transition-transform">
-                            <svg width="45" height="45" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="w-6 h-6 sm:w-7 sm:h-7 md:w-9 md:h-9" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                               <!-- Users -->
                               <g fill="#009ee3">
                                 <!-- Left -->
@@ -618,10 +673,12 @@
                         </div>
                         
                         <!-- Text Content (Bottom Left) -->
-                        <div class="relative z-10">
-                            <h3 class="text-white text-[17px] font-semibold tracking-wide mb-1 leading-tight">{{ $category->name }}</h3>
-                            <div class="text-white text-[19px] font-bold">
-                                {{ $category->jobs_count }}
+                        <div class="relative z-10 pr-2">
+                            <h3 class="text-white text-[13px] sm:text-[14px] md:text-[16px] font-semibold tracking-normal mb-1 leading-snug line-clamp-2" title="{{ $category->name }}">
+                                {{ $category->name }}
+                            </h3>
+                            <div class="text-white text-[15px] sm:text-[17px] md:text-[19px] font-bold">
+                                {{ $category->jobs_count ?? 0 }}
                             </div>
                         </div>
                     </div>
@@ -693,11 +750,11 @@
 
                     <!-- Footer -->
                     <div class="flex h-[52px] mt-auto">
-                        <div class="w-[45%] bg-[#3b82f6] text-white/90 flex items-center justify-center gap-2 text-[11px] font-bold">
-                            <i class="fas fa-info-circle opacity-60"></i> Details
-                        </div>
-                        <a href="{{ route('service.details', $service->slug) }}" class="w-[55%] bg-[#031b4e] text-white flex items-center justify-center gap-2 text-[12px] font-bold hover:bg-[#021030] transition-colors">
-                            Explore Now <i class="fas fa-arrow-right"></i>
+                        <a href="{{ route('service.details', $service->slug) }}" class="w-[45%] bg-[#3b82f6] hover:bg-[#2563eb] text-white flex items-center justify-center gap-2 text-[12px] font-bold transition-colors">
+                            <i class="fas fa-info-circle text-[13px] opacity-80"></i> Details
+                        </a>
+                        <a href="{{ route('service.details', $service->slug) }}" class="w-[55%] bg-[#031b4e] hover:bg-[#021030] text-white flex items-center justify-center gap-2 text-[12px] font-bold transition-colors">
+                            Explore Now <i class="fas fa-arrow-right text-[11px]"></i>
                         </a>
                     </div>
                 </div>
@@ -723,73 +780,79 @@
             </div>
 
 
-            <!-- Recent Tuition Cards Slider -->
+            <!-- Featured Tuition Cards Grid -->
             <div class="max-w-7xl mx-auto mb-20 relative z-10 reveal">
-                    <div class="flex justify-between items-center mb-6 px-4 xl:px-0">
-                      <h3 class="text-2xl font-bold text-[#031b4e]">Recent Tuition Posts</h3>
-                      <!-- Navigation Buttons -->
-                      <div class="flex gap-2">
-                          <button id="tuitionSliderPrev" class="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-[#031b4e] hover:border-[#031b4e] hover:bg-slate-50 flex items-center justify-center transition-all shadow-sm">
-                              <i class="fas fa-chevron-left"></i>
-                          </button>
-                          <button id="tuitionSliderNext" class="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-[#031b4e] hover:border-[#031b4e] hover:bg-slate-50 flex items-center justify-center transition-all shadow-sm">
-                              <i class="fas fa-chevron-right"></i>
-                          </button>
-                      </div>
-                  </div>
-                  
-                  <style>
-                      .hide-scrollbar::-webkit-scrollbar { display: none; }
-                      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-                  </style>
-                  
-                  <div id="tuitionCardsSlider" class="flex overflow-x-auto gap-6 pb-8 pt-2 px-4 xl:px-0 snap-x snap-mandatory hide-scrollbar cursor-grab active:cursor-grabbing">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                    <div>
+                        <h3 class="text-2xl sm:text-3xl font-black text-[#031b4e] tracking-tight">Featured Tuition Requirements</h3>
+                        <p class="text-slate-500 text-xs sm:text-sm mt-1">Verified home tuition requirements ready for qualified tutors.</p>
+                    </div>
+                    <a href="{{ route('tuitions') }}" class="inline-flex items-center gap-2 bg-[#031b4e] hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md">
+                        <span>Explore All Tuitions</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     @forelse($employerTuitions as $tuition)
-                        <div class="min-w-[85vw] md:min-w-[350px] bg-white rounded-2xl border border-blue-50 flex-shrink-0 snap-center relative overflow-hidden flex flex-col shadow-sm">
-                            <!-- Top Right Dark Blue Background -->
-                            <div class="absolute top-0 right-0 w-[45%] h-[45%] bg-[#031b4e] z-0"></div>
-                            <!-- Bottom Left Bright Blue Background -->
-                            <div class="absolute bottom-0 left-0 w-[35%] h-[25%] bg-[#3b82f6] z-0"></div>
+                        <div class="bg-white rounded-2xl border border-slate-200/80 hover:border-blue-300 shadow-[0_6px_20px_rgba(3,27,78,0.06)] hover:shadow-[0_12px_30px_rgba(3,27,78,0.12)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden group h-full">
+                            
+                            <!-- Top Accent Bar -->
+                            <div class="h-1.5 w-full bg-gradient-to-r from-[#031b4e] via-blue-600 to-sky-400"></div>
 
-                            <div class="p-5 relative z-10 flex flex-col h-full">
-                                <!-- Top row (badges) -->
-                                <div class="flex justify-between items-start mb-6">
-                                    <div class="bg-[#031b4e] text-white px-4 py-1.5 rounded-full text-xs font-bold">{{ $tuition->student_class }}</div>
-                                    <div class="bg-white text-emerald-600 px-4 py-1.5 rounded-lg text-sm font-bold border border-emerald-50 shadow-md">₹{{ $tuition->budget }}<span class="text-xs font-medium">/mo</span></div>
+                            <div class="p-5 sm:p-6 flex flex-col flex-grow">
+                                <!-- Top Row (Class Badge & Verified) -->
+                                <div class="flex items-center justify-between gap-2 mb-4">
+                                    <span class="inline-flex items-center gap-1.5 bg-[#031b4e] text-white px-3 py-1 rounded-full text-xs font-bold shadow-xs">
+                                        <i class="fas fa-graduation-cap text-sky-300 text-[11px]"></i>
+                                        {{ $tuition->class ?? $tuition->student_class ?? 'Class 10' }}
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 bg-emerald-50 border border-emerald-200 text-emerald-700 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
+                                        <i class="fas fa-check-circle text-emerald-500 text-[10px]"></i> Verified
+                                    </span>
                                 </div>
-                                
+
                                 <!-- Subject -->
-                                <h4 class="text-xl font-extrabold text-[#031b4e] mb-4">{{ $tuition->subjects }}</h4>
-                                
-                                <!-- Inner white box -->
-                                <div class="bg-white rounded-xl border border-[#031b4e] p-4 mb-6 relative z-20 shadow-[0_0_20px_rgba(0,0,0,0.25)]">
-                                    <div class="space-y-4">
-                                        <p class="text-sm text-slate-700 flex items-center gap-3">
-                                            <span class="w-8 h-8 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-red-500 flex items-center justify-center shrink-0 border border-gray-50"><i class="fas fa-map-marker-alt"></i></span> 
-                                            <span class="truncate font-medium">{{ $tuition->location }}</span>
-                                        </p>
-                                        <p class="text-sm text-slate-700 flex items-center gap-3">
-                                            <span class="w-8 h-8 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-purple-600 flex items-center justify-center shrink-0 border border-gray-50"><i class="fas fa-book"></i></span> 
-                                            <span class="truncate font-medium">{{ $tuition->board }}</span>
-                                        </p>
-                                        <p class="text-sm text-slate-700 flex items-center gap-3">
-                                            <span class="w-8 h-8 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-amber-500 flex items-center justify-center shrink-0 border border-gray-50"><i class="fas fa-user-circle"></i></span> 
-                                            <span class="truncate font-medium">{{ $tuition->employer ? ($tuition->employer->name === 'Super Admin' ? 'Warriors Educare' : $tuition->employer->name) : $tuition->guest_name }}</span>
-                                        </p>
+                                <h4 class="text-lg font-extrabold text-[#031b4e] mb-3.5 group-hover:text-blue-600 transition-colors line-clamp-1" title="{{ $tuition->subjects ?? 'All Subjects' }}">
+                                    {{ $tuition->subjects ?? 'All Subjects' }}
+                                </h4>
+
+                                <!-- Info Box -->
+                                <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-100 space-y-2.5 mb-5 flex-grow">
+                                    <div class="flex items-start gap-2.5 text-xs text-slate-600">
+                                        <div class="w-6 h-6 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                                            <i class="fas fa-map-marker-alt text-[11px]"></i>
+                                        </div>
+                                        <span class="truncate font-medium pt-0.5" title="{{ $tuition->location ?? 'Location on Request' }}">
+                                            {{ $tuition->location ?? 'Location on Request' }}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2.5 text-xs text-slate-600">
+                                        <div class="w-6 h-6 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 shadow-xs">
+                                            <i class="fas fa-book-open text-[10px]"></i>
+                                        </div>
+                                        <span class="truncate font-medium">
+                                            {{ $tuition->board ? $tuition->board : 'CBSE / All Boards' }}
+                                        </span>
                                     </div>
                                 </div>
-                                
-                                <!-- Footer row -->
-                                <div class="flex justify-between items-center mt-auto relative z-20">
-                                    <div class="absolute -top-3 left-0 w-full h-[1px] bg-slate-200 z-10"></div>
-                                    <span class="text-[11px] font-medium text-slate-500 bg-white/60 backdrop-blur-sm border border-slate-200/50 px-2 py-1 rounded flex items-center gap-1 shadow-sm relative z-20 mt-1"><i class="far fa-clock"></i> {{ $tuition->created_at->diffForHumans() }}</span>
-                                    <a href="{{ auth()->check() ? route('candidate.tuitions.index') : route('contact') }}" class="inline-flex items-center gap-2 bg-[#031b4e] text-white hover:bg-blue-900 px-5 py-2.5 rounded-lg font-bold text-sm transition-colors shadow-lg relative z-20">Apply Now <i class="fas fa-arrow-right"></i></a>
+
+                                <!-- Footer Row -->
+                                <div class="flex items-center justify-between pt-3.5 border-t border-slate-100 mt-auto">
+                                    <span class="text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
+                                        <i class="far fa-clock text-slate-300"></i> {{ $tuition->created_at ? $tuition->created_at->diffForHumans() : 'Recently' }}
+                                    </span>
+                                    <a href="{{ auth()->check() ? route('candidate.tuitions.index') : route('contact') }}" class="inline-flex items-center gap-1.5 bg-[#031b4e] hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-xs transition-all shadow-md group-hover:shadow-blue-500/20">
+                                        <span>Apply Now</span>
+                                        <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <div class="w-full text-center py-12 bg-white/40 backdrop-blur-sm rounded-2xl shadow-sm border border-white/20">
-                            <p class="text-slate-500 font-semibold">No recent tuition posts available.</p>
+                        <div class="col-span-full text-center py-12 bg-white rounded-2xl shadow-sm border border-slate-200/60">
+                            <i class="fas fa-chalkboard-teacher text-slate-300 text-3xl mb-3 block"></i>
+                            <p class="text-slate-500 font-semibold text-sm">No featured tuition posts currently available.</p>
                         </div>
                     @endforelse
                 </div>

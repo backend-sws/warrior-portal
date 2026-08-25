@@ -315,77 +315,111 @@
 
                     <!-- Terms Box -->
                     <div class="bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl p-6 mb-6 h-64 overflow-y-auto text-sm text-[#031b4e]/80 custom-scrollbar">
-                        <h4 class="font-bold text-[#031b4e] mb-4 text-center">TEACHER PLACEMENT SERVICE AGREEMENT</h4>
-                        
-                        <p class="mb-4">This Agreement is entered into voluntarily between Warriors Educare ("Agency") and the undersigned Candidate ("Teacher").</p>
+                        <div class="text-center mb-6">
+                            <h3 class="text-base font-black text-[#031b4e]">WARRIORS EDUCARE</h3>
+                            <h4 class="font-bold text-sm text-[#0ea5e9] tracking-wider uppercase">TEACHER PLACEMENT SERVICE AGREEMENT</h4>
+                            <p class="text-xs text-slate-500 mt-1">This Agreement is entered into voluntarily between Warriors Educare ("Agency") and the undersigned Candidate ("Teacher").</p>
+                        </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">1. Purpose of Agreement</h5>
-                        <p class="mb-4">This Agreement confirms that the Candidate willingly authorizes Warriors Educare to begin the recruitment and placement process for suitable teaching opportunities.</p>
+                        <div class="space-y-4 text-slate-700">
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">1. Purpose of Agreement</h5>
+                                <p>This Agreement confirms that the Candidate willingly authorizes Warriors Educare to begin the recruitment and placement process for suitable teaching opportunities.</p>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">2. Candidate Declaration</h5>
-                        <p class="mb-2">The Candidate declares that:</p>
-                        <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>All information and documents submitted are true and genuine.</li>
-                            <li>Any false information or forged document may result in immediate cancellation of registration and placement without any refund.</li>
-                            <li>The Candidate agrees to cooperate throughout the recruitment process.</li>
-                        </ul>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">2. Candidate Declaration</h5>
+                                <p class="mb-1">The Candidate declares that:</p>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>All information and documents submitted are true and genuine.</li>
+                                    <li>Any false information or forged document may result in immediate cancellation of registration and placement without any refund.</li>
+                                    <li>The Candidate agrees to cooperate throughout the recruitment process.</li>
+                                </ul>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">3. Document Verification</h5>
-                        <p class="mb-2">The Candidate shall provide all required documents, including but not limited to:</p>
-                        <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>Aadhaar Card</li>
-                            <li>Salary slip/Account statement</li>
-                            <li>Passport-size Photograph</li>
-                            <li>Any other document required by the school or Warriors Educare.</li>
-                        </ul>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">3. Document Verification</h5>
+                                <p class="mb-1">The Candidate shall provide all required documents, including but not limited to:</p>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Aadhaar Card</li>
+                                    <li>Salary slip / Account statement</li>
+                                    <li>Passport-size Photograph</li>
+                                    <li>Any other document required by the school/institution or Warriors Educare.</li>
+                                </ul>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">4. Registration Charges</h5>
-                        <p class="mb-2">The Candidate agrees to pay a non-refundable Registration Fee of ₹1,000, payable as follows:</p>
-                        <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>₹500 at the time of registration to initiate the recruitment process.</li>
-                            <li>₹500 immediately after selection by the school and before joining.</li>
-                        </ul>
-                        <p class="mb-4">Registration fees are charged for profile verification, documentation, screening, interview coordination and placement services. These charges are non-refundable.</p>
-                        <p class="mb-4"><strong>Registration Validity:</strong> The registration shall remain valid for 8 (Eight) months from the date of registration. During this period, Warriors Educare will make reasonable efforts to arrange up to 4–5 suitable interviews, subject to the Candidate's qualifications, preferred location, salary expectations and the availability of vacancies. The registration is non-transferable and non-refundable. After the expiry of the validity period, a fresh registration and the applicable registration fee may be required to continue placement services.</p>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">4. Registration Charges</h5>
+                                <p class="mb-1">The Candidate agrees to pay a non-refundable Registration Fee of ₹1,000, payable as follows:</p>
+                                <ul class="list-disc pl-5 space-y-1 mb-2">
+                                    <li><strong>₹500</strong> at the time of registration to initiate the recruitment process.</li>
+                                    <li><strong>₹500</strong> immediately after selection by the school/Institution and before joining.</li>
+                                </ul>
+                                <p class="mb-2 text-xs text-slate-600">Registration fees are charged for profile verification, documentation, screening, interview coordination and placement services. These charges are non-refundable.</p>
+                                <p class="text-xs bg-blue-50 p-2.5 rounded-lg border border-blue-100 text-blue-950">
+                                    <strong>Registration Validity:</strong> The registration shall remain valid for 8 (Eight) months from the date of registration. During this period, Warriors Educare will make reasonable efforts to arrange up to 4–5 suitable interviews, subject to the Candidate's qualifications, preferred location, salary expectations and the availability of vacancies. The registration is non-transferable and non-refundable. After the expiry of the validity period, a fresh registration and the applicable registration fee may be required to continue placement services.
+                                </p>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">5. Placement Service Charge</h5>
-                        <p class="mb-4">After joining the school/Institution and receiving the first month's salary/payment, the Candidate agrees to pay 50% of the first month's salary (equivalent to 15 days' salary) to Warriors Educare as the Placement Service Charge.</p>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">5. Placement Service Charge</h5>
+                                <p>After joining the school/Institution and receiving the first month's salary/payment, the Candidate agrees to pay <strong>50% of the first month's gross salary (equivalent to 15 days' salary)</strong> to Warriors Educare as the Placement Service Charge.</p>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">6. Payment Timeline & Delay Charges</h5>
-                        <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>The Placement Service Charge must be paid within 12 hours of receiving the first salary/payment from the school/Institution.</li>
-                            <li>If payment is not made within the prescribed time, a Late Payment Penalty of ₹300 per day shall be applicable until full payment is received.</li>
-                            <li>Warriors Educare reserves the right to suspend future placement services until all dues are cleared.</li>
-                        </ul>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">6. Payment Timeline & Delay Charges</h5>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>The Placement Service Charge must be paid <strong>within 12 hours</strong> of receiving the first salary/payment from the school/Institution.</li>
+                                    <li>If payment is not made within the prescribed time, a <strong>Late Payment Penalty of ₹300 per day</strong> shall be applicable until full payment is received.</li>
+                                    <li>Warriors Educare reserves the right to suspend future placement services until all dues are cleared.</li>
+                                </ul>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">7. Job Placement</h5>
-                        <p class="mb-4">Warriors Educare provides recruitment and placement assistance only. Final selection, salary, benefits, probation, working conditions and employment terms shall be decided solely by the respective school/Institution.</p>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">7. Job Placement</h5>
+                                <p>Warriors Educare provides recruitment and placement assistance only. Final selection, salary, benefits, probation, working conditions and employment terms shall be decided solely by the respective school/Institution.</p>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">8. Joining Commitment</h5>
-                        <p class="mb-4">If the Candidate accepts the offer and confirms joining, they shall not refuse or leave before joining without a genuine reason and prior written/intimated notice to Warriors Educare.</p>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">8. Joining Commitment</h5>
+                                <p>If the Candidate accepts the offer and confirms joining, they shall not refuse or leave before joining without a genuine reason and prior written/intimated notice to Warriors Educare.</p>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">9. Professional Conduct</h5>
-                        <p class="mb-4">The Candidate shall maintain professionalism, honesty, discipline and comply with all school policies. Any misconduct, indiscipline or fraudulent activity may result in blacklisting from Warriors Educare.</p>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">9. Professional Conduct</h5>
+                                <p>The Candidate shall maintain professionalism, honesty, discipline and comply with all school policies. Any misconduct, indiscipline or fraudulent activity may result in blacklisting from Warriors Educare.</p>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">10. Confidentiality</h5>
-                        <p class="mb-4">The Candidate shall not disclose confidential information relating to Warriors Educare, the recruiting school or students to any third party.</p>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">10. Confidentiality</h5>
+                                <p>The Candidate shall not disclose confidential information relating to Warriors Educare, the recruiting school or students to any third party.</p>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">11. No Job Guarantee</h5>
-                        <p class="mb-4">Registration with Warriors Educare does not guarantee job placement. Selection depends entirely on the school's/Institutions requirements, interview performance and candidate eligibility.</p>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">11. No Job Guarantee</h5>
+                                <p>Registration with Warriors Educare does not guarantee job placement. Selection depends entirely on the school's/Institution's requirements, interview performance and candidate eligibility.</p>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">12. Employment Relationship</h5>
-                        <p class="mb-4">The Candidate understands that employment shall be with the respective school only. Warriors Educare acts solely as a recruitment and placement agency and shall not be responsible for salary, PF, ESI, leave, incentives or any employment benefits unless otherwise agreed in writing.</p>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">12. Employment Relationship</h5>
+                                <p>The Candidate understands that employment shall be with the respective school only. Warriors Educare acts solely as a recruitment and placement agency and shall not be responsible for salary, PF, ESI, leave, incentives or any employment benefits unless otherwise agreed in writing.</p>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">13. Default & Legal Action</h5>
-                        <p class="mb-4">In case the Candidate intentionally avoids payment of the agreed Placement Service Charge or violates this Agreement, Warriors Educare reserves the right to recover the outstanding amount along with applicable late charges and to initiate appropriate legal proceedings under the applicable laws of India. Any dispute arising out of this Agreement shall be subject to the jurisdiction of the competent courts.</p>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">13. Default & Legal Action</h5>
+                                <p>In case the Candidate intentionally avoids payment of the agreed Placement Service Charge or violates this Agreement, Warriors Educare reserves the right to recover the outstanding amount along with applicable late charges and to initiate appropriate legal proceedings under the applicable laws of India. Any dispute arising out of this Agreement shall be subject to the jurisdiction of the competent courts.</p>
+                            </div>
 
-                        <h5 class="font-bold text-[#031b4e] mb-2">14. Acceptance of Terms</h5>
-                        <p class="mb-2">By signing this Agreement physically or digitally, the Candidate confirms that:</p>
-                        <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>They have carefully read and understood all the terms and conditions.</li>
-                            <li>They voluntarily accept all clauses of this Agreement without any pressure.</li>
-                            <li>They agree to comply with all payment obligations and conditions mentioned herein.</li>
-                        </ul>
+                            <div>
+                                <h5 class="font-bold text-[#031b4e] mb-1">14. Acceptance of Terms</h5>
+                                <p class="mb-1">By signing this Agreement physically or digitally, the Candidate confirms that:</p>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>They have carefully read and understood all the terms and conditions.</li>
+                                    <li>They voluntarily accept all clauses of this Agreement without any pressure.</li>
+                                    <li>They agree to comply with all payment obligations and conditions mentioned herein.</li>
+                                </ul>
+                            </div>
+                        </div>
 
                         <hr class="my-6 border-[#031b4e]/10">
 
@@ -430,12 +464,19 @@
                         <p class="mb-4">If the Candidate receives three (3) consecutive demo rejections due to candidate-related reasons, Warriors Educare reserves the right to cancel the registration without any refund.</p>
 
                         <h5 class="font-bold text-[#031b4e] mb-2">7. Service Charge</h5>
-                        <p class="mb-4">After successfully joining the tuition and receiving the first month's tuition fee/payment, the Candidate agrees to pay 50% of the first month's tuition fee (equivalent to 15 days' tuition fee) to Warriors Educare as the Service Charge.</p>
+                        <p class="mb-3">After successfully joining the tuition and receiving the first month's tuition fee/payment, the Candidate agrees to pay <strong>50% of the first month's tuition fee (equivalent to 15 days' tuition fee)</strong> to Warriors Educare as the Service Charge.</p>
+
+                        <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200/70 space-y-1 text-xs text-slate-800 mb-4">
+                            <h6 class="font-bold text-[#031b4e]">Service Charge for Hourly Tuition Assignments</h6>
+                            <p>For tuition assignments that are conducted on an hourly or per-class basis, the Candidate (Teacher) shall pay Warriors Educare a one-time service charge equivalent to <strong>50% of the total classes allotted for one month</strong>.</p>
+                            <p class="text-slate-600"><em>Example:</em> If a tuition assignment is allotted for 12 classes per month (such as IIT-JEE, NEET, or other hourly coaching), the Candidate must pay the service charge equivalent to 6 classes.</p>
+                            <p class="font-semibold text-[#031b4e]">This service charge is mandatory and remains payable irrespective of the actual number of classes conducted during the first month. Even if the Candidate teaches fewer than the allotted monthly classes, the full agreed service charge shall remain applicable.</p>
+                        </div>
 
                         <h5 class="font-bold text-[#031b4e] mb-2">8. Payment Timeline & Delay Charges</h5>
                         <ul class="list-disc pl-5 mb-4 space-y-2">
-                            <li>The Service Charge must be paid within 12 hours of receiving the first month's tuition fee/payment.</li>
-                            <li>Failure to make payment within the prescribed time shall attract a Late Payment Penalty of ₹200 per day until the outstanding amount is fully cleared.</li>
+                            <li>The Service Charge must be paid <strong>within 12 hours</strong> of receiving the first month's tuition fee/payment.</li>
+                            <li>Failure to make payment within the prescribed time shall attract a <strong>Late Payment Penalty of ₹200 per day</strong> until the outstanding amount is fully cleared.</li>
                         </ul>
 
                         <h5 class="font-bold text-[#031b4e] mb-2">9. Tutor Responsibilities</h5>
@@ -654,8 +695,8 @@
                                 <p class="text-xs text-[#031b4e]/60 uppercase tracking-wider font-semibold">Total to Pay</p>
                                 <p class="text-xl font-bold text-[#031b4e]" x-text="selectedPlan === 'premium' ? '₹1000' : '₹500'"></p>
                             </div>
-                            <button type="button" @click="submitPayment" class="bg-gradient-to-r from-blue-700 to-indigo-700 text-white px-8 py-3.5 rounded-xl font-semibold shadow-lg hover:brightness-110 transition-all hover:-translate-y-0.5 flex items-center gap-2">
-                                Pay via Razorpay <i class="fas fa-lock text-xs opacity-70"></i>
+                            <button type="button" @click="submitPayment" class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white px-8 py-3.5 rounded-xl font-semibold shadow-lg hover:brightness-110 transition-all hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer">
+                                <span>Pay via PhonePe / UPI</span> <i class="fas fa-shield-alt text-xs text-purple-200"></i>
                             </button>
                         </div>
                     </div>
@@ -1180,33 +1221,9 @@
                     this.livePhotoBase64 = e.target.result;
                 };
                 reader.readAsDataURL(file);
-            },
-            
-            getLocation() {
-                this.locationError = '';
-                this.loadingMessage = 'Fetching location...';
-                this.loading = true;
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            this.latitude = position.coords.latitude;
-                            this.longitude = position.coords.longitude;
-                            this.loading = false;
-                        },
-                        (error) => {
-                            this.locationError = "Unable to fetch location. Please grant permission.";
-                            this.loading = false;
-                        }
-                    );
-                } else {
-                    this.locationError = "Geolocation is not supported by this browser.";
-                    this.loading = false;
-                }
-            },
-
             async submitPayment() {
                 this.error = '';
-                this.loadingMessage = 'Connecting to Razorpay...';
+                this.loadingMessage = 'Connecting to PhonePe Payment Gateway...';
                 this.loading = true;
 
                 try {
@@ -1222,83 +1239,61 @@
                     });
 
                     const data = await response.json();
-                    this.loading = false;
                     
                     if (response.ok && data.success && data.order) {
                         const order = data.order;
-                        const self = this;
+                        
+                        // If PhonePe returned direct redirect URL
+                        if (order.redirect_url) {
+                            this.loadingMessage = 'Redirecting to PhonePe Secure Pay...';
+                            window.location.href = order.redirect_url;
+                            return;
+                        }
 
-                        const options = {
-                            "key": order.key,
-                            "amount": order.amount_paisa,
-                            "currency": order.currency || "INR",
-                            "name": order.name || "Warriors Educare",
-                            "description": "Teacher Registration Fee",
-                            "order_id": order.order_id,
-                            "handler": function (rzpResponse) {
-                                self.loadingMessage = 'Verifying Payment...';
-                                self.loading = true;
+                        // Sandbox or fallback test checkout
+                        this.loadingMessage = 'Verifying PhonePe Sandbox Payment...';
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '{{ route("candidate.wizard.callback") }}';
 
-                                // Submit to callback
-                                const form = document.createElement('form');
-                                form.method = 'POST';
-                                form.action = '{{ route("candidate.wizard.callback") }}';
+                        const csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = '_token';
+                        csrfInput.value = '{{ csrf_token() }}';
+                        form.appendChild(csrfInput);
 
-                                const csrfInput = document.createElement('input');
-                                csrfInput.type = 'hidden';
-                                csrfInput.name = '_token';
-                                csrfInput.value = '{{ csrf_token() }}';
-                                form.appendChild(csrfInput);
+                        const orderIdInput = document.createElement('input');
+                        orderIdInput.type = 'hidden';
+                        orderIdInput.name = 'merchantTransactionId';
+                        orderIdInput.value = order.order_id;
+                        form.appendChild(orderIdInput);
 
-                                const payIdInput = document.createElement('input');
-                                payIdInput.type = 'hidden';
-                                payIdInput.name = 'razorpay_payment_id';
-                                payIdInput.value = rzpResponse.razorpay_payment_id;
-                                form.appendChild(payIdInput);
+                        const payIdInput = document.createElement('input');
+                        payIdInput.type = 'hidden';
+                        payIdInput.name = 'transactionId';
+                        payIdInput.value = 'PP_TEST_' + Date.now();
+                        form.appendChild(payIdInput);
 
-                                const orderIdInput = document.createElement('input');
-                                orderIdInput.type = 'hidden';
-                                orderIdInput.name = 'razorpay_order_id';
-                                orderIdInput.value = rzpResponse.razorpay_order_id;
-                                form.appendChild(orderIdInput);
+                        const codeInput = document.createElement('input');
+                        codeInput.type = 'hidden';
+                        codeInput.name = 'code';
+                        codeInput.value = 'PAYMENT_SUCCESS';
+                        form.appendChild(codeInput);
 
-                                const sigInput = document.createElement('input');
-                                sigInput.type = 'hidden';
-                                sigInput.name = 'razorpay_signature';
-                                sigInput.value = rzpResponse.razorpay_signature;
-                                form.appendChild(sigInput);
-
-                                document.body.appendChild(form);
-                                form.submit();
-                            },
-                            "prefill": {
-                                "name": "{{ $user->name ?? '' }}",
-                                "email": "{{ $user->email ?? '' }}",
-                                "contact": "{{ $user->phone ?? '' }}"
-                            },
-                            "theme": {
-                                "color": "#0a2558"
-                            }
-                        };
-
-                        const rzp = new Razorpay(options);
-                        rzp.on('payment.failed', function(resp) {
-                            self.error = "Payment failed: " + resp.error.description;
-                        });
-                        rzp.open();
+                        document.body.appendChild(form);
+                        form.submit();
                     } else {
-                        this.error = data.message || 'Failed to connect to payment gateway.';
+                        this.error = data.message || 'Failed to connect to PhonePe gateway.';
                         this.loading = false;
                     }
                 } catch (e) {
-                    this.error = 'Something went wrong. Please check your connection.';
+                    this.error = 'Something went wrong while connecting to payment gateway.';
                     this.loading = false;
                 }
             }
         }));
     });
 </script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <style>
     select option {

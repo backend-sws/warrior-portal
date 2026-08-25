@@ -1,12 +1,12 @@
 @extends('layouts.parent')
 
-@section('title', 'Razorpay Secure Checkout - Parent Service Charge')
+@section('title', 'PhonePe Secure Checkout - Parent Service Charge')
 
 @section('content')
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6" x-data="{ sandboxModal: false, selectedMode: 'upi' }">
     <!-- Breadcrumb / Back button -->
     <div>
-        <a href="{{ route('parent.serviceCharge.index') }}" class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-500 hover:text-accent-blue transition-colors">
+        <a href="{{ route('parent.serviceCharge.index') }}" class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-500 hover:text-purple-700 transition-colors">
             <i class="fas fa-arrow-left"></i> Back to Invoices
         </a>
     </div>
@@ -15,9 +15,9 @@
     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12">
         
         <!-- Left Side: Order Summary -->
-        <div class="md:col-span-5 bg-gradient-to-br from-[#0a2558] to-[#1e40af] text-white p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden">
-            <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-            <div class="absolute -left-12 -top-12 w-48 h-48 bg-cyan-400/10 rounded-full blur-xl pointer-events-none"></div>
+        <div class="md:col-span-5 bg-gradient-to-br from-[#2c0e5a] via-[#4a154b] to-[#5f259f] text-white p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-purple-400/10 rounded-full blur-xl pointer-events-none"></div>
+            <div class="absolute -left-12 -top-12 w-48 h-48 bg-indigo-400/10 rounded-full blur-xl pointer-events-none"></div>
 
             <div class="relative z-10 space-y-6">
                 <div class="flex items-center gap-3">
@@ -26,42 +26,42 @@
                     </div>
                     <div>
                         <h4 class="font-black text-base sm:text-lg text-white">Warriors Educare</h4>
-                        <p class="text-xs text-blue-200 font-semibold">Razorpay Verified Merchant</p>
+                        <p class="text-xs text-purple-200 font-semibold">PhonePe Verified Merchant</p>
                     </div>
                 </div>
 
                 <div class="border-t border-white/15 pt-5 space-y-3">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-300 block">Parent Service Invoice</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-purple-200 block">Parent Service Invoice</span>
                     <div class="flex justify-between items-center text-xs">
-                        <span class="text-blue-100">Invoice #:</span>
+                        <span class="text-purple-100">Invoice #:</span>
                         <span class="font-mono font-bold text-white">{{ $invoice->invoice_number }}</span>
                     </div>
                     <div class="flex justify-between items-center text-xs">
-                        <span class="text-blue-100">Tuition Service:</span>
+                        <span class="text-purple-100">Tuition Service:</span>
                         <span class="font-bold text-white">{{ $invoice->title }}</span>
                     </div>
                     @if($invoice->lead)
                     <div class="flex justify-between items-center text-xs">
-                        <span class="text-blue-100">Class & Subjects:</span>
+                        <span class="text-purple-100">Class & Subjects:</span>
                         <span class="font-bold text-white">Class {{ $invoice->lead->class }} ({{ $invoice->lead->subjects }})</span>
                     </div>
                     @endif
                 </div>
 
                 <div class="border-t border-white/15 pt-5 space-y-1.5">
-                    <p class="text-[11px] font-bold uppercase tracking-wider text-blue-200">Total Payable Amount</p>
-                    <div class="text-3xl sm:text-4xl font-black text-emerald-400">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-purple-200">Total Payable Amount</p>
+                    <div class="text-3xl sm:text-4xl font-black text-white">
                         ₹{{ number_format($order['amount'], 2) }}
                     </div>
-                    <p class="text-[10px] text-blue-200/80">Inclusive of all digital processing & teacher placement coordination fees.</p>
+                    <p class="text-[10px] text-purple-200/80">Inclusive of all digital processing & teacher placement coordination fees.</p>
                 </div>
             </div>
 
-            <div class="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-blue-200/80">
-                <span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
+            <div class="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-purple-200/80">
+                <span class="inline-flex items-center gap-1.5 text-emerald-300 font-semibold">
                     <i class="fas fa-lock text-xs"></i> 256-Bit SSL Secured
                 </span>
-                <span>Razorpay PCI-DSS</span>
+                <span>PhonePe Standard PG</span>
             </div>
         </div>
 
@@ -70,11 +70,11 @@
             <div>
                 <div class="flex items-center justify-between mb-2">
                     <h3 class="text-lg sm:text-xl font-black text-slate-900">Secure Payment Checkout</h3>
-                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
                         <i class="fas fa-bolt text-[9px]"></i> Instant Verification
                     </span>
                 </div>
-                <p class="text-xs text-slate-500">Pay securely via Razorpay using UPI (Google Pay, PhonePe, Paytm, BHIM), Credit/Debit Cards, or NetBanking.</p>
+                <p class="text-xs text-slate-500">Pay securely via PhonePe using UPI (Google Pay, PhonePe, Paytm, BHIM), Credit/Debit Cards, or NetBanking.</p>
             </div>
 
             <!-- Supported Modes Highlights -->
@@ -104,27 +104,27 @@
                 </div>
             </div>
 
-            <!-- Razorpay Trigger Button -->
+            <!-- PhonePe Trigger Button -->
             <div>
-                <button type="button" id="rzp-parent-pay-button" 
-                        class="w-full py-4 px-6 bg-gradient-to-r from-[#0a2558] to-[#1e40af] hover:from-[#0d3175] hover:to-[#2563eb] text-white rounded-2xl text-sm font-bold transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2.5 group cursor-pointer">
-                    <i class="fas fa-lock text-emerald-400 group-hover:scale-110 transition-transform"></i>
-                    <span>Pay ₹{{ number_format($order['amount'], 2) }} Securely via Razorpay</span>
+                <button type="button" id="phonepe-parent-pay-button" 
+                        class="w-full py-4 px-6 bg-gradient-to-r from-[#5f259f] to-[#4a154b] hover:from-[#6d2ab7] hover:to-[#571a58] text-white rounded-2xl text-sm font-bold transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2.5 group cursor-pointer">
+                    <i class="fas fa-lock text-purple-200 group-hover:scale-110 transition-transform"></i>
+                    <span>Pay ₹{{ number_format($order['amount'], 2) }} Securely via PhonePe</span>
                 </button>
             </div>
 
-            <!-- Hidden Form Submitted Upon Razorpay Success -->
-            <form id="razorpay-parent-callback-form" action="{{ route('parent.serviceCharge.callback') }}" method="POST" class="hidden">
+            <!-- Hidden Form Submitted Upon PhonePe Success -->
+            <form id="phonepe-parent-callback-form" action="{{ route('parent.serviceCharge.callback') }}" method="POST" class="hidden">
                 @csrf
-                <input type="hidden" name="razorpay_payment_id" id="parent_razorpay_payment_id">
-                <input type="hidden" name="razorpay_order_id" id="parent_razorpay_order_id">
-                <input type="hidden" name="razorpay_signature" id="parent_razorpay_signature">
+                <input type="hidden" name="merchantTransactionId" id="parent_merchantTransactionId" value="{{ $order['order_id'] }}">
+                <input type="hidden" name="transactionId" id="parent_transactionId">
+                <input type="hidden" name="code" id="parent_code" value="PAYMENT_SUCCESS">
             </form>
         </div>
 
     </div>
 
-    <!-- Razorpay Sandbox Simulator Modal (For Local / Test Mode) -->
+    <!-- PhonePe Sandbox Simulator Modal (For Local / Test Mode) -->
     <div x-show="sandboxModal" x-cloak 
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
          x-transition>
@@ -132,53 +132,33 @@
              @click.outside="sandboxModal = false">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                    <div class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-xs">
                         <i class="fas fa-bolt"></i>
                     </div>
                     <div>
-                        <h4 class="font-black text-sm text-slate-900">Razorpay Payment Simulator</h4>
+                        <h4 class="font-black text-sm text-slate-900">PhonePe Payment Simulator</h4>
                         <span class="text-[10px] text-slate-400 font-semibold">Test Sandbox Environment</span>
                     </div>
                 </div>
                 <button type="button" @click="sandboxModal = false" class="text-slate-400 hover:text-slate-700">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
 
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2">
-                <div class="flex justify-between text-xs">
-                    <span class="text-slate-500">Merchant:</span>
-                    <span class="font-bold text-slate-800">Warriors Educare</span>
-                </div>
-                <div class="flex justify-between text-xs">
-                    <span class="text-slate-500">Invoice:</span>
-                    <span class="font-bold text-slate-800">#{{ $invoice->id }}</span>
-                </div>
-                <div class="flex justify-between text-xs pt-1 border-t border-slate-200">
-                    <span class="font-bold text-slate-700">Amount:</span>
-                    <span class="font-black text-base text-emerald-600">₹{{ number_format($order['amount'], 2) }}</span>
-                </div>
-            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Click below to complete the test payment transaction for ₹{{ number_format($order['amount'], 2) }}.
+            </p>
 
-            <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-700">Select Test Payment Mode:</label>
-                <div class="grid grid-cols-3 gap-2">
-                    <button type="button" @click="selectedMode = 'upi'" :class="selectedMode === 'upi' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'" class="py-2 px-3 rounded-xl text-xs font-bold transition-all">
-                        UPI / GPay
-                    </button>
-                    <button type="button" @click="selectedMode = 'card'" :class="selectedMode === 'card' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'" class="py-2 px-3 rounded-xl text-xs font-bold transition-all">
-                        Card
-                    </button>
-                    <button type="button" @click="selectedMode = 'netbanking'" :class="selectedMode === 'netbanking' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'" class="py-2 px-3 rounded-xl text-xs font-bold transition-all">
-                        Netbanking
-                    </button>
-                </div>
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1 font-mono text-slate-600">
+                <div><span class="text-slate-400">Order ID:</span> <strong class="text-slate-800">{{ $order['order_id'] }}</strong></div>
+                <div><span class="text-slate-400">Amount:</span> <strong class="text-emerald-700">₹{{ number_format($order['amount'], 2) }}</strong></div>
+                <div><span class="text-slate-400">Gateway:</span> <strong>PhonePe PG</strong></div>
             </div>
 
             <div class="pt-2">
-                <button type="button" id="confirm-parent-sandbox-pay" 
-                        class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-check-circle"></i> Complete Successful Payment
+                <button type="button" id="parent-confirm-sandbox-pay" 
+                        class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fas fa-check-circle"></i> Complete Test Payment
                 </button>
             </div>
         </div>
@@ -187,95 +167,56 @@
 @endsection
 
 @push('scripts')
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const orderData = @json($order);
         const userData = @json($user);
         const invoiceId = "{{ $invoice->id }}";
-        const isMock = orderData.is_mock || (orderData.key && orderData.key.includes('placeholder'));
 
-        function triggerParentCallback(paymentId, orderId, signature) {
-            document.getElementById('parent_razorpay_payment_id').value = paymentId;
-            document.getElementById('parent_razorpay_order_id').value = orderId;
-            document.getElementById('parent_razorpay_signature').value = signature;
+        function triggerCallback(paymentId, orderId) {
+            document.getElementById('parent_transactionId').value = paymentId;
+            document.getElementById('parent_merchantTransactionId').value = orderId;
+            document.getElementById('parent_code').value = 'PAYMENT_SUCCESS';
             
-            const btn = document.getElementById('rzp-parent-pay-button');
+            const btn = document.getElementById('phonepe-parent-pay-button');
             if (btn) {
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying Payment...';
             }
 
-            document.getElementById('razorpay-parent-callback-form').submit();
+            document.getElementById('phonepe-parent-callback-form').submit();
         }
 
-        const payButton = document.getElementById('rzp-parent-pay-button');
+        const payButton = document.getElementById('phonepe-parent-pay-button');
 
         payButton.addEventListener('click', function(e) {
             e.preventDefault();
 
-            if (isMock || typeof Razorpay === 'undefined') {
-                const alpineEl = document.querySelector('[x-data]');
-                if (alpineEl && alpineEl.__x) {
-                    alpineEl.__x.$data.sandboxModal = true;
-                } else {
-                    if (confirm("Proceed with Test Sandbox Payment of ₹" + orderData.amount + "?")) {
-                        triggerParentCallback('pay_mock_' + Date.now(), orderData.order_id, 'mock_sig_' + Date.now());
-                    }
-                }
+            // If PhonePe returned direct redirect URL
+            if (orderData.redirect_url) {
+                payButton.disabled = true;
+                payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to PhonePe...';
+                window.location.href = orderData.redirect_url;
                 return;
             }
 
-            try {
-                const options = {
-                    "key": orderData.key,
-                    "amount": orderData.amount_paisa,
-                    "currency": orderData.currency || "INR",
-                    "name": orderData.name || "Warriors Educare",
-                    "description": "Parent Tuition Service Charge (Invoice #" + invoiceId + ")",
-                    "image": "{{ asset('adobe.png') }}",
-                    "order_id": orderData.order_id,
-                    "handler": function (response) {
-                        triggerParentCallback(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
-                    },
-                    "prefill": {
-                        "name": userData.name || "",
-                        "email": userData.email || "",
-                        "contact": userData.phone || ""
-                    },
-                    "notes": {
-                        "invoice_id": invoiceId,
-                        "user_id": userData.id
-                    },
-                    "theme": {
-                        "color": "#0a2558"
-                    }
-                };
-
-                const rzp = new Razorpay(options);
-
-                rzp.on('payment.failed', function (response) {
-                    alert("Payment Failed: " + (response.error ? response.error.description : 'Transaction failed'));
-                });
-
-                rzp.open();
-            } catch (err) {
-                console.warn('Razorpay SDK error, falling back to sandbox simulator:', err);
-                const alpineEl = document.querySelector('[x-data]');
-                if (alpineEl && alpineEl.__x) {
-                    alpineEl.__x.$data.sandboxModal = true;
-                } else {
-                    triggerParentCallback('pay_mock_' + Date.now(), orderData.order_id, 'mock_sig_' + Date.now());
+            // Sandbox / test fallback
+            const alpineEl = document.querySelector('[x-data]');
+            if (alpineEl && alpineEl.__x) {
+                alpineEl.__x.$data.sandboxModal = true;
+            } else {
+                if (confirm("Proceed with Test Payment of ₹" + orderData.amount + "?")) {
+                    triggerCallback('PP_TEST_' + Date.now(), orderData.order_id);
                 }
             }
         });
 
-        const confirmSandboxBtn = document.getElementById('confirm-parent-sandbox-pay');
+        const confirmSandboxBtn = document.getElementById('parent-confirm-sandbox-pay');
         if (confirmSandboxBtn) {
             confirmSandboxBtn.addEventListener('click', function() {
                 confirmSandboxBtn.disabled = true;
                 confirmSandboxBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                triggerParentCallback('pay_mock_' + Date.now(), orderData.order_id, 'mock_sig_' + Date.now());
+                triggerCallback('PP_TEST_' + Date.now(), orderData.order_id);
             });
         }
     });

@@ -60,9 +60,9 @@
             <input type="hidden" name="status" value="{{ request('status') }}">
         @endif
         
-        <div class="relative w-full sm:w-72">
+        <div class="relative w-full sm:w-80">
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-text-dark/40 text-sm"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search title or school..." 
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Job ID (e.g. JOB-0001), title, school..." 
                    class="w-full pl-9 pr-8 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
             @if(request('search'))
                 <a href="{{ route('admin.jobs.index', ['status' => request('status')]) }}" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-dark/40 hover:text-red-400 transition-colors">
@@ -85,6 +85,7 @@
                     $route = 'admin.jobs.index';
                     $order = request('order') === 'asc' ? 'desc' : 'asc';
                 @endphp
+                <th class="w-28">Job ID</th>
                 <th>
                     <a href="{{ route($route, array_merge(request()->query(), ['sort_by' => 'title', 'order' => $order])) }}" class="flex items-center gap-2 hover:text-accent-blue transition-colors">
                         Job Title & School
@@ -123,6 +124,11 @@
         <tbody class="divide-y divide-card-border">
             @forelse($jobs as $job)
             <tr class="group">
+                <td class="align-middle">
+                    <span class="inline-flex items-center gap-1 font-mono text-xs font-bold text-indigo-600 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                        <i class="fas fa-hashtag text-[9px] opacity-70"></i>{{ $job->job_id ?: 'JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT) }}
+                    </span>
+                </td>
                 <td>
                     <div class="font-semibold text-text-main group-hover:text-accent-blue transition-colors">{{ $job->title ?? 'Untitled Job' }}</div>
                     <div class="text-xs text-text-dark/50 flex items-center gap-1 mt-1">

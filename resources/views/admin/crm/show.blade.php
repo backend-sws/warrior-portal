@@ -334,6 +334,91 @@
                             @endif
                         </form>
                     </div>
+
+                    {{-- 3. Live Digital Verification Audit Details (Photo & GPS) --}}
+                    @php
+                        $tuitionMeta = [];
+                        if ($profile?->tuition_signature_data) {
+                            $tuitionMeta = json_decode($profile->tuition_signature_data, true) ?: [];
+                        }
+                        $livePhoto = $profile?->tuition_live_photo_path ?? $profile?->live_photo_path;
+                        $geoLat = $profile?->tuition_latitude ?? $profile?->latitude ?? ($tuitionMeta['latitude'] ?? null);
+                        $geoLng = $profile?->tuition_longitude ?? $profile?->longitude ?? ($tuitionMeta['longitude'] ?? null);
+                        $geoLoc = $profile?->tuition_location_name ?? $profile?->signature_location_name ?? ($tuitionMeta['location'] ?? null);
+                        $signIp = $profile?->signature_ip_address ?? ($tuitionMeta['ip'] ?? null);
+                    @endphp
+
+                    <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-200/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black uppercase text-[#031b4e] flex items-center gap-1.5">
+                                <i class="fas fa-shield-check text-emerald-600"></i> Live Identity & GPS Verification
+                            </span>
+                            @if($livePhoto || $geoLat)
+                                <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                                    Verified
+                                </span>
+                            @else
+                                <span class="text-[9px] font-bold text-slate-400">
+                                    Pending Capture
+                                </span>
+                            @endif
+                        </div>
+
+                        @if($livePhoto)
+                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-blue-100">
+                                <a href="{{ Storage::url($livePhoto) }}" target="_blank" class="relative group shrink-0">
+                                    <img src="{{ Storage::url($livePhoto) }}" alt="Live Agreement Photo" class="w-16 h-16 rounded-lg object-cover border-2 border-emerald-500 shadow-sm">
+                                    <div class="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <i class="fas fa-search-plus text-white text-xs"></i>
+                                    </div>
+                                </a>
+                                <div class="min-w-0 text-xs">
+                                    <p class="font-bold text-emerald-800 flex items-center gap-1">
+                                        <i class="fas fa-camera text-emerald-600 text-[10px]"></i> Live Camera Snapshot
+                                    </p>
+                                    <p class="text-[10px] text-text-dark/60 mt-0.5">Captured at the moment of agreement digital signing.</p>
+                                    <a href="{{ Storage::url($livePhoto) }}" target="_blank" class="text-[11px] font-bold text-accent-blue hover:underline inline-block mt-0.5">
+                                        View Full Photo &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if($geoLat && $geoLng)
+                            <div class="bg-white p-2.5 rounded-xl border border-blue-100 text-xs space-y-1">
+                                <span class="text-[10px] font-bold text-text-dark/50 uppercase block">GPS Signing Location</span>
+                                <p class="font-bold text-text-main flex items-start gap-1">
+                                    <i class="fas fa-map-marker-alt text-red-500 mt-0.5 shrink-0"></i>
+                                    <span class="line-clamp-2">{{ $geoLoc ?: "{$geoLat}, {$geoLng}" }}</span>
+                                </p>
+                                <div class="flex items-center justify-between pt-1">
+                                    <span class="font-mono text-[10px] text-text-dark/60">Lat: {{ number_format($geoLat, 4) }}, Lng: {{ number_format($geoLng, 4) }}</span>
+                                    <a href="https://www.google.com/maps?q={{ $geoLat }},{{ $geoLng }}" target="_blank" class="px-2 py-0.5 bg-blue-50 text-accent-blue border border-blue-200 rounded text-[10px] font-bold hover:bg-blue-100 transition-colors flex items-center gap-1">
+                                        <i class="fas fa-external-link-alt text-[8px]"></i> Google Maps
+                                    </a>
+                                </div>
+                            </div>
+                        @elseif($geoLoc)
+                            <div class="bg-white p-2.5 rounded-xl border border-blue-100 text-xs">
+                                <span class="text-[10px] font-bold text-text-dark/50 uppercase block">Location</span>
+                                <p class="font-bold text-text-main">📍 {{ $geoLoc }}</p>
+                            </div>
+                        @endif
+
+                        @if($signIp || $profile?->tuition_agreement_signed_at || $profile?->signature_date_time)
+                            <div class="text-[10px] text-text-dark/60 space-y-0.5 pt-1 border-t border-blue-100">
+                                @if($signIp)
+                                    <div><i class="fas fa-laptop text-[9px] text-blue-500 mr-1"></i> IP: <span class="font-mono font-bold">{{ $signIp }}</span></div>
+                                @endif
+                                @if($profile?->tuition_agreement_signed_at)
+                                    <div><i class="fas fa-calendar-check text-[9px] text-teal-600 mr-1"></i> Tuition Signed: <span class="font-semibold">{{ \Carbon\Carbon::parse($profile->tuition_agreement_signed_at)->format('d M Y, h:i A') }}</span></div>
+                                @endif
+                                @if($profile?->signature_date_time)
+                                    <div><i class="fas fa-calendar-check text-[9px] text-indigo-600 mr-1"></i> Job Signed: <span class="font-semibold">{{ \Carbon\Carbon::parse($profile->signature_date_time)->format('d M Y, h:i A') }}</span></div>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -372,7 +457,7 @@
                     <select name="job_post_id" required class="flex-1 bg-secondary-bg border border-card-border rounded-xl text-xs py-2.5 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
                         <option value="">-- Select Active School Job --</option>
                         @foreach($availableJobs as $job)
-                            <option value="{{ $job->id }}">{{ $job->title }} — {{ $job->school_name }} ({{ $job->city->name ?? '' }})</option>
+                            <option value="{{ $job->id }}">[{{ $job->job_id ?: 'JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT) }}] {{ $job->title }} — {{ $job->school_name }} ({{ $job->city->name ?? '' }})</option>
                         @endforeach
                     </select>
                     <button type="submit" class="px-5 py-2.5 bg-accent-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm shrink-0">
@@ -393,8 +478,13 @@
                         <div class="p-5 space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                                 <div>
-                                    <h5 class="text-sm font-black text-text-main">{{ $app->jobPost->title ?? 'N/A' }}</h5>
-                                    <p class="text-xs text-text-dark/60">{{ $app->jobPost->school_name ?? 'School' }} • {{ $app->jobPost->city->name ?? '' }}</p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                                            {{ $app->jobPost->job_id ?: 'JOB-' . str_pad($app->jobPost->id, 4, '0', STR_PAD_LEFT) }}
+                                        </span>
+                                        <h5 class="text-sm font-black text-text-main">{{ $app->jobPost->title ?? 'N/A' }}</h5>
+                                    </div>
+                                    <p class="text-xs text-text-dark/60 mt-0.5">{{ $app->jobPost->school_name ?? 'School' }} • {{ $app->jobPost->city->name ?? '' }}</p>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full 
@@ -468,7 +558,7 @@
                                 <option value="">-- Choose Home Tuition Lead --</option>
                                 @foreach($availableTuitionLeads as $tLead)
                                     <option value="{{ $tLead->id }}">
-                                        Class {{ $tLead->class }} ({{ $tLead->subjects }}) — {{ $tLead->location }} [Parent: {{ $tLead->parent_name }} - {{ $tLead->parent_mobile }}]
+                                        [{{ $tLead->tuition_id ?: 'TUI-' . str_pad($tLead->id, 4, '0', STR_PAD_LEFT) }}] Class {{ $tLead->class }} ({{ $tLead->subjects }}) — {{ $tLead->location }} [Parent: {{ $tLead->parent_name }} - {{ $tLead->parent_mobile }}]
                                     </option>
                                 @endforeach
                             </select>
@@ -530,10 +620,15 @@
                         <div class="p-5 space-y-3">
                             <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                                 <div>
-                                    <h5 class="text-sm font-black text-text-main">
-                                        Class {{ $tApp->tuitionLead->class ?? 'N/A' }} ({{ $tApp->tuitionLead->subjects ?? '' }})
-                                    </h5>
-                                    <p class="text-xs text-text-dark/60">
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-accent-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                                            {{ $tApp->tuitionLead?->tuition_id ?: 'TUI-' . str_pad($tApp->tuitionLead?->id ?? 0, 4, '0', STR_PAD_LEFT) }}
+                                        </span>
+                                        <h5 class="text-sm font-black text-text-main">
+                                            Class {{ $tApp->tuitionLead->class ?? 'N/A' }} ({{ $tApp->tuitionLead->subjects ?? '' }})
+                                        </h5>
+                                    </div>
+                                    <p class="text-xs text-text-dark/60 mt-0.5">
                                         📍 {{ $tApp->tuitionLead->location ?? '' }} • Parent: {{ $tApp->tuitionLead->parent_name ?? '' }} ({{ $tApp->tuitionLead->parent_mobile ?? '' }})
                                     </p>
                                 </div>

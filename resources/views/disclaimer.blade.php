@@ -1,185 +1,226 @@
 @extends('layouts.app')
+
+@section('title', 'Disclaimer — Warriors Educare')
+@section('meta_description', 'Read the official Disclaimer of Warriors Educare regarding recruitment facilitation, employment guarantees, and operational policies.')
+
 @section('content')
-<div class="pt-32 pb-12 px-6 lg:px-[5%] text-center border-b border-card-border bg-card-bg/30">
-        <h4 class="text-accent-blue text-sm font-bold mb-3 uppercase tracking-wider">Legal</h4>
-        <h1 class="text-4xl md:text-5xl font-extrabold text-text-main mb-6"> Disclaimer</h1>
-        <p class="text-text-main opacity-70 max-w-2xl mx-auto">Last updated: October 2023</p>
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-r from-[#031b4e] via-[#092b77] to-[#031b4e] text-white pt-36 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] opacity-10"></div>
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-bold text-amber-300 uppercase tracking-widest mb-4 border border-white/15">
+                <i class="fas fa-exclamation-triangle"></i> Official Legal Notice
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-3">Disclaimer</h1>
+            <p class="text-blue-100 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+                Warriors Educare • General informational, recruitment and educational placement notice.
+            </p>
+            <div class="mt-4 text-xs text-blue-200/80 font-medium">
+                Founder: Prince Kumar • Updated & Effective for All Users
+            </div>
+        </div>
     </div>
 
-    <div class="py-16 px-6 lg:px-[5%] max-w-4xl mx-auto reveal">
-        <div
-            class="prose prose-sm md:prose-base prose-headings:text-text-main prose-p:text-text-main prose-p:opacity-80 prose-a:text-accent-blue max-w-none">
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4"> Disclaimer</h2>
-            <p class="mb-6 leading-relaxed">The information provided on the website of Warriors Educare ("Company", "we",
-            "our", or "us") is intended for general informational and recruitment purposes only. By
-            accessing or using our website and services, you acknowledge and agree to the terms of this
-            Disclaimer.</p>
-           </div>
-    
-<h2 class="text-2xl font-bold text-text-main mt-8 mb-4">1. Recruitment Services Only</h2>
+    <!-- Main Content -->
+    <div class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 min-h-screen font-sans">
+        <div class="max-w-4xl mx-auto bg-white rounded-3xl p-6 sm:p-10 md:p-12 shadow-xl border border-slate-200/80 text-slate-700 text-sm sm:text-base leading-relaxed space-y-8">
 
-<p class="text-text-secondary leading-7 mb-4">
-Warriors Educare is an independent recruitment and placement consultancy that connects qualified candidates with educational institutions across India.
-</p>
+            <!-- Overview Notice Box -->
+            <div class="p-6 rounded-2xl border-2" style="background-color: #fffbeb; border-color: #fcd34d;">
+                <h3 class="font-black text-[#78350f] text-lg sm:text-xl mb-2 flex items-center gap-2.5">
+                    <i class="fas fa-info-circle text-amber-600"></i> Warriors Educare Disclaimer
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium mb-3">
+                    The information, services and content provided on this website are for <strong>general informational, recruitment and educational placement purposes only</strong>.
+                </p>
+                <p class="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
+                    <strong>Warriors Educare</strong>, owned and operated by <strong>Prince Kumar</strong>, acts solely as a recruitment, placement and educational staffing consultancy. We facilitate connections between candidates, tutors, parents, schools and educational institutions. However, Warriors Educare does not guarantee employment, job placement, tuition assignments, interview calls, salary levels, candidate selection or business outcomes.
+                </p>
+            </div>
 
-<p class="text-text-secondary leading-7 mb-4">
-Our role is limited to facilitating the recruitment process between candidates and employers.
-</p>
+            <!-- No Employment Guarantee -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-black shrink-0">1</span>
+                    No Employment Guarantee
+                </h2>
+                <p class="text-slate-700 font-medium">Registration with Warriors Educare does not guarantee:</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm font-semibold text-slate-700 pl-2">
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2"><i class="fas fa-times-circle text-red-500"></i> Job placement</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2"><i class="fas fa-times-circle text-red-500"></i> School selection</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2"><i class="fas fa-times-circle text-red-500"></i> Interview opportunities</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2"><i class="fas fa-times-circle text-red-500"></i> Home tuition assignments</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2"><i class="fas fa-times-circle text-red-500"></i> Parent approval</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2"><i class="fas fa-times-circle text-red-500"></i> Candidate selection</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2"><i class="fas fa-times-circle text-red-500"></i> Salary packages</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2"><i class="fas fa-times-circle text-red-500"></i> Number of placement opportunities</div>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-700 font-medium bg-slate-50 p-3.5 rounded-xl border border-slate-200 mt-2">
+                    Final hiring, selection and appointment decisions are made solely by the respective parent, school, institution or client based on their individual requirements and evaluation criteria.
+                </p>
+            </div>
 
-<p class="text-text-secondary leading-7 mb-4">
-We do not act as the employer, nor do we become a party to any employment agreement entered into between a candidate and an employer.
-</p>
+            <hr class="border-slate-100">
 
-<h2 class="text-2xl font-bold text-text-main mt-8 mb-4">2. No Guarantee of Employment</h2>
+            <!-- No Employer–Employee Relationship -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">2</span>
+                    No Employer–Employee Relationship
+                </h2>
+                <p class="text-slate-700 font-medium">
+                    Warriors Educare is not the employer of any candidate, teacher, tutor or non-teaching staff member placed through its services.
+                </p>
+                <p class="text-slate-700 font-medium">
+                    Any employment relationship shall exist solely between the candidate and the respective school, institution, parent or client.
+                </p>
+                <p class="text-slate-700 font-medium">Warriors Educare shall not be responsible for:</p>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm font-semibold text-slate-700 pl-2">
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Salary payments</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Employment disputes</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• PF, ESI or statutory benefits</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Leave policies</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Promotions</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Working conditions</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Termination decisions</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Workplace disputes</li>
+                </ul>
+                <p class="text-xs text-slate-500 italic mt-1">unless otherwise agreed in writing.</p>
+            </div>
 
-<p class="text-text-secondary leading-7 mb-4">
-Registration with Warriors Educare does not guarantee:
-</p>
+            <hr class="border-slate-100">
 
-<ul class="list-disc pl-6 mb-4 space-y-2">
-    <li class="text-text-secondary leading-7">Employment or job placement.</li>
-    <li class="text-text-secondary leading-7">Selection by any employer.</li>
-    <li class="text-text-secondary leading-7">Interview invitations.</li>
-    <li class="text-text-secondary leading-7">Specific salary packages.</li>
-    <li class="text-text-secondary leading-7">Preferred job location.</li>
-    <li class="text-text-secondary leading-7">Confirmation of employment after probation.</li>
-    <li class="text-text-secondary leading-7">Future promotions or career progression.</li>
-</ul>
+            <!-- Accuracy of Information -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">3</span>
+                    Accuracy of Information
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+                    While Warriors Educare makes reasonable efforts to verify candidate and vacancy information, we do not warrant or guarantee the accuracy, completeness, reliability or authenticity of information provided by candidates, schools, institutions, parents or third parties.
+                </p>
+                <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-950 font-bold">
+                    Users are advised to independently verify all information before making decisions.
+                </div>
+            </div>
 
-<p class="text-text-secondary leading-7 mb-4">
-All recruitment and hiring decisions are made solely by the respective employer based on their own requirements and selection criteria.
-</p>
+            <hr class="border-slate-100">
 
-<h2 class="text-2xl font-bold text-text-main mt-8 mb-4">3. Accuracy of Information</h2>
+            <!-- Candidate Responsibility -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">4</span>
+                    Candidate Responsibility
+                </h2>
+                <p class="text-slate-700 font-medium">Candidates are solely responsible for:</p>
+                <ul class="list-disc pl-6 space-y-1 text-slate-700 text-xs sm:text-sm font-medium">
+                    <li>The accuracy of information submitted.</li>
+                    <li>Authenticity of documents provided.</li>
+                    <li>Professional conduct during interviews, demo classes and employment.</li>
+                    <li>Compliance with commitments made during the recruitment process.</li>
+                </ul>
+                <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-900 font-bold">
+                    Any false information, forged documents or misconduct may result in suspension, blacklisting or termination of services.
+                </div>
+            </div>
 
-<p class="text-text-secondary leading-7 mb-4">
-We make reasonable efforts to ensure that the information published on our website, including job vacancies and recruitment updates, is accurate and current.
-</p>
+            <hr class="border-slate-100">
 
-<p class="text-text-secondary leading-7 mb-4">
-However, we do not warrant or guarantee that all information will always be complete, accurate, or up to date. Employers may revise job descriptions, salary ranges, eligibility criteria, or hiring requirements without prior notice.
-</p>
+            <!-- Parent & School Decisions -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">5</span>
+                    Parent & School Decisions
+                </h2>
+                <p class="text-slate-700 font-medium">Warriors Educare shall not be held responsible if:</p>
+                <ul class="list-disc pl-6 space-y-1 text-slate-700 text-xs sm:text-sm font-medium">
+                    <li>A parent rejects a tutor after a demo class.</li>
+                    <li>A school rejects a candidate during recruitment.</li>
+                    <li>A candidate is not shortlisted.</li>
+                    <li>A candidate fails an interview.</li>
+                    <li>A tuition assignment is cancelled by a parent.</li>
+                    <li>A vacancy is withdrawn by a school or institution.</li>
+                </ul>
+                <p class="text-xs text-slate-600 font-semibold italic">
+                    Such decisions remain entirely at the discretion of the respective parent, school or institution.
+                </p>
+            </div>
 
-<h2 class="text-2xl font-bold text-text-main mt-8 mb-4">4. Candidate Responsibility</h2>
+            <hr class="border-slate-100">
 
-<p class="text-text-secondary leading-7 mb-4">
-Candidates are solely responsible for:
-</p>
+            <!-- Third-Party Services -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">6</span>
+                    Third-Party Services
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+                    Our website may contain links, integrations or references to third-party services, payment gateways or external websites. Warriors Educare is not responsible for the content, policies, availability, security or practices of such third-party platforms.
+                </p>
+            </div>
 
-<ul class="list-disc pl-6 mb-4 space-y-2">
-    <li class="text-text-secondary leading-7">Providing accurate and truthful information during registration.</li>
-    <li class="text-text-secondary leading-7">Submitting genuine documents and certificates.</li>
-    <li class="text-text-secondary leading-7">Attending scheduled interviews.</li>
-    <li class="text-text-secondary leading-7">Verifying employment terms directly with the employer before accepting any offer.</li>
-</ul>
+            <hr class="border-slate-100">
 
-<p class="text-text-secondary leading-7 mb-4">
-Warriors Educare shall not be responsible for any consequences arising from false or misleading information submitted by a candidate.
-</p>
+            <!-- Limitation of Liability -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">7</span>
+                    Limitation of Liability
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-700 font-medium">
+                    To the maximum extent permitted by applicable law, Warriors Educare, its founder, employees, representatives and affiliates shall not be liable for any direct, indirect, incidental, consequential or special damages arising from:
+                </p>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 font-medium pl-2">
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Use of our website or services</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Recruitment decisions</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Placement outcomes</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Candidate performance</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Parent decisions</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• School decisions</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Service interruptions</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Technical failures & third-party actions</li>
+                </ul>
+                <p class="text-xs text-slate-600 font-semibold italic">Users access and use our services at their own discretion and risk.</p>
+            </div>
 
-<h2 class="text-2xl font-bold text-text-main mt-8 mb-4">5. Employer Responsibility</h2>
+            <hr class="border-slate-100">
 
-<p class="text-text-secondary leading-7 mb-4">
-Employers are solely responsible for:
-</p>
+            <!-- Changes to Disclaimer -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">8</span>
+                    Changes to Disclaimer
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+                    Warriors Educare reserves the right to modify, update or revise this Disclaimer at any time without prior notice. Continued use of the website and services shall constitute acceptance of any revised version.
+                </p>
+            </div>
 
-<ul class="list-disc pl-6 mb-4 space-y-2">
-    <li class="text-text-secondary leading-7">Recruitment decisions.</li>
-    <li class="text-text-secondary leading-7">Issuing appointment letters.</li>
-    <li class="text-text-secondary leading-7">Employment contracts.</li>
-    <li class="text-text-secondary leading-7">Salary payments.</li>
-    <li class="text-text-secondary leading-7">Working conditions.</li>
-    <li class="text-text-secondary leading-7">Compliance with applicable labour and employment laws.</li>
-</ul>
+            <hr class="border-slate-100">
 
-<p class="text-text-secondary leading-7 mb-4">
-Warriors Educare is not responsible for disputes arising between employers and candidates after employment begins.
-</p>
+            <!-- Contact Information -->
+            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5 mb-4">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">9</span>
+                    Contact Information
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-slate-800 font-semibold">
+                    <div class="flex items-center gap-2"><i class="fas fa-building text-accent-blue"></i> <span><strong>Company:</strong> Warriors Educare</span></div>
+                    <div class="flex items-center gap-2"><i class="fas fa-user-tie text-accent-blue"></i> <span><strong>Founder:</strong> Prince Kumar</span></div>
+                    <div class="flex items-center gap-2"><i class="fas fa-globe text-accent-blue"></i> <span><strong>Website:</strong> <a href="https://www.warriorseducare.com" target="_blank" class="text-accent-blue hover:underline">www.warriorseducare.com</a></span></div>
+                    <div class="flex items-center gap-2"><i class="fas fa-envelope text-accent-blue"></i> <span><strong>Email:</strong> <a href="mailto:support@warriorseducare.com" class="text-accent-blue hover:underline">support@warriorseducare.com</a></span></div>
+                    <div class="flex items-center gap-2"><i class="fas fa-phone-alt text-accent-blue"></i> <span><strong>Phone:</strong> <a href="tel:+918210545286" class="text-accent-blue hover:underline">+91 8210545286</a></span></div>
+                </div>
+            </div>
 
-<h2 class="text-2xl font-bold text-text-main mt-8 mb-4">6. Third-Party Links</h2>
+            <!-- Acceptance Clause -->
+            <div class="p-6 rounded-2xl bg-[#031b4e] text-white shadow-lg">
+                <h4 class="text-amber-400 font-extrabold uppercase tracking-wider text-xs mb-2">Acceptance</h4>
+                <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                    By accessing this website, registering for our services, submitting documents, making payments or using any Warriors Educare service, you acknowledge that you have read, understood and agreed to this Disclaimer.
+                </p>
+            </div>
 
-<p class="text-text-secondary leading-7 mb-4">
-Our website may contain links to third-party websites or services for your convenience.
-</p>
-
-<p class="text-text-secondary leading-7 mb-4">
-We do not control, endorse, or assume responsibility for the content, privacy practices, or policies of any third-party websites. Users access such websites at their own discretion and risk.
-</p>
-
-<h2 class="text-2xl font-bold text-text-main mt-8 mb-4">7. Limitation of Liability</h2>
-
-<p class="text-text-secondary leading-7 mb-4">
-To the fullest extent permitted by applicable law, Warriors Educare shall not be liable for any direct, indirect, incidental, consequential, special, or punitive damages arising out of or related to:
-</p>
-
-<ul class="list-disc pl-6 mb-4 space-y-2">
-    <li class="text-text-secondary leading-7">Job application outcomes.</li>
-    <li class="text-text-secondary leading-7">Employer hiring decisions.</li>
-    <li class="text-text-secondary leading-7">Interview results.</li>
-    <li class="text-text-secondary leading-7">Employment termination.</li>
-    <li class="text-text-secondary leading-7">Salary disputes.</li>
-    <li class="text-text-secondary leading-7">Workplace issues.</li>
-    <li class="text-text-secondary leading-7">Delays in recruitment or joining.</li>
-    <li class="text-text-secondary leading-7">Loss of income or employment opportunities.</li>
-    <li class="text-text-secondary leading-7">Technical interruptions or temporary website unavailability.</li>
-</ul>
-
-<p class="text-text-secondary leading-7 mb-4">
-Our liability, if any, shall be limited to the extent required under applicable law.
-</p>
-
-<h2 class="text-2xl font-bold text-text-main mt-8 mb-4">8. Intellectual Property</h2>
-
-<p class="text-text-secondary leading-7 mb-4">
-All trademarks, logos, branding elements, website content, graphics, text, and other intellectual property displayed on this website are owned by or licensed to Warriors Educare.
-</p>
-
-<p class="text-text-secondary leading-7 mb-4">
-No content from this website may be copied, reproduced, modified, distributed, or used for commercial purposes without our prior written consent.
-</p>
-
-<h2 class="text-2xl font-bold text-text-main mt-8 mb-4">9. Changes to this Disclaimer</h2>
-
-<p class="text-text-secondary leading-7 mb-4">
-Warriors Educare reserves the right to update, amend, or replace this Disclaimer at any time without prior notice.
-</p>
-
-<p class="text-text-secondary leading-7 mb-4">
-The updated version will be effective immediately upon publication on this website.
-</p>
-
-<h2 class="text-2xl font-bold text-text-main mt-8 mb-4">10. Contact Us</h2>
-
-<p class="text-text-secondary leading-7 mb-4">
-If you have any questions regarding this Disclaimer, please contact us:
-</p>
-
-<p class="text-text-secondary leading-7 mb-2">
-Warriors Educare
-</p>
-
-<p class="text-text-secondary leading-7 mb-2">
-Email:
-<a href="mailto:warriorseducare@gmail.com" class="text-primary hover:underline break-all">
-    warriorseducare@gmail.com
-</a>
-</p>
-
-<p class="text-text-secondary leading-7 mb-2">
-Phone:
-<a href="tel:+918210545286" class="text-primary hover:underline">
-    +91 8210545286
-</a>
-</p>
-
-<p class="text-text-secondary leading-7 mb-4">
-Website:
-<a href="https://www.warriorseducare.in" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline break-all">
-    www.warriorseducare.in
-</a>
-</p>
-
-</div>
-
-
+        </div>
+    </div>
 @endsection

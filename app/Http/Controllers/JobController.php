@@ -28,7 +28,27 @@ class JobController extends Controller
             abort(404);
         }
         
-        return view('jobs.show', compact('job'));
+        $job->load(['category', 'subject', 'qualification', 'specialization', 'state', 'city']);
+
+        $similarJobs = JobPost::with(['category', 'subject', 'city', 'state'])
+            ->where('status', 'approved')
+            ->where('id', '!=', $job->id)
+            ->where(function($q) use ($job) {
+                $q->where('category_id', $job->category_id)
+                  ->orWhere('subject_id', $job->subject_id);
+            })
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $hasApplied = false;
+        if (auth()->check() && auth()->user()->role === 'candidate') {
+            $hasApplied = \App\Models\JobApplication::where('job_post_id', $job->id)
+                ->where('candidate_id', auth()->id())
+                ->exists();
+        }
+
+        return view('jobs.show', compact('job', 'similarJobs', 'hasApplied'));
     }
 
     public function storeJobQuery(Request $request)

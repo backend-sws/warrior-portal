@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\Payment\RazorpayService;
+use App\Services\Payment\PhonePeService;
 use App\Models\PaymentTransaction;
 use App\Models\ServiceChargeInvoice;
 use App\Models\User;
@@ -14,128 +14,154 @@ use Illuminate\Support\Facades\Mail;
 
 class WebhookController extends Controller
 {
-    protected RazorpayService $razorpay;
+    protected PhonePeService $phonepe;
 
-    public function __construct(RazorpayService $razorpay)
+    public function __construct(PhonePeService $phonepe)
     {
-        $this->razorpay = $razorpay;
+        $this->phonepe = $phonepe;
     }
 
     /**
-     * Handle incoming Razorpay webhook events
+     * Handle incoming PhonePe webhook events (Server-to-Server)
      */
-    public function handleRazorpay(Request $request)
+    public function handlePhonePe(Request $request)
     {
-        $payload   = $request->getContent();
-        $signature = $request->header('X-Razorpay-Signature');
+        $rawContent = $request->getContent();
+        $signature  = $request->header('X-VERIFY') ?: $request->header('x-verify');
+        $rawInput   = $request->all();
 
-        Log::info('Razorpay Webhook Received', [
-            'event'     => $request->input('event'),
+        Log::info('PhonePe Webhook Received', [
             'signature' => $signature ? 'Present' : 'Missing',
+            'has_raw'   => !empty($rawContent),
         ]);
 
-        // Verify Webhook Signature if webhook secret is configured
-        if (config('services.razorpay.webhook_secret')) {
-            if (!$signature || !$this->razorpay->verifyWebhookSignature($payload, $signature)) {
-                Log::warning('Razorpay Webhook Signature Verification Failed');
-                return response()->json(['error' => 'Invalid webhook signature'], 400);
-            }
+        $base64Response = $rawInput['response'] ?? null;
+
+        // If response is nested in json body
+        if (!$base64Response && !empty($rawContent)) {
+            $decodedJson = json_decode($rawContent, true);
+            $base64Response = $decodedJson['response'] ?? null;
         }
 
-        $event = json_decode($payload, true);
-        if (!$event || !isset($event['event'])) {
-            return response()->json(['error' => 'Invalid webhook payload'], 400);
+        if (!$base64Response) {
+            Log::warning('PhonePe Webhook Missing Base64 Response Payload', $rawInput);
+            return response()->json(['success' => false, 'message' => 'Missing response payload'], 400);
         }
 
-        $eventType = $event['event'];
-        $entity    = $event['payload']['payment']['entity'] ?? ($event['payload']['order']['entity'] ?? []);
+        // Verify PhonePe signature if present
+        if ($signature && !$this->phonepe->verifyWebhookSignature($base64Response, $signature)) {
+            Log::warning('PhonePe Webhook Signature Verification Failed');
+            return response()->json(['success' => false, 'message' => 'Invalid signature'], 400);
+        }
+
+        // Decode Base64 JSON Payload
+        $decodedPayload = json_decode(base64_decode($base64Response), true);
+
+        if (!$decodedPayload || !isset($decodedPayload['code'])) {
+            Log::warning('PhonePe Webhook Failed to Decode Base64 Payload', ['payload' => $base64Response]);
+            return response()->json(['success' => false, 'message' => 'Invalid JSON in base64 response'], 400);
+        }
+
+        Log::info('PhonePe Webhook Decoded Payload', ['payload' => $decodedPayload]);
+
+        $code        = $decodedPayload['code'] ?? '';
+        $data        = $decodedPayload['data'] ?? [];
+        $merchantId  = $data['merchantId'] ?? '';
+        $orderId     = $data['merchantTransactionId'] ?? '';
+        $providerTxn = $data['transactionId'] ?? '';
+        $amountInRs  = isset($data['amount']) ? ($data['amount'] / 100) : 0;
+        $state       = $data['state'] ?? '';
+        $paymentType = $data['paymentInstrument']['type'] ?? 'PHONEPE_ONLINE';
+        $utr         = $data['paymentInstrument']['utr'] ?? ($data['paymentInstrument']['pgTransactionId'] ?? '');
 
         try {
-            switch ($eventType) {
-                case 'payment.captured':
-                case 'order.paid':
-                    $this->handlePaymentSuccess($entity, $event);
-                    break;
-
-                case 'payment.failed':
-                    $this->handlePaymentFailed($entity, $event);
-                    break;
-
-                default:
-                    Log::info("Razorpay unhandled webhook event: {$eventType}");
-                    break;
+            if ($code === 'PAYMENT_SUCCESS' || $state === 'COMPLETED') {
+                $this->handlePhonePeSuccess($orderId, $providerTxn, $amountInRs, $paymentType, $utr, $decodedPayload);
+            } else {
+                $this->handlePhonePeFailed($orderId, $providerTxn, $code, $decodedPayload['message'] ?? 'Payment failed', $decodedPayload);
             }
 
-            return response()->json(['status' => 'success', 'event' => $eventType], 200);
+            return response()->json([
+                'success' => true,
+                'message' => 'PhonePe webhook processed successfully',
+            ], 200);
+
         } catch (\Exception $e) {
-            Log::error("Razorpay Webhook Processing Error [{$eventType}]: " . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+            Log::error("PhonePe Webhook Processing Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 
     /**
-     * Handle successful payment event
+     * Handle successful PhonePe payment
      */
-    protected function handlePaymentSuccess(array $paymentEntity, array $fullEvent): void
+    protected function handlePhonePeSuccess(string $orderId, string $paymentId, float $amount, string $paymentType, string $utr, array $fullPayload): void
     {
-        $orderId   = $paymentEntity['order_id'] ?? null;
-        $paymentId = $paymentEntity['id'] ?? null;
-        $amount    = isset($paymentEntity['amount']) ? ($paymentEntity['amount'] / 100) : 0;
-        $method    = $paymentEntity['method'] ?? 'online';
-        $notes     = $paymentEntity['notes'] ?? [];
-
-        if (!$orderId && !$paymentId) {
-            Log::warning('Webhook payment success missing order_id/payment_id');
+        if (empty($orderId)) {
+            Log::warning('PhonePe Webhook Success missing merchantTransactionId');
             return;
         }
 
-        DB::transaction(function () use ($orderId, $paymentId, $amount, $method, $notes, $paymentEntity, $fullEvent) {
-            // Find existing transaction by order_id or payment_id
-            $txn = null;
-            if ($orderId) {
-                $txn = PaymentTransaction::where('order_id', $orderId)->first();
-            }
-            if (!$txn && $paymentId) {
-                $txn = PaymentTransaction::where('payment_id', $paymentId)->first();
-            }
+        DB::transaction(function () use ($orderId, $paymentId, $amount, $paymentType, $utr, $fullPayload) {
+            $txn = PaymentTransaction::where('order_id', $orderId)->first();
 
-            // If already processed and successful, don't duplicate
+            // If already processed and marked successful
             if ($txn && $txn->status === 'success') {
-                Log::info("Webhook: Transaction #{$txn->id} already marked success.");
+                Log::info("PhonePe Webhook: Transaction #{$txn->id} already marked success.");
                 return;
             }
 
-            $candidateId = $notes['user_id'] ?? ($notes['candidate_id'] ?? ($txn?->candidate_id ?? null));
-            $invoiceId   = $notes['invoice_id'] ?? ($txn?->invoice_id ?? null);
-            $type        = $notes['type'] ?? ($txn?->type ?? 'service_charge');
+            $candidateId = $txn?->candidate_id;
+            $invoiceId   = $txn?->invoice_id;
+            $type        = $txn?->type ?? 'service_charge';
 
             if ($txn) {
                 $txn->update([
                     'payment_id'       => $paymentId,
                     'status'           => 'success',
-                    'payment_method'   => $method,
-                    'gateway'          => 'razorpay',
-                    'gateway_response' => $paymentEntity,
-                    'webhook_payload'  => $fullEvent,
+                    'payment_method'   => strtolower($paymentType),
+                    'gateway'          => 'phonepe',
+                    'gateway_response' => $fullPayload,
+                    'webhook_payload'  => $fullPayload,
                 ]);
             } else {
                 $txn = PaymentTransaction::create([
                     'candidate_id'     => $candidateId,
                     'amount'           => $amount,
-                    'transaction_id'   => 'RZP_' . ($paymentId ?: time()),
+                    'transaction_id'   => $orderId,
                     'order_id'         => $orderId,
                     'payment_id'       => $paymentId,
                     'type'             => $type,
                     'status'           => 'success',
-                    'gateway'          => 'razorpay',
-                    'payment_method'   => $method,
+                    'gateway'          => 'phonepe',
+                    'payment_method'   => strtolower($paymentType),
                     'invoice_id'       => $invoiceId,
-                    'gateway_response' => $paymentEntity,
-                    'webhook_payload'  => $fullEvent,
+                    'gateway_response' => $fullPayload,
+                    'webhook_payload'  => $fullPayload,
                 ]);
             }
 
-            // Update ServiceChargeInvoice if present
+            // Handle Registration / Verification Fee
+            if ($type === 'registration_fee' && $candidateId) {
+                $user = User::with('profile')->find($candidateId);
+                if ($user && $user->profile) {
+                    $user->profile->update([
+                        'initial_fee_paid' => true,
+                        'is_fee_paid'      => true,
+                        'plan_type'        => $amount >= 1000 ? 'premium' : 'standard',
+                    ]);
+
+                    NotificationHelper::notifyUser(
+                        $candidateId,
+                        'Registration Payment Confirmed 💳',
+                        '₹' . number_format($amount, 2) . ' received via PhonePe. Your account is activated and ready for job matching.',
+                        route('candidate.dashboard'),
+                        'fas fa-check-circle'
+                    );
+                }
+            }
+
+            // Handle Service Charge Invoices
             if ($invoiceId) {
                 $invoice = ServiceChargeInvoice::find($invoiceId);
                 if ($invoice && $invoice->status !== 'paid') {
@@ -153,16 +179,15 @@ class WebhookController extends Controller
                         ]);
                     }
 
-                    // In-app notification to candidate
                     NotificationHelper::notifyUser(
                         $candidateId,
                         'Service Charge Payment Confirmed ✅',
-                        '₹' . number_format($amount, 2) . ' received via Razorpay. Your payment receipt is updated in your portal.',
+                        '₹' . number_format($amount, 2) . ' received via PhonePe. Your payment receipt is updated in your portal.',
                         route('candidate.serviceCharge.show'),
                         'fas fa-check-circle'
                     );
 
-                    // Email Receipt
+                    // Email Receipt if mail configured
                     if ($user && $user->email) {
                         try {
                             Mail::to($user->email)->send(
@@ -177,8 +202,8 @@ class WebhookController extends Controller
 
             // Notify Admin
             NotificationHelper::notifyAdmin(
-                '💳 Razorpay Payment Received',
-                '₹' . number_format($amount, 2) . ' received via Razorpay (' . strtoupper($method) . ') for ' . ucfirst(str_replace('_', ' ', $type)) . '.',
+                '💳 PhonePe Payment Received',
+                '₹' . number_format($amount, 2) . ' received via PhonePe (' . strtoupper($paymentType) . ') for ' . ucfirst(str_replace('_', ' ', $type)) . (empty($utr) ? '' : ' [UTR: ' . $utr . ']') . '.',
                 route('admin.transactions.index'),
                 'fas fa-wallet'
             );
@@ -186,16 +211,11 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle failed payment event
+     * Handle failed PhonePe payment
      */
-    protected function handlePaymentFailed(array $paymentEntity, array $fullEvent): void
+    protected function handlePhonePeFailed(string $orderId, string $paymentId, string $errorCode, string $errorDescription, array $fullPayload): void
     {
-        $orderId          = $paymentEntity['order_id'] ?? null;
-        $paymentId        = $paymentEntity['id'] ?? null;
-        $errorCode        = $paymentEntity['error_code'] ?? 'PAYMENT_FAILED';
-        $errorDescription = $paymentEntity['error_description'] ?? 'Payment attempt failed';
-
-        Log::warning('Webhook: Payment Failed', [
+        Log::warning('PhonePe Webhook: Payment Failed', [
             'order_id'    => $orderId,
             'payment_id'  => $paymentId,
             'error_code'  => $errorCode,
@@ -208,11 +228,24 @@ class WebhookController extends Controller
                 $txn->update([
                     'status'            => 'failed',
                     'payment_id'        => $paymentId,
+                    'gateway'           => 'phonepe',
                     'error_code'        => $errorCode,
                     'error_description' => $errorDescription,
-                    'webhook_payload'   => $fullEvent,
+                    'webhook_payload'   => $fullPayload,
                 ]);
             }
         }
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Razorpay Webhook Handler (Commented Out as requested)
+    |--------------------------------------------------------------------------
+    */
+    /*
+    public function handleRazorpay(Request $request)
+    {
+        return response()->json(['message' => 'Razorpay is disabled.'], 200);
+    }
+    */
 }

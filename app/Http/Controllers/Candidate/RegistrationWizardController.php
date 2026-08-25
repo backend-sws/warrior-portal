@@ -303,45 +303,63 @@ class RegistrationWizardController extends Controller
 
     public function callback(Request $request)
     {
+        $orderId = $request->input('merchantTransactionId')
+            ?? $request->input('order_id')
+            ?? $request->input('razorpay_order_id')
+            ?? session('active_wizard_order_id');
+
+        $paymentId = $request->input('transactionId')
+            ?? $request->input('payment_id')
+            ?? $request->input('razorpay_payment_id')
+            ?? ($orderId ? 'PP_' . $orderId : null);
+
+        $code = $request->input('code', 'PAYMENT_SUCCESS');
+        $pendingPlanType = session('pending_plan_type', 'standard');
+
+        $txn = !empty($orderId) ? PaymentTransaction::where('order_id', $orderId)->first() : null;
+
         $user = auth()->user();
+        if (!$user && $txn && $txn->candidate_id) {
+            $user = \App\Models\User::find($txn->candidate_id);
+            if ($user) {
+                auth()->login($user);
+            }
+        }
+
         if (!$user) {
             return redirect()->route('login')->with('error', 'Session expired. Please log in.');
         }
 
-        $orderId   = $request->input('razorpay_order_id', session('active_wizard_order_id'));
-        $paymentId = $request->input('razorpay_payment_id');
-        $signature = $request->input('razorpay_signature');
-        $pendingPlanType = session('pending_plan_type', 'standard');
-
-        if (empty($paymentId) || empty($orderId)) {
+        if (empty($orderId)) {
             return redirect()->route('candidate.dashboard')->with('error', 'Payment was cancelled or failed.');
         }
 
         $gateway = $this->paymentManager->driver();
         $verification = $gateway->verifyPayment([
-            'order_id'   => $orderId,
-            'payment_id' => $paymentId,
-            'signature'  => $signature,
+            'order_id'       => $orderId,
+            'payment_id'     => $paymentId,
+            'code'           => $code,
+            'response'       => $request->input('response'),
         ]);
 
         $txn = PaymentTransaction::where('order_id', $orderId)->first();
 
         if (!$verification['success']) {
             if ($txn) {
-                $txn->update(['status' => 'failed', 'payment_id' => $paymentId, 'signature' => $signature]);
+                $txn->update(['status' => 'failed', 'payment_id' => $paymentId]);
             }
             return redirect()->route('candidate.dashboard')->with('error', 'Payment verification failed.');
         }
 
         $amountPaid = $txn ? $txn->amount : ($pendingPlanType === 'standard' ? 500 : 1000);
+        $finalPaymentId = $verification['payment_id'] ?: ($paymentId ?: 'PP_' . $orderId);
 
         if ($txn) {
             $txn->update([
-                'payment_id'       => $paymentId,
-                'signature'        => $signature,
+                'payment_id'       => $finalPaymentId,
                 'status'           => 'success',
-                'payment_method'   => $verification['payment_method'] ?? 'online',
-                'gateway'          => 'razorpay',
+                'payment_method'   => $verification['payment_method'] ?? 'phonepe_online',
+                'gateway'          => 'phonepe',
                 'gateway_response' => $verification['raw'] ?? [],
             ]);
         }
@@ -351,32 +369,32 @@ class RegistrationWizardController extends Controller
         if ($pendingPlanType === 'standard') {
             // Standard plan payment (2 job applications allowed)
             $profile->update([
-                'plan_type' => 'standard',
+                'plan_type'                  => 'standard',
                 'total_allowed_applications' => 2,
-                'initial_fee_paid' => true,
-                'paid_amount' => $profile->paid_amount + $amountPaid,
-                'pending_amount' => 500, // Initial 500 paid, 500 pending
-                'payment_id' => $statusResult['transactionId'],
-                'registration_completed_at' => now(),
-                'plan_started_at' => now(),
+                'initial_fee_paid'           => true,
+                'paid_amount'                => $profile->paid_amount + $amountPaid,
+                'pending_amount'             => 500, // Initial 500 paid, 500 pending
+                'payment_id'                 => $finalPaymentId,
+                'registration_completed_at'  => now(),
+                'plan_started_at'            => now(),
             ]);
         } else {
             // Premium plan payment (3 job applications allowed)
             $profile->update([
-                'plan_type' => 'premium',
+                'plan_type'                  => 'premium',
                 'total_allowed_applications' => 3,
-                'initial_fee_paid' => true,
-                'is_fee_paid' => true,
-                'paid_amount' => $profile->paid_amount + $amountPaid,
-                'pending_amount' => 0,
-                'payment_id' => $statusResult['transactionId'],
-                'registration_completed_at' => now(),
-                'plan_started_at' => now(),
+                'initial_fee_paid'           => true,
+                'is_fee_paid'                => true,
+                'paid_amount'                => $profile->paid_amount + $amountPaid,
+                'pending_amount'             => 0,
+                'payment_id'                 => $finalPaymentId,
+                'registration_completed_at'  => now(),
+                'plan_started_at'            => now(),
             ]);
         }
 
         // Clear session
-        $request->session()->forget(['registration_plan', 'payment_txn_id', 'pending_plan_type', 'last_txn_id']);
+        $request->session()->forget(['registration_plan', 'payment_txn_id', 'pending_plan_type', 'last_txn_id', 'active_wizard_order_id']);
 
         // Insert Database Notification for Candidate
         \Illuminate\Support\Facades\DB::table('notifications')->insert([

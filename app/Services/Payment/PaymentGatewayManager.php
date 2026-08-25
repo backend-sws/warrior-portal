@@ -38,7 +38,8 @@ class PaymentGatewayManager
     protected function createDriver(string $driver): PaymentGatewayInterface
     {
         return match ($driver) {
-            'razorpay' => new RazorpayService(),
+            'phonepe'  => new PhonePeService(),
+            // 'razorpay' => new RazorpayService(), // Razorpay commented as requested
             default    => throw new InvalidArgumentException("Payment gateway driver [{$driver}] is not supported."),
         };
     }
@@ -50,7 +51,7 @@ class PaymentGatewayManager
      */
     public function getDefaultDriver(): string
     {
-        return env('PAYMENT_GATEWAY', 'razorpay');
+        return env('PAYMENT_GATEWAY', 'phonepe');
     }
 
     /**
