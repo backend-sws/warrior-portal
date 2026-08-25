@@ -55,14 +55,56 @@ class AgreementController extends Controller
             return back()->with('error', 'Did not match data URI with image data');
         }
 
+        $photoPath = $profile->live_photo_path;
+        if ($request->filled('live_photo')) {
+            $livePhoto = $request->input('live_photo');
+            if (preg_match('/^data:image\/(\w+);base64,/', $livePhoto, $pType)) {
+                $pData = substr($livePhoto, strpos($livePhoto, ',') + 1);
+                $pExt = strtolower($pType[1]);
+                if (in_array($pExt, ['jpg', 'jpeg', 'png', 'webp'])) {
+                    $decodedPhoto = base64_decode($pData);
+                    $photoFilename = 'candidate_live_photos/job_agreement_user_' . $user->id . '_' . time() . '.' . ($pExt === 'jpeg' ? 'jpg' : $pExt);
+                    Storage::disk('public')->put($photoFilename, $decodedPhoto);
+                    $photoPath = $photoFilename;
+                }
+            }
+        } elseif ($request->hasFile('live_photo_file')) {
+            $photoPath = $request->file('live_photo_file')->store('candidate_live_photos', 'public');
+        }
+
+        // Enforce mandatory photo
+        if (empty($photoPath)) {
+            return back()->with('error', 'Live camera photo or photo upload is mandatory to sign this agreement.');
+        }
+
+        $locationName = $request->input('location_name') ?: ($request->input('latitude') ? 'GPS: ' . $request->input('latitude') . ', ' . $request->input('longitude') : null);
+
         $fileName = $this->generateStampedPdf($user, $profile, $signatureData, $type);
 
         // Update profile
-        $profile->update([
+        $updateData = [
             'is_agreement_signed' => true,
             'agreement_pdf_path' => $fileName,
-            'agreement_status' => 'signed'
-        ]);
+            'agreement_status' => 'signed',
+            'signature_data' => $request->signature,
+            'signature_type' => 'draw',
+            'signature_date_time' => now(),
+            'signature_ip_address' => $request->ip(),
+            'signature_device_info' => $request->userAgent(),
+        ];
+        if ($photoPath) {
+            $updateData['live_photo_path'] = $photoPath;
+        }
+        if ($request->filled('latitude')) {
+            $updateData['latitude'] = $request->input('latitude');
+        }
+        if ($request->filled('longitude')) {
+            $updateData['longitude'] = $request->input('longitude');
+        }
+        if ($locationName) {
+            $updateData['signature_location_name'] = $locationName;
+        }
+        $profile->update($updateData);
 
         return redirect()->route('candidate.dashboard')->with('success', 'Agreement digitally signed successfully.');
     }
@@ -79,13 +121,13 @@ class AgreementController extends Controller
 
             if (!$profile->agreement_pdf_path || !Storage::disk('public')->exists($profile->agreement_pdf_path) || ($request->has('regenerate') && $request->regenerate == '1')) {
                 $signatureDataRaw = $profile->signature_data;
-                if (!$signatureDataRaw) {
-                    return redirect()->route('candidate.dashboard')->with('error', 'Signature data is missing. Please sign the agreement again.');
-                }
-
                 $signatureData = '';
                 $type = 'png';
-                if ($profile->signature_type === 'type') {
+
+                if (!$signatureDataRaw) {
+                    $signatureData = $user->name;
+                    $type = 'type';
+                } elseif ($profile->signature_type === 'type') {
                     $signatureData = $signatureDataRaw;
                     $type = 'type';
                 } elseif (Str::startsWith($signatureDataRaw, 'data:image')) {
@@ -97,13 +139,16 @@ class AgreementController extends Controller
                     if (file_exists($path)) {
                         $type = pathinfo($path, PATHINFO_EXTENSION);
                         $signatureData = file_get_contents($path);
+                    } else {
+                        $signatureData = $user->name;
+                        $type = 'type';
                     }
                 } else {
                     $signatureData = base64_decode($signatureDataRaw);
-                }
-
-                if (!$signatureData) {
-                    return redirect()->route('candidate.dashboard')->with('error', 'Signature data invalid.');
+                    if (!$signatureData) {
+                        $signatureData = $user->name;
+                        $type = 'type';
+                    }
                 }
 
                 $fileName = $this->generateStampedPdf($user, $profile, $signatureData, $type);

@@ -108,7 +108,8 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
     Route::match(['get', 'post'], '/wizard/callback', [\App\Http\Controllers\Candidate\RegistrationWizardController::class, 'callback'])->name('wizard.callback');
 
     Route::get('/dashboard', function () {
-        $profile = auth()->user()->profile;
+        $user = auth()->user();
+        $profile = $user->profile ?? $user->profile()->create([]);
         return view('candidate.dashboard', compact('profile'));
     })->name('dashboard');
 });
@@ -259,6 +260,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/tuition-leads/{id}', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'update'])->name('tuition-leads.update');
     Route::put('/tuition-leads/{id}/status', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'updateStatus'])->name('tuition-leads.status.update');
     Route::post('/tuition-leads/{id}/approve', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'approve'])->name('tuition-leads.approve');
+    Route::post('/tuition-leads/{id}/toggle-featured', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'toggleFeatured'])->name('tuition-leads.toggle-featured');
     Route::post('/tuition-leads/{id}/assign-teacher', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'assignTeacher'])->name('tuition-leads.assign-teacher');
     Route::post('/tuition-leads/{id}/follow-up', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'storeFollowUp'])->name('tuition-leads.followup.store');
     Route::post('/tuition-leads/{id}/service-charge-invoice', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'storeInvoice'])->name('tuition-leads.invoice.store');
@@ -273,6 +275,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Tuition Service Charges (Teacher / Candidate Invoices)
     Route::get('/tuition-service-charges', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'index'])->name('tuition-service-charges.index');
+    Route::get('/tuition-service-charges/invoice/{id}', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'showInvoice'])->name('serviceCharge.invoice');
     Route::post('/tuition-service-charges', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'store'])->name('tuition-service-charges.store');
     Route::put('/tuition-service-charges/{id}', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'update'])->name('tuition-service-charges.update');
     Route::post('/tuition-service-charges/{id}/mark-paid', [\App\Http\Controllers\Admin\TuitionServiceChargeController::class, 'markPaid'])->name('tuition-service-charges.mark-paid');
@@ -288,6 +291,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/tuition-fees/{id}', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'update'])->name('tuition-fees.update');
     Route::delete('/tuition-fees/{id}', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'destroy'])->name('tuition-fees.destroy');
     Route::post('/tuition-fees/{id}/payment', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'addPayment'])->name('tuition-fees.payment.add');
+    Route::post('/tuition-fees/{id}/follow-up', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'setFollowUp'])->name('tuition-fees.follow-up');
+    Route::post('/tuition-fees/{id}/status', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'updatePaymentStatus'])->name('tuition-fees.status.update');
+    Route::post('/tuition-fees/{id}/send-reminder', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'sendPaymentReminder'])->name('tuition-fees.send-reminder');
+    Route::post('/tuition-fees-daily-summary', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'sendDailySummaryEmail'])->name('tuition-fees.daily-summary');
+    Route::post('/tuition-fees-bulk-reminders', [\App\Http\Controllers\Admin\TuitionFeeController::class, 'sendBulkReminders'])->name('tuition-fees.bulk-reminders');
 
 
     // Candidate Payment Management
@@ -315,6 +323,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // ── Admin Manual Reminder System ──────────────────────────────────────
     Route::prefix('reminders')->name('reminders.')->group(function () {
         Route::get('/',                 [\App\Http\Controllers\Admin\ReminderController::class, 'index'])->name('index');
+        Route::get('/search-candidates',[\App\Http\Controllers\Admin\ReminderController::class, 'searchCandidates'])->name('search-candidates');
         Route::post('/service-charge',  [\App\Http\Controllers\Admin\ReminderController::class, 'sendServiceChargeReminder'])->name('service-charge');
         Route::post('/tuition-service', [\App\Http\Controllers\Admin\ReminderController::class, 'sendTuitionServiceReminder'])->name('tuition-service');
         Route::post('/agreement',       [\App\Http\Controllers\Admin\ReminderController::class, 'sendAgreementReminder'])->name('agreement');
@@ -328,5 +337,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 Route::post('/submit-tuition-request', [\App\Http\Controllers\FrontendLeadController::class, 'storeTuitionLead'])->name('submit-tuition-request');
 
-// Razorpay Webhooks
-Route::post('/webhooks/razorpay', [\App\Http\Controllers\WebhookController::class, 'handleRazorpay'])->name('webhook.razorpay');
+// PhonePe Webhooks
+Route::post('/webhooks/phonepe', [\App\Http\Controllers\WebhookController::class, 'handlePhonePe'])->name('webhook.phonepe');
+
+// Razorpay Webhooks (Commented)
+// Route::post('/webhooks/razorpay', [\App\Http\Controllers\WebhookController::class, 'handleRazorpay'])->name('webhook.razorpay');

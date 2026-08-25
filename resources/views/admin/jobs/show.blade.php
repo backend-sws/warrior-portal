@@ -9,6 +9,9 @@
             <i class="fas fa-arrow-left"></i> Back to Jobs
         </a>
         <h2 class="text-xl font-bold text-gray-800">Review Job Post</h2>
+        <span class="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded">
+            {{ $job->job_id ?: 'JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT) }}
+        </span>
     </div>
     
     <div class="flex items-center space-x-3">

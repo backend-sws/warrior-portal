@@ -46,6 +46,11 @@
                         {{ strtoupper(substr($job->school_name, 0, 2)) }}
                     </div>
                     <div>
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                                <i class="fas fa-hashtag text-[8px] opacity-70"></i>{{ $job->job_id ?: 'JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT) }}
+                            </span>
+                        </div>
                         <h3 class="font-bold text-[#031b4e] hover:text-[#0ea5e9] transition-colors leading-tight text-sm">
                             <a href="{{ route('jobs.show', $job->id) }}" target="_blank">{{ $job->title ?? 'Teacher Required' }}</a>
                         </h3>

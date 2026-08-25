@@ -1,492 +1,487 @@
 @extends('layouts.app')
+
+@section('title', 'How Our Hiring & Placement Process Works - Warriors Educare')
+@section('meta_description', 'Learn about our transparent step-by-step placement process for Home Tuitions and School Teaching & Non-Teaching Staff at Warriors Educare.')
+
 @section('content')
 <style>
-/* Animated background gradient line */
-@keyframes flowGradient {
-    0% { background-position: 0% 0%; }
-    100% { background-position: 0% 200%; }
-}
-.timeline-line::before {
-    background-size: 100% 200%;
-    animation: flowGradient 4s linear infinite;
-}
-
-/* Floating animated background blobs */
-@keyframes floatBlob {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(40px, -60px) scale(1.2); }
-    66% { transform: translate(-30px, 40px) scale(0.8); }
-}
-.blob-1 { animation: floatBlob 15s ease-in-out infinite; }
-.blob-2 { animation: floatBlob 18s ease-in-out infinite reverse; }
-
-/* Pulse ring around the step circles */
-@keyframes pulseRing {
-    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
-    70% { box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-}
-.step-circle {
-    animation: pulseRing 3s infinite;
-}
-
-/* Card Floating Animation */
-@keyframes cardFloat {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-12px); }
-}
-.card-float-1 { animation: cardFloat 6s ease-in-out infinite; }
-.card-float-2 { animation: cardFloat 7s ease-in-out infinite 1s; }
-.card-float-3 { animation: cardFloat 5s ease-in-out infinite 2s; }
-.card-float-4 { animation: cardFloat 8s ease-in-out infinite 0.5s; }
-.card-float-5 { animation: cardFloat 6.5s ease-in-out infinite 1.5s; }
-.card-float-6 { animation: cardFloat 7.5s ease-in-out infinite 0.2s; }
-
-/* Unique Card Hover Effects */
-.card-float-1, .card-float-2, .card-float-3, .card-float-4, .card-float-5, .card-float-6 {
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s ease;
-    cursor: pointer; /* Changed to pointer on hover immediately */
-}
-/* Glassy Shine effect */
-.card-float-1::before, .card-float-2::before, .card-float-3::before, .card-float-4::before, .card-float-5::before, .card-float-6::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -150%; width: 50%; height: 100%;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
-    transform: skewX(-25deg);
-    transition: all 0.7s ease;
-    z-index: 1;
-    pointer-events: none;
-}
-.card-float-1:hover::before, .card-float-2:hover::before, .card-float-3:hover::before, .card-float-4:hover::before, .card-float-5:hover::before, .card-float-6:hover::before {
-    left: 200%;
-}
-/* Dynamic Glow shadow & Lift on hover */
-.card-float-1:hover { margin-top: -8px; border-color: rgba(3, 27, 78, 0.5); box-shadow: 0 25px 50px -12px rgba(3, 27, 78, 0.35); }
-.card-float-2:hover { margin-top: -8px; border-color: rgba(234, 179, 8, 0.5); box-shadow: 0 25px 50px -12px rgba(234, 179, 8, 0.35); }
-.card-float-3:hover { margin-top: -8px; border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.35); }
-.card-float-4:hover { margin-top: -8px; border-color: rgba(139, 92, 246, 0.5); box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.35); }
-.card-float-5:hover { margin-top: -8px; border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.35); }
-.card-float-6:hover { margin-top: -8px; border-color: rgba(234, 88, 12, 0.5); box-shadow: 0 25px 50px -12px rgba(234, 88, 12, 0.35); }
-
-/* Icon Pop Effect */
-.card-float-1 .w-12, .card-float-2 .w-12, .card-float-3 .w-12, .card-float-4 .w-12, .card-float-5 .w-12, .card-float-6 .w-12 {
-    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-}
-.card-float-1:hover .w-12, .card-float-2:hover .w-12, .card-float-3:hover .w-12, .card-float-4:hover .w-12, .card-float-5:hover .w-12, .card-float-6:hover .w-12 {
-    transform: scale(1.15) rotate(8deg);
-}
+    .track-tab-btn.active {
+        background: #031b4e !important;
+        color: #ffffff !important;
+        box-shadow: 0 10px 25px -5px rgba(3, 27, 78, 0.3);
+    }
+    .track-tab-btn {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .step-badge {
+        background: linear-gradient(135deg, #031b4e 0%, #129aef 100%);
+    }
 </style>
 
-<x-page-header title="Our Hiring Process" :breadcrumbs="['Home' => route('home'), 'Hiring Process' => null]" />
+<x-page-header title="How Our Hiring & Placement Process Works" :breadcrumbs="['Home' => route('home'), 'Hiring Process' => null]" />
 
-<div class="py-20 px-6 lg:px-[5%] metallic-blue-card border-none shadow-none relative font-sans overflow-hidden min-h-screen" style="background-image: url(&quot;data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%23129aef' fill-opacity='0.25'%3E%3Cpath d='M 10 20 Q 20 10 30 20 Q 20 30 10 20 Z' transform='rotate(45 20 20)'/%3E%3Cpath d='M 60 15 Q 70 5 80 15 Q 70 25 60 15 Z' transform='rotate(-30 70 15)'/%3E%3Cpath d='M 25 60 Q 35 50 45 60 Q 35 70 25 60 Z' transform='rotate(75 35 60)'/%3E%3Cpath d='M 75 70 Q 85 60 95 70 Q 85 80 75 70 Z' transform='rotate(-15 85 70)'/%3E%3Cpath d='M 45 30 Q 55 20 65 30 Q 55 40 45 30 Z' transform='rotate(10 55 30)'/%3E%3Cpath d='M 5 80 Q 15 70 25 80 Q 15 90 5 80 Z' transform='rotate(120 15 80)'/%3E%3Cpath d='M 85 35 Q 95 25 105 35 Q 95 45 85 35 Z' transform='rotate(-70 95 35)'/%3E%3Cpath d='M 40 90 Q 50 80 60 90 Q 50 100 40 90 Z' transform='rotate(40 50 90)'/%3E%3Cpath d='M -10 40 Q 0 30 10 40 Q 0 50 -10 40 Z' transform='rotate(-20 0 40)'/%3E%3Cpath d='M 30 -5 Q 40 -15 50 -5 Q 40 5 30 -5 Z' transform='rotate(35 40 -5)'/%3E%3C/g%3E%3C/svg%3E&quot;); background-size: 150px; background-repeat: repeat; opacity: 0.98;">
-    <!-- Animated Background Blobs -->
-    <div class="absolute top-1/4 left-0 w-[500px] h-[500px] bg-accent-blue/10 rounded-full blur-[120px] blob-1 pointer-events-none z-0"></div>
-    <div class="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-accent-yellow/10 rounded-full blur-[120px] blob-2 pointer-events-none z-0"></div>
-    <div class="max-w-5xl mx-auto relative z-10">
+<div class="py-16 lg:py-24 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#ffffff] relative font-sans overflow-hidden">
+    
+    <!-- Background Decor -->
+    <div class="absolute top-0 right-0 w-96 h-96 bg-blue-100/50 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+    <div class="absolute bottom-1/3 left-0 w-96 h-96 bg-amber-100/40 rounded-full blur-3xl pointer-events-none -ml-20"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        <div class="text-center mb-16 reveal">
-            <h2 class="text-3xl lg:text-4xl font-bold text-white mb-4 drop-shadow-md">Step-by-Step Hiring Process</h2>
-            <p class="text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">Our streamlined recruitment process is designed to connect talented educators with top institutions efficiently.</p>
+        <!-- Header Introduction -->
+        <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-blue-50 text-accent-blue border border-blue-200/60 shadow-2xs mb-4">
+                <i class="fas fa-route text-accent-blue"></i> Transparent & Streamlined Workflow
+            </span>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#031b4e] tracking-tight leading-tight mb-4">
+                WARRIORS EDUCARE
+            </h2>
+            <p class="text-base sm:text-lg text-slate-700 font-medium leading-relaxed">
+                Understand our simple, professional, and end-to-end recruitment process for <strong class="text-[#031b4e] font-extrabold">Home Tuitions</strong> and <strong class="text-[#031b4e] font-extrabold">School Teaching & Non-Teaching Staff</strong>.
+            </p>
+
+            <!-- Interactive Track Tabs -->
+            <div class="mt-8 inline-flex p-1.5 bg-white border border-slate-200 rounded-2xl shadow-sm max-w-full overflow-x-auto">
+                <button type="button" onclick="switchTrack('tuition')" id="tuitionTabBtn" class="track-tab-btn active px-6 py-3 rounded-xl text-xs sm:text-sm font-black flex items-center gap-2.5 shrink-0">
+                    <i class="fas fa-chalkboard-teacher text-amber-400"></i>
+                    <span>Home Tuition Placement (10 Steps)</span>
+                </button>
+                <button type="button" onclick="switchTrack('school')" id="schoolTabBtn" class="track-tab-btn px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#031b4e] flex items-center gap-2.5 shrink-0">
+                    <i class="fas fa-school text-blue-500"></i>
+                    <span>School & Staff Placement (11 Steps)</span>
+                </button>
+            </div>
         </div>
 
-        <div class="space-y-12 relative before:absolute before:inset-0 before:ml-8 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-1 before:bg-gradient-to-b before:from-[#ffb800] before:via-accent-blue before:to-[#ffb800] timeline-line">
-
-            <!-- Step 1 -->
-            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group reveal">
-                <div class="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white metallic-blue-card border-none shadow-none text-white shadow-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 step-circle">
-                    <span class="text-2xl font-bold">1</span>
-                </div>
-                
-                <div class="w-[calc(100%-4.5rem)] md:w-[calc(50%-3rem)] bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 ml-5 md:ml-0 card-float-1">
-                    <div class="flex items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-[#031b4e] flex items-center justify-center text-xl shrink-0 shadow-inner">
-                            <i class="fas fa-file-invoice"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-[#031b4e]">Document Submission</h3>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center gap-2"><i class="fas fa-upload text-accent-blue"></i> Submit</h4>
-                            <ul class="space-y-2 text-[13px] text-slate-600">
-                                <li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-0.5"></i> Updated Resume (CV)</li>
-                                <li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-0.5"></i> Latest Salary Slip OR Offer Letter</li>
-                            </ul>
+        <!-- ========================================== -->
+        <!-- TRACK 1: HOME TUITION PLACEMENT PROCESS   -->
+        <!-- ========================================== -->
+        <div id="tuitionTrackSection" class="transition-all duration-300">
+            
+            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-md p-6 sm:p-10 mb-12">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 mb-8 border-b border-slate-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center text-2xl font-black shadow-inner shrink-0">
+                            <i class="fas fa-book-reader"></i>
                         </div>
                         <div>
-                            <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center gap-2"><i class="fas fa-bullseye text-accent-blue"></i> Purpose</h4>
-                            <ul class="space-y-2 text-[13px] text-slate-600">
-                                <li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-0.5"></i> Profile Evaluation</li>
-                                <li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-0.5"></i> Eligibility Check</li>
-                                <li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-0.5"></i> Vacancy Matching</li>
-                            </ul>
+                            <span class="text-xs font-bold text-amber-700 uppercase tracking-widest">Tutor Placement Guide</span>
+                            <h3 class="text-xl sm:text-2xl font-extrabold text-[#031b4e]">Home Tuition Placement Process</h3>
                         </div>
                     </div>
+                    <a href="{{ route('candidate.register') }}" class="px-5 py-2.5 bg-[#031b4e] hover:bg-[#021338] text-white rounded-xl text-xs font-bold shadow-md transition-all flex items-center gap-2">
+                        <span>Register as Tutor</span> <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- 10 Step Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                    
+                    <!-- Step 1 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-blue-50/40 hover:border-blue-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">01</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 1 – Submit Your Application</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Complete the registration form by providing your personal details, qualifications, teaching subjects, preferred classes and preferred teaching location.
+                        </p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-blue-50/40 hover:border-blue-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">02</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 2 – Profile Verification</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Our team reviews and verifies your profile, qualifications and other submitted information to ensure suitability for tuition opportunities.
+                        </p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-blue-50/40 hover:border-blue-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">03</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 3 – Registration Completion</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Complete the registration process to activate your tutor profile in our database.
+                        </p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-blue-50/40 hover:border-blue-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">04</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 4 – Tuition Requirement Matching</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Based on your subject expertise, class preference, location and availability, we match your profile with suitable student requirements.
+                        </p>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-blue-50/40 hover:border-blue-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">05</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 5 – Tuition Lead Sharing</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Once a suitable requirement is available, complete details of the tuition opportunity will be shared with you.
+                        </p>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-blue-50/40 hover:border-blue-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">06</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 6 – Demo Class (If Required)</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            The parent may request a demo class before finalizing the tutor. Candidates are expected to attend the demo professionally and on time.
+                        </p>
+                    </div>
+
+                    <!-- Step 7 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-blue-50/40 hover:border-blue-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">07</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 7 – Parent Confirmation</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            If the parent is satisfied with the demo class and profile, the tuition assignment will be confirmed.
+                        </p>
+                    </div>
+
+                    <!-- Step 8 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-blue-50/40 hover:border-blue-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">08</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 8 – Start Teaching</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Begin classes according to the mutually agreed schedule and maintain professional conduct throughout the engagement.
+                        </p>
+                    </div>
+
+                    <!-- Step 9 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-emerald-50/70 border border-emerald-300 hover:bg-emerald-50 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">09</span>
+                            <h4 class="font-extrabold text-emerald-950 text-base">Step 9 – Successful Placement 🎉</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-emerald-950 leading-relaxed font-semibold pl-11">
+                            Your tuition placement is considered successful once classes have commenced and the first month's tuition fee is received.
+                        </p>
+                    </div>
+
+                    <!-- Step 10 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-blue-50/70 border border-blue-300 hover:bg-blue-50 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="w-8 h-8 rounded-xl bg-[#031b4e] text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">10</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base">Step 10 – Service Charge Settlement</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-800 leading-relaxed font-semibold pl-11">
+                            After receiving the first month's tuition fee/payment, the applicable service charge must be paid as per the agreed terms and conditions.
+                        </p>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- Step 2 -->
-            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group reveal reveal-delay-1">
-                <div class="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-accent-yellow text-slate-900 shadow-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 step-circle">
-                    <span class="text-2xl font-bold">2</span>
-                </div>
-                
-                <div class="w-[calc(100%-4.5rem)] md:w-[calc(50%-3rem)] bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 ml-5 md:ml-0 card-float-2">
-                    <div class="flex items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-                        <div class="w-12 h-12 rounded-xl bg-yellow-50 text-accent-yellow flex items-center justify-center text-xl shrink-0 shadow-inner">
-                            <i class="fas fa-clipboard-list"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800">Registration Process</h3>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-5">
-                        <div class="border border-slate-200 rounded-xl p-4 relative bg-slate-50 transition-colors hover:border-accent-blue/30">
-                            <div class="text-center mb-3">
-                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Standard Plan</h4>
-                                <div class="text-xl font-extrabold text-accent-blue mt-1">₹500</div>
-                            </div>
-                            <ul class="space-y-2 text-[12px] text-slate-600">
-                                <li class="flex items-start gap-1.5"><i class="fas fa-check-circle text-accent-blue mt-0.5"></i> Process starts within 24 hours</li>
-                                <li class="flex items-start gap-1.5"><i class="fas fa-check-circle text-accent-blue mt-0.5"></i> Validity: 3 Months</li>
-                                <li class="flex items-start gap-1.5"><i class="fas fa-check-circle text-accent-blue mt-0.5"></i> Up to 2 Interview Opportunities</li>
-                                <li class="flex items-start gap-1.5"><i class="fas fa-check-circle text-accent-blue mt-0.5"></i> ₹500 (After Selection)</li>
-                            </ul>
-                        </div>
-                        <div class="border-2 border-accent-yellow rounded-xl p-4 relative bg-[#fffdf5] shadow-[0_4px_15px_rgba(255,184,0,0.1)]">
-                            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-accent-yellow text-slate-900 text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase whitespace-nowrap shadow-sm">Recommended</div>
-                            <div class="text-center mb-3 mt-1">
-                                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Premium Plan</h4>
-                                <div class="text-xl font-extrabold text-accent-yellow mt-1 drop-shadow-sm">₹1000</div>
-                            </div>
-                            <ul class="space-y-2 text-[12px] text-slate-700 font-medium">
-                                <li class="flex items-start gap-1.5"><i class="fas fa-star text-accent-yellow mt-0.5"></i> Priority Processing</li>
-                                <li class="flex items-start gap-1.5"><i class="fas fa-star text-accent-yellow mt-0.5"></i> Same-Day Verification</li>
-                                <li class="flex items-start gap-1.5"><i class="fas fa-star text-accent-yellow mt-0.5"></i> Up to 3 Interview Opportunities</li>
-                                <li class="flex items-start gap-1.5"><i class="fas fa-star text-accent-yellow mt-0.5"></i> Priority Vacancies</li>
-                                <li class="flex items-start gap-1.5"><i class="fas fa-star text-accent-yellow mt-0.5"></i> Validity: 6 Months</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-red-50 border border-red-100 p-3 rounded-lg text-[11px] text-red-700 flex gap-2.5 items-start shadow-sm">
-                        <i class="fas fa-exclamation-triangle mt-0.5"></i>
-                        <span><strong class="font-bold">IMPORTANT:</strong> Registration charges are non-refundable after process initiation.</span>
-                    </div>
-                </div>
-            </div>
+        </div>
 
-            <!-- Step 3 -->
-            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group reveal reveal-delay-2">
-                <div class="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-[#10b981] text-white shadow-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 step-circle">
-                    <span class="text-2xl font-bold">3</span>
-                </div>
-                
-                <div class="w-[calc(100%-4.5rem)] md:w-[calc(50%-3rem)] bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 ml-5 md:ml-0 card-float-3">
-                    <div class="flex items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0 shadow-inner">
-                            <i class="fas fa-handshake"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800">Candidate Agreement</h3>
-                    </div>
-                    
-                    <p class="text-[13px] text-slate-600 mb-4 font-medium">Before proceeding, candidates review and sign:</p>
-                    <div class="flex items-center gap-6">
-                        <ul class="space-y-3.5 text-[13px] text-slate-700 font-semibold flex-1">
-                            <li class="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100"><i class="fas fa-check-circle text-emerald-500 text-lg"></i> Candidate Consent Form</li>
-                            <li class="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100"><i class="fas fa-check-circle text-emerald-500 text-lg"></i> Service Agreement</li>
-                            <li class="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100"><i class="fas fa-check-circle text-emerald-500 text-lg"></i> Terms & Conditions Acceptance</li>
-                        </ul>
-                        <div class="hidden sm:flex text-6xl text-emerald-600/10 pr-4">
-                            <i class="fas fa-file-signature"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 4 -->
-            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group reveal reveal-delay-3">
-                <div class="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-[#8b5cf6] text-white shadow-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 step-circle">
-                    <span class="text-2xl font-bold">4</span>
-                </div>
-                
-                <div class="w-[calc(100%-4.5rem)] md:w-[calc(50%-3rem)] bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 ml-5 md:ml-0 card-float-4">
-                    <div class="flex items-center gap-4 mb-4 pb-4 border-b border-slate-100">
-                        <div class="w-12 h-12 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center text-xl shrink-0 shadow-inner">
-                            <i class="fas fa-video"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="text-xl font-bold text-slate-800 mb-1">Introduction Video</h3>
-                            <span class="text-[10px] font-bold uppercase tracking-wider bg-violet-100 text-violet-700 px-2.5 py-0.5 rounded-full">Duration: 1-2 Minutes</span>
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-                        <div class="flex-1 w-full">
-                            <p class="text-[13px] font-bold text-slate-800 mb-3 uppercase tracking-wide">Include in your video:</p>
-                            <ul class="space-y-2 text-[13px] text-slate-600 list-disc list-inside marker:text-violet-500">
-                                <li>Personal Introduction</li>
-                                <li>Educational Qualification</li>
-                                <li>Experience</li>
-                                <li>Subject / Position Applied For</li>
-                            </ul>
-                        </div>
-                        <div class="w-full sm:w-28 h-28 bg-slate-50 rounded-xl flex items-center justify-center text-violet-200 text-5xl relative overflow-hidden shrink-0 border border-slate-200 shadow-inner">
-                            <i class="fas fa-desktop"></i>
-                            <div class="absolute inset-0 flex items-center justify-center text-violet-500 drop-shadow-md">
-                                <i class="fas fa-play-circle text-4xl bg-white rounded-full"></i>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6 bg-violet-50 border border-violet-100 p-3.5 rounded-xl flex gap-3 items-start shadow-sm">
-                        <div class="bg-violet-200 text-violet-700 w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5"><i class="far fa-lightbulb text-[11px]"></i></div>
-                        <p class="text-[12px] text-violet-900 font-medium leading-relaxed">Speak confidently and professionally. This helps us understand you better!</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 5 -->
-            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group reveal reveal-delay-4">
-                <div class="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-accent-blue text-white shadow-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 step-circle">
-                    <span class="text-2xl font-bold">5</span>
-                </div>
-                
-                <div class="w-[calc(100%-4.5rem)] md:w-[calc(50%-3rem)] bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 ml-5 md:ml-0 card-float-5">
-                    <div class="flex items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-accent-blue flex items-center justify-center text-xl shrink-0 shadow-inner relative overflow-hidden">
-                            <i class="fas fa-trophy text-accent-yellow absolute z-10 drop-shadow-sm"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800">Interview & Selection</h3>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row gap-6 items-center">
-                        <ul class="space-y-3.5 text-[13px] text-slate-700 font-semibold flex-1 w-full">
-                            <li class="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100"><i class="fas fa-check-circle text-accent-blue text-lg"></i> Profile Shortlisting</li>
-                            <li class="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100"><i class="fas fa-check-circle text-accent-blue text-lg"></i> School Interview Coordination</li>
-                            <li class="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100"><i class="fas fa-check-circle text-accent-blue text-lg"></i> Final Selection by School</li>
-                            <li class="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100"><i class="fas fa-check-circle text-accent-blue text-lg"></i> Offer Confirmation</li>
-                        </ul>
-                        <div class="hidden sm:flex text-6xl text-accent-blue/10 pr-4">
-                            <i class="fas fa-user-tie"></i>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-
-        <!-- Step 6 -->
-            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group reveal reveal-delay-1">
-                <div class="flex items-center justify-center w-16 h-16 rounded-full border-4 border-white bg-accent-yellow text-slate-900 shadow-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 step-circle">
-                    <span class="text-2xl font-bold">6</span>
-                </div>
-                
-                <div class="w-[calc(100%-4.5rem)] md:w-[calc(50%-3rem)] bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 ml-5 md:ml-0 card-float-6">
-                    <div class="flex items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-                        <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-xl shrink-0 shadow-inner">
-                            <i class="fas fa-rupee-sign"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800">Joining & Service Charges</h3>
-                    </div>
-                    
-                    <div class="mb-5 bg-orange-50/70 p-4 rounded-xl border border-orange-100 flex flex-col sm:flex-row items-center gap-4 justify-between">
-                        <div>
-                            <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wide mb-2.5">Payable Only After:</h4>
-                            <ul class="space-y-2 text-[13px] text-slate-700 font-medium">
-                                <li class="flex items-center gap-2"><i class="fas fa-check-circle text-orange-500"></i> Successful Joining</li>
-                                <li class="flex items-center gap-2"><i class="fas fa-check-circle text-orange-500"></i> First Salary Received</li>
-                            </ul>
-                        </div>
-                        <div class="text-5xl text-orange-400 opacity-80 drop-shadow-sm px-4">
-                            <i class="fas fa-sack-dollar"></i>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-                        <div class="border border-slate-200 rounded-xl p-4 text-center bg-white shadow-sm transition-colors hover:border-orange-300">
-                            <h4 class="text-[11px] font-bold text-orange-600 uppercase tracking-wide mb-3">Teaching Staff</h4>
-                            <div class="flex flex-col items-center justify-center gap-2">
-                                <div class="text-3xl text-slate-700 mb-1"><i class="fas fa-chalkboard-teacher"></i></div>
-                                <div>
-                                    <div class="text-2xl font-extrabold text-slate-800 leading-none">50%</div>
-                                    <div class="text-[10px] text-slate-500 uppercase font-bold mt-1">of One Month Salary</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="border border-slate-200 rounded-xl p-4 text-center bg-white shadow-sm transition-colors hover:border-orange-300">
-                            <h4 class="text-[11px] font-bold text-orange-600 uppercase tracking-wide mb-3">Management / Non-Teaching</h4>
-                            <div class="flex flex-col items-center justify-center gap-2">
-                                <div class="text-3xl text-slate-700 mb-1"><i class="fas fa-briefcase"></i></div>
-                                <div>
-                                    <div class="text-2xl font-extrabold text-slate-800 leading-none">20 Days</div>
-                                    <div class="text-[10px] text-slate-500 uppercase font-bold mt-1">Salary <br><span class="text-[8px] opacity-70">(66.67% of One Month)</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-xl overflow-hidden shadow-md mb-5">
-                        <div class="text-center py-2 bg-black/10 text-[11px] font-bold uppercase tracking-widest border-b border-white/20">EMI Facility Available</div>
-                        <div class="grid grid-cols-2 divide-x divide-white/20 p-3.5">
-                            <div class="text-center">
-                                <div class="text-[10px] font-medium opacity-90 mb-1 uppercase tracking-wide">Teaching Staff</div>
-                                <div class="text-[10px] opacity-80 mb-0.5">Processing Fee</div>
-                                <div class="text-lg font-bold drop-shadow-sm">₹1499</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-[10px] font-medium opacity-90 mb-1 uppercase tracking-wide">Management / Non-Teaching</div>
-                                <div class="text-[10px] opacity-80 mb-0.5">Processing Fee</div>
-                                <div class="text-lg font-bold drop-shadow-sm">₹2999</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-[11px] text-slate-600 flex gap-3 items-start shadow-sm">
-                        <div class="metallic-blue-card border-none shadow-none text-white w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-[9px]"><i class="fas fa-info"></i></div>
-                        <p class="font-medium leading-relaxed">Service charges are performance-based and payable only after successful employment through Warriors Educare.</p>
-                    </div>
-                </div>
-            </div>
-
-        </div> <!-- End of timeline container -->
-
-        <!-- Bottom Sections -->
-        <div class="mt-20 max-w-4xl mx-auto space-y-8 reveal">
-            <!-- Vacancy & Application Process -->
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
-                <div class="metallic-blue-card border-none shadow-none text-white text-center py-3 font-bold uppercase tracking-wider text-[13px]">
-                    Vacancy & Application Process
-                </div>
-                <div class="p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-2 text-center relative bg-slate-50/50">
-                    <!-- Step A -->
-                    <div class="flex-1 flex flex-col items-center z-10">
-                        <div class="w-14 h-14 rounded-full bg-white border border-slate-200 text-[#031b4e] flex items-center justify-center text-xl mb-3 shadow-sm hover:scale-110 transition-transform">
+        <!-- ======================================================== -->
+        <!-- TRACK 2: SCHOOL TEACHER & STAFF PLACEMENT PROCESS        -->
+        <!-- ======================================================== -->
+        <div id="schoolTrackSection" class="hidden transition-all duration-300">
+            
+            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-md p-6 sm:p-10 mb-12">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 mb-8 border-b border-slate-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-50 text-accent-blue border border-blue-200 flex items-center justify-center text-2xl font-black shadow-inner shrink-0">
                             <i class="fas fa-school"></i>
                         </div>
-                        <p class="text-[11px] text-slate-700 font-semibold leading-tight max-w-[120px]">Vacancies received from reputed schools</p>
-                    </div>
-                    <!-- Arrow -->
-                    <div class="hidden md:block text-slate-300 text-lg"><i class="fas fa-chevron-right"></i></div>
-                    <div class="md:hidden text-slate-300 text-lg my-1"><i class="fas fa-chevron-down"></i></div>
-                    
-                    <!-- Step B -->
-                    <div class="flex-1 flex flex-col items-center z-10">
-                        <div class="w-14 h-14 rounded-full bg-white border border-slate-200 text-[#031b4e] flex items-center justify-center text-xl mb-3 shadow-sm hover:scale-110 transition-transform">
-                            <i class="fas fa-search"></i>
+                        <div>
+                            <span class="text-xs font-bold text-accent-blue uppercase tracking-widest">Institutional Recruitment</span>
+                            <h3 class="text-xl sm:text-2xl font-extrabold text-[#031b4e]">School Teacher & Non-Teaching Staff Placement Process</h3>
                         </div>
-                        <p class="text-[11px] text-slate-700 font-semibold leading-tight max-w-[120px]">Careful review & sharing of details</p>
                     </div>
-                    <!-- Arrow -->
-                    <div class="hidden md:block text-slate-300 text-lg"><i class="fas fa-chevron-right"></i></div>
-                    <div class="md:hidden text-slate-300 text-lg my-1"><i class="fas fa-chevron-down"></i></div>
+                    <a href="{{ route('candidate.register') }}" class="px-5 py-2.5 bg-accent-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md transition-all flex items-center gap-2">
+                        <span>Apply for School Jobs</span> <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- 11 Step Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                     
-                    <!-- Step C -->
-                    <div class="flex-1 flex flex-col items-center z-10">
-                        <div class="w-14 h-14 rounded-full bg-white border border-slate-200 text-[#031b4e] flex items-center justify-center text-xl mb-3 shadow-sm hover:scale-110 transition-transform">
-                            <i class="fas fa-file-signature"></i>
+                    <!-- Step 1 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-indigo-50/40 hover:border-indigo-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">01</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 1 – Submit Your Application</h4>
                         </div>
-                        <p class="text-[11px] text-slate-700 font-semibold leading-tight max-w-[120px]">Submit updated Resume (CV)</p>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Complete the registration form and provide your educational qualifications, work experience, preferred location and expected salary details.
+                        </p>
                     </div>
-                    <!-- Arrow -->
-                    <div class="hidden md:block text-slate-300 text-lg"><i class="fas fa-chevron-right"></i></div>
-                    <div class="md:hidden text-slate-300 text-lg my-1"><i class="fas fa-chevron-down"></i></div>
-                    
-                    <!-- Step D -->
-                    <div class="flex-1 flex flex-col items-center z-10">
-                        <div class="w-14 h-14 rounded-full bg-white border border-slate-200 text-[#031b4e] flex items-center justify-center text-xl mb-3 shadow-sm hover:scale-110 transition-transform">
-                            <i class="fas fa-users"></i>
+
+                    <!-- Step 2 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-indigo-50/40 hover:border-indigo-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">02</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 2 – Upload Required Documents</h4>
                         </div>
-                        <p class="text-[11px] text-slate-700 font-semibold leading-tight max-w-[120px]">Profile evaluation & shortlisting</p>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Submit the required documents for verification, including educational certificates, Aadhaar Card, resume/CV, photograph and other relevant documents.
+                        </p>
                     </div>
-                    <!-- Arrow -->
-                    <div class="hidden md:block text-slate-300 text-lg"><i class="fas fa-chevron-right"></i></div>
-                    <div class="md:hidden text-slate-300 text-lg my-1"><i class="fas fa-chevron-down"></i></div>
-                    
-                    <!-- Step E -->
-                    <div class="flex-1 flex flex-col items-center z-10">
-                        <div class="w-14 h-14 rounded-full metallic-blue-card border-none shadow-none border border-[#031b4e] text-white flex items-center justify-center text-xl mb-3 shadow-md hover:scale-110 transition-transform">
-                            <i class="fas fa-user-check"></i>
+
+                    <!-- Step 3 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-purple-50/70 border border-purple-300 hover:bg-purple-50 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="w-8 h-8 rounded-xl bg-purple-700 text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">03</span>
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-extrabold text-purple-950 text-base">Step 3 – Introduction Video</h4>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-200 text-purple-900 uppercase">Mandatory</span>
+                            </div>
                         </div>
-                        <p class="text-[11px] text-slate-800 font-bold leading-tight max-w-[120px]">Interview coordination & final selection</p>
+                        <p class="text-xs sm:text-sm text-purple-950 leading-relaxed font-semibold pl-11">
+                            Upload a 1–2 minute professional introduction video introducing yourself, your qualifications, teaching/professional experience, subject expertise and communication skills.
+                        </p>
                     </div>
+
+                    <!-- Step 4 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-indigo-50/40 hover:border-indigo-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">04</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 4 – Profile Screening & Verification</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Our recruitment team carefully reviews your profile, documents and experience to assess your suitability for available vacancies.
+                        </p>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-indigo-50/40 hover:border-indigo-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">05</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 5 – Registration Confirmation</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            After successful verification and registration completion, your profile becomes eligible for placement opportunities.
+                        </p>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-indigo-50/40 hover:border-indigo-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">06</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 6 – Vacancy Matching</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Your profile is matched with suitable teaching or non-teaching vacancies based on qualifications, experience, salary expectations and location preferences.
+                        </p>
+                    </div>
+
+                    <!-- Step 7 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-indigo-50/40 hover:border-indigo-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">07</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 7 – Interview Coordination</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Shortlisted candidates receive interview schedules and guidance for the recruitment process.
+                        </p>
+                    </div>
+
+                    <!-- Step 8 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-indigo-50/40 hover:border-indigo-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">08</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 8 – School Selection Process</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            The respective school or institution conducts interviews and makes the final hiring decision.
+                        </p>
+                    </div>
+
+                    <!-- Step 9 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:bg-indigo-50/40 hover:border-indigo-300 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="step-badge w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">09</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base group-hover:text-accent-blue transition-colors">Step 9 – Offer & Joining Confirmation</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium pl-11">
+                            Selected candidates receive offer details and confirm their joining date.
+                        </p>
+                    </div>
+
+                    <!-- Step 10 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-emerald-50/70 border border-emerald-300 hover:bg-emerald-50 transition-all group">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">10</span>
+                            <h4 class="font-extrabold text-emerald-950 text-base">Step 10 – Successful Placement 🎓</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-emerald-950 leading-relaxed font-semibold pl-11">
+                            The placement process is considered successfully completed once the candidate joins the school/institution and begins working.
+                        </p>
+                    </div>
+
+                    <!-- Step 11 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-blue-50/70 border border-blue-300 hover:bg-blue-50 transition-all group md:col-span-2">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <span class="w-8 h-8 rounded-xl bg-[#031b4e] text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">11</span>
+                            <h4 class="font-extrabold text-[#031b4e] text-base">Step 11 – Placement Service Charge Settlement</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-800 leading-relaxed font-semibold pl-11">
+                            After receiving the first salary/payment, the applicable placement service charge must be paid as per the agreed terms and conditions.
+                        </p>
+                    </div>
+
                 </div>
             </div>
-            
-            <!-- Conclusion -->
-            <div class="metallic-blue-card border-none shadow-none rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row items-center p-8 gap-6 text-white relative">
-                <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 40%);"></div>
-                <div class="flex-1 relative z-10 text-center md:text-left">
-                    <h4 class="text-accent-yellow font-bold uppercase tracking-wider mb-3 text-sm">Conclusion</h4>
-                    <p class="text-[13px] leading-relaxed text-slate-200 opacity-90 max-w-2xl">We appreciate your trust in Warriors Educare and look forward to supporting your professional journey. Our team remains committed to providing a transparent, efficient, and reliable recruitment experience while helping candidates connect with suitable career opportunities across India.</p>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- WHY CHOOSE WARRIORS EDUCARE?               -->
+        <!-- ========================================== -->
+        <div class="mt-12 bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-10 mb-10">
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <span class="text-xs font-black text-accent-blue uppercase tracking-widest">Our Strengths</span>
+                <h3 class="text-2xl sm:text-3xl font-black text-[#031b4e] mt-1">Why Choose Warriors Educare?</h3>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-sm font-black shrink-0 mt-0.5">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#031b4e] text-sm">Verified Opportunities</h4>
+                        <p class="text-xs text-slate-600 mt-0.5 font-medium">Genuine parent requirements & verified educational institutions.</p>
+                    </div>
                 </div>
-                <div class="text-6xl text-accent-yellow opacity-80 relative z-10 shrink-0 hidden md:block">
-                    <i class="fas fa-users-cog"></i>
+
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-sm font-black shrink-0 mt-0.5">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#031b4e] text-sm">Professional Profile Screening</h4>
+                        <p class="text-xs text-slate-600 mt-0.5 font-medium">In-depth evaluation of qualifications and communication skills.</p>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-sm font-black shrink-0 mt-0.5">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#031b4e] text-sm">Transparent Placement Process</h4>
+                        <p class="text-xs text-slate-600 mt-0.5 font-medium">Clear stages with no hidden or unexpected commercial terms.</p>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-sm font-black shrink-0 mt-0.5">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#031b4e] text-sm">Dedicated Recruitment Support</h4>
+                        <p class="text-xs text-slate-600 mt-0.5 font-medium">Personalized guidance throughout interview & demo sessions.</p>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-sm font-black shrink-0 mt-0.5">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#031b4e] text-sm">Dual Placement Assistance</h4>
+                        <p class="text-xs text-slate-600 mt-0.5 font-medium">Comprehensive assistance for Home Tuitions & School vacancies.</p>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-sm font-black shrink-0 mt-0.5">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#031b4e] text-sm">Skill & Requirement Matching</h4>
+                        <p class="text-xs text-slate-600 mt-0.5 font-medium">Opportunities matched strictly on qualifications, subjects & location.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- IMPORTANT NOTE / DISCLAIMER (CRYSTAL CLEAR)-->
+        <!-- ========================================== -->
+        <div class="rounded-3xl p-6 sm:p-8 shadow-sm border-2" style="background-color: #fffbeb; border-color: #fcd34d;">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0 mt-0.5 shadow-xs" style="background-color: #fef3c7; color: #b45309; border: 1.5px solid #f59e0b;">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="text-base sm:text-lg font-black uppercase tracking-wider" style="color: #78350f;">
+                        Important Note
+                    </h4>
+                    <p class="text-sm sm:text-[15px] leading-relaxed font-semibold" style="color: #451a03;">
+                        Registration with <strong style="color: #031b4e; font-weight: 900;">Warriors Educare</strong> is intended to facilitate tuition and job placement opportunities. However, placement is not guaranteed and depends on factors such as candidate eligibility, qualifications, availability of vacancies, parent requirements, interview performance and final selection by the parent, school or institution.
+                    </p>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Modal for Step Cards -->
-<div id="stepModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 metallic-blue-card border-none shadow-none/90 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="absolute inset-0 cursor-pointer" id="stepModalOverlay"></div>
-    <div id="stepModalContent" class="relative z-10 w-full max-w-lg transform scale-90 transition-transform duration-300">
-        <button id="closeModalBtn" class="absolute -top-12 right-0 md:-right-12 text-white bg-white/10 hover:bg-white/30 w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-lg border border-white/20">
-            <i class="fas fa-times text-xl"></i>
-        </button>
-        <div id="clonedCardContainer" class="relative"></div>
+        <!-- Bottom CTA -->
+        <div class="mt-12 text-center">
+            <div class="bg-[#031b4e] text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-accent-blue/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-2xl mx-auto space-y-4">
+                    <h3 class="text-2xl sm:text-3xl font-black">Ready to Start Your Teaching Journey?</h3>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                        Join hundreds of educators across India who trust Warriors Educare for premier home tuition and institutional career placements.
+                    </p>
+                    <div class="pt-4 flex flex-wrap items-center justify-center gap-3">
+                        <a href="{{ route('candidate.register') }}" class="px-7 py-3 bg-[#fbc043] hover:bg-[#e5ae3a] text-slate-900 font-extrabold rounded-xl text-sm shadow-md transition-all">
+                            Register as Candidate &rarr;
+                        </a>
+                        <a href="{{ route('contact') }}" class="px-7 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-sm border border-white/20 transition-all">
+                            Contact Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('stepModal');
-        const overlay = document.getElementById('stepModalOverlay');
-        const modalContent = document.getElementById('stepModalContent');
-        const closeBtn = document.getElementById('closeModalBtn');
-        const clonedContainer = document.getElementById('clonedCardContainer');
-        const cards = document.querySelectorAll('.card-float-1, .card-float-2, .card-float-3, .card-float-4, .card-float-5, .card-float-6');
+    function switchTrack(track) {
+        const tuitionSection = document.getElementById('tuitionTrackSection');
+        const schoolSection = document.getElementById('schoolTrackSection');
+        const tuitionBtn = document.getElementById('tuitionTabBtn');
+        const schoolBtn = document.getElementById('schoolTabBtn');
 
-        cards.forEach(card => {
-            card.classList.add('cursor-pointer');
-            // Add a little hint icon?
+        if (track === 'tuition') {
+            tuitionSection.classList.remove('hidden');
+            schoolSection.classList.add('hidden');
             
-            card.addEventListener('click', () => {
-                // Clear previous
-                clonedContainer.innerHTML = '';
-                
-                // Clone the card
-                const clone = card.cloneNode(true);
-                // Strip the float animations so it just sits statically in the modal
-                clone.className = 'bg-white p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-100 overflow-hidden relative';
-                
-                // Append to modal
-                clonedContainer.appendChild(clone);
-                
-                // Show modal
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-                modalContent.classList.remove('scale-90');
-                modalContent.classList.add('scale-100');
-            });
-        });
-
-        const closeModal = () => {
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-90');
-        };
-
-        overlay.addEventListener('click', closeModal);
-        closeBtn.addEventListener('click', closeModal);
-        
-        // Escape key to close
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-    });
+            tuitionBtn.className = 'track-tab-btn active px-6 py-3 rounded-xl text-xs sm:text-sm font-black flex items-center gap-2.5 shrink-0';
+            schoolBtn.className = 'track-tab-btn px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#031b4e] flex items-center gap-2.5 shrink-0';
+        } else {
+            schoolSection.classList.remove('hidden');
+            tuitionSection.classList.add('hidden');
+            
+            schoolBtn.className = 'track-tab-btn active px-6 py-3 rounded-xl text-xs sm:text-sm font-black flex items-center gap-2.5 shrink-0';
+            tuitionBtn.className = 'track-tab-btn px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#031b4e] flex items-center gap-2.5 shrink-0';
+        }
+    }
 </script>
 @endsection
-

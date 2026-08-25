@@ -19,6 +19,7 @@ class CandidateProfile extends Model
         'is_fee_paid' => 'boolean',
         'registration_completed_at' => 'datetime',
         'signature_date_time' => 'datetime',
+        'tuition_agreement_signed_at' => 'datetime',
         'plan_started_at' => 'datetime',
         'agreement_status' => 'string',
     ];

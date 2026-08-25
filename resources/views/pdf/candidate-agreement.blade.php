@@ -128,87 +128,86 @@
     </div>
 
     <div class="content">
-        <p>This document sets forth the official Terms & Conditions, policies, responsibilities, and professional expectations applicable to all candidates registering with Warriors Educare.</p>
-        <p>By registering with the Agency and proceeding further, the candidate acknowledges and enters into a legal and professional agreement governed by these Terms & Conditions.</p>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; color: #031b4e; font-size: 18px;">WARRIORS EDUCARE</h2>
+            <h3 style="margin: 5px 0 0 0; color: #004de6; font-size: 15px;">TEACHER PLACEMENT SERVICE AGREEMENT</h3>
+            <p style="font-size: 12px; color: #555; margin-top: 5px;">This Agreement is entered into voluntarily between Warriors Educare ("Agency") and the undersigned Candidate ("Teacher").</p>
+        </div>
 
-        <h3>Purpose of This Document</h3>
-        <p>The objective of this document is to ensure clarity, transparency, and mutual understanding between the candidate and Warriors Educare throughout the recruitment and placement process.</p>
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">1. Purpose of Agreement</h4>
+        <p>This Agreement confirms that the Candidate willingly authorizes Warriors Educare to begin the recruitment and placement process for suitable teaching opportunities.</p>
 
-        <h3>TERMS & CONDITIONS (SUMMARY)</h3>
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">2. Candidate Declaration</h4>
+        <p>The Candidate declares that:</p>
         <ul>
-            <li><strong>Registration:</strong> A non-refundable registration fee of Rs. 1,000 is payable. Registration remains valid for 3 job applications.</li>
-            <li><strong>Eligibility:</strong> Candidates must meet eligibility criteria as prescribed by the hiring institution. Documents: Submission of genuine and verifiable documents is mandatory. Any misrepresentation may result in cancellation without refund.</li>
-            <li><strong>Interviews & Demos:</strong> Attendance as scheduled is compulsory. Non-attendance may lead to removal from opportunities.</li>
-            <li><strong>Selection & Joining:</strong> Final selection rests solely with the hiring institution. Candidates must honor joining commitments once selected.</li>
-            <li><strong>Service Charges:</strong> The candidate agrees to pay the applicable service charge within 12 hours of receiving the first month's salary: Teaching Staff – 50% of one month's gross salary | Management/Non-Teaching Staff – 66.67% of one month's gross salary (20 days' salary).</li>
-            <li><strong>Refund Policy:</strong> Registration fees are strictly non-refundable under any circumstances.</li>
-            <li><strong>Payment Default:</strong> Delay or failure in payment may attract penalties, service suspension, or legal action.</li>
-            <li><strong>Job Commitment:</strong> A minimum service period of 90 working days is required unless otherwise agreed in writing.</li>
-            <li>These terms shall be deemed legally binding and enforceable, subject to the jurisdiction of Patna, Bihar.</li>
+            <li>All information and documents submitted are true and genuine.</li>
+            <li>Any false information or forged document may result in immediate cancellation of registration and placement without any refund.</li>
+            <li>The Candidate agrees to cooperate throughout the recruitment process.</li>
         </ul>
 
-        <h3>PAYMENT, CONFIDENTIALITY & LEGAL COMPLIANCE</h3>
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">3. Document Verification</h4>
+        <p>The Candidate shall provide all required documents, including but not limited to:</p>
         <ul>
-            <li>The candidate agrees to remit the applicable service charge within twelve (12) hours of receipt of the first salary.</li>
-            <li>Failure to make payment within the stipulated period shall attract a late penalty of Rs. 300 per day until the outstanding amount is cleared in full.</li>
-            <li>Non-payment beyond seven (7) days shall be treated as a material breach of contract under the Indian Contract Act, 1872, and may result in recovery proceedings, blacklisting, and suspension or termination of all placement services.</li>
-            <li>The candidate shall maintain strict confidentiality and shall not misuse, disclose, or share any employer, school, or Agency information. Any such violation may attract action under applicable laws, including the Information Technology Act, 2000, wherever applicable.</li>
-            <li>These terms shall be deemed legally binding and enforceable, subject to the exclusive jurisdiction of Patna, Bihar.</li>
+            <li>Aadhaar Card</li>
+            <li>Salary slip / Account statement</li>
+            <li>Passport-size Photograph</li>
+            <li>Any other document required by the school/institution or Warriors Educare.</li>
         </ul>
 
-
-
-        <h3>Candidates must:</h3>
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">4. Registration Charges</h4>
+        <p>The Candidate agrees to pay a non-refundable Registration Fee of Rs. 1,000, payable as follows:</p>
         <ul>
-            <li>Follow the school’s internal guidelines and rules be punctual and cooperative and maintain decorum and professionalism at all times.</li>
-            <li>Candidates must not share or misuse School contact information, Job leads and agency reference letters or documents.</li>
-            <li>Approaching a school directly or through any third party after receiving the lead from the Agency will result in Immediate blacklisting and legal action under data breach or professional misconduct.</li>
+            <li><strong>Rs. 500</strong> at the time of registration to initiate the recruitment process.</li>
+            <li><strong>Rs. 500</strong> immediately after selection by the school/Institution and before joining.</li>
+        </ul>
+        <p>Registration fees are charged for profile verification, documentation, screening, interview coordination and placement services. These charges are non-refundable.</p>
+        <p><strong>Registration Validity:</strong> The registration shall remain valid for 8 (Eight) months from the date of registration. During this period, Warriors Educare will make reasonable efforts to arrange up to 4–5 suitable interviews, subject to the Candidate's qualifications, preferred location, salary expectations and the availability of vacancies. The registration is non-transferable and non-refundable. After the expiry of the validity period, a fresh registration and the applicable registration fee may be required to continue placement services.</p>
+
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">5. Placement Service Charge</h4>
+        <p>After joining the school/Institution and receiving the first month's salary/payment, the Candidate agrees to pay <strong>50% of the first month's gross salary (equivalent to 15 days' salary)</strong> to Warriors Educare as the Placement Service Charge.</p>
+
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">6. Payment Timeline & Delay Charges</h4>
+        <ul>
+            <li>The Placement Service Charge must be paid <strong>within 12 hours</strong> of receiving the first salary/payment from the school/Institution.</li>
+            <li>If payment is not made within the prescribed time, a <strong>Late Payment Penalty of Rs. 300 per day</strong> shall be applicable until full payment is received.</li>
+            <li>Warriors Educare reserves the right to suspend future placement services until all dues are cleared.</li>
         </ul>
 
-        <h3>Registration fee is strictly non-refundable under any condition:</h3>
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">7. Job Placement</h4>
+        <p>Warriors Educare provides recruitment and placement assistance only. Final selection, salary, benefits, probation, working conditions and employment terms shall be decided solely by the respective school/Institution.</p>
+
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">8. Joining Commitment</h4>
+        <p>If the Candidate accepts the offer and confirms joining, they shall not refuse or leave before joining without a genuine reason and prior written/intimated notice to Warriors Educare.</p>
+
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">9. Professional Conduct</h4>
+        <p>The Candidate shall maintain professionalism, honesty, discipline and comply with all school policies. Any misconduct, indiscipline or fraudulent activity may result in blacklisting from Warriors Educare.</p>
+
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">10. Confidentiality</h4>
+        <p>The Candidate shall not disclose confidential information relating to Warriors Educare, the recruiting school or students to any third party.</p>
+
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">11. No Job Guarantee</h4>
+        <p>Registration with Warriors Educare does not guarantee job placement. Selection depends entirely on the school's/Institution's requirements, interview performance and candidate eligibility.</p>
+
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">12. Employment Relationship</h4>
+        <p>The Candidate understands that employment shall be with the respective school only. Warriors Educare acts solely as a recruitment and placement agency and shall not be responsible for salary, PF, ESI, leave, incentives or any employment benefits unless otherwise agreed in writing.</p>
+
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">13. Default & Legal Action</h4>
+        <p>In case the Candidate intentionally avoids payment of the agreed Placement Service Charge or violates this Agreement, Warriors Educare reserves the right to recover the outstanding amount along with applicable late charges and to initiate appropriate legal proceedings under the applicable laws of India. Any dispute arising out of this Agreement shall be subject to the jurisdiction of the competent courts at Patna, Bihar.</p>
+
+        <h4 style="color: #031b4e; margin-top: 15px; margin-bottom: 5px;">14. Acceptance of Terms</h4>
+        <p>By signing this Agreement physically or digitally, the Candidate confirms that:</p>
         <ul>
-            <li>Rejection by school.</li>
-            <li>Voluntary withdrawal by candidate.</li>
-            <li>Change of mind.</li>
-            <li>The service charge is also non-refundable once the candidate has received their salary and the due period for payment has begun.</li>
-            <li>Refunds will not be entertained for dissatisfaction with salary, location, or working conditions post joining.</li>
+            <li>They have carefully read and understood all the terms and conditions.</li>
+            <li>They voluntarily accept all clauses of this Agreement without any pressure.</li>
+            <li>They agree to comply with all payment obligations and conditions mentioned herein.</li>
         </ul>
 
-        <h3>BEHAVIORAL CODE OF CONDUCT</h3>
-        <p><strong>Candidates must always:</strong></p>
-        <ul>
-            <li>Be respectful and honest in communication.</li>
-            <li>Maintain professional appearance and behavior.</li>
-            <li>Refrain from abusive language or harassment.</li>
-            <li>Avoid any disputes with the employer during tenure.</li>
-            <li>Complaints from employers regarding attitude, communication, or ethics will be taken seriously and may result in blacklisting.</li>
-        </ul>
-
-        <h3>COMMUNICATION GUIDELINES</h3>
-        <p>All communication from the Agency will be done via: WhatsApp (only through registered numbers), Email (warriorseducare@gmail.com), Direct phone calls.</p>
-        <p><strong>Candidates must:</strong></p>
-        <ul>
-            <li>Respond within 24–48 hours to all official communications</li>
-            <li>Keep their registered mobile number and email active</li>
-            <li>Inform the Agency of any number/email changes.</li>
-            <li>Failure to communicate may result in cancellation of interview or job opportunity.</li>
-        </ul>
-
-
-
-        <h3 style="text-align: center; font-size: 18px;">DECLARATION & ACCEPTANCE</h3>
+        <h3 style="text-align: center; font-size: 16px; margin-top: 25px; color: #031b4e;">DECLARATION & ACCEPTANCE</h3>
         
         <p>I, <strong>{{ $user->name }}</strong>, hereby solemnly declare that I have thoroughly read, understood, and willingly accepted all the terms and conditions stated in this document of Warriors Educare.</p>
         <p>I confirm that all personal, academic, and professional details provided by me are true, accurate, and complete. I understand that any false or misleading information may result in immediate cancellation of my registration without any refund.</p>
-        <p>I hereby agree to pay a service/registration fee of <strong>Rs. 1000 (Rupees One Thousand only)</strong> to Warriors Educare, as mutually agreed, for availing recruitment and placement assistance services.</p>
-        <p>I clearly acknowledge and accept that the aforesaid amount is non-refundable under any circumstances once paid, irrespective of selection, joining, delay, or personal decision.</p>
-        <p>I further understand that Warriors Educare functions solely as a placement facilitation and consultancy service provider and does not guarantee employment, salary structure, job continuity, or service conditions, which are solely governed by the hiring institution.</p>
-        <p>I agree to abide by all rules, policies, and professional ethics of the agency. Any breach, non-compliance, or misconduct on my part may lead to termination of services and may attract legal action, if deemed necessary.</p>
+        <p>I clearly acknowledge and accept that the Registration Fee is non-refundable under any circumstances once paid, irrespective of selection, joining, delay, or personal decision.</p>
         <p>This declaration shall be deemed to constitute a lawful and binding agreement, enforceable in accordance with applicable laws, and subject exclusively to the jurisdiction of Patna, Bihar.</p>
-        
-        <p style="margin-top: 20px; font-weight: bold; font-style: italic;">
-            Candidates agree to resolve disputes through formal communication before taking legal recourse.
-        </p>
     </div>
 
     <div class="signature-section" style="margin-top: 60px;">
@@ -219,13 +218,25 @@
                         <strong>Date of Execution:</strong> {{ $date }}
                     </div>
                 </td>
-                <td style="width: 50%; text-align: left; padding-left: 35%; padding-top: 40px;">
-                    <div style="font-family: 'Times New Roman', Times, serif; font-size: 14px; color: #000; line-height: 1.2;">
+                <td style="width: 50%; text-align: left; padding-left: 25%; padding-top: 30px;">
+                    <div style="font-family: 'Times New Roman', Times, serif; font-size: 13px; color: #000; line-height: 1.35;">
+                        <div style="font-family: Arial, sans-serif; font-size: 11px; font-weight: bold; color: #059669; margin-bottom: 4px;">
+                            DIGITALLY SIGNED & VERIFIED
+                        </div>
                         <i>Digitally Signed by</i><br>
                         <i>Name : {{ $user->name }}</i><br>
                         <i>Phone No : ******{{ substr($user->phone ?? '0000', -4) }}</i><br>
-                        <i>Reason: Agreement E-signature</i><br>
-                        <i>Date : {{ \Carbon\Carbon::parse($profile->signature_date_time ?? now())->format('D M d H:i:s T Y') }}</i>
+                        @if(!empty($profile->signature_location_name))
+                            <i>GPS Location : 📍 {{ $profile->signature_location_name }}</i><br>
+                        @elseif($profile->latitude && $profile->longitude)
+                            <i>GPS Coordinates : 📍 {{ number_format($profile->latitude, 4) }}° N, {{ number_format($profile->longitude, 4) }}° E</i><br>
+                        @endif
+                        @if(!empty($profile->signature_ip_address))
+                            <i>IP Address : 💻 {{ $profile->signature_ip_address }}</i><br>
+                        @endif
+                        <i>Reason: Candidate Teacher Placement Agreement</i><br>
+                        <i>Date : {{ \Carbon\Carbon::parse($profile->signature_date_time ?? now())->format('D M d H:i:s T Y') }}</i><br>
+                        <i>Identity Verification : {{ $profile->live_photo_path ? 'Live Camera Snapshot Verified ✅' : 'Verified Digital Signature ✅' }}</i>
                     </div>
                 </td>
             </tr>

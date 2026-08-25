@@ -261,14 +261,15 @@
                 </select>
             </div>
 
-            <div>
+            {{-- Demo Session (Hidden if Rejected) --}}
+            <div id="demoSessionContainer">
                 <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Schedule Demo Session (Optional)</label>
-                <input type="datetime-local" name="demo_date" id="modalDemoDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40">
-                <p class="text-[11px] text-slate-400 mt-1">If set, candidate will receive a notification with this date & time.</p>
+                <input type="datetime-local" name="demo_date" id="modalDemoDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40">
+                <p class="text-[11px] text-slate-400 mt-1">If set, candidate will receive an instant notification & email with this demo date & time.</p>
             </div>
 
             {{-- Service Charge Invoice Generation (Shown when Assigned) --}}
-            <div id="serviceChargeBox" class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+            <div id="serviceChargeBox" class="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-3">
                 <label class="flex items-center gap-2.5 cursor-pointer">
                     <input type="checkbox" name="create_service_charge" value="1" id="createServiceChargeCheckbox" class="w-4 h-4 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500 cursor-pointer" onchange="toggleServiceChargeFields()">
                     <span class="text-xs font-bold text-emerald-900">
@@ -283,27 +284,32 @@
                             <input type="number" step="0.01" name="service_charge_amount" id="serviceChargeAmount" value="500" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2 text-xs font-bold text-[#031b4e]">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-emerald-900 mb-1">Due Date</label>
-                            <input type="date" name="service_charge_due_date" id="serviceChargeDueDate" value="{{ now()->addDays(7)->format('Y-m-d') }}" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2 text-xs font-medium text-[#031b4e]">
+                            <label class="block text-[11px] font-bold text-emerald-900 mb-1">Due Date <span class="text-xs text-emerald-600 font-normal">(Triggers Reminders)</span></label>
+                            <input type="date" name="service_charge_due_date" id="serviceChargeDueDate" value="{{ now()->addDays(7)->format('Y-m-d') }}" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2 text-xs font-bold text-[#031b4e]">
                         </div>
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-emerald-900 mb-1">Invoice Description</label>
                         <input type="text" name="service_charge_description" id="serviceChargeDesc" value="Service Charge for Home Tuition Assignment" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2 text-xs text-[#031b4e]">
                     </div>
+                    <p class="text-[10px] text-emerald-700 font-medium">
+                        <i class="fas fa-bell mr-1"></i> When this Due Date arrives, automated collection alerts & email reminders will be sent to the candidate and displayed in the Admin Reminder Center.
+                    </p>
                 </div>
             </div>
 
+            {{-- Remarks / Rejection Reason --}}
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Admin Remarks / Notes</label>
-                <textarea name="remarks" id="modalRemarks" rows="2" placeholder="Enter internal notes, interview feedback, or remarks..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 resize-none"></textarea>
+                <label id="remarksLabel" class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Admin Remarks / Notes</label>
+                <textarea name="remarks" id="modalRemarks" rows="2" placeholder="Enter internal notes, interview feedback, or remarks..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 resize-none transition-all"></textarea>
+                <p id="remarksHelper" class="text-[11px] text-slate-400 mt-1">Remarks will be included in the candidate's dashboard update and email.</p>
             </div>
 
             <div class="pt-4 border-t border-slate-100 flex justify-end gap-2.5">
                 <button type="button" onclick="closeStatusModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition-colors">
                     Cancel
                 </button>
-                <button type="submit" class="px-6 py-2.5 bg-accent-blue hover:bg-accent-blue-hover text-white rounded-xl font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5">
+                <button type="submit" class="px-6 py-2.5 bg-accent-blue hover:bg-blue-700 text-white rounded-xl font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5">
                     <i class="fas fa-save"></i> Save Status
                 </button>
             </div>
@@ -312,6 +318,58 @@
 </div>
 
 <script>
+function updateModalFieldsForStatus(status) {
+    const remarksLabel = document.getElementById('remarksLabel');
+    const remarksInput = document.getElementById('modalRemarks');
+    const remarksHelper = document.getElementById('remarksHelper');
+    const serviceChargeBox = document.getElementById('serviceChargeBox');
+    const demoSessionContainer = document.getElementById('demoSessionContainer');
+    const createChargeCheckbox = document.getElementById('createServiceChargeCheckbox');
+
+    if (status === 'Rejected') {
+        remarksLabel.innerHTML = '<span class="text-red-600 font-black"><i class="fas fa-times-circle mr-1"></i> Rejection Reason / Feedback *</span> <span class="text-[10px] text-red-500 font-normal lowercase">(Sent to candidate via email & dashboard)</span>';
+        remarksInput.placeholder = 'e.g. Profile location mismatch, candidate requested higher fee than parent budget, etc.';
+        remarksInput.classList.add('border-red-300', 'bg-red-50/30');
+        remarksHelper.innerText = 'Candidate will clearly see this reason on their dashboard and in their status email.';
+        remarksHelper.classList.add('text-red-500');
+
+        serviceChargeBox.classList.add('hidden');
+        demoSessionContainer.classList.add('hidden');
+        createChargeCheckbox.checked = false;
+    } else if (status === 'Assigned') {
+        remarksLabel.innerHTML = '<span class="text-emerald-700 font-black"><i class="fas fa-check-circle mr-1"></i> Assignment Notes & Instructions</span>';
+        remarksInput.placeholder = 'e.g. Parent prefers evening classes from 5 PM to 6:30 PM. Please carry intro notes.';
+        remarksInput.classList.remove('border-red-300', 'bg-red-50/30');
+        remarksHelper.innerText = 'Candidate will receive these instructions with parent contact details.';
+        remarksHelper.classList.remove('text-red-500');
+
+        serviceChargeBox.classList.remove('hidden');
+        demoSessionContainer.classList.remove('hidden');
+        createChargeCheckbox.checked = true;
+    } else if (status === 'Shortlisted') {
+        remarksLabel.innerHTML = '<span class="text-amber-700 font-black"><i class="fas fa-star mr-1"></i> Shortlisting Notes / Demo Guidelines</span>';
+        remarksInput.placeholder = 'e.g. Shortlisted for Class 10th Maths demo. Be prepared for chapter 1 & 2.';
+        remarksInput.classList.remove('border-red-300', 'bg-red-50/30');
+        remarksHelper.innerText = 'Included in candidate shortlist notification & email.';
+        remarksHelper.classList.remove('text-red-500');
+
+        serviceChargeBox.classList.add('hidden');
+        demoSessionContainer.classList.remove('hidden');
+        createChargeCheckbox.checked = false;
+    } else {
+        remarksLabel.innerHTML = 'Admin Remarks / Notes';
+        remarksInput.placeholder = 'Enter internal notes, interview feedback, or remarks...';
+        remarksInput.classList.remove('border-red-300', 'bg-red-50/30');
+        remarksHelper.innerText = 'Remarks will be included in the candidate dashboard update.';
+        remarksHelper.classList.remove('text-red-500');
+
+        serviceChargeBox.classList.add('hidden');
+        demoSessionContainer.classList.remove('hidden');
+        createChargeCheckbox.checked = false;
+    }
+    toggleServiceChargeFields();
+}
+
 function openStatusModal(appId, status, remarks, demoDate, candidateName, className, subjects) {
     document.getElementById('statusForm').action = `/admin/tuition-applications/${appId}/status`;
     document.getElementById('modalCandidateTitle').innerText = `${candidateName} (Class ${className} - ${subjects})`;
@@ -320,10 +378,7 @@ function openStatusModal(appId, status, remarks, demoDate, candidateName, classN
     document.getElementById('modalDemoDate').value = demoDate || '';
     document.getElementById('serviceChargeDesc').value = `Service Charge for Home Tuition (Class ${className} - ${subjects})`;
     
-    // Auto-check invoice if status is Assigned
-    const isAssigned = (status === 'Assigned');
-    document.getElementById('createServiceChargeCheckbox').checked = isAssigned;
-    toggleServiceChargeFields();
+    updateModalFieldsForStatus(status);
 
     document.getElementById('statusModal').classList.remove('hidden');
 }
@@ -343,12 +398,7 @@ function toggleServiceChargeFields() {
 }
 
 document.getElementById('modalStatusSelect').addEventListener('change', function() {
-    if (this.value === 'Assigned') {
-        document.getElementById('createServiceChargeCheckbox').checked = true;
-    } else {
-        document.getElementById('createServiceChargeCheckbox').checked = false;
-    }
-    toggleServiceChargeFields();
+    updateModalFieldsForStatus(this.value);
 });
 </script>
 

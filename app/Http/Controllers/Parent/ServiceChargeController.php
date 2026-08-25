@@ -80,11 +80,12 @@ class ServiceChargeController extends Controller
         $receipt = 'PSC_' . $invoice->id . '_' . time();
         $gateway = $this->paymentManager->driver();
 
-        // Create Razorpay Order
+        // Create Order on Gateway
         $order = $gateway->createOrder([
-            'amount'   => $amount,
-            'receipt'  => $receipt,
-            'notes'    => [
+            'amount'       => $amount,
+            'receipt'      => $receipt,
+            'redirect_url' => route('parent.serviceCharge.callback'),
+            'notes'        => [
                 'invoice_id'     => (string)$invoice->id,
                 'user_id'        => (string)$user->id,
                 'user_name'      => (string)$user->name,
@@ -95,7 +96,7 @@ class ServiceChargeController extends Controller
         ]);
 
         if (!$order['success']) {
-            Log::error('Razorpay Parent Service Charge Order Creation Failed', ['error' => $order['error']]);
+            Log::error('Parent Service Charge Order Creation Failed', ['error' => $order['error']]);
             return back()->with('error', 'Payment gateway error: ' . ($order['error'] ?? 'Please try again later.'));
         }
 
@@ -130,26 +131,44 @@ class ServiceChargeController extends Controller
 
     public function callback(Request $request)
     {
+        $orderId = $request->input('merchantTransactionId')
+            ?? $request->input('order_id')
+            ?? $request->input('razorpay_order_id')
+            ?? session('active_parent_order_id');
+
+        $paymentId = $request->input('transactionId')
+            ?? $request->input('payment_id')
+            ?? $request->input('razorpay_payment_id')
+            ?? ($orderId ? 'PP_' . $orderId : null);
+
+        $code = $request->input('code', 'PAYMENT_SUCCESS');
+        $invoiceId = session('parent_sc_invoice_id') ?? $request->input('invoice_id');
+
+        $txn = !empty($orderId) ? PaymentTransaction::where('order_id', $orderId)->first() : null;
+
         $user = auth()->user();
+        if (!$user && $txn && $txn->candidate_id) {
+            $user = \App\Models\User::find($txn->candidate_id);
+            if ($user) {
+                auth()->login($user);
+            }
+        }
+
         if (!$user) {
             return redirect()->route('login')->with('error', 'Session expired. Please log in.');
         }
 
-        $orderId   = $request->input('razorpay_order_id', session('active_parent_order_id'));
-        $paymentId = $request->input('razorpay_payment_id');
-        $signature = $request->input('razorpay_signature');
-        $invoiceId = session('parent_sc_invoice_id') ?? $request->input('invoice_id');
-
-        if (empty($paymentId) || empty($orderId)) {
+        if (empty($orderId)) {
             return redirect()->route('parent.serviceCharge.index')->with('error', 'Payment was cancelled or failed.');
         }
 
-        // Verify with Razorpay
+        // Verify with Gateway
         $gateway = $this->paymentManager->driver();
         $verification = $gateway->verifyPayment([
-            'order_id'   => $orderId,
-            'payment_id' => $paymentId,
-            'signature'  => $signature,
+            'order_id'       => $orderId,
+            'payment_id'     => $paymentId,
+            'code'           => $code,
+            'response'       => $request->input('response'),
         ]);
 
         $txn = PaymentTransaction::where('order_id', $orderId)->first();
@@ -159,7 +178,7 @@ class ServiceChargeController extends Controller
                 $txn->update([
                     'status'            => 'failed',
                     'payment_id'        => $paymentId,
-                    'signature'         => $signature,
+                    'gateway'           => 'phonepe',
                     'error_description' => $verification['error'] ?? 'Signature verification failed',
                 ]);
             }
@@ -167,19 +186,19 @@ class ServiceChargeController extends Controller
         }
 
         $paymentDetails = $verification['raw'] ?? [];
-        $paymentMethod  = $verification['payment_method'] ?? 'online';
+        $paymentMethod  = $verification['payment_method'] ?? 'phonepe_online';
+        $finalPaymentId = $verification['payment_id'] ?: ($paymentId ?: 'PP_' . $orderId);
 
-        DB::transaction(function () use ($txn, $invoiceId, $user, $paymentId, $signature, $paymentMethod, $paymentDetails) {
+        DB::transaction(function () use ($txn, $invoiceId, $user, $finalPaymentId, $paymentMethod, $paymentDetails) {
             $invoice = ParentServiceChargeInvoice::find($invoiceId);
             $amount  = $invoice ? $invoice->amount : ($txn?->amount ?? 0);
 
             if ($txn) {
                 $txn->update([
-                    'payment_id'       => $paymentId,
-                    'signature'        => $signature,
+                    'payment_id'       => $finalPaymentId,
                     'status'           => 'success',
                     'payment_method'   => $paymentMethod,
-                    'gateway'          => 'razorpay',
+                    'gateway'          => 'phonepe',
                     'gateway_response' => $paymentDetails,
                 ]);
             }
@@ -193,7 +212,7 @@ class ServiceChargeController extends Controller
                 if ($invoice->lead) {
                     $invoice->lead->followUps()->create([
                         'admin_id' => null,
-                        'note'     => "Service Charge Invoice #{$invoice->invoice_number} (₹" . number_format($invoice->amount, 2) . ") was paid online via Razorpay.",
+                        'note'     => "Service Charge Invoice #{$invoice->invoice_number} (₹" . number_format($invoice->amount, 2) . ") was paid online via PhonePe.",
                     ]);
                 }
 
@@ -209,6 +228,6 @@ class ServiceChargeController extends Controller
 
         session()->forget(['active_parent_order_id', 'parent_sc_invoice_id']);
 
-        return redirect()->route('parent.serviceCharge.index')->with('success', '✅ Payment of ₹' . number_format($txn?->amount ?? 0, 2) . ' completed successfully via Razorpay!');
+        return redirect()->route('parent.serviceCharge.index')->with('success', '✅ Payment of ₹' . number_format($txn?->amount ?? 0, 2) . ' completed successfully via PhonePe!');
     }
 }

@@ -21,7 +21,7 @@
 
 
 
-        @if($profile->agreement_status === 'pending_signature')
+        @if($profile?->agreement_status === 'pending_signature')
             {{-- ================= PENDING AGREEMENT BANNER ================= --}}
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm reveal">
                 <div class="flex items-start sm:items-center gap-3">
@@ -114,7 +114,7 @@
             </div>
 
             <div class="relative z-10 flex flex-col md:flex-row items-center gap-6">
-                @if($profile->profile_photo_path)
+                @if($profile?->profile_photo_path)
                     <img src="{{ asset('storage/' . $profile->profile_photo_path) }}" alt="Profile Photo"
                         class="w-24 h-24 rounded-full object-cover border-4 border-white/20 shadow-xl">
                 @else
@@ -126,7 +126,7 @@
                 <div class="text-center md:text-left flex-1">
                     <h1 class="text-3xl font-bold mb-1 flex items-center flex-wrap gap-2">
                         Welcome back, {{ auth()->user()->name }}!
-                        @if($profile->is_verified)
+                        @if($profile?->is_verified)
                             <span
                                 class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/20 border border-blue-400/50 text-blue-300 text-xs font-bold uppercase tracking-wider rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]"
                                 title="Verified Profile">
@@ -226,7 +226,7 @@
                 </div>
 
                 {{-- Financial & Pending Charges --}}
-                @if($profile->pending_amount > 0)
+                @if(($profile?->pending_amount ?? 0) > 0)
                     <div class="bg-blue-50/50 border border-blue-200/50 rounded-2xl p-6 flex items-center justify-between shadow-sm reveal reveal-delay-2">
                         <div>
                             <h3 class="text-lg font-bold text-blue-800 flex items-center gap-2">
@@ -293,25 +293,25 @@
                         </div>
                         <div class="flex justify-between items-center py-2 border-b border-slate-100">
                             <span class="text-slate-500"><i class="fas fa-graduation-cap mr-2 w-4"></i> Education</span>
-                            <span class="font-semibold text-[#031b4e]">{{ $profile->highest_qualification ?? 'N/A' }}</span>
+                            <span class="font-semibold text-[#031b4e]">{{ $profile?->highest_qualification ?? 'N/A' }}</span>
                         </div>
                         <div class="flex justify-between items-center py-2 border-b border-slate-100">
                             <span class="text-slate-500"><i class="fas fa-briefcase mr-2 w-4"></i> Experience</span>
-                            <span class="font-semibold text-[#031b4e]">{{ $profile->years_of_experience ?? 0 }} Years</span>
+                            <span class="font-semibold text-[#031b4e]">{{ $profile?->years_of_experience ?? 0 }} Years</span>
                         </div>
                         <div class="flex justify-between items-center py-2">
                             <span class="text-slate-500"><i class="fas fa-map-marker-alt mr-2 w-4"></i> Location</span>
-                            <span class="font-semibold text-[#031b4e]">{{ $profile->city ?? 'N/A' }}</span>
+                            <span class="font-semibold text-[#031b4e]">{{ $profile?->city ?? 'N/A' }}</span>
                         </div>
                     </div>
 
                     <div class="mt-5 pt-4 border-t border-slate-100">
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-xs font-bold text-[#031b4e]">Profile Completion</span>
-                            <span class="text-xs font-extrabold text-emerald-600">{{ $profile->profile_completion_percentage ?? 80 }}%</span>
+                            <span class="text-xs font-extrabold text-emerald-600">{{ $profile?->profile_completion_percentage ?? 80 }}%</span>
                         </div>
                         <div class="w-full bg-slate-100 rounded-full h-2">
-                            <div class="bg-emerald-500 h-2 rounded-full transition-all" style="width: {{ $profile->profile_completion_percentage ?? 80 }}%"></div>
+                            <div class="bg-emerald-500 h-2 rounded-full transition-all" style="width: {{ $profile?->profile_completion_percentage ?? 80 }}%"></div>
                         </div>
                     </div>
                 </div>

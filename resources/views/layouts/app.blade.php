@@ -4,9 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Warriors Educare — The Gold Standard in Education Recruitment')</title>
+    <title>@yield('title', 'Warriors Educare — #1 Education Recruitment Agency & Verified Home Tutors in India')</title>
     <meta name="description"
-        content="@yield('meta_description', 'Warriors Educare connects educators and schools across India. Find top teaching jobs or hire expert educators with us.')">
+        content="@yield('meta_description', 'India’s trusted education network. Hire verified home tutors for all subjects, recruit top school & college faculty, or apply for high-paying teaching jobs.')">
+    <meta name="keywords"
+        content="@yield('meta_keywords', 'education recruitment agency, home tutors in India, hire school teachers, private home tuition, teaching jobs India, PGT TGT PRT teachers, Warriors Educare')">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="@yield('title', 'Warriors Educare — #1 Education Recruitment Agency & Verified Home Tutors in India')">
+    <meta property="og:description" content="@yield('meta_description', 'India’s trusted education network. Hire verified home tutors for all subjects, recruit top school & college faculty, or apply for high-paying teaching jobs.')">
+    <meta property="og:image" content="{{ asset('adobe.png') }}">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'Warriors Educare — #1 Education Recruitment Agency & Verified Home Tutors in India')">
+    <meta name="twitter:description" content="@yield('meta_description', 'India’s trusted education network. Hire verified home tutors for all subjects, recruit top school & college faculty, or apply for high-paying teaching jobs.')">
+    <meta name="twitter:image" content="{{ asset('adobe.png') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -258,10 +274,8 @@
         </div>
     @endif
 
-            </div>
-
-        <!-- Global Marquee Bar -->
-    <div class="fixed top-0 left-0 w-full bg-gradient-to-r from-[#031b4e] via-[#031b4e] to-[#031b4e] text-white text-[12px] md:text-sm py-2 px-4 font-semibold tracking-wide shadow-md z-[101] border-b border-white/10">
+    <!-- Global Marquee Bar -->
+    <div class="fixed top-0 left-0 w-full bg-[#031b4e] text-white text-[12px] md:text-sm py-2 px-4 font-semibold tracking-wide shadow-md z-[101] border-b border-white/10">
         <marquee behavior="scroll" direction="left" scrollamount="5" class="w-full flex items-center">
             <span class="mx-4 text-[#ff8800]"><i class="fas fa-bolt"></i></span>
             <span>Welcome to Warriors Educare! Empowering your journey with expert guidance and tailored solutions.</span>
@@ -280,71 +294,89 @@
             
             <span class="mx-4 text-[#ff8800]"><i class="fas fa-star"></i></span>
             <span>Sign up today to get exclusive access to premium job listings and career resources.</span>
-
-            <span class="mx-4 text-[#ff8800]"><i class="fas fa-bolt"></i></span>
-            <span>Welcome to Warriors Educare! Empowering your journey with expert guidance and tailored solutions.</span>
-            
-            <span class="mx-4 text-[#ff8800]"><i class="fas fa-star"></i></span>
-            <span>Latest Updates: New consulting services available. Contact us for a free evaluation!</span>
-            
-            <span class="mx-4 text-[#ff8800]"><i class="fas fa-bolt"></i></span>
-            <span>Join our community today and take the next step in your career.</span>
-            
-            <span class="mx-4 text-[#ff8800]"><i class="fas fa-graduation-cap"></i></span>
-            <span>Boost your career with our specialized resume building and interview prep services.</span>
-            
-            <span class="mx-4 text-[#ff8800]"><i class="fas fa-globe"></i></span>
-            <span>Connecting top talent with leading employers globally. Explore opportunities now!</span>
-            
-            <span class="mx-4 text-[#ff8800]"><i class="fas fa-star"></i></span>
-            <span>Sign up today to get exclusive access to premium job listings and career resources.</span>
         </marquee>
-    </div>    <!-- Header -->
+    </div>
+
+    <!-- Header -->
     <header id="main-header"
-        class="!fixed top-[48px] left-1/2 -translate-x-1/2 w-[95%] max-w-7xl px-2 lg:px-6 py-1.5 flex justify-between items-center z-[100] transition-all duration-500 bg-white/95 backdrop-blur-lg border border-gray-200 shadow-[0_4px_30px_rgba(0,0,0,0.1)] rounded-full">
-        <!-- White pill background for logo -->
-        <a href="{{ route('home') }}" onclick="sessionStorage.removeItem('welcomeShown');" class="flex items-center no-underline py-1.5 px-6 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.2)] z-10 mr-4">
-            <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-10 lg:h-12 logo-img transition-all duration-300">
+        class="!fixed top-[46px] left-1/2 -translate-x-1/2 w-[96%] max-w-[1400px] px-4 lg:px-7 py-3 flex justify-between items-center z-[100] transition-all duration-500 bg-white/98 backdrop-blur-xl border border-slate-200/90 shadow-[0_10px_35px_rgba(3,27,78,0.12)] rounded-full">
+        
+        <!-- Clean Logo -->
+        <a href="{{ route('home') }}" onclick="sessionStorage.removeItem('welcomeShown');" class="flex items-center no-underline pl-1 sm:pl-2 pr-4 shrink-0 transition-transform hover:scale-105">
+            <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-10 lg:h-12 w-auto object-contain logo-img">
         </a>
-        <nav class="hidden lg:flex items-center gap-4 xl:gap-6">
-            <ul class="flex gap-3 lg:gap-4 xl:gap-6 list-none m-0 p-0">
-                <li><a href="{{ route('home') }}"
-                        class="{{ request()->routeIs('home') ? 'text-[#031b4e] font-bold' : 'text-gray-600 hover:text-[#031b4e]' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Home</a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden lg:flex items-center gap-3 xl:gap-5">
+            <ul class="flex gap-1.5 xl:gap-2 list-none m-0 p-0 items-center">
+                <li>
+                    <a href="{{ route('home') }}"
+                       class="{{ request()->routeIs('home') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       Home
+                    </a>
                 </li>
-                <li><a href="{{ route('about') }}"
-                        class="{{ request()->routeIs('about') ? 'text-[#031b4e] font-bold' : 'text-gray-600 hover:text-[#031b4e]' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">About us</a></li>
-                <li><a href="{{ route('services') }}"
-                        class="{{ request()->routeIs('services') ? 'text-[#031b4e] font-bold' : 'text-gray-600 hover:text-[#031b4e]' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Services</a></li>
-                <li><a href="{{ route('jobs') }}"
-                        class="{{ request()->routeIs('jobs') ? 'text-[#031b4e] font-bold' : 'text-gray-600 hover:text-[#031b4e]' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Jobs</a>
+                <li>
+                    <a href="{{ route('about') }}"
+                       class="{{ request()->routeIs('about') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       About us
+                    </a>
                 </li>
-                <li><a href="{{ route('tuitions') }}"
-                        class="{{ request()->routeIs('tuitions') ? 'text-[#031b4e] font-bold' : 'text-gray-600 hover:text-[#031b4e]' }} whitespace-nowrap font-medium text-[14px] lg:text-[15px] transition-colors">Tuitions</a>
+                <li>
+                    <a href="{{ route('services') }}"
+                       class="{{ request()->routeIs('services') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       Services
+                    </a>
                 </li>
-                <li><a href="{{ route('resume.builder') }}"
-                        class="{{ request()->routeIs('resume.builder') ? 'text-[#031b4e] font-bold' : 'text-gray-600 hover:text-[#031b4e]' }} whitespace-nowrap font-medium text-[15px] transition-colors">Resume Builder <span
-                            class="bg-accent-blue text-white text-[9px] px-1.5 py-0.5 rounded-sm uppercase font-extrabold ml-1 relative -top-1">Free</span></a>
+                <li>
+                    <a href="{{ route('jobs') }}"
+                       class="{{ request()->routeIs('jobs') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       School Jobs
+                    </a>
                 </li>
-                <li><a href="{{ route('contact') }}"
-                        class="{{ request()->routeIs('contact') ? 'text-[#031b4e] font-bold' : 'text-gray-600 hover:text-[#031b4e]' }} whitespace-nowrap font-medium text-[15px] transition-colors">Contact</a></li>
+                <li>
+                    <a href="{{ route('tuitions') }}"
+                       class="{{ request()->routeIs('tuitions') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       Home Tuition
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('hiring') }}"
+                       class="{{ request()->routeIs('hiring') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       Hiring Process
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('resume.builder') }}"
+                       class="{{ request()->routeIs('resume.builder') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       Resume Builder <span class="bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase font-black ml-1 relative -top-0.5 shadow-xs">Free</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('contact') }}"
+                       class="{{ request()->routeIs('contact') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       Contact
+                    </a>
+                </li>
             </ul>
-            <div class="flex gap-3 lg:gap-4 items-center">
+
+            <!-- Right Action Items -->
+            <div class="flex gap-2.5 items-center pl-3 border-l border-slate-200">
                 @auth
                     <!-- Notification Bell -->
                     <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" @click.away="open = false" class="relative p-2 text-gray-600 hover:text-[#031b4e] transition-colors">
-                            <i class="fas fa-bell text-lg"></i>
+                        <button @click="open = !open" @click.away="open = false" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-[#031b4e] flex items-center justify-center transition-colors relative">
+                            <i class="fas fa-bell text-sm"></i>
                             @if(auth()->user()->unreadNotifications->count() > 0)
-                                <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#031b4e]"></span>
+                                <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
                             @endif
                         </button>
                         
                         <!-- Dropdown -->
-                        <div x-show="open" style="display: none;" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden text-gray-800">
-                            <div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                                <h3 class="font-bold text-sm text-[#031b4e]">Notifications</h3>
+                        <div x-show="open" style="display: none;" class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden text-gray-800">
+                            <div class="p-3.5 border-b border-gray-100 flex justify-between items-center bg-slate-50">
+                                <h3 class="font-bold text-xs text-[#031b4e] uppercase tracking-wider">Notifications</h3>
                                 @if(auth()->user()->unreadNotifications->count() > 0)
-                                    <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">{{ auth()->user()->unreadNotifications->count() }} New</span>
+                                    <span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">{{ auth()->user()->unreadNotifications->count() }} New</span>
                                 @endif
                             </div>
                             <div class="max-h-80 overflow-y-auto">
@@ -352,56 +384,60 @@
                                     <div class="p-3 border-b border-gray-50 hover:bg-gray-50 transition-colors {{ is_null($notification->read_at) ? 'bg-blue-50/30' : '' }}">
                                         <div class="flex gap-3">
                                             <div class="w-8 h-8 rounded-full bg-blue-100 text-[#031b4e] flex items-center justify-center shrink-0">
-                                                <i class="{{ $notification->data['icon'] ?? 'fas fa-bell' }} text-sm"></i>
+                                                <i class="{{ $notification->data['icon'] ?? 'fas fa-bell' }} text-xs"></i>
                                             </div>
                                             <div>
-                                                <h4 class="text-sm font-semibold text-gray-900">{{ $notification->data['title'] ?? 'Notification' }}</h4>
-                                                <p class="text-xs text-gray-600 mt-0.5 line-clamp-2">{{ $notification->data['message'] ?? '' }}</p>
-                                                <span class="text-[10px] text-gray-400 mt-1 block">{{ $notification->created_at->diffForHumans() }}</span>
+                                                <h4 class="text-xs font-semibold text-gray-900">{{ $notification->data['title'] ?? 'Notification' }}</h4>
+                                                <p class="text-[11px] text-gray-600 mt-0.5 line-clamp-2">{{ $notification->data['message'] ?? '' }}</p>
+                                                <span class="text-[9px] text-gray-400 mt-1 block">{{ $notification->created_at->diffForHumans() }}</span>
                                             </div>
                                         </div>
                                     </div>
                                 @empty
                                     <div class="p-6 text-center text-gray-500">
                                         <i class="fas fa-bell-slash text-2xl text-gray-300 mb-2 block"></i>
-                                        <p class="text-sm">No notifications yet</p>
+                                        <p class="text-xs">No notifications yet</p>
                                     </div>
                                 @endforelse
                             </div>
-                            <div class="p-2 border-t border-gray-100 bg-gray-50 text-center">
-                                <a href="#" class="text-xs font-semibold text-[#031b4e] hover:underline">View All</a>
+                            <div class="p-2 border-t border-gray-100 bg-slate-50 text-center">
+                                <a href="#" class="text-xs font-bold text-[#031b4e] hover:underline">View All</a>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Dashboard Pill -->
                     <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard')) }}"
-                        class="px-5 py-2.5 rounded font-medium text-[14px] cursor-pointer transition-all bg-[#031b4e]/5 text-[#031b4e] hover:bg-[#031b4e]/10 border border-[#031b4e]/10 flex items-center gap-2 whitespace-nowrap">
-                        <div
-                            class="w-6 h-6 rounded-full bg-[#031b4e] text-white flex items-center justify-center text-[10px] font-bold">
+                        class="px-4 py-2 rounded-full font-bold text-sm bg-[#031b4e] text-white hover:bg-blue-900 transition-all flex items-center gap-2 shadow-sm whitespace-nowrap">
+                        <div class="w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-[10px] font-black">
                             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                         </div>
-                        Dashboard
+                        <span>Dashboard</span>
                     </a>
+
+                    <!-- Logout Button -->
                     <form action="{{ route('logout') }}" method="POST" class="inline">
                         @csrf
                         <button type="submit"
-                            class="px-4 py-2.5 rounded font-medium text-[14px] cursor-pointer transition-all text-gray-600 hover:bg-gray-100 hover:text-[#031b4e] flex items-center gap-1.5">
-                            <i class="fas fa-sign-out-alt text-xs"></i> Logout
+                            class="px-3 py-2 rounded-full font-bold text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all flex items-center gap-1.5 cursor-pointer">
+                            <i class="fas fa-sign-out-alt text-xs"></i>
+                            <span>Logout</span>
                         </button>
                     </form>
                 @else
                     <a href="/login"
-                        class="px-4 py-2 rounded font-medium text-[14px] text-gray-700 hover:text-[#031b4e] transition-colors whitespace-nowrap">
+                        class="px-4 py-2 rounded-full font-bold text-sm text-slate-700 hover:text-[#031b4e] hover:bg-slate-100 transition-colors whitespace-nowrap">
                         Login
                     </a>
                     <a href="/register"
-                        class="px-6 py-2.5 rounded-full font-semibold text-[14px] bg-[#031b4e] text-white hover:bg-blue-900 transition-colors shadow-lg whitespace-nowrap">
+                        class="px-5 py-2.5 rounded-full font-bold text-sm bg-[#031b4e] text-white hover:bg-blue-900 transition-all shadow-md hover:shadow-lg whitespace-nowrap">
                         Get Started
                     </a>
                 @endauth
             </div>
         </nav>
-        <button id="mobileMenuBtn" class="lg:hidden text-[#031b4e] text-2xl focus:outline-none z-10">
+
+        <button id="mobileMenuBtn" class="lg:hidden text-[#031b4e] text-2xl focus:outline-none z-10 p-1.5">
             <i class="fas fa-bars"></i>
         </button>
     </header>
@@ -426,10 +462,10 @@
                         class="{{ request()->routeIs('services') ? 'text-[#fbc043]' : 'text-white/80 hover:text-white' }} transition-colors">Our
                         Services</a></li>
                 <li><a href="{{ route('jobs') }}"
-                        class="{{ request()->routeIs('jobs') ? 'text-[#fbc043]' : 'text-white/80 hover:text-white' }} transition-colors">Jobs</a>
+                        class="{{ request()->routeIs('jobs') ? 'text-[#fbc043]' : 'text-white/80 hover:text-white' }} transition-colors">School Jobs</a>
                 </li>
                 <li><a href="{{ route('tuitions') }}"
-                        class="{{ request()->routeIs('tuitions') ? 'text-[#fbc043]' : 'text-white/80 hover:text-white' }} transition-colors">Tuitions</a>
+                        class="{{ request()->routeIs('tuitions') ? 'text-[#fbc043]' : 'text-white/80 hover:text-white' }} transition-colors">Home Tuition</a>
                 </li>
                 <li><a href="{{ route('resume.builder') }}"
                         class="{{ request()->routeIs('resume.builder') ? 'text-[#fbc043]' : 'text-white/80 hover:text-white' }} transition-colors">Resume
@@ -473,8 +509,8 @@
         @yield('content')
     </main>
 
-                    <!-- Footer -->
-    <footer class="bg-gradient-to-br from-[#f0f4f8] to-[#ffffff] pt-20 pb-8 text-[#555] font-sans relative overflow-hidden border-t border-gray-200">
+    <!-- Footer -->
+    <footer class="bg-gradient-to-br from-[#f0f4f8] to-[#ffffff] pt-16 pb-8 text-[#555] font-sans relative overflow-hidden border-t border-gray-200">
         <!-- Decorative Background Elements -->
         <svg class="absolute right-[-5%] bottom-[-10%] w-[50%] h-[120%] z-0 text-[#dbeafe] pointer-events-none opacity-60" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="300" cy="300" r="200" stroke="currentColor" stroke-width="50"/>
@@ -486,68 +522,87 @@
         </svg>
         <div class="absolute inset-0 bg-[radial-gradient(#a3b8ad_1.5px,transparent_1.5px)] [background-size:24px_24px] opacity-[0.2] z-0 pointer-events-none"></div>
 
-        <div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-16 mb-16 relative z-10">
-            <!-- Brand -->
+        <div class="max-w-[1300px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-14 relative z-10">
+            <!-- Brand Column -->
             <div>
-                <a href="{{ route('home') }}" class="flex items-center no-underline mb-6">
-                    <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-20">
+                <a href="{{ route('home') }}" class="flex items-center no-underline mb-5">
+                    <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-14 lg:h-16 w-auto object-contain">
                 </a>
-                <p class="text-[13px] text-gray-600 font-medium leading-[1.8] mb-8 pr-4">
-                    Our goal is to demystify the process, address your concerns, and empower you with the knowledge to embark.
+                <p class="text-[13px] text-gray-600 font-medium leading-relaxed mb-6">
+                    India's trusted educational placement & home tuition network. Connecting premier schools, verified home tutors, and passionate educators nationwide.
                 </p>
-                <div class="flex items-center gap-3">
-                    <a href="#" class="w-[34px] h-[34px] rounded-full bg-[#031b4e] text-white flex items-center justify-center hover:bg-[#004de6] hover:-translate-y-1 transition-all shadow-md text-sm"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="w-[34px] h-[34px] rounded-full bg-[#031b4e] text-white flex items-center justify-center hover:bg-[#004de6] hover:-translate-y-1 transition-all shadow-md text-sm"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" class="w-[34px] h-[34px] rounded-full bg-[#031b4e] text-white flex items-center justify-center hover:bg-[#004de6] hover:-translate-y-1 transition-all shadow-md text-sm"><i class="fab fa-youtube"></i></a>
-                    <a href="#" class="w-[34px] h-[34px] rounded-full bg-[#031b4e] text-white flex items-center justify-center hover:bg-[#004de6] hover:-translate-y-1 transition-all shadow-md text-sm font-bold">X</a>
+                <div class="flex items-center gap-2.5 mb-5">
+                    <a href="https://facebook.com" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-[#031b4e] text-white flex items-center justify-center hover:bg-[#004de6] hover:-translate-y-0.5 transition-all shadow-sm text-xs"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://linkedin.com" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-[#031b4e] text-white flex items-center justify-center hover:bg-[#004de6] hover:-translate-y-0.5 transition-all shadow-sm text-xs"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://youtube.com" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-[#031b4e] text-white flex items-center justify-center hover:bg-[#004de6] hover:-translate-y-0.5 transition-all shadow-sm text-xs"><i class="fab fa-youtube"></i></a>
+                    <a href="https://instagram.com" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-[#031b4e] text-white flex items-center justify-center hover:bg-[#004de6] hover:-translate-y-0.5 transition-all shadow-sm text-xs"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
 
             <!-- Quick Links -->
             <div>
-                <h4 class="text-[17px] font-bold text-gray-900 mb-6 relative inline-block">Quick Links<span class="absolute bottom-[-6px] left-0 w-1/2 h-[2px] bg-[#031b4e]"></span></h4>
-                <ul class="flex flex-col gap-4 text-[13px] text-gray-600 font-semibold mt-4">
+                <h4 class="text-[16px] font-bold text-gray-900 mb-5 relative inline-block">Quick Links<span class="absolute bottom-[-6px] left-0 w-1/2 h-[2px] bg-[#031b4e]"></span></h4>
+                <ul class="flex flex-col gap-3 text-[13.5px] text-gray-600 font-semibold mt-2">
+                    <li><a href="{{ route('home') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Home</a></li>
                     <li><a href="{{ route('about') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> About Us</a></li>
                     <li><a href="{{ route('services') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Services</a></li>
-                    <li><a href="{{ route('home') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Solution</a></li>
-                    <!-- <li><a href="#" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Our Blog</a></li> -->
-                    <li><a href="{{ route('contact') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Contact Us</a></li>
+                    <li><a href="{{ route('jobs') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> School Jobs</a></li>
+                    <li><a href="{{ route('tuitions') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Home Tuition</a></li>
+                    <li><a href="{{ route('hiring') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#031b4e]/60"></i> Hiring Process</a></li>
                 </ul>
             </div>
 
+            <!-- Portals & Policies -->
+            <div>
+                <h4 class="text-[16px] font-bold text-gray-900 mb-5 relative inline-block">Portals & Policies<span class="absolute bottom-[-6px] left-0 w-1/2 h-[2px] bg-[#031b4e]"></span></h4>
+                <ul class="flex flex-col gap-3 text-[13.5px] text-gray-600 font-semibold mt-2">
+                    <li><a href="{{ route('candidate.register') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2 text-blue-700 font-bold"><i class="fas fa-user-plus text-[9px]"></i> Join as Teacher / Tutor</a></li>
+                    <li><a href="{{ route('resume.builder') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-file-alt text-[9px] text-[#031b4e]/60"></i> Free Resume Builder</a></li>
+                    <li><a href="{{ route('terms') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-shield-alt text-[8px] text-[#031b4e]/60"></i> Terms & Conditions</a></li>
+                    <li><a href="{{ route('privacy') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-lock text-[8px] text-[#031b4e]/60"></i> Privacy Policy</a></li>
+                    <li><a href="{{ route('refund') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-undo-alt text-[8px] text-[#031b4e]/60"></i> Refund & Cancellation</a></li>
+                    <li><a href="{{ route('disclaimer') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-info-circle text-[8px] text-[#031b4e]/60"></i> Legal Disclaimer</a></li>
+                </ul>
+            </div>
 
             <!-- Contact Us -->
             <div>
-                <h4 class="text-[17px] font-bold text-gray-900 mb-6 relative inline-block">Contact Us<span class="absolute bottom-[-6px] left-0 w-1/2 h-[2px] bg-[#031b4e]"></span></h4>
-                <ul class="flex flex-col gap-5 text-[13px] text-gray-600 font-semibold mt-4">
+                <h4 class="text-[16px] font-bold text-gray-900 mb-5 relative inline-block">Contact Us<span class="absolute bottom-[-6px] left-0 w-1/2 h-[2px] bg-[#031b4e]"></span></h4>
+                <ul class="flex flex-col gap-4 text-[13px] text-gray-600 font-semibold mt-2">
                     <li class="flex items-start gap-3 group">
-                        <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-phone-alt text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
-                        <span class="mt-1">+91 82105 45286</span>
+                        <div class="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-phone-alt text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
+                        <a href="tel:+918210545286" class="mt-1 hover:text-[#031b4e] transition-colors">+91 82105 45286</a>
                     </li>
                     <li class="flex items-start gap-3 group">
-                        <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-map-marker-alt text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
-                        <span class="mt-1 leading-relaxed">Sardar Patel Colony, Sandalpur Rd, Kumhrar, Patna</span>
+                        <div class="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-map-marker-alt text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
+                        <span class="mt-1 leading-relaxed">Sardar Patel Colony, Sandalpur Rd, Kumhrar, Patna, Bihar</span>
                     </li>
                     <li class="flex items-start gap-3 group">
-                        <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-envelope text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
-                        <span class="mt-1">support@warriorseducare.com</span>
+                        <div class="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-envelope text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
+                        <a href="mailto:support@warriorseducare.com" class="mt-1 hover:text-[#031b4e] transition-colors break-all">support@warriorseducare.com</a>
                     </li>
-                    <!-- <li class="flex items-start gap-3 group">
-                        <div class="w-7 h-7 rounded bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:bg-[#031b4e] transition-colors"><i class="fas fa-globe text-[#031b4e] group-hover:text-white text-xs transition-colors"></i></div>
-                        <span class="mt-1">warriorseducare.com</span>
-                    </li> -->
                 </ul>
             </div>
         </div>
 
-        <div class="max-w-[1200px] mx-auto px-6 border-t border-gray-300 pt-6 pb-2 text-center text-[13px] text-gray-500 font-medium relative z-10">
-            <div>&copy; Copyright 2024 - Warriors Educare. All Right Reserved</div>
-            <a href="https://www.startupwebsupport.com/" target="_blank" class="mt-1 text-xs opacity-80">Designed By: Startup Web Support</a>
+        <!-- Bottom Copyright & Legal Links -->
+        <div class="max-w-[1300px] mx-auto px-6 border-t border-gray-300 pt-6 pb-2 flex flex-col md:flex-row items-center justify-between text-[12.5px] text-gray-500 font-medium gap-3 relative z-10">
+            <div>&copy; {{ date('Y') }} Warriors Educare. All Rights Reserved.</div>
+            <div class="flex items-center gap-4 flex-wrap justify-center text-xs">
+                <a href="{{ route('terms') }}" class="hover:text-[#031b4e] transition-colors">Terms & Conditions</a>
+                <span>•</span>
+                <a href="{{ route('privacy') }}" class="hover:text-[#031b4e] transition-colors">Privacy Policy</a>
+                <span>•</span>
+                <a href="{{ route('refund') }}" class="hover:text-[#031b4e] transition-colors">Refund Policy</a>
+                <span>•</span>
+                <a href="{{ route('disclaimer') }}" class="hover:text-[#031b4e] transition-colors">Disclaimer</a>
+            </div>
+            <a href="https://www.startupwebsupport.com/" target="_blank" rel="noopener" class="text-xs text-gray-500 hover:text-[#031b4e] transition-colors">Designed By: Startup Web Support</a>
         </div>
     </footer>
 
     <!-- FABs -->
-    <div class="fixed right-6 bottom-6 flex flex-col gap-4 z-[999]">
+    <div class="fixed right-4 sm:right-6 bottom-4 sm:bottom-6 flex flex-col gap-3 sm:gap-4 z-40">
         <a href="tel:+918210545286" title="Call Us"
             class="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl no-underline transition-all duration-300 hover:scale-110 active:scale-95 active:translate-y-1 bg-gradient-to-b from-blue-400 to-blue-600 shadow-[0_8px_20px_rgba(37,99,235,0.4),inset_0_-4px_0_rgba(0,0,0,0.2),inset_0_2px_0_rgba(255,255,255,0.4)] relative">
             <i class="fas fa-phone-alt relative z-10" style="filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));"></i>

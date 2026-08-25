@@ -1,4 +1,6 @@
 @extends('layouts.app')
+@section('title', 'Verified Home Tutors & 1-to-1 Private Tuitions in India | Warriors Educare')
+@section('meta_description', 'Find pre-screened, verified home tutors for Nursery to Class 12 & competitive exams in your city. Book a free demo class today with Warriors Educare.')
 @section('content')
 <x-page-header title="Find Tuitions" :breadcrumbs="['Home' => route('home'), 'Tuitions' => null]" image="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" />
 
@@ -113,8 +115,13 @@
         <div class="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col justify-between hover:border-accent-blue/50 hover:shadow-xl transition-all duration-300 group reveal">
             <div>
                 <div class="flex justify-between items-start mb-4">
-                    <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-chalkboard-teacher text-2xl text-accent-blue"></i>
+                    <div class="flex items-center gap-2">
+                        <div class="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-chalkboard-teacher text-xl text-accent-blue"></i>
+                        </div>
+                        <span class="inline-flex items-center gap-1 font-mono text-xs font-bold text-accent-blue bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                            <i class="fas fa-hashtag text-[9px] opacity-70"></i>{{ $tuition->tuition_id ?: 'TUI-' . str_pad($tuition->id, 4, '0', STR_PAD_LEFT) }}
+                        </span>
                     </div>
                     <span class="bg-blue-50 text-accent-blue px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap">{{ $tuition->board ?? 'N/A' }}</span>
                 </div>

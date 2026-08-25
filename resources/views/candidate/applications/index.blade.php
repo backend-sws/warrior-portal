@@ -83,6 +83,11 @@
                                         {{ strtoupper(substr($app->jobPost->school_name ?? 'SC', 0, 2)) }}
                                     </div>
                                     <div>
+                                        <div class="flex items-center gap-1.5 mb-1">
+                                            <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                                                <i class="fas fa-hashtag text-[8px] opacity-70"></i>{{ $app->jobPost->job_id ?: 'JOB-' . str_pad($app->jobPost->id, 4, '0', STR_PAD_LEFT) }}
+                                            </span>
+                                        </div>
                                         <h3 class="font-extrabold text-[#031b4e] text-base hover:text-accent-blue transition-colors">
                                             <a href="{{ route('jobs.show', $app->jobPost->id) }}" target="_blank">
                                                 {{ $app->jobPost->title ?? 'Teacher' }}
@@ -127,6 +132,15 @@
                                             Join Interview &rarr;
                                         </a>
                                     @endif
+                                </div>
+                            @endif
+
+                            {{-- Rejection Feedback or Admin Notes --}}
+                            @if($app->status === 'rejected' && $app->remarks)
+                                <div class="mb-4 p-3.5 rounded-2xl bg-red-50/80 border border-red-200 text-xs text-red-900">
+                            @elseif($app->remarks)
+                                <div class="mb-4 p-3 rounded-xl bg-slate-100/80 border border-slate-200 text-xs text-slate-700">
+                                    <strong>Admin Note:</strong> "{{ $app->remarks }}"
                                 </div>
                             @endif
 
@@ -177,6 +191,9 @@
                                     </div>
                                     <div>
                                         <div class="flex items-center gap-2">
+                                            <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-accent-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                                                <i class="fas fa-hashtag text-[8px] opacity-70"></i>{{ $lead?->tuition_id ?: 'TUI-' . str_pad($lead?->id ?? 0, 4, '0', STR_PAD_LEFT) }}
+                                            </span>
                                             <h3 class="font-extrabold text-[#031b4e] text-base sm:text-lg">
                                                 Class {{ $lead?->class ?? 'N/A' }}
                                             </h3>
@@ -245,8 +262,28 @@
                                 </div>
                             @endif
 
-                            {{-- Admin Remarks --}}
-                            @if($tApp->remarks)
+                            {{-- Rejection Feedback or Admin Remarks --}}
+                            @if($status === 'Rejected')
+                                <div class="mb-4 p-3.5 rounded-2xl bg-red-50/80 border border-red-200 text-xs text-red-900">
+                                    <div class="flex items-center gap-2 font-bold mb-1 text-red-700">
+                                        <i class="fas fa-times-circle"></i>
+                                        <span>Application Feedback / Reason:</span>
+                                    </div>
+                                    @if($tApp->remarks)
+                                        <p class="text-red-800 leading-relaxed font-medium pl-5">{{ $tApp->remarks }}</p>
+                                    @else
+                                        <p class="text-red-700/80 italic pl-5">Profile did not match the parent's current tuition criteria. You can apply for other available home tuitions.</p>
+                                    @endif
+                                </div>
+                            @elseif($status === 'Assigned' && $tApp->remarks)
+                                <div class="mb-4 p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-xs text-emerald-900">
+                                    <div class="flex items-center gap-2 font-bold mb-1 text-emerald-800">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Assignment Instructions & Notes:</span>
+                                    </div>
+                                    <p class="text-emerald-800 leading-relaxed pl-5">{{ $tApp->remarks }}</p>
+                                </div>
+                            @elseif($tApp->remarks)
                                 <div class="mb-4 p-3 rounded-xl bg-slate-100/80 border border-slate-200 text-xs text-slate-700">
                                     <strong>Admin Note:</strong> "{{ $tApp->remarks }}"
                                 </div>

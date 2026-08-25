@@ -145,16 +145,30 @@
 
             <div class="h-px w-full bg-card-border"></div>
 
-            <!-- Section 4: Publishing Status -->
-            <div class="bg-secondary-bg/30 p-5 rounded-2xl border border-card-border">
-                <label class="block text-xs font-bold text-text-dark/80 uppercase tracking-wider mb-2">Publishing Status <span class="text-red-500">*</span></label>
-                <div class="relative">
-                    <select name="status" required class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm font-semibold text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
-                        <option value="Approved" {{ old('status', $lead->status) == 'Approved' ? 'selected' : '' }}>✅ Approved (Live on Website / Open for Tutors to Apply)</option>
-                        <option value="New Lead" {{ old('status', $lead->status) == 'New Lead' ? 'selected' : '' }}>⏳ New Lead (Awaiting Admin Review & Approval)</option>
-                        <option value="Confirmed" {{ old('status', $lead->status) == 'Confirmed' ? 'selected' : '' }}>🎉 Confirmed (Tutor Appointed & Assigned)</option>
-                        <option value="Cancelled" {{ old('status', $lead->status) == 'Cancelled' ? 'selected' : '' }}>❌ Cancelled / Closed</option>
-                    </select>
+            <!-- Section 4: Publishing Status & Homepage Feature -->
+            <div class="bg-secondary-bg/30 p-5 rounded-2xl border border-card-border space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/80 uppercase tracking-wider mb-2">Publishing Status <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <select name="status" required class="w-full px-4 py-3 bg-secondary-bg border border-card-border rounded-xl text-sm font-semibold text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
+                            <option value="Approved" {{ old('status', $lead->status) == 'Approved' ? 'selected' : '' }}>✅ Approved (Live on Website / Open for Tutors to Apply)</option>
+                            <option value="New Lead" {{ old('status', $lead->status) == 'New Lead' ? 'selected' : '' }}>⏳ New Lead (Awaiting Admin Review & Approval)</option>
+                            <option value="Confirmed" {{ old('status', $lead->status) == 'Confirmed' ? 'selected' : '' }}>🎉 Confirmed (Tutor Appointed & Assigned)</option>
+                            <option value="Cancelled" {{ old('status', $lead->status) == 'Cancelled' ? 'selected' : '' }}>❌ Cancelled / Closed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-card-border/60">
+                    <label class="flex items-start gap-3 cursor-pointer select-none">
+                        <input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $lead->is_featured) ? 'checked' : '' }} class="w-5 h-5 mt-0.5 rounded-lg border-card-border text-accent-blue focus:ring-accent-blue/40 transition-all">
+                        <div>
+                            <span class="text-sm font-bold text-text-main flex items-center gap-1.5">
+                                <i class="fas fa-star text-amber-500"></i> Feature on Welcome Page
+                            </span>
+                            <span class="text-xs text-text-dark/60 block mt-0.5">Check this to prominently showcase this tuition card on the homepage.</span>
+                        </div>
+                    </label>
                 </div>
             </div>
 

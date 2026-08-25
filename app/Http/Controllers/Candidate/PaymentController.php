@@ -53,9 +53,10 @@ class PaymentController extends Controller
         $gateway = $this->paymentManager->driver();
 
         $order = $gateway->createOrder([
-            'amount'   => $amount,
-            'receipt'  => $receipt,
-            'notes'    => [
+            'amount'       => $amount,
+            'receipt'      => $receipt,
+            'redirect_url' => route('candidate.payment.callback'),
+            'notes'        => [
                 'user_id'    => (string)$user->id,
                 'user_name'  => (string)$user->name,
                 'plan'       => $request->plan,
@@ -89,42 +90,61 @@ class PaymentController extends Controller
 
     public function callback(Request $request)
     {
+        $orderId = $request->input('merchantTransactionId')
+            ?? $request->input('order_id')
+            ?? $request->input('razorpay_order_id')
+            ?? session('active_payment_order_id');
+
+        $paymentId = $request->input('transactionId')
+            ?? $request->input('payment_id')
+            ?? $request->input('razorpay_payment_id')
+            ?? ($orderId ? 'PP_' . $orderId : null);
+
+        $code = $request->input('code', 'PAYMENT_SUCCESS');
+
+        $txn = !empty($orderId) ? PaymentTransaction::where('order_id', $orderId)->first() : null;
+
         $user = auth()->user();
+        if (!$user && $txn && $txn->candidate_id) {
+            $user = \App\Models\User::find($txn->candidate_id);
+            if ($user) {
+                auth()->login($user);
+            }
+        }
+
         if (!$user) {
             return redirect()->route('login')->with('error', 'Session expired. Please log in.');
         }
 
-        $orderId   = $request->input('razorpay_order_id', session('active_payment_order_id'));
-        $paymentId = $request->input('razorpay_payment_id');
-        $signature = $request->input('razorpay_signature');
-
-        if (empty($paymentId) || empty($orderId)) {
+        if (empty($orderId)) {
             return redirect()->route('candidate.dashboard')->with('error', 'Payment cancelled or verification failed.');
         }
 
         $gateway = $this->paymentManager->driver();
         $verification = $gateway->verifyPayment([
-            'order_id'   => $orderId,
-            'payment_id' => $paymentId,
-            'signature'  => $signature,
+            'order_id'       => $orderId,
+            'payment_id'     => $paymentId,
+            'code'           => $code,
+            'response'       => $request->input('response'),
         ]);
 
         $txn = PaymentTransaction::where('order_id', $orderId)->first();
 
         if (!$verification['success']) {
             if ($txn) {
-                $txn->update(['status' => 'failed', 'payment_id' => $paymentId, 'signature' => $signature]);
+                $txn->update(['status' => 'failed', 'payment_id' => $paymentId, 'gateway' => 'phonepe']);
             }
             return redirect()->route('candidate.dashboard')->with('error', 'Payment verification failed.');
         }
 
+        $finalPaymentId = $verification['payment_id'] ?: ($paymentId ?: 'PP_' . $orderId);
+
         if ($txn) {
             $txn->update([
-                'payment_id'       => $paymentId,
-                'signature'        => $signature,
+                'payment_id'       => $finalPaymentId,
                 'status'           => 'success',
-                'payment_method'   => $verification['payment_method'] ?? 'online',
-                'gateway'          => 'razorpay',
+                'payment_method'   => $verification['payment_method'] ?? 'phonepe_online',
+                'gateway'          => 'phonepe',
                 'gateway_response' => $verification['raw'] ?? [],
             ]);
         }
@@ -138,11 +158,31 @@ class PaymentController extends Controller
 
         NotificationHelper::notifyAdmin(
             'Candidate Payment Received 💳',
-            '₹' . number_format($txn?->amount ?? 0, 2) . ' received from ' . $user->name . ' via Razorpay.',
+            '₹' . number_format($txn?->amount ?? 0, 2) . ' received from ' . $user->name . ' via PhonePe.',
             route('admin.transactions.index'),
             'fas fa-wallet'
         );
 
-        return redirect()->route('candidate.dashboard')->with('success', 'Payment successful via Razorpay!');
+        return redirect()->route('candidate.dashboard')->with('success', 'Payment successful via PhonePe!');
+    }
+
+    public function invoice($id)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Please log in to view the invoice.');
+        }
+
+        $transaction = PaymentTransaction::where('id', $id)
+            ->where('candidate_id', $user->id)
+            ->with(['invoice.tuitionLead', 'invoice.jobApplication.jobPost.subject', 'tuitionLead', 'candidate.profile'])
+            ->firstOrFail();
+
+        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('candidate.payment.invoice', compact('user', 'transaction'));
+            return $pdf->download('Payment_Invoice_' . ($transaction->transaction_id ?: $transaction->id) . '.pdf');
+        }
+
+        return view('candidate.payment.invoice', compact('user', 'transaction'));
     }
 }

@@ -8,16 +8,32 @@ use App\Models\HomeTuitionLead;
 use App\Models\TuitionApplication;
 use App\Helpers\NotificationHelper;
 
+use Illuminate\Support\Facades\Storage;
+
 class TuitionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $profile = auth()->user()->profile;
         $isAgreementSigned = (bool) ($profile?->is_tuition_agreement_signed);
 
-        $tuitions = HomeTuitionLead::where('status', 'Approved')
-            ->latest()
-            ->paginate(12);
+        $query = HomeTuitionLead::where('status', 'Approved');
+
+        if ($search = $request->input('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('tuition_id', 'like', "%{$search}%")
+                  ->orWhere('class', 'like', "%{$search}%")
+                  ->orWhere('subjects', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+                if (is_numeric($search)) {
+                    $q->orWhere('id', $search);
+                }
+            });
+        }
+
+        $tuitions = $query->latest()
+            ->paginate(12)
+            ->withQueryString();
 
         $appliedTuitionIds = TuitionApplication::where('candidate_id', auth()->id())
             ->pluck('home_tuition_lead_id')
@@ -30,26 +46,79 @@ class TuitionController extends Controller
     {
         $request->validate([
             'accept_terms' => 'required|accepted',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'location_name' => 'nullable|string|max:500',
         ]);
 
         $profile = auth()->user()->profile;
         if ($profile) {
-            $profile->update([
+            $photoPath = $profile->tuition_live_photo_path ?? $profile->live_photo_path;
+
+            // Handle base64 live camera capture
+            if ($request->filled('live_photo')) {
+                $livePhoto = $request->input('live_photo');
+                if (preg_match('/^data:image\/(\w+);base64,/', $livePhoto, $type)) {
+                    $data = substr($livePhoto, strpos($livePhoto, ',') + 1);
+                    $ext = strtolower($type[1]);
+                    if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
+                        $decoded = base64_decode($data);
+                        $filename = 'candidate_live_photos/tuition_agreement_user_' . auth()->id() . '_' . time() . '.' . ($ext === 'jpeg' ? 'jpg' : $ext);
+                        Storage::disk('public')->put($filename, $decoded);
+                        $photoPath = $filename;
+                    }
+                }
+            } elseif ($request->hasFile('live_photo_file')) {
+                $photoPath = $request->file('live_photo_file')->store('candidate_live_photos', 'public');
+            }
+
+            // Strictly enforce mandatory live photo capture
+            if (empty($photoPath)) {
+                return back()->with('error', 'Live camera selfie is MANDATORY to sign this agreement. Please click "Open Camera" and capture your live photo (or upload photo).');
+            }
+
+            $locationName = $request->input('location_name') ?: ($request->input('latitude') ? 'GPS: ' . $request->input('latitude') . ', ' . $request->input('longitude') : ($profile->address ?? 'Location not shared'));
+
+            $signatureMeta = [
+                'name' => auth()->user()->name,
+                'phone' => auth()->user()->phone,
+                'email' => auth()->user()->email,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
+                'location' => $locationName,
+                'signed_at' => now()->toIso8601String(),
+                'photo_path' => $photoPath,
+            ];
+
+            $updateData = [
                 'is_tuition_agreement_signed' => true,
                 'tuition_agreement_signed_at' => now(),
-                'tuition_signature_data' => auth()->user()->name . ' (IP: ' . $request->ip() . ')',
-            ]);
+                'tuition_signature_data' => json_encode($signatureMeta),
+                'tuition_live_photo_path' => $photoPath,
+                'tuition_latitude' => $request->input('latitude'),
+                'tuition_longitude' => $request->input('longitude'),
+                'tuition_location_name' => $locationName,
+            ];
+
+            // If profile has no live photo yet, set it
+            if (!$profile->live_photo_path && $photoPath) {
+                $updateData['live_photo_path'] = $photoPath;
+            }
+
+            $profile->update($updateData);
         }
 
         NotificationHelper::notifyUser(
             auth()->id(),
-            'Tuition Agreement Signed ✅',
-            'You have successfully signed the Home Tuition Tutor Service Agreement. You can now apply for all home tuitions.',
+            'Tuition Agreement Signed & Verified ✅',
+            'You have successfully signed the Home Tuition Tutor Service Agreement with live verification. You can now apply for all home tuitions.',
             route('candidate.tuitions.index'),
             'fas fa-file-signature'
         );
 
-        return back()->with('success', 'Home Tuition Tutor Service Agreement signed successfully! All tuitions are now unlocked for you.');
+        return back()->with('success', 'Home Tuition Tutor Service Agreement signed and digitally verified! All tuitions are now unlocked for you.');
     }
 
     public function apply(Request $request, $id)

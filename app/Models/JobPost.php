@@ -12,6 +12,21 @@ class JobPost extends Model
 
     protected $guarded = [];
 
+    protected static function booted()
+    {
+        static::created(function ($job) {
+            if (empty($job->job_id)) {
+                $job->job_id = 'JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT);
+                $job->saveQuietly();
+            }
+        });
+    }
+
+    public function getJobIdAttribute($value)
+    {
+        return $value ?: ('JOB-' . str_pad($this->id, 4, '0', STR_PAD_LEFT));
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -1,267 +1,335 @@
 @extends('layouts.app')
-@section('content')
 
-    <div class="pt-32 pb-12 px-6 lg:px-[5%] text-center border-b border-card-border metallic-blue-card border-none shadow-none text-white">
-        <h4 class="text-accent-blue text-sm font-bold mb-3 uppercase tracking-wider">Legal</h4>
-        <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6">Refund, Cancellation & Payment Policy</h1>
-        <p class="text-white opacity-70 max-w-2xl mx-auto">Last updated: October 2023</p>
+@section('title', 'Refund Policy — Warriors Educare')
+@section('meta_description', 'Official Refund Policy of Warriors Educare governing Home Tuition registrations, School placement services, service charges, timelines, and refund conditions.')
+
+@section('content')
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-r from-[#031b4e] via-[#092b77] to-[#031b4e] text-white pt-36 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] opacity-10"></div>
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-bold text-cyan-300 uppercase tracking-widest mb-4 border border-white/15">
+                <i class="fas fa-undo-alt"></i> Official Refund Documentation
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-3">Refund Policy</h1>
+            <p class="text-blue-100 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+                Warriors Educare • Comprehensive conditions and guidelines regarding registrations, service charges, and refund requests.
+            </p>
+            <div class="mt-4 text-xs text-blue-200/80 font-medium">
+                Founder: Prince Kumar • Integral Part of Terms & Conditions
+            </div>
+        </div>
     </div>
 
-    <div class="py-16 px-6 lg:px-[5%] max-w-4xl mx-auto">
-        <div
-            class="prose prose-sm md:prose-base prose-headings:text-text-main prose-p:text-text-main prose-p:opacity-80 prose-a:text-accent-blue max-w-none">
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4"> Refund, Cancellation & Payment Policy</h2>
-            <p class="mb-6 leading-relaxed">At Warriors Educare, we believe in maintaining complete transparency
-                regarding
-                our payment, cancellation, and refund practices. This policy explains how registration fees,
-                placement service charges, cancellations, and refunds are handled.</p>
-            <p>
-                By making any payment through our website, you acknowledge that you have read,
-                understood, and agreed to this policy.
-            </p>
+    <!-- Main Content -->
+    <div class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 min-h-screen font-sans">
+        <div class="max-w-4xl mx-auto bg-white rounded-3xl p-6 sm:p-10 md:p-12 shadow-xl border border-slate-200/80 text-slate-700 text-sm sm:text-base leading-relaxed space-y-10">
 
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4">1. Registration Fees</h2>
-
-            <p class="text-text-secondary leading-7 mb-4">
-                Warriors Educare offers the following registration plans:
-            </p>
-
-            <div class="overflow-x-auto mb-6">
-                <table class="min-w-full border border-gray-300">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border px-4 py-2 text-left">Registration Plan</th>
-                            <th class="border px-4 py-2 text-left">Fee</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="border px-4 py-2">Standard Registration</td>
-                            <td class="border px-4 py-2">₹500</td>
-                        </tr>
-                        <tr>
-                            <td class="border px-4 py-2">Premium Registration</td>
-                            <td class="border px-4 py-2">₹1,000</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- Policy Overview Card -->
+            <div class="p-6 rounded-2xl border-2" style="background-color: #f0f7ff; border-color: #bae6fd;">
+                <h3 class="font-black text-[#031b4e] text-lg sm:text-xl mb-2 flex items-center gap-2.5">
+                    <i class="fas fa-file-contract text-accent-blue"></i> Warriors Educare Refund Policy
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium mb-3">
+                    This Refund Policy forms an integral part of the Terms & Conditions of <strong>Warriors Educare</strong> and applies to all Home Tuition, School Teaching Staff Recruitment and Non-Teaching Staff Placement Services offered by Warriors Educare.
+                </p>
+                <p class="text-xs sm:text-sm text-[#031b4e] leading-relaxed font-bold">
+                    By registering with Warriors Educare, making any payment or using any of our services, you acknowledge that you have read, understood and agreed to this Refund Policy.
+                </p>
             </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                The registration fee covers administrative and recruitment support services, including but not limited to:
-            </p>
+            <!-- 1. General Policy -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">1</span>
+                    General Policy
+                </h2>
+                <p class="text-slate-700 font-medium">
+                    Warriors Educare provides recruitment, placement and educational staffing services. Registration fees are charged for profile verification, candidate screening, documentation review, interview coordination, lead generation, placement assistance and administrative services.
+                </p>
+                <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs sm:text-sm text-amber-950 font-semibold">
+                    <i class="fas fa-info-circle text-amber-600 mr-1"></i>
+                    Since these services begin immediately after registration, refunds are limited and shall be granted only in circumstances specifically mentioned in this policy.
+                </div>
+            </div>
 
-            <ul class="list-disc pl-6 mb-4 space-y-2">
-                <li class="text-text-secondary leading-7">Candidate profile creation</li>
-                <li class="text-text-secondary leading-7">Document verification</li>
-                <li class="text-text-secondary leading-7">Resume screening</li>
-                <li class="text-text-secondary leading-7">Profile management</li>
-                <li class="text-text-secondary leading-7">Job matching</li>
-                <li class="text-text-secondary leading-7">Interview coordination</li>
-                <li class="text-text-secondary leading-7">Recruitment assistance</li>
-                <li class="text-text-secondary leading-7">Candidate database maintenance</li>
-            </ul>
+            <hr class="border-slate-100">
 
-            <p class="text-text-secondary leading-7 mb-4">
-                Payment of the registration fee does not guarantee job placement, interview selection, or employment.
-            </p>
+            <!-- 2. Home Tuition Registration Fee Refund -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">2</span>
+                    Home Tuition Registration Fee Refund
+                </h2>
+                <p class="text-slate-700 font-medium">
+                    A candidate may be eligible for a refund of the Home Tuition Registration Fee <strong>only when all of the following conditions are satisfied:</strong>
+                </p>
+                <div class="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2 text-xs sm:text-sm text-emerald-950 font-semibold">
+                    <div class="flex items-start gap-2.5">
+                        <i class="fas fa-check-circle text-emerald-600 mt-0.5"></i>
+                        <span>A confirmed demo class or tuition lead is cancelled by the parent before the tuition is finalized.</span>
+                    </div>
+                    <div class="flex items-start gap-2.5">
+                        <i class="fas fa-check-circle text-emerald-600 mt-0.5"></i>
+                        <span>The cancellation is not caused by the candidate's conduct, qualifications, availability, communication skills, demo performance or any candidate-related reason.</span>
+                    </div>
+                    <div class="flex items-start gap-2.5">
+                        <i class="fas fa-check-circle text-emerald-600 mt-0.5"></i>
+                        <span>Warriors Educare is unable to provide another suitable confirmed tuition lead within <strong>25 working days</strong> from the date of cancellation.</span>
+                    </div>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-800 font-bold bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    If all the above conditions are fulfilled, the candidate may become eligible for a <strong>100% refund of the registration fee</strong>. The refund process shall commence only after the completion of the applicable waiting period and internal verification.
+                </p>
+            </div>
 
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4">2. Refund Policy</h2>
+            <hr class="border-slate-100">
 
-            <p class="text-text-secondary leading-7 mb-4">
-                All registration fees paid to Warriors Educare are strictly non-refundable and non-transferable.
-            </p>
+            <!-- 3. Parent Rejection After Demo Class -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">3</span>
+                    Parent Rejection After Demo Class
+                </h2>
+                <p class="text-slate-700 font-medium">
+                    Warriors Educare does not guarantee selection by any parent. Parents make the final decision based on various factors including:
+                </p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-bold text-slate-700">
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">• Teaching methodology</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">• Communication skills</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">• Subject knowledge</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">• Student compatibility</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">• Experience level</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">• Personal preference</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl col-span-2 sm:col-span-2">• Academic requirements</div>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-700 font-medium">
+                    Accordingly, if a parent rejects a candidate after a demo class or decides not to continue with the candidate, such rejection shall not automatically entitle the candidate to a refund. Warriors Educare may make reasonable efforts to provide alternative tuition opportunities based on availability and suitability.
+                </p>
+            </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                Once a registration has been successfully completed and the profile has been activated, no refund will be
-                issued under any circumstances, including but not limited to:
-            </p>
+            <hr class="border-slate-100">
 
-            <ul class="list-disc pl-6 mb-4 space-y-2">
-                <li class="text-text-secondary leading-7">The candidate decides not to continue with the recruitment
-                    process.</li>
-                <li class="text-text-secondary leading-7">The candidate is not shortlisted by any employer.</li>
-                <li class="text-text-secondary leading-7">The candidate is not selected after an interview.</li>
-                <li class="text-text-secondary leading-7">The candidate declines a job offer.</li>
-                <li class="text-text-secondary leading-7">The candidate accepts employment through another source.</li>
-                <li class="text-text-secondary leading-7">The registration validity expires.</li>
-                <li class="text-text-secondary leading-7">Incorrect or incomplete information is submitted by the candidate.
-                </li>
-                <li class="text-text-secondary leading-7">The candidate fails to attend scheduled interviews.</li>
-                <li class="text-text-secondary leading-7">The candidate voluntarily withdraws from the recruitment process.
-                </li>
-            </ul>
+            <!-- 4. Home Tuition Registration Fee – Non-Refundable Cases -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-red-100 text-red-700 flex items-center justify-center text-xs font-black shrink-0">4</span>
+                    Home Tuition Registration Fee – Non-Refundable Cases
+                </h2>
+                <p class="text-slate-700 font-medium">The Home Tuition Registration Fee shall not be refunded under the following circumstances:</p>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-slate-700 font-semibold pl-2">
+                    <li class="p-2.5 bg-red-50/50 border border-red-100 rounded-xl flex items-center gap-2"><i class="fas fa-times text-red-500"></i> The candidate voluntarily withdraws from the process.</li>
+                    <li class="p-2.5 bg-red-50/50 border border-red-100 rounded-xl flex items-center gap-2"><i class="fas fa-times text-red-500"></i> The candidate refuses a suitable tuition opportunity.</li>
+                    <li class="p-2.5 bg-red-50/50 border border-red-100 rounded-xl flex items-center gap-2"><i class="fas fa-times text-red-500"></i> The candidate fails to attend a scheduled demo class.</li>
+                    <li class="p-2.5 bg-red-50/50 border border-red-100 rounded-xl flex items-center gap-2"><i class="fas fa-times text-red-500"></i> The candidate is unavailable for the tuition assignment.</li>
+                    <li class="p-2.5 bg-red-50/50 border border-red-100 rounded-xl flex items-center gap-2"><i class="fas fa-times text-red-500"></i> The candidate provides incorrect, misleading or incomplete info.</li>
+                    <li class="p-2.5 bg-red-50/50 border border-red-100 rounded-xl flex items-center gap-2"><i class="fas fa-times text-red-500"></i> The candidate submits false, forged or invalid documents.</li>
+                    <li class="p-2.5 bg-red-50/50 border border-red-100 rounded-xl flex items-center gap-2"><i class="fas fa-times text-red-500"></i> Unprofessional behavior with parents, students or staff.</li>
+                    <li class="p-2.5 bg-red-50/50 border border-red-100 rounded-xl flex items-center gap-2"><i class="fas fa-times text-red-500"></i> 3 consecutive demo rejections due to candidate reasons.</li>
+                    <li class="p-2.5 bg-red-50/50 border border-red-100 rounded-xl flex items-center gap-2"><i class="fas fa-times text-red-500"></i> Violation of policies or Terms & Conditions.</li>
+                    <li class="p-2.5 bg-red-50/50 border border-red-100 rounded-xl flex items-center gap-2"><i class="fas fa-times text-red-500"></i> The registration validity period has expired.</li>
+                </ul>
+            </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                Candidates are advised to review all details carefully before making any payment.
-            </p>
+            <hr class="border-slate-100">
 
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4">3. Cancellation Policy</h2>
+            <!-- 5. School Teacher & Non-Teaching Staff Registration Fee -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">5</span>
+                    School Teacher & Non-Teaching Staff Registration Fee
+                </h2>
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                    <p class="text-xs sm:text-sm text-slate-800 font-bold mb-2">
+                        The registration fee paid for School Teaching and Non-Teaching Staff Placement Services is <span class="text-red-600">strictly non-refundable</span>.
+                    </p>
+                    <p class="text-xs text-slate-600 mb-2">The fee is charged towards:</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-700 font-semibold">
+                        <div class="p-2 bg-white rounded-lg border border-slate-100">• Profile Verification</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-100">• Candidate Screening</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-100">• Documentation Review</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-100">• Vacancy Matching</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-100">• Recruitment Support</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-100">• Interview Coordination</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-100">• Placement Assistance</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-100">• Admin Processing</div>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-500 italic font-medium">
+                    As these services commence immediately upon registration, no refund shall be provided once the registration process has been initiated.
+                </p>
+            </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                Candidates may request cancellation of their registration at any time by contacting our support team.
-            </p>
+            <hr class="border-slate-100">
 
-            <p class="text-text-secondary leading-7 mb-4">
-                However:
-            </p>
+            <!-- 6. Interview, Selection & Placement Related Refunds -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">6</span>
+                    Interview, Selection & Placement Related Refunds
+                </h2>
+                <p class="text-slate-700 font-medium">No refund shall be provided if:</p>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 font-medium pl-2">
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• A school rejects the candidate.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• The candidate is not shortlisted by the school.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• The candidate fails the interview.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• The candidate declines the job offer.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• The candidate refuses the joining opportunity.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• The candidate leaves before joining.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• The candidate fails to meet school requirements.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Profile does not match vacancy criteria.</li>
+                </ul>
+                <p class="text-xs text-slate-600 font-semibold italic">Warriors Educare provides placement assistance only and does not guarantee employment.</p>
+            </div>
 
-            <ul class="list-disc pl-6 mb-4 space-y-2">
-                <li class="text-text-secondary leading-7">Cancellation of registration does not entitle the candidate to any
-                    refund.</li>
-                <li class="text-text-secondary leading-7">Cancellation does not waive any outstanding obligations arising
-                    from successful placement through Warriors Educare.</li>
-                <li class="text-text-secondary leading-7">Once cancelled, access to recruitment support and related services
-                    may be discontinued.</li>
-            </ul>
+            <hr class="border-slate-100">
 
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4">4. Placement Service Charges</h2>
+            <!-- 7. Service Charges & Placement Charges -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">7</span>
+                    Service Charges & Placement Charges
+                </h2>
+                <div class="p-4 rounded-2xl bg-red-50/60 border border-red-200">
+                    <h4 class="font-extrabold text-red-950 text-sm mb-2">All service charges and placement charges are strictly non-refundable:</h4>
+                    <ul class="space-y-2 text-xs sm:text-sm text-slate-800 font-semibold">
+                        <li class="flex items-center justify-between p-2 bg-white rounded-lg border border-red-100">
+                            <span>Home Tuition Service Charge:</span>
+                            <span class="text-red-700">50% of 1st month tuition fee (15 days fee)</span>
+                        </li>
+                        <li class="flex items-center justify-between p-2 bg-white rounded-lg border border-red-100">
+                            <span>Hourly Tuition Assignments:</span>
+                            <span class="text-red-700">50% of total allotted monthly classes</span>
+                        </li>
+                        <li class="flex items-center justify-between p-2 bg-white rounded-lg border border-red-100">
+                            <span>School Placement Service Charge:</span>
+                            <span class="text-red-700">50% of 1st month gross salary (15 days salary)</span>
+                        </li>
+                    </ul>
+                </div>
+                <p class="text-xs text-slate-600 italic">Once placement services have been successfully delivered, no refund shall be granted under any circumstances.</p>
+            </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                Warriors Educare does not collect placement service charges before successful joining.
-            </p>
+            <hr class="border-slate-100">
 
-            <p class="text-text-secondary leading-7 mb-4">
-                Placement service charges become payable only after the candidate has successfully joined the hiring
-                institution through our recruitment services.
-            </p>
+            <!-- 8. Duplicate Payments -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">8</span>
+                    Duplicate Payments
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+                    If a user accidentally makes a duplicate payment for the same service, Warriors Educare may, after verification of records and transactions, refund the excess amount received.
+                </p>
+            </div>
 
-            <p class="text-text-secondary font-semibold mb-2">
-                The applicable service charges are:
-            </p>
+            <hr class="border-slate-100">
 
-            <p class="text-text-secondary font-semibold mb-2">
-                Teaching Staff
-            </p>
+            <!-- 9. Failed or Unsuccessful Transactions -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">9</span>
+                    Failed or Unsuccessful Transactions
+                </h2>
+                <p class="text-slate-700 font-medium">
+                    If payment is deducted from the user's bank account but the transaction is not successfully completed due to banking issues, technical failures, UPI network issues or payment gateway errors, the refund shall be governed by the policies and timelines of the respective bank or payment gateway provider.
+                </p>
+                <p class="text-xs text-slate-500 font-medium">Warriors Educare shall not be responsible for delays caused by third-party financial institutions.</p>
+            </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                Service Charge: 50% of the candidate's first month's gross salary.
-            </p>
+            <hr class="border-slate-100">
 
-            <p class="text-text-secondary font-semibold mb-2">
-                Example:
-            </p>
+            <!-- 10. Refund Request Procedure -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">10</span>
+                    Refund Request Procedure
+                </h2>
+                <p class="text-slate-700 font-medium">To request a refund, the user must contact Warriors Educare and provide:</p>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs text-slate-700 font-semibold">
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl"><i class="fas fa-user text-accent-blue mr-1"></i> Full Name</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl"><i class="fas fa-phone text-accent-blue mr-1"></i> Registered Mobile</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl"><i class="fas fa-receipt text-accent-blue mr-1"></i> Payment Details</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl"><i class="fas fa-barcode text-accent-blue mr-1"></i> Transaction ID</div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl col-span-2 sm:col-span-2"><i class="fas fa-comment-alt text-accent-blue mr-1"></i> Reason for Refund Request & Supporting Documents</div>
+                </div>
+                <p class="text-xs text-slate-500 font-medium">Warriors Educare reserves the right to request additional information before processing any refund request.</p>
+            </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                If the first month's gross salary is ₹40,000, the applicable service charge will be ₹20,000.
-            </p>
+            <hr class="border-slate-100">
 
-            <p class="text-text-secondary font-semibold mb-2">
-                Non-Teaching Staff
-            </p>
+            <!-- 11. Refund Processing Timeline -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">11</span>
+                    Refund Processing Timeline
+                </h2>
+                <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs sm:text-sm text-blue-950 font-bold">
+                    <i class="fas fa-clock text-accent-blue mr-1.5"></i>
+                    Approved refunds shall generally be processed within 7–15 business days from the date of approval.
+                </div>
+                <p class="text-xs text-slate-600 font-medium">
+                    The actual credit timeline may vary depending upon Banking Networks, UPI Service Providers, Payment Gateway Providers and Financial Institutions.
+                </p>
+            </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                Service Charge: 66.67% of the candidate's first month's gross salary, equivalent to 20 days' salary.
-            </p>
+            <hr class="border-slate-100">
 
-            <p class="text-text-secondary font-semibold mb-2">
-                Example:
-            </p>
+            <!-- 12. Right to Reject Refund Requests -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">12</span>
+                    Right to Reject Refund Requests
+                </h2>
+                <p class="text-slate-700 font-medium">Warriors Educare reserves the absolute right to reject any refund request if:</p>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 font-medium pl-2">
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• The request does not satisfy policy conditions.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Incorrect information has been provided.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Fraudulent activity is suspected.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• False or forged documents have been submitted.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• The candidate has violated Terms & Conditions.</li>
+                    <li class="p-2 bg-slate-50 rounded-lg border border-slate-100">• Services have already been substantially provided.</li>
+                </ul>
+            </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                If the first month's gross salary is ₹30,000, the applicable service charge will be ₹20,000.
-            </p>
+            <hr class="border-slate-100">
 
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4">5. Payment Methods</h2>
+            <!-- 13. Modification of Refund Policy -->
+            <div class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">13</span>
+                    Modification of Refund Policy
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+                    Warriors Educare reserves the right to modify, update or revise this Refund Policy at any time without prior notice. Any revised policy shall become effective immediately upon publication on the website.
+                </p>
+            </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                Payments may be accepted through secure online payment methods made available on our website, including:
-            </p>
+            <hr class="border-slate-100">
 
-            <ul class="list-disc pl-6 mb-4 space-y-2">
-                <li class="text-text-secondary leading-7">UPI</li>
-                <li class="text-text-secondary leading-7">Debit Cards</li>
-                <li class="text-text-secondary leading-7">Credit Cards</li>
-                <li class="text-text-secondary leading-7">Net Banking</li>
-                <li class="text-text-secondary leading-7">Wallets</li>
-                <li class="text-text-secondary leading-7">Other approved digital payment methods</li>
-            </ul>
+            <!-- 14. Contact Information -->
+            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+                <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2.5 mb-4">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#031b4e] flex items-center justify-center text-xs font-black shrink-0">14</span>
+                    Contact Information
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-slate-800 font-semibold">
+                    <div class="flex items-center gap-2"><i class="fas fa-building text-accent-blue"></i> <span><strong>Company:</strong> Warriors Educare</span></div>
+                    <div class="flex items-center gap-2"><i class="fas fa-user-tie text-accent-blue"></i> <span><strong>Founder:</strong> Prince Kumar</span></div>
+                    <div class="flex items-center gap-2"><i class="fas fa-globe text-accent-blue"></i> <span><strong>Website:</strong> <a href="https://www.warriorseducare.com" target="_blank" class="text-accent-blue hover:underline">www.warriorseducare.com</a></span></div>
+                    <div class="flex items-center gap-2"><i class="fas fa-envelope text-accent-blue"></i> <span><strong>Email:</strong> <a href="mailto:support@warriorseducare.com" class="text-accent-blue hover:underline">support@warriorseducare.com</a></span></div>
+                    <div class="flex items-center gap-2"><i class="fas fa-phone-alt text-accent-blue"></i> <span><strong>Phone:</strong> <a href="tel:+918210545286" class="text-accent-blue hover:underline">+91 8210545286</a></span></div>
+                </div>
+            </div>
 
-            <p class="text-text-secondary leading-7 mb-4">
-                All online payments are processed through authorized and secure payment gateway partners.
-            </p>
-
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4">6. Failed or Duplicate Payments</h2>
-
-            <p class="text-text-secondary leading-7 mb-4">
-                If a payment fails but the amount is debited from your account, it is generally reversed automatically by
-                your bank or payment service provider within the applicable settlement period.
-            </p>
-
-            <p class="text-text-secondary leading-7 mb-4">
-                In case of a duplicate payment, please contact our support team with the relevant payment details. Verified
-                duplicate transactions may be reviewed and resolved in accordance with applicable banking and payment
-                gateway procedures.
-            </p>
-
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4">7. Payment Confirmation</h2>
-
-            <p class="text-text-secondary leading-7 mb-4">
-                A payment will be considered successful only after confirmation is received from the payment gateway and
-                reflected in our system.
-            </p>
-
-            <p class="text-text-secondary leading-7 mb-4">
-                Warriors Educare reserves the right to delay activation of services until payment verification is
-                complete.
-            </p>
-
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4">8. Taxes</h2>
-
-            <p class="text-text-secondary leading-7 mb-4">
-                All applicable taxes, duties, or statutory charges, if any, shall be charged in accordance with the
-                prevailing laws of India.
-            </p>
-
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4">9. Policy Updates</h2>
-
-            <p class="text-text-secondary leading-7 mb-4">
-                Warriors Educare reserves the right to amend or update this Refund, Cancellation &amp; Payment
-                Policy at any time without prior notice.
-            </p>
-
-            <p class="text-text-secondary leading-7 mb-4">
-                The latest version published on our website shall supersede all previous versions.
-            </p>
-
-            <h2 class="text-2xl font-bold text-text-main mt-8 mb-4">10. Contact Us</h2>
-
-            <p class="text-text-secondary leading-7 mb-4">
-                For any payment, cancellation, or refund-related queries, please contact:
-            </p>
-
-            <p class="text-text-secondary leading-7 mb-2">
-                Warriors Educare
-            </p>
-
-            <p class="text-text-secondary leading-7 mb-2">
-                Email:
-                <a href="mailto:warriorseducare@gmail.com" class="text-primary hover:underline break-all">
-                    warriorseducare@gmail.com
-                </a>
-            </p>
-
-            <p class="text-text-secondary leading-7 mb-2">
-                Phone:
-                <a href="tel:+918210545286" class="text-primary hover:underline">
-                    +91 8210545286
-                </a>
-            </p>
-
-            <p class="text-text-secondary leading-7 mb-4">
-                Website:
-                <a href="https://www.warriorseducare.in" target="_blank" rel="noopener noreferrer"
-                    class="text-primary hover:underline break-all">
-                    www.warriorseducare.in
-                </a>
-            </p>
-
-
+            <!-- Acceptance Clause -->
+            <div class="p-6 rounded-2xl bg-[#031b4e] text-white shadow-lg">
+                <h4 class="text-amber-400 font-extrabold uppercase tracking-wider text-xs mb-2">Acceptance</h4>
+                <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                    By registering with Warriors Educare, making any payment, applying for tuition opportunities, participating in recruitment activities or using any of our services, you acknowledge that you have read, understood and agreed to this Refund Policy in its entirety.
+                </p>
+            </div>
 
         </div>
-
-
     </div>
-
 @endsection
-

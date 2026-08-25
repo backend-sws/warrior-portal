@@ -223,6 +223,12 @@ class TuitionServiceChargeController extends Controller
         return back()->with('success', "Invoice #{$invoice->id} updated successfully.");
     }
 
+    public function showInvoice($id)
+    {
+        $invoice = ServiceChargeInvoice::with(['candidate.profile', 'jobApplication.jobPost', 'tuitionLead'])->findOrFail($id);
+        return view('candidate.serviceCharge.invoice', compact('invoice'));
+    }
+
     public function destroy($id)
     {
         $invoice = ServiceChargeInvoice::with('candidate.profile')->findOrFail($id);

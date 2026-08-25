@@ -1,4 +1,6 @@
 @extends('layouts.app')
+@section('title', 'Teaching Jobs & School Faculty Vacancies in India | Warriors Educare')
+@section('meta_description', 'Explore top school and college teaching vacancies across India. Apply for PGT, TGT, PRT, and Principal positions with instant employer matching.')
 @section('content')
 <x-page-header title="Find Your Dream Role" :breadcrumbs="['Home' => route('home'), 'Jobs' => null]" image="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" />
 <div class="py-8 sm:py-12 px-4 sm:px-6 lg:px-[5%] metallic-blue-card border-none shadow-none border-b border-white/10 relative overflow-hidden">
@@ -16,6 +18,12 @@
                 @if(request('job_type'))
                     <input type="hidden" name="job_type" value="{{ request('job_type') }}">
                 @endif
+                <!-- Keyword / Job ID -->
+                <div class="flex-1 w-full">
+                    <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">Job ID / Keyword</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Job ID (e.g. JOB-0001) or title..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue placeholder:text-slate-400">
+                </div>
+
                 <!-- State -->
                 <div class="flex-1 w-full">
                     <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">State</label>
@@ -79,8 +87,13 @@
                 <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 flex flex-col justify-between hover:border-accent-blue/50 hover:shadow-xl transition-all duration-300 group reveal">
                     <div>
                         <div class="flex justify-between items-start mb-4">
-                            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode($job->school_name) }}&background=random" class="rounded">
+                            <div class="flex items-center gap-2">
+                                <div class="w-12 h-12 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-graduation-cap text-[#0ea5e9] text-xl"></i>
+                                </div>
+                                <span class="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-100">
+                                    <i class="fas fa-hashtag text-[8px] opacity-70"></i>{{ $job->job_id ?: 'JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT) }}
+                                </span>
                             </div>
                             <span class="bg-blue-50 text-accent-blue px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap">{{ $job->category?->name ?? 'N/A' }}</span>
                         </div>
@@ -88,7 +101,9 @@
                         <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-1 group-hover:text-accent-blue transition-colors line-clamp-1">
                             <a href="{{ route('jobs.show', $job->id) }}">{{ $job->title ?? 'Job Requirement' }}</a>
                         </h3>
-                        <p class="text-xs sm:text-sm text-slate-500 font-medium mb-3 line-clamp-1">{{ $job->school_name }} • {{ $job->city?->name ?? 'N/A' }}, {{ $job->state?->name ?? 'N/A' }}</p>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium mb-3 line-clamp-1">
+                            <i class="fas fa-shield-alt text-[#0ea5e9] text-[11px] mr-1"></i> Verified Institution • {{ $job->city?->name ?? 'N/A' }}, {{ $job->state?->name ?? 'N/A' }}
+                        </p>
                         
                         <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-5 line-clamp-3">
                             {{ Str::limit(strip_tags($job->description), 100) }}

@@ -31,13 +31,23 @@ class HomeController extends Controller
         $totalJobs = JobPost::where('status', 'approved')->count();
         $totalApplications = \App\Models\JobApplication::count();
         $totalEmployers = \App\Models\User::where('role', 'employer')->count();
-        $employerTuitions = \App\Models\TuitionRequirement::where('status', 'Pending')->whereNotNull('employer_id')->latest()->take(6)->get();
-        $guestTuitions = \App\Models\TuitionRequirement::where('status', 'Pending')->whereNull('employer_id')->latest()->take(6)->get();
+        $employerTuitions = \App\Models\HomeTuitionLead::where('is_featured', true)
+            ->where('status', 'Approved')
+            ->latest()
+            ->take(8)
+            ->get();
+
+        if ($employerTuitions->isEmpty()) {
+            $employerTuitions = \App\Models\HomeTuitionLead::where('status', 'Approved')
+                ->latest()
+                ->take(8)
+                ->get();
+        }
 
         $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
         $qualifications = \App\Models\Qualification::where('is_active', true)->orderBy('name')->get();
 
-        return view('welcome', compact('recentJobs', 'categories', 'services', 'testimonials', 'clients', 'totalJobs', 'totalApplications', 'totalEmployers', 'employerTuitions', 'guestTuitions', 'states', 'qualifications'));
+        return view('welcome', compact('recentJobs', 'categories', 'services', 'testimonials', 'clients', 'totalJobs', 'totalApplications', 'totalEmployers', 'employerTuitions', 'states', 'qualifications'));
     }
 
     public function storeTuition(Request $request)
@@ -158,7 +168,8 @@ class HomeController extends Controller
     public function serviceDetails($slug)
     {
         $service = Service::where('slug', $slug)->firstOrFail();
-        return view('service-details', compact('service'));
+        $allServices = Service::where('is_active', true)->where('id', '!=', $service->id)->get();
+        return view('service-details', compact('service', 'allServices'));
     }
 
 
@@ -166,6 +177,18 @@ class HomeController extends Controller
     {
         $query = JobPost::with(['category', 'subject', 'state', 'city', 'qualification'])
             ->where('status', 'approved');
+
+        if ($search = $request->input('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('job_id', 'like', "%{$search}%")
+                  ->orWhere('title', 'like', "%{$search}%")
+                  ->orWhere('school_name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+                if (is_numeric($search)) {
+                    $q->orWhere('id', $search);
+                }
+            });
+        }
 
         if ($request->filled('state')) {
             $query->where('state_id', $request->state);
@@ -187,7 +210,7 @@ class HomeController extends Controller
             $query->where('job_type', $request->job_type);
         }
 
-        $jobs = $query->orderBy('created_at', 'desc')->paginate(12);
+        $jobs = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
 
         $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
         $subjects = \App\Models\Subject::where('is_active', true)->orderBy('name')->get();
@@ -198,9 +221,24 @@ class HomeController extends Controller
 
     public function tuitions(\Illuminate\Http\Request $request)
     {
-        $tuitions = \App\Models\HomeTuitionLead::where('status', 'Approved')
-            ->latest()
-            ->paginate(12);
+        $query = \App\Models\HomeTuitionLead::where('status', 'Approved');
+
+        if ($search = $request->input('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('tuition_id', 'like', "%{$search}%")
+                  ->orWhere('class', 'like', "%{$search}%")
+                  ->orWhere('subjects', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhere('pincode', 'like', "%{$search}%");
+                if (is_numeric($search)) {
+                    $q->orWhere('id', $search);
+                }
+            });
+        }
+
+        $tuitions = $query->latest()
+            ->paginate(12)
+            ->withQueryString();
 
         return view('tuitions', compact('tuitions'));
     }

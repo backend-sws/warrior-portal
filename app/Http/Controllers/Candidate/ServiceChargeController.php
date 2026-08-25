@@ -57,12 +57,11 @@ class ServiceChargeController extends Controller
 
         $receipt = 'SC_' . $invoice->id . '_' . time();
         $gateway = $this->paymentManager->driver();
-
-        // Create Razorpay Order
         $order = $gateway->createOrder([
-            'amount'   => $amount,
-            'receipt'  => $receipt,
-            'notes'    => [
+            'amount'       => $amount,
+            'receipt'      => $receipt,
+            'redirect_url' => route('candidate.serviceCharge.callback'),
+            'notes'        => [
                 'invoice_id'   => (string)$invoice->id,
                 'user_id'      => (string)$user->id,
                 'user_name'    => (string)$user->name,
@@ -73,7 +72,7 @@ class ServiceChargeController extends Controller
         ]);
 
         if (!$order['success']) {
-            Log::error('Razorpay Service Charge Order Creation Failed', ['error' => $order['error']]);
+            Log::error('Service Charge Order Creation Failed', ['error' => $order['error']]);
             return back()->with('error', 'Payment gateway error: ' . ($order['error'] ?? 'Please try again later.'));
         }
 
@@ -101,26 +100,44 @@ class ServiceChargeController extends Controller
 
     public function callback(Request $request)
     {
+        $orderId = $request->input('merchantTransactionId')
+            ?? $request->input('order_id')
+            ?? $request->input('razorpay_order_id')
+            ?? session('active_order_id');
+
+        $paymentId = $request->input('transactionId')
+            ?? $request->input('payment_id')
+            ?? $request->input('razorpay_payment_id')
+            ?? ($orderId ? 'PP_' . $orderId : null);
+
+        $code = $request->input('code', 'PAYMENT_SUCCESS');
+
+        $txn = !empty($orderId) ? PaymentTransaction::where('order_id', $orderId)->first() : null;
+
         $user = auth()->user();
+        if (!$user && $txn && $txn->candidate_id) {
+            $user = \App\Models\User::find($txn->candidate_id);
+            if ($user) {
+                auth()->login($user);
+            }
+        }
+
         if (!$user) {
             return redirect()->route('login')->with('error', 'Session expired. Please log in.');
         }
 
-        $orderId   = $request->input('razorpay_order_id', session('active_order_id'));
-        $paymentId = $request->input('razorpay_payment_id');
-        $signature = $request->input('razorpay_signature');
-
-        if (empty($paymentId) || empty($orderId)) {
-            Log::warning('Razorpay Callback Missing Parameters', $request->all());
+        if (empty($orderId)) {
+            Log::warning('Payment Callback Missing Order ID', $request->all());
             return redirect()->route('candidate.serviceCharge.show')->with('error', 'Payment was cancelled or failed to verify.');
         }
 
-        // Verify with Razorpay
+        // Verify with Gateway
         $gateway = $this->paymentManager->driver();
         $verification = $gateway->verifyPayment([
-            'order_id'   => $orderId,
-            'payment_id' => $paymentId,
-            'signature'  => $signature,
+            'order_id'       => $orderId,
+            'payment_id'     => $paymentId,
+            'code'           => $code,
+            'response'       => $request->input('response'),
         ]);
 
         $txn = PaymentTransaction::where('order_id', $orderId)->first();
@@ -130,30 +147,30 @@ class ServiceChargeController extends Controller
                 $txn->update([
                     'status'            => 'failed',
                     'payment_id'        => $paymentId,
-                    'signature'         => $signature,
-                    'error_description' => $verification['error'] ?? 'Signature verification failed',
+                    'gateway'           => 'phonepe',
+                    'error_description' => $verification['error'] ?? 'Payment verification failed',
                 ]);
             }
-            return redirect()->route('candidate.serviceCharge.show')->with('error', 'Payment verification failed: ' . ($verification['error'] ?? 'Invalid signature.'));
+            return redirect()->route('candidate.serviceCharge.show')->with('error', 'Payment verification failed: ' . ($verification['error'] ?? 'Transaction was declined.'));
         }
 
         // Verification Succeeded
         $paymentDetails = $verification['raw'] ?? [];
-        $paymentMethod  = $verification['payment_method'] ?? 'online';
+        $paymentMethod  = $verification['payment_method'] ?? 'phonepe_online';
+        $finalPaymentId = $verification['payment_id'] ?: ($paymentId ?: 'PP_' . $orderId);
         $invoiceId      = $txn?->invoice_id ?? session('sc_invoice_id');
 
         $invoice = ServiceChargeInvoice::find($invoiceId);
 
-        DB::transaction(function () use ($txn, $invoice, $user, $orderId, $paymentId, $signature, $paymentMethod, $paymentDetails) {
+        DB::transaction(function () use ($txn, $invoice, $user, $orderId, $finalPaymentId, $paymentMethod, $paymentDetails) {
             $amount = $invoice ? ($invoice->amount + $invoice->late_fee) : ($txn?->amount ?? 0);
 
             if ($txn) {
                 $txn->update([
-                    'payment_id'       => $paymentId,
-                    'signature'        => $signature,
+                    'payment_id'       => $finalPaymentId,
                     'status'           => 'success',
                     'payment_method'   => $paymentMethod,
-                    'gateway'          => 'razorpay',
+                    'gateway'          => 'phonepe',
                     'gateway_response' => $paymentDetails,
                 ]);
             }
@@ -177,7 +194,7 @@ class ServiceChargeController extends Controller
                 // Notify Admin
                 NotificationHelper::notifyAdmin(
                     'Service Charge Received 💳',
-                    '₹' . number_format($amount, 2) . ' received from ' . $user->name . ' via Razorpay (' . strtoupper($paymentMethod) . ').',
+                    '₹' . number_format($amount, 2) . ' received from ' . $user->name . ' via PhonePe (' . strtoupper($paymentMethod) . ').',
                     route('admin.transactions.index'),
                     'fas fa-receipt'
                 );
@@ -186,7 +203,7 @@ class ServiceChargeController extends Controller
                 NotificationHelper::notifyUser(
                     $user->id,
                     'Service Charge Payment Confirmed ✅',
-                    '₹' . number_format($amount, 2) . ' received successfully via Razorpay. Your receipt has been generated.',
+                    '₹' . number_format($amount, 2) . ' received successfully via PhonePe. Your receipt has been generated.',
                     route('candidate.serviceCharge.show'),
                     'fas fa-check-circle'
                 );
@@ -204,18 +221,32 @@ class ServiceChargeController extends Controller
 
         session()->forget(['active_order_id', 'sc_invoice_id']);
 
-        return redirect()->route('candidate.serviceCharge.show')->with('success', '✅ Payment verified and recorded successfully via Razorpay!');
+        return redirect()->route('candidate.serviceCharge.show')->with('success', '✅ Payment verified and recorded successfully via PhonePe!');
     }
 
     public function invoice($id)
     {
+        return $this->downloadInvoicePdf($id);
+    }
+
+    public function downloadInvoicePdf($id)
+    {
         $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Please log in to view the invoice.');
+        }
+
         $invoice = ServiceChargeInvoice::where('id', $id)
             ->where('candidate_id', $user->id)
             ->with(['candidate.profile', 'jobApplication.jobPost', 'tuitionLead'])
             ->firstOrFail();
 
-        return view('candidate.serviceCharge.invoice', compact('invoice'));
+        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('candidate.serviceCharge.invoice_pdf', compact('invoice', 'user'));
+            return $pdf->download('Invoice_' . ($invoice->invoice_number ?: $invoice->id) . '.pdf');
+        }
+
+        return view('candidate.serviceCharge.invoice_pdf', compact('invoice', 'user'));
     }
 
     private function syncToAdminCandidatePayments($candidate, $invoice, $amount)
@@ -245,10 +276,10 @@ class ServiceChargeController extends Controller
             CandidatePaymentRecord::create([
                 'candidate_payment_account_id' => $account->id,
                 'amount'         => $amount,
-                'payment_mode'   => 'Razorpay Online',
-                'transaction_id' => 'RZP_' . time(),
+                'payment_mode'   => 'PhonePe Online',
+                'transaction_id' => 'PP_' . time(),
                 'payment_date'   => now(),
-                'received_by'    => 'Razorpay Gateway',
+                'received_by'    => 'PhonePe Gateway',
                 'notes'          => 'Online payment for Invoice #' . $invoice->id,
             ]);
         } catch (\Exception $e) {
