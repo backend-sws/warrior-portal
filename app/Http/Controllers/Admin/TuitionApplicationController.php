@@ -117,18 +117,26 @@ class TuitionApplicationController extends Controller
             ]);
 
             // Auto-Sync with Parent Tuition Fee Account for collection tracking
-            if ($lead->fee && $lead->fee > 0) {
+            $numericMonthlyFee = 0.00;
+            if (!empty($lead->fee)) {
+                $rawFee = str_replace(',', '', (string)$lead->fee);
+                if (preg_match('/(\d+(?:\.\d+)?)/', $rawFee, $matches)) {
+                    $numericMonthlyFee = (float)$matches[1];
+                }
+            }
+
+            if ($numericMonthlyFee > 0 && !empty($lead->parent_mobile)) {
                 TuitionFeeAccount::firstOrCreate(
                     ['mobile_number' => $lead->parent_mobile],
                     [
-                        'parent_name'          => $lead->parent_name,
-                        'student_name'         => $lead->parent_name . ' (Student)',
-                        'address'              => $lead->location,
-                        'class'                => $lead->class,
-                        'subject'              => $lead->subjects,
+                        'parent_name'          => $lead->parent_name ?: 'Parent',
+                        'student_name'         => ($lead->parent_name ?: 'Student') . ' (Student)',
+                        'address'              => $lead->location ?: 'N/A',
+                        'class'                => $lead->class ?: 'N/A',
+                        'subject'              => $lead->subjects ?: 'All Subjects',
                         'teacher_name'         => $candidate->name,
                         'teacher_joining_date' => now()->toDateString(),
-                        'monthly_fee'          => $lead->fee,
+                        'monthly_fee'          => $numericMonthlyFee,
                         'status'               => 'active',
                         'payment_status'       => 'pending',
                         'next_due_date'        => now()->addMonth()->toDateString(),
