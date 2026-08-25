@@ -68,10 +68,15 @@
 
                         {{-- Late Fee --}}
                         <div>
-                            <p class="text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/60 mb-1 sm:mb-2">Late Fee</p>
-                            <div class="text-base sm:text-lg font-semibold text-accent-yellow">
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/60 mb-1 sm:mb-2">Late Fine (₹300/day)</p>
+                            <div class="text-base sm:text-lg font-semibold {{ ($invoice->late_fee ?? 0) > 0 ? 'text-red-600' : 'text-slate-700' }}">
                                 ₹{{ number_format($invoice->late_fee ?? 0, 2) }}
                             </div>
+                            @if(($invoice->late_fee ?? 0) > 0 && isset($invoice->due_date))
+                                <span class="text-[10px] font-bold text-red-500 block mt-0.5">
+                                    {{ (int) \Carbon\Carbon::parse($invoice->due_date)->startOfDay()->diffInDays(now()->startOfDay()) }} days overdue
+                                </span>
+                            @endif
                         </div>
 
                         {{-- Total Payable --}}
@@ -83,6 +88,9 @@
                             <div class="text-xl sm:text-2xl font-extrabold {{ $pendingAmount > 0 ? 'text-red-500' : 'text-green-500' }}">
                                 ₹{{ number_format(max(0, $pendingAmount), 2) }}
                             </div>
+                            @if(($invoice->late_fee ?? 0) > 0)
+                                <span class="text-[10px] text-slate-500 block mt-0.5">Includes ₹{{ number_format($invoice->late_fee, 0) }} late fine</span>
+                            @endif
                         </div>
                     </div>
 

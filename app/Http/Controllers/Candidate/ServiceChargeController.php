@@ -33,6 +33,26 @@ class ServiceChargeController extends Controller
             ->with(['tuitionLead', 'jobApplication.jobPost'])
             ->latest()
             ->get();
+
+        // Real-time Late Fee Sync (₹300 per day after due date)
+        foreach ($invoices as $inv) {
+            if ($inv->status !== 'paid' && $inv->due_date && \Carbon\Carbon::parse($inv->due_date)->startOfDay()->isPast()) {
+                $daysOverdue = (int) \Carbon\Carbon::parse($inv->due_date)->startOfDay()->diffInDays(now()->startOfDay());
+                if ($daysOverdue > 0) {
+                    $calculatedFee = $daysOverdue * 300;
+                    if ($calculatedFee > (float)$inv->late_fee) {
+                        $diff = $calculatedFee - (float)$inv->late_fee;
+                        $inv->update([
+                            'late_fee' => $calculatedFee,
+                            'status'   => 'overdue'
+                        ]);
+                        if ($profile) {
+                            $profile->increment('pending_amount', $diff);
+                        }
+                    }
+                }
+            }
+        }
         
         $paymentHistory = PaymentTransaction::where('candidate_id', $candidateId)
             ->latest()
@@ -49,6 +69,24 @@ class ServiceChargeController extends Controller
             ->whereIn('status', ['pending', 'overdue'])
             ->with(['tuitionLead', 'jobApplication.jobPost'])
             ->firstOrFail();
+
+        // Real-time Late Fee Sync (₹300 per day after due date)
+        if ($invoice->status !== 'paid' && $invoice->due_date && \Carbon\Carbon::parse($invoice->due_date)->startOfDay()->isPast()) {
+            $daysOverdue = (int) \Carbon\Carbon::parse($invoice->due_date)->startOfDay()->diffInDays(now()->startOfDay());
+            if ($daysOverdue > 0) {
+                $calculatedFee = $daysOverdue * 300;
+                if ($calculatedFee > (float)$invoice->late_fee) {
+                    $diff = $calculatedFee - (float)$invoice->late_fee;
+                    $invoice->update([
+                        'late_fee' => $calculatedFee,
+                        'status'   => 'overdue'
+                    ]);
+                    if ($user->profile) {
+                        $user->profile->increment('pending_amount', $diff);
+                    }
+                }
+            }
+        }
 
         $amount = (float) ($invoice->amount + $invoice->late_fee);
         if ($amount <= 0) {
