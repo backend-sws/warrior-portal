@@ -16,21 +16,25 @@ class CalculateLateFees extends Command
     public function handle()
     {
         $overdueInvoices = \App\Models\ServiceChargeInvoice::where('status', '!=', 'paid')
+            ->whereNotNull('due_date')
             ->whereDate('due_date', '<', now()->toDateString())
             ->get();
 
         $count = 0;
         foreach ($overdueInvoices as $invoice) {
-            $daysOverdue = (int) now()->diffInDays(\Carbon\Carbon::parse($invoice->due_date), false) * -1;
-            if ($daysOverdue > 0) {
-                $newLateFee = $daysOverdue * 300; // 300 per day
+            $dueDate = \Carbon\Carbon::parse($invoice->due_date)->startOfDay();
+            $today = now()->startOfDay();
+            $daysOverdue = (int) $dueDate->diffInDays($today);
 
-                if ($newLateFee > $invoice->late_fee) {
-                    $difference = $newLateFee - $invoice->late_fee;
+            if ($daysOverdue > 0) {
+                $newLateFee = $daysOverdue * 300; // Rs. 300 per day
+
+                if ($newLateFee > (float)$invoice->late_fee) {
+                    $difference = $newLateFee - (float)$invoice->late_fee;
                     
                     $invoice->update([
                         'late_fee' => $newLateFee,
-                        'status' => 'overdue'
+                        'status'   => 'overdue'
                     ]);
 
                     // Update candidate profile pending amount
@@ -38,24 +42,23 @@ class CalculateLateFees extends Command
                     if ($candidate && $candidate->profile) {
                         $candidate->profile->increment('pending_amount', $difference);
 
-                        // Notify Candidate DB
-                        \Illuminate\Support\Facades\DB::table('notifications')->insert([
-                            'id' => \Illuminate\Support\Str::uuid()->toString(),
-                            'type' => 'App\Notifications\ServiceChargeLateFeeAdded',
-                            'notifiable_type' => 'App\Models\User',
-                            'notifiable_id' => $candidate->id,
-                            'data' => json_encode([
-                                'title' => 'Invoice Overdue - Late Fine Added',
-                                'message' => 'A late fine of ₹' . number_format($difference, 2) . ' has been added to your pending invoice.',
-                                'amount' => $difference,
-                                'invoice_id' => $invoice->id
-                            ]),
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
+                        // In-App Notification
+                        \App\Helpers\NotificationHelper::notifyUser(
+                            $candidate->id,
+                            'Invoice Overdue: Late Fee Applied ⚠️',
+                            'Invoice #' . ($invoice->invoice_number ?: $invoice->id) . ' is ' . $daysOverdue . ' days overdue. Late fine of ₹300/day (Total Fine: ₹' . number_format($newLateFee, 2) . ') is added. Total payable: ₹' . number_format($invoice->amount + $newLateFee, 2) . '.',
+                            route('candidate.serviceCharge.show'),
+                            'fas fa-exclamation-triangle'
+                        );
 
                         // Send Email
-                        \Illuminate\Support\Facades\Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $difference));
+                        try {
+                            if ($candidate->email) {
+                                \Illuminate\Support\Facades\Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $difference));
+                            }
+                        } catch (\Exception $e) {
+                            \Illuminate\Support\Facades\Log::warning("Late Fee Email Exception: " . $e->getMessage());
+                        }
                     }
                     $count++;
                 }
