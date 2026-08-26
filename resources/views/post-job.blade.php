@@ -81,38 +81,38 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                Institution / School Name
+                                Institution / School Name <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="school_name" value="{{ old('school_name', (auth()->check() && auth()->user()->role == 'employer') ? auth()->user()->name : '') }}" 
+                            <input type="text" name="school_name" required minlength="3" maxlength="150" value="{{ old('school_name', (auth()->check() && auth()->user()->role == 'employer') ? auth()->user()->name : '') }}" 
                                 class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all placeholder:text-slate-400 font-medium"
                                 placeholder="e.g. St. Xavier International School">
                         </div>
                         
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                Contact Person Name
+                                Contact Person Name <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="contact_person" value="{{ old('contact_person', (auth()->check() && auth()->user()->role == 'employer') ? auth()->user()->name : '') }}" 
+                            <input type="text" name="contact_person" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" title="Please enter valid name (letters only)." value="{{ old('contact_person', (auth()->check() && auth()->user()->role == 'employer') ? auth()->user()->name : '') }}" 
                                 class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all placeholder:text-slate-400 font-medium"
                                 placeholder="e.g. Dr. Rajesh Sharma">
                         </div>
                         
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                Official Email Address
+                                Official Email Address <span class="text-rose-500">*</span>
                             </label>
-                            <input type="email" name="email" value="{{ old('email', (auth()->check() && auth()->user()->role == 'employer') ? auth()->user()->email : '') }}" 
+                            <input type="email" name="email" required value="{{ old('email', (auth()->check() && auth()->user()->role == 'employer') ? auth()->user()->email : '') }}" 
                                 class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all placeholder:text-slate-400 font-medium"
                                 placeholder="e.g. hr@stxaviers.edu.in">
                         </div>
                         
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                Contact Phone Number
+                                Contact Phone Number <span class="text-rose-500">*</span>
                             </label>
-                            <input type="tel" name="phone" value="{{ old('phone', (auth()->check() && auth()->user()->role == 'employer') ? auth()->user()->phone : '') }}" 
+                            <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." value="{{ old('phone', (auth()->check() && auth()->user()->role == 'employer') ? auth()->user()->phone : '') }}" 
                                 class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all placeholder:text-slate-400 font-medium"
-                                placeholder="e.g. +91 98765 43210">
+                                placeholder="e.g. 9876543210">
                         </div>
                     </div>
                 </div>
@@ -129,9 +129,9 @@
                     <div class="space-y-6">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                Job Title / Position Name
+                                Job Title / Position Name <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="title" value="{{ old('title') }}" 
+                            <input type="text" name="title" required value="{{ old('title') }}" 
                                 class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all placeholder:text-slate-400 font-medium" 
                                 placeholder="e.g. PGT Physics Teacher / Vice Principal / Academic Coordinator">
                         </div>

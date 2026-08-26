@@ -232,9 +232,15 @@ career with Warriors Educare
 
                 <button type="submit"
                     class="w-full bg-[#1e3a8a] text-white font-bold py-3.5 rounded-xl hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 mt-2">
-                    <i class="fas fa-user-plus"></i>
-                    Create Candidate Account
+                    <i class="fas fa-paper-plane text-xs"></i>
+                    <span>Send Verification OTP & Continue</span>
                 </button>
+                <div class="text-center mt-2">
+                    <p class="text-[11px] text-gray-500 flex items-center justify-center gap-1.5">
+                        <i class="fas fa-shield-halved text-[#0ea5e9]"></i>
+                        <span>An OTP will be sent to your email to verify authenticity.</span>
+                    </p>
+                </div>
             </form>
 
             <div class="mt-6 flex items-center gap-4">

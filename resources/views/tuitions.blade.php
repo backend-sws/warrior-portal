@@ -191,47 +191,58 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="bg-rose-50 border border-rose-300 text-rose-800 px-4 py-3 rounded-xl relative mb-6 text-xs flex flex-col gap-1 shadow-sm" role="alert">
+                    <div class="font-bold flex items-center gap-1.5"><i class="fas fa-exclamation-circle text-rose-600"></i> Please fix the following errors:</div>
+                    <ul class="list-disc pl-5 mt-1 space-y-0.5">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form action="{{ route('tuition.post') }}" method="POST" class="flex flex-col gap-5">
                 @csrf
                 <div class="grid grid-cols-1 gap-5">
                     <div>
                         <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Your Name *</label>
-                        <input type="text" name="guest_name" placeholder="Enter your full name" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
+                        <input type="text" name="guest_name" value="{{ old('guest_name') }}" placeholder="Enter your full name" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" title="Please enter your full name (letters only, min 3 characters)." class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Your Phone Number *</label>
-                        <input type="text" name="guest_phone" placeholder="Enter your phone number" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
+                        <input type="tel" name="guest_phone" value="{{ old('guest_phone') }}" placeholder="Enter 10-digit mobile number" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium font-mono">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 gap-5">
                     <div>
                         <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Student's Class *</label>
-                        <input type="text" name="student_class" placeholder="e.g. Class 10" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
+                        <input type="text" name="student_class" value="{{ old('student_class') }}" placeholder="e.g. Class 10" required minlength="1" maxlength="50" class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Board *</label>
-                        <input type="text" name="board" placeholder="e.g. CBSE / ICSE / State" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
+                        <input type="text" name="board" value="{{ old('board') }}" placeholder="e.g. CBSE / ICSE / State" required minlength="2" maxlength="50" class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Subjects Needed *</label>
-                    <input type="text" name="subjects" placeholder="e.g., Math, Science, English" required class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
+                    <input type="text" name="subjects" value="{{ old('subjects') }}" placeholder="e.g. Math, Science, English" required minlength="2" maxlength="150" class="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-white text-[#031b4e] font-medium">
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Complete Location/Address *</label>
-                    <input type="text" name="location" required placeholder="Enter full address or area" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
+                    <input type="text" name="location" value="{{ old('location') }}" required minlength="3" maxlength="200" placeholder="Enter full address or area" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Pincode *</label>
-                    <input type="text" name="pincode" required placeholder="Enter 6-digit Pincode" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
+                    <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Pincode</label>
+                    <input type="text" name="pincode" value="{{ old('pincode') }}" maxlength="6" pattern="^[0-9]{6}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);" title="Please enter a valid 6-digit Pincode." placeholder="Enter 6-digit Pincode" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none font-mono">
                 </div>
                 
                 <div class="mt-4 flex justify-center">
-                    <button type="submit" class="bg-[#031b4e] text-white rounded-full px-8 py-3.5 font-bold hover:bg-[#021133] transition-colors shadow-lg flex items-center justify-center gap-2 w-auto min-w-[200px]">
+                    <button type="submit" class="bg-[#031b4e] text-white rounded-full px-8 py-3.5 font-bold hover:bg-[#021133] transition-colors shadow-lg flex items-center justify-center gap-2 w-auto min-w-[200px] cursor-pointer">
                         Submit Request for Review <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>

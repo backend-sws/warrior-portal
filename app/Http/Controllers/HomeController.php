@@ -26,7 +26,11 @@ class HomeController extends Controller
         $testimonials = Testimonial::where('is_active', true)->get();
         $clients = ClientLogo::where('is_active', true)->get();
         $services = Service::where('is_active', true)->get();
-        $recentJobs = JobPost::where('status', 'approved')->latest()->take(5)->get();
+        $recentJobs = JobPost::with(['category', 'subject', 'state', 'city', 'qualification'])
+            ->where('status', 'approved')
+            ->latest()
+            ->take(6)
+            ->get();
         
         $totalJobs = JobPost::where('status', 'approved')->count();
         $totalApplications = \App\Models\JobApplication::count();
@@ -53,14 +57,25 @@ class HomeController extends Controller
     public function storeTuition(Request $request)
     {
         $validated = $request->validate([
-            'guest_name' => 'required|string|max:255',
-            'guest_phone' => 'required|string|max:255',
-            'student_class' => 'required|string|max:255',
-            'board' => 'required|string|max:255',
-            'subjects' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            'pincode' => 'nullable|string|max:20',
-            'description' => 'nullable|string|max:1000',
+            'guest_name' => ['required', 'string', 'min:3', 'max:80', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
+            'guest_phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'student_class' => ['required', 'string', 'min:1', 'max:50'],
+            'board' => ['required', 'string', 'max:50'],
+            'subjects' => ['required', 'string', 'min:2', 'max:200'],
+            'location' => ['required', 'string', 'min:3', 'max:255'],
+            'pincode' => ['nullable', 'regex:/^\d{6}$/'],
+            'description' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'guest_name.required' => 'Please enter your full name.',
+            'guest_name.min' => 'Your name must be at least 3 characters long.',
+            'guest_name.regex' => 'Your name should only contain letters, dots, and spaces.',
+            'guest_phone.required' => 'Please enter your 10-digit mobile number.',
+            'guest_phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'student_class.required' => "Please enter student's class or grade.",
+            'board.required' => 'Please select an education board.',
+            'subjects.required' => 'Please specify the subjects needed.',
+            'location.required' => 'Please enter your complete area or location address.',
+            'pincode.regex' => 'Pincode must be a valid 6-digit number.',
         ]);
 
         \App\Models\HomeTuitionLead::create([
@@ -95,18 +110,33 @@ class HomeController extends Controller
     public function storeSchoolRequirement(Request $request)
     {
         $validated = $request->validate([
-            'school_name' => 'required|string|max:255',
-            'contact_person' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'title' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'qualification_id' => 'required|exists:qualifications,id',
-            'state_id' => 'required|exists:states,id',
-            'city_id' => 'required|exists:cities,id',
-            'salary_range' => 'nullable|string|max:255',
-            'description' => 'nullable|string|max:2000',
+            'school_name' => ['required', 'string', 'min:3', 'max:200'],
+            'contact_person' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'email' => ['nullable', 'email:rfc,dns', 'max:255'],
+            'title' => ['required', 'string', 'min:3', 'max:200'],
+            'category_id' => ['required', 'exists:categories,id'],
+            'subject_id' => ['required', 'exists:subjects,id'],
+            'qualification_id' => ['required', 'exists:qualifications,id'],
+            'state_id' => ['required', 'exists:states,id'],
+            'city_id' => ['required', 'exists:cities,id'],
+            'salary_range' => ['nullable', 'string', 'max:100'],
+            'description' => ['nullable', 'string', 'max:2000'],
+        ], [
+            'school_name.required' => 'Please enter the school / institution name.',
+            'school_name.min' => 'Institution name must be at least 3 characters.',
+            'contact_person.required' => 'Please enter the contact person name.',
+            'contact_person.min' => 'Contact person name must be at least 3 characters.',
+            'contact_person.regex' => 'Contact person name should only contain letters and spaces.',
+            'phone.required' => 'Please enter a 10-digit mobile number.',
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'email.email' => 'Please enter a valid email address.',
+            'title.required' => 'Please enter the vacancy / job title.',
+            'category_id.required' => 'Please select a job category.',
+            'subject_id.required' => 'Please select a subject.',
+            'qualification_id.required' => 'Please select the required qualification.',
+            'state_id.required' => 'Please select a state.',
+            'city_id.required' => 'Please select a city.',
         ]);
 
         // 1. Create JobPost with pending approval status
@@ -141,7 +171,6 @@ class HomeController extends Controller
                 'message' => 'Thank you! Your teacher requirement has been submitted for approval. Our administration team will review and approve it shortly.'
             ]);
         }
-
         return redirect()->to(url()->previous() . '#quick-request-form')->with('school_success', 'Your teacher requirement has been submitted for approval! Our team will review and approve it shortly.');
     }
 

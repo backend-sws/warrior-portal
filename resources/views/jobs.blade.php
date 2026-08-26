@@ -156,7 +156,6 @@
         @endif
     </div>
 </div>
-@include('partials.job-registration-popup')
 
 <script>
     (function() {

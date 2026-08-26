@@ -377,11 +377,15 @@
             Join hundreds of trusted schools and academic institutes using Warriors Educare to hire exceptional faculty and upgrade infrastructure.
         </p>
         <div class="flex flex-wrap items-center justify-center gap-4">
-            <a href="{{ route('post-job') }}" class="bg-[#2563eb] hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">
-                Post Institutional Requirement
+            <a href="{{ route('post-job') }}" class="inline-flex items-center justify-center bg-[#2563eb] hover:bg-blue-600 text-white font-extrabold px-8 py-4 rounded-2xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 group cursor-pointer">
+                <i class="fas fa-file-signature mr-2.5 text-sky-200 text-base"></i>
+                <span>Post Institutional Requirement</span>
+                <i class="fas fa-arrow-right ml-2.5 text-xs group-hover:translate-x-1 transition-transform"></i>
             </a>
-            <a href="{{ route('contact') }}" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold px-8 py-4 rounded-xl backdrop-blur-md transition-all">
-                Contact Our Team
+            <a href="{{ route('contact') }}" class="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/25 text-white font-extrabold px-8 py-4 rounded-2xl backdrop-blur-md transition-all transform hover:-translate-y-0.5 group cursor-pointer">
+                <i class="fas fa-headset mr-2.5 text-sky-300 text-base"></i>
+                <span>Contact Our Team</span>
+                <i class="fas fa-chevron-right ml-2.5 text-xs group-hover:translate-x-1 transition-transform"></i>
             </a>
         </div>
     </div>

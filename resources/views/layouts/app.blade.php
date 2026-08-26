@@ -299,75 +299,75 @@
 
     <!-- Header -->
     <header id="main-header"
-        class="!fixed top-[46px] left-1/2 -translate-x-1/2 w-[96%] max-w-[1400px] px-4 lg:px-7 py-3 flex justify-between items-center z-[100] transition-all duration-500 bg-white/98 backdrop-blur-xl border border-slate-200/90 shadow-[0_10px_35px_rgba(3,27,78,0.12)] rounded-full">
+        class="!fixed top-[46px] left-1/2 -translate-x-1/2 w-[98%] max-w-[1440px] px-3 sm:px-4 lg:px-5 xl:px-6 py-2.5 flex justify-between items-center z-[100] transition-all duration-500 bg-white/98 backdrop-blur-xl border border-slate-200/90 shadow-[0_10px_35px_rgba(3,27,78,0.12)] rounded-full">
         
         <!-- Clean Logo -->
-        <a href="{{ route('home') }}" onclick="sessionStorage.removeItem('welcomeShown');" class="flex items-center no-underline pl-1 sm:pl-2 pr-4 shrink-0 transition-transform hover:scale-105">
-            <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-10 lg:h-12 w-auto object-contain logo-img">
+        <a href="{{ route('home') }}" onclick="sessionStorage.removeItem('welcomeShown');" class="flex items-center no-underline pl-1 pr-2 xl:pr-3 shrink-0 transition-transform hover:scale-105">
+            <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-9 lg:h-10 xl:h-11 w-auto object-contain logo-img">
         </a>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden lg:flex items-center gap-3 xl:gap-5">
-            <ul class="flex gap-1.5 xl:gap-2 list-none m-0 p-0 items-center">
+        <nav class="hidden lg:flex items-center gap-1.5 xl:gap-2.5 2xl:gap-3 shrink-0">
+            <ul class="flex gap-0.5 xl:gap-1 2xl:gap-1.5 list-none m-0 p-0 items-center">
                 <li>
                     <a href="{{ route('home') }}"
-                       class="{{ request()->routeIs('home') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       class="{{ request()->routeIs('home') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200">
                        Home
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('about') }}"
-                       class="{{ request()->routeIs('about') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       class="{{ request()->routeIs('about') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200">
                        About us
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('services') }}"
-                       class="{{ request()->routeIs('services') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       class="{{ request()->routeIs('services') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200">
                        Services
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('jobs') }}"
-                       class="{{ request()->routeIs('jobs') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       class="{{ request()->routeIs('jobs') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200">
                        School Jobs
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('tuitions') }}"
-                       class="{{ request()->routeIs('tuitions') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       class="{{ request()->routeIs('tuitions') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200">
                        Home Tuition
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('hiring') }}"
-                       class="{{ request()->routeIs('hiring') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       class="{{ request()->routeIs('hiring') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200">
                        Hiring Process
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('resume.builder') }}"
-                       class="{{ request()->routeIs('resume.builder') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
-                       Resume Builder <span class="bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase font-black ml-1 relative -top-0.5 shadow-xs">Free</span>
+                       class="{{ request()->routeIs('resume.builder') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200">
+                       Resume Builder <span class="bg-blue-600 text-white text-[9px] px-1.5 py-0.5 rounded-full uppercase font-black ml-0.5 relative -top-0.5 shadow-xs">Free</span>
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('contact') }}"
-                       class="{{ request()->routeIs('contact') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[14px] xl:text-[15px] px-3.5 py-2 rounded-full transition-all duration-200">
+                       class="{{ request()->routeIs('contact') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200">
                        Contact
                     </a>
                 </li>
             </ul>
 
             <!-- Right Action Items -->
-            <div class="flex gap-2.5 items-center pl-3 border-l border-slate-200">
+            <div class="flex gap-2 xl:gap-2.5 items-center pl-2 xl:pl-3 border-l border-slate-200 shrink-0">
                 @auth
                     <!-- Notification Bell -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" @click.away="open = false" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-[#031b4e] flex items-center justify-center transition-colors relative">
-                            <i class="fas fa-bell text-sm"></i>
+                    <div class="relative shrink-0" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-[#031b4e] flex items-center justify-center transition-colors relative">
+                            <i class="fas fa-bell text-xs"></i>
                             @if(auth()->user()->unreadNotifications->count() > 0)
-                                <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                             @endif
                         </button>
                         
@@ -408,7 +408,7 @@
 
                     <!-- Dashboard Pill -->
                     <a href="{{ auth()->user()->role === 'candidate' ? route('candidate.dashboard') : (auth()->user()->role === 'parent' ? route('parent.dashboard') : route('admin.dashboard')) }}"
-                        class="px-4 py-2 rounded-full font-bold text-sm bg-[#031b4e] text-white hover:bg-blue-900 transition-all flex items-center gap-2 shadow-sm whitespace-nowrap">
+                        class="px-3.5 py-1.5 rounded-full font-bold text-xs xl:text-sm bg-[#031b4e] text-white hover:bg-blue-900 transition-all flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0">
                         <div class="w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-[10px] font-black">
                             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                         </div>
@@ -416,21 +416,21 @@
                     </a>
 
                     <!-- Logout Button -->
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                    <form action="{{ route('logout') }}" method="POST" class="inline shrink-0">
                         @csrf
                         <button type="submit"
-                            class="px-3 py-2 rounded-full font-bold text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all flex items-center gap-1.5 cursor-pointer">
+                            class="px-2.5 py-1.5 rounded-full font-bold text-xs xl:text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all flex items-center gap-1 cursor-pointer">
                             <i class="fas fa-sign-out-alt text-xs"></i>
-                            <span>Logout</span>
+                            <span class="hidden 2xl:inline">Logout</span>
                         </button>
                     </form>
                 @else
                     <a href="/login"
-                        class="px-4 py-2 rounded-full font-bold text-sm text-slate-700 hover:text-[#031b4e] hover:bg-slate-100 transition-colors whitespace-nowrap">
+                        class="px-3.5 py-1.5 rounded-full font-bold text-xs xl:text-sm text-slate-700 hover:text-[#031b4e] hover:bg-slate-100 transition-colors whitespace-nowrap">
                         Login
                     </a>
                     <a href="/register"
-                        class="px-5 py-2.5 rounded-full font-bold text-sm bg-[#031b4e] text-white hover:bg-blue-900 transition-all shadow-md hover:shadow-lg whitespace-nowrap">
+                        class="px-4 py-2 rounded-full font-bold text-xs xl:text-sm bg-[#031b4e] text-white hover:bg-blue-900 transition-all shadow-md hover:shadow-lg whitespace-nowrap">
                         Get Started
                     </a>
                 @endauth
@@ -556,7 +556,11 @@
             <div>
                 <h4 class="text-[16px] font-bold text-gray-900 mb-5 relative inline-block">Portals & Policies<span class="absolute bottom-[-6px] left-0 w-1/2 h-[2px] bg-[#031b4e]"></span></h4>
                 <ul class="flex flex-col gap-3 text-[13.5px] text-gray-600 font-semibold mt-2">
-                    <li><a href="{{ route('candidate.register') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2 text-blue-700 font-bold"><i class="fas fa-user-plus text-[9px]"></i> Join as Teacher / Tutor</a></li>
+                    @guest
+                        <li><button type="button" onclick="openTeacherModal()" class="hover:text-[#031b4e] transition-colors flex items-center gap-2 text-blue-700 font-bold cursor-pointer text-left"><i class="fas fa-user-plus text-[9px]"></i> Join as Teacher / Tutor</button></li>
+                    @else
+                        <li><a href="{{ route('candidate.dashboard') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2 text-blue-700 font-bold"><i class="fas fa-user-plus text-[9px]"></i> Join as Teacher / Tutor</a></li>
+                    @endguest
                     <li><a href="{{ route('resume.builder') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-file-alt text-[9px] text-[#031b4e]/60"></i> Free Resume Builder</a></li>
                     <li><a href="{{ route('terms') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-shield-alt text-[8px] text-[#031b4e]/60"></i> Terms & Conditions</a></li>
                     <li><a href="{{ route('privacy') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-lock text-[8px] text-[#031b4e]/60"></i> Privacy Policy</a></li>
@@ -957,14 +961,12 @@
         }, { threshold: 0.2 });
 
         typeElements.forEach(el => {
-            if (!el.hasAttribute('data-original-text')) {
-                el.setAttribute('data-original-text', el.innerText.trim());
-            }
-            el.innerHTML = '&nbsp;'; 
             observer.observe(el);
         });
     });
     </script>
+    @include('partials.requirement-modal')
+    @include('partials.job-registration-popup')
 </body>
 
 </html>
