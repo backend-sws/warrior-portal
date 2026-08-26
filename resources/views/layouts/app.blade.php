@@ -33,6 +33,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="icon" type="image/png" href="{{ asset('adobe.png') }}?v={{ time() }}">
 
+    <!-- SlimSelect (Searchable Dropdowns) -->
+    <link href="https://cdn.jsdelivr.net/npm/slim-select@2.8.2/dist/slimselect.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/slim-select@2.8.2/dist/slimselect.min.js"></script>
+
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -601,7 +605,6 @@
                 <span>•</span>
                 <a href="{{ route('disclaimer') }}" class="hover:text-[#031b4e] transition-colors">Disclaimer</a>
             </div>
-            <a href="https://www.startupwebsupport.com/" target="_blank" rel="noopener" class="text-xs text-gray-500 hover:text-[#031b4e] transition-colors">Designed By: Startup Web Support</a>
         </div>
     </footer>
 
