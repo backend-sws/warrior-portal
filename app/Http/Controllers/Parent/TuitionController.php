@@ -53,13 +53,24 @@ class TuitionController extends Controller
     public function store(\Illuminate\Http\Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
-            'class' => 'required|string|max:255',
-            'board' => 'required|string|max:255',
-            'subjects' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            'pincode' => 'nullable|string|max:20',
+            'name' => ['required', 'string', 'min:3', 'max:80', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'class' => ['required', 'string', 'min:1', 'max:50'],
+            'board' => ['required', 'string', 'max:50'],
+            'subjects' => ['required', 'string', 'min:2', 'max:200'],
+            'location' => ['required', 'string', 'min:3', 'max:255'],
+            'pincode' => ['nullable', 'regex:/^\d{6}$/'],
+        ], [
+            'name.required' => 'Please enter your full name.',
+            'name.min' => 'Name must be at least 3 characters long.',
+            'name.regex' => 'Name should only contain letters and spaces.',
+            'phone.required' => 'Please enter your 10-digit mobile number.',
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'class.required' => "Please enter student's class.",
+            'board.required' => 'Please select an education board.',
+            'subjects.required' => 'Please specify subjects needed.',
+            'location.required' => 'Please enter location address.',
+            'pincode.regex' => 'Pincode must be a 6-digit number.',
         ]);
 
         $locationWithPincode = $request->location;

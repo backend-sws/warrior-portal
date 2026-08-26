@@ -56,24 +56,26 @@ class ApplicationController extends Controller
         $matchedJobs = $jobs->map(function ($job) use ($profile) {
             $score = 0;
             
-            // Subject match is most important (40%)
-            if ($job->subject_id == $profile->subject_id) $score += 40;
-            
-            // Category match (30%)
-            if ($job->category_id == $profile->category_id) $score += 30;
-            
-            // Qualification match (20%)
-            if ($job->qualification_id == $profile->highest_qualification_id) $score += 20;
-            
-            // Location match (10%)
-            if ($job->city_id == $profile->preferred_city_id) $score += 10;
-            elseif ($job->state_id == $profile->preferred_state_id) $score += 5;
+            if ($profile) {
+                // Subject match is most important (40%)
+                if (!empty($profile->subject_id) && $job->subject_id == $profile->subject_id) $score += 40;
+                
+                // Category match (30%)
+                if (!empty($profile->category_id) && $job->category_id == $profile->category_id) $score += 30;
+                
+                // Qualification match (20%)
+                if (!empty($profile->highest_qualification_id) && $job->qualification_id == $profile->highest_qualification_id) $score += 20;
+                
+                // Location match (10%)
+                if (!empty($profile->preferred_city_id) && $job->city_id == $profile->preferred_city_id) $score += 10;
+                elseif (!empty($profile->preferred_state_id) && $job->state_id == $profile->preferred_state_id) $score += 5;
+            }
             
             $job->match_score = $score;
             return $job;
         })->sortByDesc('match_score')->values();
 
-        return view('candidate.applications.available', compact('matchedJobs'));
+        return view('candidate.applications.available', compact('matchedJobs', 'profile'));
     }
 
     public function apply(Request $request, JobPost $job)

@@ -419,6 +419,212 @@
             </div>
         </div>
 
+        <!-- ========================================================= -->
+        <!-- PAYMENT COLLECTION, PRICING & COMMERCIAL TERMS (PHONEPE)  -->
+        <!-- ========================================================= -->
+        <div id="payment-policy" class="mt-12 bg-white rounded-3xl border border-slate-200/90 shadow-xl p-6 sm:p-10 lg:p-12 mb-10 relative overflow-hidden">
+            
+            <!-- Top Header Badge & Title -->
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs mb-3">
+                    <i class="fas fa-lock text-emerald-600"></i> Secure & Transparent Payment Policy
+                </span>
+                <h3 class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#031b4e] tracking-tight mb-3">
+                    Fee Structure, Payment Collection & Terms
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-2xl mx-auto">
+                    All financial transactions, registration charges, and placement fees at Warriors Educare are processed securely through certified payment gateways in full compliance with RBI guidelines.
+                </p>
+            </div>
+
+            <!-- 3 Columns: Transparent Pricing Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                
+                <!-- Card 1: Home Tuition Registration -->
+                <div class="rounded-2xl bg-amber-50/60 border border-amber-200/90 p-5 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-200/60 px-2.5 py-1 rounded-full">
+                                Home Tuition
+                            </span>
+                            <span class="text-xs font-bold text-slate-500">1 Year Validity</span>
+                        </div>
+                        <h4 class="text-lg font-black text-[#031b4e] mb-1">Tutor Registration Fee</h4>
+                        <p class="text-xs text-slate-600 mb-4 font-medium">One-time registration for access to verified home tuition leads.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-amber-200/60 text-xs font-bold text-slate-800">
+                                <span>Junior Classes (Up to Class 5)</span>
+                                <span class="text-amber-800 font-black text-sm">₹500</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-amber-200/60 text-xs font-bold text-slate-800">
+                                <span>Senior Classes (Class 6 - 12)</span>
+                                <span class="text-amber-800 font-black text-sm">₹600</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium border-t border-amber-200/60 pt-3">
+                        <i class="fas fa-check-circle text-amber-600 mr-1"></i> Includes KYC, profile verification & lead matching.
+                    </p>
+                </div>
+
+                <!-- Card 2: School Staff Registration -->
+                <div class="rounded-2xl bg-blue-50/60 border border-blue-200/90 p-5 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-blue-800 bg-blue-200/60 px-2.5 py-1 rounded-full">
+                                School Placement
+                            </span>
+                            <span class="text-xs font-bold text-slate-500">8 Months Validity</span>
+                        </div>
+                        <h4 class="text-lg font-black text-[#031b4e] mb-1">Teacher & Staff Registration</h4>
+                        <p class="text-xs text-slate-600 mb-4 font-medium">Split fee structure for institutional placement assistance.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-blue-200/60 text-xs font-bold text-slate-800">
+                                <span>At Initial Registration</span>
+                                <span class="text-blue-800 font-black text-sm">₹500</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-blue-200/60 text-xs font-bold text-slate-800">
+                                <span>After Final Selection</span>
+                                <span class="text-blue-800 font-black text-sm">₹500</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium border-t border-blue-200/60 pt-3">
+                        <i class="fas fa-check-circle text-blue-600 mr-1"></i> Total ₹1,000. Covers screening, mock & interview scheduling.
+                    </p>
+                </div>
+
+                <!-- Card 3: Post-Placement Service Charge -->
+                <div class="rounded-2xl bg-emerald-50/60 border border-emerald-200/90 p-5 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-200/60 px-2.5 py-1 rounded-full">
+                                Post-Placement
+                            </span>
+                            <span class="text-xs font-bold text-emerald-700">Success-Based</span>
+                        </div>
+                        <h4 class="text-lg font-black text-[#031b4e] mb-1">Placement Service Charge</h4>
+                        <p class="text-xs text-slate-600 mb-4 font-medium">Payable ONLY after receiving your first month salary or tuition fee.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="p-2.5 bg-white rounded-xl border border-emerald-200/60 text-xs text-slate-800">
+                                <span class="font-bold block text-emerald-900">Home Tuition Assignment:</span>
+                                <span class="font-extrabold text-emerald-700">50% of 1st Month Tuition Fee (15 Days)</span>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-xl border border-emerald-200/60 text-xs text-slate-800">
+                                <span class="font-bold block text-emerald-900">School Faculty Job:</span>
+                                <span class="font-extrabold text-emerald-700">50% of 1st Month Gross Salary (15 Days)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium border-t border-emerald-200/60 pt-3">
+                        <i class="fas fa-check-circle text-emerald-600 mr-1"></i> Zero recurring monthly commission thereafter.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- PhonePe & Payment Gateway Security Box -->
+            <div class="bg-gradient-to-r from-slate-900 via-[#031b4e] to-slate-900 text-white rounded-2xl p-6 sm:p-8 mb-10 shadow-lg border border-white/10">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl text-cyan-300 shrink-0 border border-white/20">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <div>
+                            <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-extrabold uppercase tracking-wider mb-1">
+                                <i class="fas fa-bolt"></i> PhonePe Payment Gateway Integrated
+                            </div>
+                            <h4 class="text-lg sm:text-xl font-black">100% Safe & Authorized Online Payment Collection</h4>
+                            <p class="text-xs text-slate-300 font-medium mt-1">
+                                Supported Methods: PhonePe UPI, Google Pay, Paytm, Net Banking, Credit/Debit Cards (Visa/Mastercard/RuPay), & Wallets.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 shrink-0">
+                        <span class="px-3 py-1.5 bg-white/10 rounded-xl text-xs font-bold text-slate-200 border border-white/10 flex items-center gap-1.5">
+                            <i class="fas fa-lock text-emerald-400"></i> 256-Bit SSL
+                        </span>
+                        <span class="px-3 py-1.5 bg-white/10 rounded-xl text-xs font-bold text-slate-200 border border-white/10 flex items-center gap-1.5">
+                            <i class="fas fa-receipt text-cyan-400"></i> Instant E-Receipt
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terms & Conditions Bullet Points for Payment Collection -->
+            <div class="space-y-6">
+                <h4 class="text-lg sm:text-xl font-black text-[#031b4e] flex items-center gap-2">
+                    <i class="fas fa-file-contract text-accent-blue"></i>
+                    Payment Collection Rules & Terms of Service
+                </h4>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700 font-medium">
+                    
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                        <h5 class="font-bold text-[#031b4e] flex items-center gap-2 text-sm">
+                            <i class="fas fa-clock text-blue-600"></i> Payment Settlement Timelines
+                        </h5>
+                        <p class="text-slate-600 leading-relaxed">
+                            Upon receiving the first month's salary or tuition fee from the school/parent, the candidate is required to settle the agreed 50% service charge within <strong>12 to 24 hours</strong> through official online channels.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                        <h5 class="font-bold text-[#031b4e] flex items-center gap-2 text-sm">
+                            <i class="fas fa-ban text-red-500"></i> No Unauthorized Cash Collection
+                        </h5>
+                        <p class="text-slate-600 leading-relaxed">
+                            Warriors Educare never asks candidates or schools to pay cash to personal bank accounts or unverified agents. All payments must be made strictly via the official portal, PhonePe Payment Gateway, or official company QR.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                        <h5 class="font-bold text-[#031b4e] flex items-center gap-2 text-sm">
+                            <i class="fas fa-undo-alt text-amber-600"></i> Refund & Failed Transaction Policy
+                        </h5>
+                        <p class="text-slate-600 leading-relaxed">
+                            Registration fees cover administrative expenses (KYC verification, database access, screening) and are non-refundable. In case of failed or duplicate transactions, amounts are automatically refunded to the source account within 5-7 business days.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                        <h5 class="font-bold text-[#031b4e] flex items-center gap-2 text-sm">
+                            <i class="fas fa-gavel text-indigo-600"></i> Legal & Compliance Governing Law
+                        </h5>
+                        <p class="text-slate-600 leading-relaxed">
+                            Candidate registration and service charge agreements are legally binding. Non-payment after successful placement is subject to civil remedy and jurisdiction of competent courts in Bihar, India.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Footer Quick Links for Legal Compliance -->
+                <div class="p-4 rounded-2xl bg-blue-50/60 border border-blue-200/70 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-slate-700">
+                    <span class="flex items-center gap-2 text-[#031b4e]">
+                        <i class="fas fa-info-circle text-accent-blue text-sm"></i>
+                        For full legal terms, refer to our detailed statutory policies:
+                    </span>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ route('terms') }}" class="px-3 py-1.5 bg-white text-[#031b4e] rounded-lg border border-slate-200 hover:border-[#031b4e] transition-colors shadow-2xs">
+                            Terms & Conditions &rarr;
+                        </a>
+                        <a href="{{ route('refund') }}" class="px-3 py-1.5 bg-white text-[#031b4e] rounded-lg border border-slate-200 hover:border-[#031b4e] transition-colors shadow-2xs">
+                            Refund & Cancellation Policy &rarr;
+                        </a>
+                        <a href="{{ route('privacy') }}" class="px-3 py-1.5 bg-white text-[#031b4e] rounded-lg border border-slate-200 hover:border-[#031b4e] transition-colors shadow-2xs">
+                            Privacy Policy &rarr;
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
         <!-- ========================================== -->
         <!-- IMPORTANT NOTE / DISCLAIMER (CRYSTAL CLEAR)-->
         <!-- ========================================== -->

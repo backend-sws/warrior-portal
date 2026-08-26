@@ -96,6 +96,10 @@ Route::post('/email/verification-notification', function (Request $request) {
 // Candidate Auth Routes
 Route::get('/register', [\App\Http\Controllers\CandidateAuthController::class, 'showRegistrationForm'])->middleware('guest')->name('candidate.register');
 Route::post('/register', [\App\Http\Controllers\CandidateAuthController::class, 'register'])->middleware('guest')->name('candidate.register.post');
+Route::get('/register/verify-otp', [\App\Http\Controllers\CandidateAuthController::class, 'showOtpForm'])->middleware('guest')->name('register.otp.show');
+Route::post('/register/verify-otp', [\App\Http\Controllers\CandidateAuthController::class, 'verifyOtp'])->middleware('guest')->name('register.otp.verify');
+Route::post('/register/resend-otp', [\App\Http\Controllers\CandidateAuthController::class, 'resendOtp'])->middleware('guest')->name('register.otp.resend');
+Route::get('/register/cancel', [\App\Http\Controllers\CandidateAuthController::class, 'cancelRegistration'])->middleware('guest')->name('register.cancel');
 
 // Candidate Routes (Unverified but Auth Required)
 Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.')->group(function () {

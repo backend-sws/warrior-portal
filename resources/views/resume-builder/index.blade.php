@@ -3,29 +3,32 @@
 @section('content')
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-<div class="bg-slate-50 min-h-screen pt-4 pb-12" x-data="resumeBuilder()">
-    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+<div class="bg-slate-50 min-h-screen pt-[135px] lg:pt-[150px] pb-16" x-data="resumeBuilder()">
+    <div class="max-w-[1650px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-[#031b4e]">Free Auto Resume Builder</h1>
-                <p class="text-[#031b4e]/60 mt-1">Create a professional teaching resume in minutes. Live preview and PDF download.</p>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#031b4e] font-extrabold uppercase tracking-wider text-[11px] border border-blue-200/60 shadow-xs mb-1.5">
+                    <i class="fas fa-file-invoice text-[#0ea5e9]"></i> Instant Resume Creator
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-black text-[#031b4e] tracking-tight">Free Auto Resume Builder</h1>
+                <p class="text-slate-500 text-xs sm:text-sm font-medium mt-0.5">Create a professional teaching resume in minutes. Live preview and PDF download.</p>
             </div>
             <div>
                 <form action="{{ route('resume.builder.download') }}" method="POST" id="downloadForm">
                     @csrf
                     <input type="hidden" name="resume_data" x-bind:value="JSON.stringify($data.resume)">
-                    <button type="submit" class="px-6 py-3 bg-[#031b4e] text-white font-bold rounded-xl shadow-lg shiny-btn hover:bg-[#021030] hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                        <i class="fas fa-download"></i> Download PDF
+                    <button type="submit" class="px-6 py-3 bg-[#031b4e] text-white font-extrabold text-xs sm:text-sm rounded-2xl shadow-lg hover:bg-[#092b77] hover:-translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-file-pdf text-red-400"></i> Download PDF Resume
                     </button>
                 </form>
             </div>
         </div>
 
-        <div class="flex flex-col lg:flex-row gap-8">
+        <div class="flex flex-col lg:flex-row gap-8 items-start">
             
             {{-- LEFT: EDITOR PANEL --}}
-            <div class="w-full lg:w-[45%] h-[calc(100vh-200px)] overflow-y-auto pr-4 hide-scrollbar">
+            <div class="w-full lg:w-[46%] h-[calc(100vh-230px)] min-h-[750px] overflow-y-auto pr-3 custom-scrollbar">
                 
                 {{-- Personal Details --}}
                 <div class="light-metallic-blue-card border-0 rounded-2xl p-6 mb-6 shadow-sm">
@@ -176,10 +179,10 @@
             </div>
 
             {{-- RIGHT: LIVE PREVIEW PANEL --}}
-            <div class="w-full lg:w-[55%] h-[calc(100vh-200px)] overflow-y-auto rounded-lg shadow-2xl relative bg-gray-50 hide-scrollbar" style="font-family: 'Times New Roman', Times, serif; color: #333;">
+            <div class="w-full lg:w-[54%] h-[calc(100vh-230px)] min-h-[750px] overflow-y-auto rounded-3xl shadow-xl relative bg-slate-200/70 p-4 sm:p-6 custom-scrollbar" style="font-family: 'Times New Roman', Times, serif; color: #333;">
                 
                 {{-- A4 Paper wrapper --}}
-                <div class="bg-white mx-auto min-h-[1122px] w-full max-w-[794px] p-10 sm:p-12 shadow-sm border border-gray-200">
+                <div class="bg-white mx-auto min-h-[1122px] w-full max-w-[794px] p-8 sm:p-12 shadow-2xl rounded-xl border border-slate-300">
                     
                     {{-- Header --}}
                     <div class="flex items-center gap-6 mb-8 border-b-2 border-gray-800 pb-6" :class="resume.personal.photo ? 'flex-row text-left' : 'flex-col text-center'">
@@ -258,8 +261,10 @@
 </div>
 
 <style>
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(3, 27, 78, 0.2); border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(3, 27, 78, 0.4); }
 </style>
 
 <script>

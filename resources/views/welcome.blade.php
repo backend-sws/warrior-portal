@@ -117,7 +117,8 @@
                 </button>
                 
                 <!-- Card 3: Join as Teacher / Tutor -->
-                <a href="{{ route('candidate.register') }}" 
+                @guest
+                <button type="button" onclick="openTeacherModal()" 
                    class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-br from-amber-50/80 via-amber-50/30 to-white hover:from-[#031b4e] hover:to-[#092b77] border-2 border-amber-100/90 hover:border-[#031b4e] shadow-sm hover:shadow-xl hover:-translate-y-1 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-amber-500/25 group-hover:scale-105 transition-all duration-300 md:mb-3.5 shrink-0">
@@ -135,7 +136,28 @@
                             <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
                         </div>
                     </div>
+                </button>
+                @else
+                <a href="{{ route('candidate.dashboard') }}" 
+                   class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-br from-amber-50/80 via-amber-50/30 to-white hover:from-[#031b4e] hover:to-[#092b77] border-2 border-amber-100/90 hover:border-[#031b4e] shadow-sm hover:shadow-xl hover:-translate-y-1 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
+                    <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-amber-500/25 group-hover:scale-105 transition-all duration-300 md:mb-3.5 shrink-0">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="flex-grow text-left md:text-center">
+                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-900 group-hover:bg-white/20 group-hover:text-amber-200 px-2 py-0.5 rounded-md mb-1 transition-colors">For Teachers & Tutors</span>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-white mb-0.5 md:mb-1.5 transition-colors">Join as Teacher / Tutor</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-blue-100 leading-snug transition-colors hidden sm:block">Find verified home tuitions & school teaching jobs in your city.</p>
+                        </div>
+                    </div>
+                    <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 md:group-hover:border-white/15 w-auto md:w-full flex items-center justify-end md:justify-center gap-1.5 text-xs font-bold text-amber-700 group-hover:text-amber-300 transition-colors shrink-0">
+                        <span class="hidden md:inline">Go to Dashboard</span>
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-100 group-hover:bg-white/20 flex items-center justify-center text-amber-700 group-hover:text-white transition-colors">
+                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
+                        </div>
+                    </div>
                 </a>
+                @endguest
 
             </div>
             
@@ -232,7 +254,7 @@
         }
         
         section.bg-white, section.bg-slate-50, section.bg-gray-50, section.bg-\[\#f4f7f5\], section.bg-\[\#f4f7f9\] {
-            background-image: linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.75)), url('{{ asset('images/enhanced_building.jpg') }}') !important;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.96)), url('{{ asset('images/enhanced_building.jpg') }}') !important;
             background-size: cover !important;
             background-attachment: fixed !important;
             background-position: center !important;
@@ -288,8 +310,12 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="{{ route('contact') }}" id="btn-hire" class="bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] transition shadow-lg flex items-center justify-center">Hire a Teacher / Tutor</a>
-                    <a href="{{ route('candidate.register') }}" id="btn-join" class="bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 transition border border-gray-200 shadow-sm flex items-center justify-center gap-2">Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i></a>
+                    <button type="button" onclick="openRequirementModal('tuition')" id="btn-hire" class="bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] hover:scale-105 transition-all shadow-lg flex items-center justify-center cursor-pointer">Hire a Teacher / Tutor</button>
+                    @guest
+                        <button type="button" onclick="openTeacherModal()" id="btn-join" class="bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 hover:scale-105 transition-all border border-gray-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer">Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i></button>
+                    @else
+                        <a href="{{ route('candidate.dashboard') }}" id="btn-join" class="bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 hover:scale-105 transition-all border border-gray-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer">Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i></a>
+                    @endguest
                 </div>
             </div>
 
@@ -308,9 +334,11 @@
             <!-- Far Right Column: Explore Offerings & Second Image -->
             <div class="w-full lg:w-[18%] flex flex-col justify-center mt-16 lg:mt-0 gap-10">
                 
-                <div class="text-[#071520] pt-4">
-                    <h3 class="text-3xl font-bold mb-4 leading-tight tracking-tight">Explore Our <br>Offerings</h3>
-                    <p class="text-gray-500 text-[12px] leading-relaxed max-w-[200px]">
+                <div class="pt-4">
+                    <h3 class="text-2xl lg:text-3xl font-black mb-3 leading-tight tracking-tight text-[#031b4e]">
+                        Explore Our <br><span class="text-[#0ea5e9]">Offerings</span>
+                    </h3>
+                    <p class="text-slate-800 font-semibold text-[13px] lg:text-[14px] leading-relaxed max-w-[220px]">
                         Whether you're a beginner or looking for advanced tutoring, our community is here to support your journey.
                     </p>
                 </div>
@@ -419,45 +447,56 @@
 
                     </div>
 
-                    <!-- Right Text Content -->
-                    <div class="w-full md:w-1/2">
-                        <span class="text-accent-500 font-bold uppercase tracking-wider text-sm mb-2 block">About Warriors Educare</span>
-                        <h2 class="text-3xl md:text-4xl font-extrabold text-[#031b4e] mb-6 leading-tight">Empowering Businesses With The Best Right Talent</h2>
-                        <p class="text-gray-600 mb-8 leading-relaxed">
+                    <!-- Right Text Content (High-Contrast & Clean Card) -->
+                    <div class="w-full md:w-1/2 bg-white/95 backdrop-blur-xl p-6 sm:p-8 lg:p-10 rounded-3xl border border-slate-200/90 shadow-[0_20px_50px_rgba(3,27,78,0.08)] relative z-20">
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#031b4e] font-extrabold uppercase tracking-wider text-xs mb-3.5 border border-blue-200/70 shadow-xs">
+                            <i class="fas fa-sparkles text-amber-500"></i> About Warriors Educare
+                        </span>
+                        <h2 class="text-3xl md:text-4xl lg:text-[40px] font-black text-[#031b4e] mb-4 leading-tight tracking-tight">
+                            Empowering Businesses With The Best Right Talent
+                        </h2>
+                        <p class="text-slate-700 text-sm sm:text-base font-semibold mb-6 leading-relaxed">
                             At Warriors Educare, we believe that the success of any business hinges on having the right people in place. Our mission is to empower companies by providing access to top-tier academic and administrative talent.
                         </p>
                         
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mb-8">
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 rounded-full bg-royal-100 flex items-center justify-center text-[#031b4e]">
-                                    <i class="fas fa-check text-xs"></i>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+                            <div class="flex items-center gap-3 p-3 bg-slate-50/90 rounded-2xl border border-slate-200/70 shadow-xs hover:bg-blue-50/60 transition-colors">
+                                <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-[#031b4e] shrink-0 font-bold">
+                                    <i class="fas fa-check text-xs text-blue-800"></i>
                                 </div>
-                                <span class="font-semibold text-gray-800">Tailored Staffing Solutions</span>
+                                <span class="font-extrabold text-slate-900 text-xs sm:text-sm">Tailored Staffing Solutions</span>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 rounded-full bg-royal-100 flex items-center justify-center text-[#031b4e]">
-                                    <i class="fas fa-check text-xs"></i>
+                            <div class="flex items-center gap-3 p-3 bg-slate-50/90 rounded-2xl border border-slate-200/70 shadow-xs hover:bg-blue-50/60 transition-colors">
+                                <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-[#031b4e] shrink-0 font-bold">
+                                    <i class="fas fa-check text-xs text-blue-800"></i>
                                 </div>
-                                <span class="font-semibold text-gray-800">Ongoing Support</span>
+                                <span class="font-extrabold text-slate-900 text-xs sm:text-sm">Ongoing Support</span>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 rounded-full bg-royal-100 flex items-center justify-center text-[#031b4e]">
-                                    <i class="fas fa-check text-xs"></i>
+                            <div class="flex items-center gap-3 p-3 bg-slate-50/90 rounded-2xl border border-slate-200/70 shadow-xs hover:bg-blue-50/60 transition-colors">
+                                <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-[#031b4e] shrink-0 font-bold">
+                                    <i class="fas fa-check text-xs text-blue-800"></i>
                                 </div>
-                                <span class="font-semibold text-gray-800">Streamlined Hiring Process</span>
+                                <span class="font-extrabold text-slate-900 text-xs sm:text-sm">Streamlined Hiring Process</span>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 rounded-full bg-royal-100 flex items-center justify-center text-[#031b4e]">
-                                    <i class="fas fa-check text-xs"></i>
+                            <div class="flex items-center gap-3 p-3 bg-slate-50/90 rounded-2xl border border-slate-200/70 shadow-xs hover:bg-blue-50/60 transition-colors">
+                                <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-[#031b4e] shrink-0 font-bold">
+                                    <i class="fas fa-check text-xs text-blue-800"></i>
                                 </div>
-                                <span class="font-semibold text-gray-800">Experienced Team</span>
+                                <span class="font-extrabold text-slate-900 text-xs sm:text-sm">Experienced Team</span>
                             </div>
                         </div>
 
-                        <a href="{{ route('candidate.register') }}" class="inline-flex items-center justify-center bg-[#031b4e] hover:bg-[#092b77] text-white font-bold py-3.5 px-8 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 group">
-                            <span>Join Our Network</span>
-                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                        </a>
+                        @guest
+                            <button type="button" onclick="openTeacherModal()" class="inline-flex items-center justify-center bg-[#031b4e] hover:bg-[#092b77] text-white font-bold py-3.5 px-8 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer text-sm">
+                                <span>Join Our Network</span>
+                                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                        @else
+                            <a href="{{ route('candidate.dashboard') }}" class="inline-flex items-center justify-center bg-[#031b4e] hover:bg-[#092b77] text-white font-bold py-3.5 px-8 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 group text-sm">
+                                <span>Go to Dashboard</span>
+                                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                        @endguest
                     </div>
                 </div>
             </div>
@@ -491,12 +530,12 @@
                                 </h2>
                                 <div class="w-24 h-1.5 bg-gradient-to-r from-[#fbc043] to-[#fbc043]/20 mt-8 rounded-full"></div>
 
-                                <!-- "EXPLORE MORE" button styled as a bottom tab like in Image 1 -->
+                                <!-- "EXPLORE MORE" button styled as a bottom tab linking to About page -->
                                 <div class="mt-12 hidden lg:flex items-center gap-4">
-                                    <a href="#" class="inline-flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg border border-white/10">
-                                        EXPLORE MORE
+                                    <a href="{{ route('about') }}" class="inline-flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg border border-white/10 group/btn">
+                                        <span>EXPLORE MORE</span>
                                     </a>
-                                    <a href="#" class="w-14 h-14 bg-[#fbc043] hover:bg-[#e5ae3c] rounded-2xl flex items-center justify-center text-[#031b4e] text-xl shadow-lg transition-transform hover:scale-105">
+                                    <a href="{{ route('about') }}" aria-label="Learn more about Warriors Educare" class="w-14 h-14 bg-[#fbc043] hover:bg-[#e5ae3c] rounded-2xl flex items-center justify-center text-[#031b4e] text-xl shadow-lg transition-transform hover:scale-105">
                                         <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
@@ -527,8 +566,8 @@
                                     
                                     <!-- Mobile explore button -->
                                     <div class="mt-8 flex lg:hidden items-center gap-4">
-                                        <a href="#" class="inline-flex items-center gap-3 bg-[#031b4e] text-white px-6 py-3 rounded-xl font-bold">
-                                            EXPLORE MORE <i class="fas fa-arrow-right"></i>
+                                        <a href="{{ route('about') }}" class="inline-flex items-center gap-3 bg-[#031b4e] hover:bg-[#092b77] text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-md">
+                                            <span>EXPLORE MORE</span> <i class="fas fa-arrow-right"></i>
                                         </a>
                                     </div>
                                 </div>
@@ -542,21 +581,21 @@
 
 
 
-        <!-- Simple Footer / CTA Prep -->
-        <footer class="bg-white py-12">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-3xl font-extrabold text-[#031b4e] mb-4">Ready To Power Up Your Savings And Reliability?</h2>
-                <p class="text-gray-600 mb-8">Let's Start the Conversation and find the right talent for your institution.</p>
-                <a href="#" class="bg-[#031b4e] hover:hover:bg-[#021030] text-white font-bold py-3 px-8 rounded-full transition-colors shadow-lg">
-                    Contact Us Today
-                </a>
-            </div>
-        </footer>
-
-
-
     <!-- Categories Section -->
-        <section class="py-12 sm:py-16 px-4 sm:px-6 lg:px-[5%] relative bg-slate-50">
+        <section class="py-12 sm:py-16 px-4 sm:px-6 lg:px-[5%] relative bg-slate-50 border-b border-slate-200/60">
+            
+            <div class="max-w-7xl mx-auto mb-8 text-center">
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 text-[#031b4e] font-extrabold uppercase tracking-wider text-xs border border-blue-200/60 shadow-xs mb-2.5">
+                    <i class="fas fa-th-large text-[#0ea5e9]"></i> Browse Categories
+                </span>
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#031b4e] tracking-tight mb-2">
+                    Explore Teaching Jobs by Level
+                </h2>
+                <p class="text-slate-500 text-xs sm:text-sm font-medium max-w-lg mx-auto">
+                    Select a category to explore active vacancies in schools and educational institutions.
+                </p>
+            </div>
+
             <style>
                 .category-card {
                     background: linear-gradient(135deg, #1e3a8a 0%, #031b4e 100%);
@@ -684,6 +723,128 @@
                     </div>
                 </a>
                 @endforeach
+            </div>
+        </section>
+
+        <!-- Latest Jobs / Recent Opportunities Section (Moved Right Below Categories) -->
+        <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-[5%] relative bg-white border-b border-slate-200/70 overflow-hidden">
+            <div class="max-w-7xl mx-auto relative z-10">
+                
+                <!-- Section Header -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#031b4e] font-extrabold uppercase tracking-wider text-xs border border-blue-200/60 shadow-xs mb-2.5">
+                            <i class="fas fa-bolt text-[#ff8800]"></i> <span>Verified Vacancies</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#031b4e] tracking-tight">
+                            Explore Recent Opportunities
+                        </h2>
+                        <p class="text-slate-500 text-xs sm:text-sm font-medium mt-1.5 max-w-lg">
+                            Apply directly to newly posted teaching vacancies and school requirements across India.
+                        </p>
+                    </div>
+
+                    <a href="{{ route('jobs') }}" class="hidden sm:inline-flex items-center gap-2 px-6 py-3 bg-[#031b4e] hover:bg-[#092b77] text-white font-bold rounded-full text-xs sm:text-sm shadow-md hover:shadow-lg transition-all group shrink-0">
+                        <span>View All Jobs</span>
+                        <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+
+                <!-- Job Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                    @forelse($recentJobs as $job)
+                    <div class="bg-white rounded-3xl border border-slate-200/90 hover:border-[#0ea5e9]/50 shadow-[0_4px_20px_rgba(3,27,78,0.05)] hover:shadow-[0_20px_40px_rgba(14,165,233,0.12)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden p-5 sm:p-6">
+                        
+                        <!-- Top Accent Bar on Hover -->
+                        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#031b4e] via-[#0ea5e9] to-[#38bdf8] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <div>
+                            <!-- Header Row: School Name & Status -->
+                            <div class="flex items-center justify-between gap-2 mb-3">
+                                <span class="text-xs font-bold text-slate-500 flex items-center gap-1.5 truncate">
+                                    <i class="fas fa-school text-[#0ea5e9] text-xs shrink-0"></i>
+                                    <span class="truncate">{{ $job->school_name ?? 'Educational Institution' }}</span>
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                                </span>
+                            </div>
+
+                            <!-- Job Title -->
+                            <h3 class="text-base sm:text-lg font-black text-[#031b4e] group-hover:text-[#0ea5e9] transition-colors leading-snug mb-3 line-clamp-2" title="{{ $job->title }}">
+                                <a href="{{ route('jobs.show', $job->id) }}" class="hover:underline">
+                                    {{ $job->title ?? 'Teacher Vacancy' }}
+                                </a>
+                            </h3>
+
+                            <!-- Badges -->
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                @if($job->category)
+                                    <span class="bg-blue-50 text-blue-900 border border-blue-200/60 px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1">
+                                        <i class="fas fa-folder-open text-[9px] text-blue-600"></i> {{ $job->category->name }}
+                                    </span>
+                                @endif
+                                @if($job->subject)
+                                    <span class="bg-purple-50 text-purple-900 border border-purple-200/60 px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1">
+                                        <i class="fas fa-book text-[9px] text-purple-600"></i> {{ $job->subject->name }}
+                                    </span>
+                                @endif
+                                @if($job->qualification)
+                                    <span class="bg-amber-50 text-amber-900 border border-amber-200/60 px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1">
+                                        <i class="fas fa-graduation-cap text-[9px] text-amber-600"></i> {{ $job->qualification->name }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            <!-- Description Snippet -->
+                            @if($job->description)
+                            <p class="text-slate-600 text-xs leading-relaxed mb-4 line-clamp-2">
+                                {{ Str::limit(strip_tags($job->description), 95) }}
+                            </p>
+                            @endif
+                        </div>
+
+                        <!-- Card Footer: Location, Salary & CTA Button -->
+                        <div class="pt-4 border-t border-slate-100 mt-2 flex flex-col gap-3">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-slate-500 font-semibold flex items-center gap-1.5">
+                                    <i class="fas fa-map-marker-alt text-rose-500 text-xs shrink-0"></i>
+                                    <span>{{ $job->city?->name ?? 'City' }}{{ $job->state ? ', ' . $job->state->name : '' }}</span>
+                                </span>
+                                @if(!empty($job->salary_range))
+                                    <span class="font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 text-[11px]">
+                                        {{ $job->salary_range }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            <a href="{{ route('jobs.show', $job->id) }}" class="w-full py-2.5 px-4 rounded-xl bg-slate-50 group-hover:bg-[#031b4e] text-[#031b4e] group-hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition-all duration-200 border border-slate-200 group-hover:border-[#031b4e] shadow-xs">
+                                <span>View Details & Apply</span>
+                                <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="col-span-full py-12 text-center bg-slate-50 rounded-3xl border border-slate-200/80 p-8">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-blue-50 text-[#031b4e] flex items-center justify-center text-2xl mb-3">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <h4 class="font-extrabold text-slate-800 text-base mb-1">No Active Openings Right Now</h4>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto mb-4">New teaching and academic positions are added daily. You can post your requirement or register as a teacher.</p>
+                        <button type="button" onclick="openRequirementModal('school')" class="px-6 py-2.5 bg-[#031b4e] text-white rounded-full text-xs font-bold shadow-md hover:bg-[#092b77] transition-all">
+                            Post School Requirement
+                        </button>
+                    </div>
+                    @endforelse
+                </div>
+
+                <!-- Mobile View All Button -->
+                <div class="mt-8 text-center sm:hidden">
+                    <a href="{{ route('jobs') }}" class="inline-flex items-center gap-2 px-7 py-3 bg-[#031b4e] text-white font-bold rounded-full text-xs shadow-md">
+                        <span>View All Jobs</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
             </div>
         </section>
 
@@ -948,7 +1109,7 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Your Name <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user text-sm"></i></span>
-                                    <input type="text" name="guest_name" required placeholder="Enter your full name" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="guest_name" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" title="Please enter your full name (letters only, min 3 characters)." placeholder="Enter your full name" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                                 </div>
                             </div>
                             <!-- Phone Number -->
@@ -956,7 +1117,7 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Phone Number <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-phone-alt text-sm"></i></span>
-                                    <input type="tel" name="guest_phone" required placeholder="Enter 10-digit mobile number" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="tel" name="guest_phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." placeholder="Enter 10-digit mobile number" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                                 </div>
                             </div>
                             
@@ -965,7 +1126,7 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Student's Class / Grade <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-graduation-cap text-sm"></i></span>
-                                    <input type="text" name="student_class" placeholder="e.g. Class 10 / Class 1-5 / Nursery" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="student_class" minlength="1" maxlength="50" placeholder="e.g. Class 10 / Class 1-5 / Nursery" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                                 </div>
                             </div>
                             
@@ -991,7 +1152,7 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Subjects Needed <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-pencil-alt text-sm"></i></span>
-                                    <input type="text" name="subjects" required placeholder="e.g. Mathematics, Physics, English, or All Subjects" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="subjects" required minlength="2" maxlength="150" placeholder="e.g. Mathematics, Physics, English, or All Subjects" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                                 </div>
                             </div>
 
@@ -1000,7 +1161,7 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Complete Location / Area <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-map-marker-alt text-sm"></i></span>
-                                    <input type="text" name="location" required placeholder="e.g. Kankarbagh, Patna or Area name" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="location" required minlength="3" maxlength="200" placeholder="e.g. Kankarbagh, Patna or Area name" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                                 </div>
                             </div>
 
@@ -1009,13 +1170,13 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Pincode</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-mail-bulk text-sm"></i></span>
-                                    <input type="text" name="pincode" maxlength="6" placeholder="Enter 6-digit Pincode" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="pincode" maxlength="6" pattern="^[0-9]{6}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);" title="Please enter a valid 6-digit Pincode." placeholder="Enter 6-digit Pincode" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm font-mono">
                                 </div>
                             </div>
                         </div>
 
                         <div class="text-center pt-2">
-                            <button type="submit" :disabled="loading" class="bg-gradient-to-r from-[#031b4e] to-[#004de6] hover:from-[#021338] hover:to-[#003cb8] text-white px-10 py-4 rounded-full font-bold text-base md:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 inline-flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0">
+                            <button type="submit" :disabled="loading" class="bg-gradient-to-r from-[#031b4e] to-[#004de6] hover:from-[#021338] hover:to-[#003cb8] text-white px-10 py-4 rounded-full font-bold text-base md:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 inline-flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
                                 <template x-if="!loading">
                                     <span class="inline-flex items-center gap-2">Post Tuition Requirement <i class="fas fa-paper-plane text-sm"></i></span>
                                 </template>
@@ -1037,7 +1198,7 @@
                             <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Job Title / Position Name <span class="text-rose-500">*</span></label>
                             <div class="relative">
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-briefcase text-sm"></i></span>
-                                <input type="text" name="title" required placeholder="e.g. Senior Physics Teacher / PRT All Subjects / Academic Coordinator" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                <input type="text" name="title" required minlength="3" maxlength="150" placeholder="e.g. Senior Physics Teacher / PRT All Subjects / Academic Coordinator" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                             </div>
                         </div>
 
@@ -1047,7 +1208,7 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">School / Institution Name <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-school text-sm"></i></span>
-                                    <input type="text" name="school_name" required placeholder="e.g. St. Xavier's High School / Apex Academy" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="school_name" required minlength="3" maxlength="150" placeholder="e.g. St. Xavier's High School / Apex Academy" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                                 </div>
                             </div>
 
@@ -1056,7 +1217,7 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Contact Person & Designation <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user-tie text-sm"></i></span>
-                                    <input type="text" name="contact_person" required placeholder="e.g. Ramesh Kumar (Principal / HR Head)" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="contact_person" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" title="Please enter a valid contact person name (letters only)." placeholder="e.g. Ramesh Kumar (Principal / HR Head)" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                                 </div>
                             </div>
 
@@ -1065,7 +1226,7 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Contact Phone / Mobile <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-phone-alt text-sm"></i></span>
-                                    <input type="tel" name="phone" required placeholder="Enter 10-digit mobile number" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." placeholder="Enter 10-digit mobile number" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                                 </div>
                             </div>
 
@@ -1158,7 +1319,7 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Salary Range / Budget (Monthly)</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-rupee-sign text-sm"></i></span>
-                                    <input type="text" name="salary_range" placeholder="e.g. ₹35,000 - ₹50,000 / Negotiable" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="salary_range" maxlength="80" placeholder="e.g. ₹35,000 - ₹50,000 / Negotiable" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                                 </div>
                             </div>
 
@@ -1166,7 +1327,7 @@
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Job Description & Experience Requirements (Optional)</label>
                                 <div class="relative">
-                                    <textarea name="description" rows="2" placeholder="e.g. Looking for an experienced teacher with B.Ed and minimum 2+ years of teaching experience..." class="w-full bg-white border border-blue-200 rounded-xl p-4 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm resize-none"></textarea>
+                                    <textarea name="description" rows="2" maxlength="1500" placeholder="e.g. Looking for an experienced teacher with B.Ed and minimum 2+ years of teaching experience..." class="w-full bg-white border border-blue-200 rounded-xl p-4 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm resize-none"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -1481,61 +1642,7 @@
             </div>
         </section>
 
-        <!-- Latest Jobs Section -->
-        <section class="py-20 px-6 lg:px-[5%] metallic-blue-card border-none shadow-none text-white relative overflow-hidden">
-            <!-- Background Dot Pattern -->
-            <div class="absolute inset-0 z-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px); background-size: 30px 30px;"></div>
-            
-            <div class="text-center mb-12 relative z-10 reveal">
-                <h4 class="text-white/80 text-base font-medium mb-1.5 uppercase tracking-wider">Latest Jobs</h4>
-                <h2 class="text-white text-3xl lg:text-4xl font-bold mb-4">Explore Recent Opportunities</h2>
-                <div class="zigzag-divider w-16 h-2 mx-auto"></div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                @forelse($recentJobs as $job)
-                <a href="{{ route('jobs.show', $job->id) }}"
-                    class="block bg-white border border-slate-200 rounded-2xl p-7 text-slate-800 transition-all duration-300 hover:-translate-y-2 shadow-lg hover:shadow-[0_20px_40px_rgba(64,186,115,0.15)] hover:border-[#031b4e]/30 flex flex-col group reveal cursor-pointer">
-                    <h3 class="text-xl font-bold mb-3 text-slate-900 group-hover:text-[#031b4e] transition-colors">{{ $job->title ?? 'Job Requirement' }}</h3>
-                    <p class="text-xs text-slate-500 mb-4 flex items-center gap-3">
-                        <span class="text-red-400"><i class="fas fa-map-marker-alt mr-0.5"></i> {{ $job->city?->name ?? 'N/A' }}, {{ $job->state?->name ?? 'N/A' }}</span>
-                        <span><i class="far fa-calendar-alt mr-0.5"></i> {{ $job->created_at->format('d M Y') }}</span>
-                    </p>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="bg-[#031b4e]/8 text-[#031b4e] px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1.5">
-                            <i class="fas fa-folder-open text-[9px]"></i> {{ $job->category?->name ?? 'N/A' }}
-                        </span>
-                        <span class="bg-[#031b4e]/8 text-[#031b4e] px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1.5">
-                            <i class="fas fa-book text-[9px]"></i> {{ $job->subject?->name ?? 'N/A' }}
-                        </span>
-                        <span class="bg-[#031b4e]/8 text-[#031b4e] px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1.5">
-                            <i class="fas fa-graduation-cap text-[9px]"></i> {{ $job->qualification?->name ?? 'N/A' }}
-                        </span>
-                    </div>
-                    <p class="text-[13px] text-slate-600 leading-relaxed mb-6 flex-grow">
-                        {{ Str::limit(strip_tags($job->description), 100) }}
-                    </p>
-                    <div class="text-[#031b4e] font-semibold text-[13px] inline-flex items-center gap-2 self-start group-hover:gap-3 transition-all mt-auto">
-                        View Details 
-                        <span class="bg-accent-yellow text-slate-900 w-5 h-5 rounded-full flex items-center justify-center text-[9px] transition-transform group-hover:scale-110">
-                            <i class="fas fa-chevron-right"></i>
-                        </span>
-                    </div>
-                </a>
-                @empty
-                <div class="col-span-full text-center py-10 opacity-60">
-                    <p>No recent job openings available at the moment.</p>
-                </div>
-                @endforelse
-            </div>
-
-            <div class="text-center mt-12 reveal">
-                <a href="{{ route('jobs') }}" class="inline-flex items-center justify-center gap-3 bg-[#031b4e] text-white font-bold text-[15px] px-8 py-3.5 rounded-full hover:bg-[#1e3a8a] hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-xl group">
-                    View All Jobs 
-                    <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
-                </a>
-            </div>
-        </section>
 
         
 
@@ -1786,81 +1893,6 @@
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        // --- Hero Section Image & Text Swap Animation ---
-        const btnHire = document.getElementById('btn-hire');
-        const btnJoin = document.getElementById('btn-join');
-        const mainImg = document.getElementById('main-img');
-        const subImg = document.getElementById('sub-img');
-        const heroTitle = document.getElementById('hero-title');
-        const heroDesc = document.getElementById('hero-desc');
-
-        if (btnHire && btnJoin && mainImg && subImg) {
-            let activeState = 'hire';
-
-            const textContent = {
-                hire: {
-                    title: 'Find the Right Tutor. Hire the Right Teacher. Build the Right <br>\n                    <div class="relative w-max mt-4 mb-2">\n                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">Team.</span>\n                    </div>',
-                    desc: 'Warriors Educare helps parents find suitable home tutors and helps schools hire qualified teaching and non-teaching staff.'
-                },
-                join: {
-                    title: 'Join our team of expert <br>\n                    <div class="relative w-max mt-4 mb-2">\n                        <span class="bg-[#fbc043] text-[#1d2542] px-6 py-2 md:py-3 rounded-full inline-block relative z-20 shadow-md">educators</span>\n                    </div>',
-                    desc: 'Become a part of our growing community. Teach, mentor, and shape the bright futures of students worldwide.'
-                }
-            };
-
-            const activeBtnClass = "bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] transition shadow-lg flex items-center justify-center";
-            const inactiveBtnClass = "bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 transition border border-gray-200 shadow-sm flex items-center justify-center gap-2";
-
-            heroTitle.style.transition = 'opacity 0.3s ease-in-out';
-            heroDesc.style.transition = 'opacity 0.3s ease-in-out';
-            mainImg.style.transition = 'opacity 0.3s ease-in-out';
-            subImg.style.transition = 'opacity 0.3s ease-in-out';
-
-            function setState(state, event) {
-                if (activeState === state) return;
-                event.preventDefault();
-                activeState = state;
-
-                // Fade out
-                heroTitle.style.opacity = '0';
-                heroDesc.style.opacity = '0';
-                mainImg.style.opacity = '0';
-                subImg.style.opacity = '0';
-
-                // Swap button styles
-                if (state === 'join') {
-                    btnJoin.className = activeBtnClass;
-                    btnJoin.innerHTML = 'Join as a Teacher / Tutor';
-                    
-                    btnHire.className = inactiveBtnClass;
-                    btnHire.innerHTML = 'Hire a Teacher / Tutor <i class="fas fa-arrow-right"></i>';
-                } else {
-                    btnHire.className = activeBtnClass;
-                    btnHire.innerHTML = 'Hire a Teacher / Tutor';
-                    
-                    btnJoin.className = inactiveBtnClass;
-                    btnJoin.innerHTML = 'Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i>';
-                }
-
-                setTimeout(() => {
-                    heroTitle.innerHTML = textContent[state].title;
-                    heroDesc.innerHTML = textContent[state].desc;
-                    
-                    const tempSrc = mainImg.src;
-                    mainImg.src = subImg.src;
-                    subImg.src = tempSrc;
-
-                    heroTitle.style.opacity = '1';
-                    heroDesc.style.opacity = '1';
-                    mainImg.style.opacity = '1';
-                    subImg.style.opacity = '1';
-                }, 300);
-            }
-
-            btnHire.addEventListener('click', (e) => setState('hire', e));
-            btnJoin.addEventListener('click', (e) => setState('join', e));
-        }
-
         // --- Stats Observer ---
         const stats = document.querySelectorAll('.stat-number');
         

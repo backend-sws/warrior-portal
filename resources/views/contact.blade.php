@@ -57,27 +57,26 @@
                 <form action="{{ route('contact.store') }}" method="POST" class="space-y-6" id="contactForm">
                     @csrf
                     <div>
-                        <label class="block text-slate-800 text-sm font-medium mb-2">Name</label>
-                        <input type="text" name="name" required class="w-full bg-transparent border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all" placeholder="Your fullname">
+                        <label class="block text-slate-800 text-sm font-medium mb-2">Name <span class="text-rose-500">*</span></label>
+                        <input type="text" name="name" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" title="Please enter your full name (letters only, min 3 characters)." class="w-full bg-transparent border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all" placeholder="Your full name">
                     </div>
                     
                     <div>
-                        <label class="block text-slate-800 text-sm font-medium mb-2">Your email</label>
-                        <input type="email" name="email" class="w-full bg-transparent border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all" placeholder="Your email address">
+                        <label class="block text-slate-800 text-sm font-medium mb-2">Your Email</label>
+                        <input type="email" name="email" class="w-full bg-transparent border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all" placeholder="Your email address (e.g. name@domain.com)">
                     </div>
 
-                    <!-- Phone (keeping from original context) -->
                     <div>
-                        <label class="block text-slate-800 text-sm font-medium mb-2">Your phone</label>
-                        <input type="text" name="phone" required class="w-full bg-transparent border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all" placeholder="Your phone number">
+                        <label class="block text-slate-800 text-sm font-medium mb-2">Your Phone <span class="text-rose-500">*</span></label>
+                        <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." class="w-full bg-transparent border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all font-mono" placeholder="Enter 10-digit mobile number">
                     </div>
                     
                     <div>
-                        <label class="block text-slate-800 text-sm font-medium mb-2">Your messages</label>
-                        <textarea name="message" required rows="5" class="w-full bg-transparent border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all resize-none" placeholder="Your messages here..."></textarea>
+                        <label class="block text-slate-800 text-sm font-medium mb-2">Your Message <span class="text-rose-500">*</span></label>
+                        <textarea name="message" required minlength="10" maxlength="3000" rows="5" class="w-full bg-transparent border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all resize-none" placeholder="Write your requirement or message here... (minimum 10 characters)"></textarea>
                     </div>
                     
-                    <button type="submit" class="w-full bg-[#111] text-white font-medium py-4 rounded-xl hover:bg-black hover:shadow-xl transition-all duration-300">
+                    <button type="submit" class="w-full bg-[#111] text-white font-medium py-4 rounded-xl hover:bg-black hover:shadow-xl transition-all duration-300 cursor-pointer">
                         Submit
                     </button>
                 </form>
@@ -144,25 +143,36 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
         method: 'POST',
         body: new FormData(this),
         headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
         }
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(async response => {
+        const data = await response.json();
         const msgBox = document.getElementById('formMessage');
-        msgBox.classList.remove('hidden', 'bg-red-50', 'text-red-700');
-        msgBox.classList.add('bg-green-50', 'text-green-700');
-        msgBox.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ' + (data.message || 'Message sent successfully!');
-        
-        if(data.success) {
+        if (response.ok && data.success) {
+            msgBox.classList.remove('hidden', 'bg-red-50', 'text-red-700');
+            msgBox.classList.add('bg-green-50', 'text-green-700');
+            msgBox.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ' + (data.message || 'Message sent successfully!');
             this.reset();
+        } else {
+            let errorText = data.message || 'Something went wrong. Please check your inputs.';
+            if (data.errors) {
+                const firstKey = Object.keys(data.errors)[0];
+                if (firstKey && data.errors[firstKey].length > 0) {
+                    errorText = data.errors[firstKey][0];
+                }
+            }
+            msgBox.classList.remove('hidden', 'bg-green-50', 'text-green-700');
+            msgBox.classList.add('bg-red-50', 'text-red-700');
+            msgBox.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> ' + errorText;
         }
     })
     .catch(error => {
         const msgBox = document.getElementById('formMessage');
         msgBox.classList.remove('hidden', 'bg-green-50', 'text-green-700');
         msgBox.classList.add('bg-red-50', 'text-red-700');
-        msgBox.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> Something went wrong. Please try again.';
+        msgBox.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> Network error. Please try again.';
     })
     .finally(() => {
         btn.innerHTML = originalText;
