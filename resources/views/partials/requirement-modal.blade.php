@@ -31,6 +31,7 @@ function globalRequirementModal() {
                 }
                 this.successMessage = '';
                 this.errorMessage = '';
+                this.fieldErrors = {};
             });
         },
 
@@ -41,7 +42,7 @@ function globalRequirementModal() {
             }
             this.loadingSubjects = true;
             fetch(`/api/categories/${this.selectedCategory}/subjects`)
-                .then(r => r.json())
+                .then(res => res.json())
                 .then(data => {
                     this.subjects = data;
                     this.loadingSubjects = false;
@@ -56,7 +57,7 @@ function globalRequirementModal() {
             }
             this.loadingCities = true;
             fetch(`/api/states/${this.selectedState}/cities`)
-                .then(r => r.json())
+                .then(res => res.json())
                 .then(data => {
                     this.cities = data;
                     this.loadingCities = false;
@@ -70,31 +71,48 @@ function globalRequirementModal() {
             this.submitting = true;
             this.successMessage = '';
             this.errorMessage = '';
+            this.fieldErrors = {};
 
             try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || formData.get('_token') || '';
                 const response = await fetch('{{ route("tuition.post") }}', {
                     method: 'POST',
                     body: formData,
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
                     }
                 });
-                const data = await response.json();
+                
+                let data = {};
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    try { data = JSON.parse(text); } catch (e) { data = {}; }
+                }
 
                 if (response.ok && data.success) {
                     this.successMessage = data.message || 'Your tuition requirement has been submitted for review! Our academic team will verify and post it shortly.';
                     form.reset();
+                    this.fieldErrors = {};
                 } else {
-                    if (data.errors) {
-                        const firstKey = Object.keys(data.errors)[0];
-                        this.errorMessage = data.errors[firstKey][0] || 'Validation error. Please verify the input fields.';
+                    if (response.status === 419) {
+                        this.errorMessage = 'Your browser session has expired. Please refresh the page (F5) and submit again.';
+                    } else if (data.errors && typeof data.errors === 'object' && Object.keys(data.errors).length > 0) {
+                        this.fieldErrors = data.errors;
+                        this.errorMessage = data.message || 'Please correct the highlighted fields.';
+                    } else if (data.message) {
+                        this.errorMessage = data.message;
                     } else {
-                        this.errorMessage = data.message || 'Something went wrong. Please check your inputs.';
+                        this.errorMessage = 'Something went wrong. Please check your inputs.';
                     }
                 }
             } catch (err) {
-                this.errorMessage = 'Network connection error. Please try again.';
+                console.error('Tuition modal submission error:', err);
+                this.errorMessage = 'Unable to complete request. Please verify your connection or refresh the page.';
             } finally {
                 this.submitting = false;
             }
@@ -106,35 +124,52 @@ function globalRequirementModal() {
             this.submitting = true;
             this.successMessage = '';
             this.errorMessage = '';
+            this.fieldErrors = {};
 
             try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || formData.get('_token') || '';
                 const response = await fetch('{{ route("school.requirement.post") }}', {
                     method: 'POST',
                     body: formData,
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
                     }
                 });
-                const data = await response.json();
+                
+                let data = {};
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    try { data = JSON.parse(text); } catch (e) { data = {}; }
+                }
 
                 if (response.ok && data.success) {
                     this.successMessage = data.message || 'Your teacher hiring requirement has been submitted for approval! Our team will review and approve it shortly.';
                     form.reset();
+                    this.fieldErrors = {};
                     this.selectedCategory = '';
                     this.selectedState = '';
                     this.subjects = [];
                     this.cities = [];
                 } else {
-                    if (data.errors) {
-                        const firstKey = Object.keys(data.errors)[0];
-                        this.errorMessage = data.errors[firstKey][0] || 'Validation error. Please verify the input fields.';
+                    if (response.status === 419) {
+                        this.errorMessage = 'Your browser session has expired. Please refresh the page (F5) and submit again.';
+                    } else if (data.errors && typeof data.errors === 'object' && Object.keys(data.errors).length > 0) {
+                        this.fieldErrors = data.errors;
+                        this.errorMessage = data.message || 'Please correct the highlighted fields.';
+                    } else if (data.message) {
+                        this.errorMessage = data.message;
                     } else {
-                        this.errorMessage = data.message || 'Something went wrong. Please check your inputs.';
+                        this.errorMessage = 'Something went wrong. Please check your inputs.';
                     }
                 }
             } catch (err) {
-                this.errorMessage = 'Network connection error. Please try again.';
+                console.error('School modal submission error:', err);
+                this.errorMessage = 'Unable to complete request. Please verify your connection or refresh the page.';
             } finally {
                 this.submitting = false;
             }
@@ -144,7 +179,7 @@ function globalRequirementModal() {
 </script>
 
 <div x-data="globalRequirementModal()" 
-     x-on:open-requirement-modal.window="openPostModal = true; if($event.detail && $event.detail.tab) { tab = $event.detail.tab; } successMessage = ''; errorMessage = '';"
+     x-on:open-requirement-modal.window="openPostModal = true; if($event.detail && $event.detail.tab) { tab = $event.detail.tab; } successMessage = ''; errorMessage = ''; fieldErrors = {};"
      class="relative z-[9999]">
 
     {{-- Professional Dual-Tab Requirement Modal (Mobile-First & High Aesthetic) --}}
@@ -170,13 +205,13 @@ function globalRequirementModal() {
 
                 <!-- Modern Tab Switcher -->
                 <div class="grid grid-cols-2 bg-white/10 p-1.5 rounded-2xl gap-2 mt-5 relative z-10 border border-white/10">
-                    <button type="button" @click="tab = 'tuition'; successMessage = ''; errorMessage = '';" 
+                    <button type="button" @click="tab = 'tuition'; successMessage = ''; errorMessage = ''; fieldErrors = {};" 
                             :class="tab === 'tuition' ? 'bg-white text-[#031b4e] shadow-lg font-black scale-[1.01]' : 'text-white/80 hover:text-white font-bold'" 
                             class="py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fas fa-home text-sm text-[#0ea5e9]"></i> 
                         <span>Home Tuition <span class="hidden sm:inline font-normal text-xs text-slate-500">(For Parents)</span></span>
                     </button>
-                    <button type="button" @click="tab = 'school'; successMessage = ''; errorMessage = '';" 
+                    <button type="button" @click="tab = 'school'; successMessage = ''; errorMessage = ''; fieldErrors = {};" 
                             :class="tab === 'school' ? 'bg-white text-[#031b4e] shadow-lg font-black scale-[1.01]' : 'text-white/80 hover:text-white font-bold'" 
                             class="py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fas fa-school text-sm text-purple-600"></i> 
@@ -198,13 +233,25 @@ function globalRequirementModal() {
                 </div>
 
                 {{-- Error Banner --}}
-                <div x-show="errorMessage" class="p-4 sm:p-5 bg-rose-50 border border-rose-300 text-rose-800 rounded-2xl mb-6 text-sm flex items-start gap-3 shadow-sm" x-transition>
-                    <i class="fas fa-exclamation-circle text-rose-600 text-xl mt-0.5 shrink-0"></i>
+                <div x-show="errorMessage || Object.keys(fieldErrors).length > 0" class="p-4 sm:p-5 bg-rose-50 border-2 border-rose-300 text-rose-900 rounded-2xl mb-6 text-sm flex items-start gap-3 shadow-sm" x-transition>
+                    <i class="fas fa-exclamation-triangle text-rose-600 text-xl mt-0.5 shrink-0"></i>
                     <div class="flex-1">
                         <h4 class="font-bold text-rose-900">Please Correct the Following:</h4>
-                        <p class="text-xs text-rose-700 mt-1" x-text="errorMessage"></p>
+                        <template x-if="Object.keys(fieldErrors).length > 0">
+                            <ul class="space-y-1.5 mt-2">
+                                <template x-for="(errs, field) in fieldErrors" :key="field">
+                                    <li class="text-xs font-semibold text-rose-800 flex items-start gap-2 bg-white/70 p-2 rounded-lg border border-rose-200/60">
+                                        <i class="fas fa-arrow-circle-right text-rose-500 text-xs mt-0.5 shrink-0"></i>
+                                        <span x-text="Array.isArray(errs) ? errs[0] : errs"></span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template x-if="Object.keys(fieldErrors).length === 0 && errorMessage">
+                            <p class="text-xs text-rose-700 mt-1" x-text="errorMessage"></p>
+                        </template>
                     </div>
-                    <button type="button" @click="errorMessage = ''" class="text-rose-400 hover:text-rose-600"><i class="fas fa-times"></i></button>
+                    <button type="button" @click="errorMessage = ''; fieldErrors = {};" class="text-rose-400 hover:text-rose-600"><i class="fas fa-times"></i></button>
                 </div>
 
                 {{-- TAB 1: HOME TUITION FORM --}}

@@ -1070,13 +1070,34 @@
                             <p class="text-sm text-emerald-700 leading-relaxed">{{ session('tuition_success') ?? session('school_success') }}</p>
                         </div>
                     </div>
-                @endif
+                @endif                {{-- Inline AJAX Error Banner --}}
+                <div x-show="errorMessage || Object.keys(fieldErrors).length > 0" x-cloak class="mb-6 bg-rose-50/95 border-2 border-rose-300 text-rose-900 px-6 py-5 rounded-2xl shadow-md animate-fade-in">
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center shrink-0 text-sm shadow-sm mt-0.5">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-extrabold text-rose-900 text-sm mb-1">Please correct the following:</h4>
+                            
+                            <template x-if="Object.keys(fieldErrors).length > 0">
+                                <ul class="space-y-1.5 mt-2">
+                                    <template x-for="(errs, field) in fieldErrors" :key="field">
+                                        <li class="text-xs font-semibold text-rose-800 flex items-start gap-2 bg-white/70 p-2 rounded-lg border border-rose-200/60">
+                                            <i class="fas fa-arrow-circle-right text-rose-500 text-xs mt-0.5 shrink-0"></i>
+                                            <span x-text="Array.isArray(errs) ? errs[0] : errs"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </template>
 
-                {{-- Inline AJAX Error Banner --}}
-                <div x-show="errorMessage" x-cloak class="mb-6 bg-rose-50 border border-rose-300 text-rose-800 px-5 py-4 rounded-2xl flex items-center gap-3 shadow-sm">
-                    <i class="fas fa-exclamation-circle text-rose-500 text-lg shrink-0"></i>
-                    <span class="text-sm font-medium" x-text="errorMessage"></span>
-                    <button type="button" @click="errorMessage = ''" class="ml-auto text-rose-400 hover:text-rose-600"><i class="fas fa-times"></i></button>
+                            <template x-if="Object.keys(fieldErrors).length === 0 && errorMessage">
+                                <p class="text-xs font-semibold text-rose-800 mt-1" x-text="errorMessage"></p>
+                            </template>
+                        </div>
+                        <button type="button" @click="errorMessage = ''; fieldErrors = {};" class="text-rose-400 hover:text-rose-700 text-sm p-1 rounded-lg hover:bg-rose-100 transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
 
                 {{-- Inline AJAX Success Celebration State --}}
@@ -1109,16 +1130,30 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Your Name <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user text-sm"></i></span>
-                                    <input type="text" name="guest_name" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" title="Please enter your full name (letters only, min 3 characters)." placeholder="Enter your full name" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="guest_name" required minlength="3" maxlength="80" 
+                                        @input="if(fieldErrors.guest_name) { delete fieldErrors.guest_name; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.guest_name ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        placeholder="e.g. Ramesh Sharma" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
                                 </div>
+                                <p x-show="fieldErrors.guest_name" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.guest_name ? fieldErrors.guest_name[0] : ''"></span>
+                                </p>
                             </div>
+
                             <!-- Phone Number -->
                             <div>
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Phone Number <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-phone-alt text-sm"></i></span>
-                                    <input type="tel" name="guest_phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." placeholder="Enter 10-digit mobile number" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="tel" name="guest_phone" required minlength="10" maxlength="10" 
+                                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" 
+                                        @input="if(fieldErrors.guest_phone) { delete fieldErrors.guest_phone; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.guest_phone ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        placeholder="e.g. 9876543210" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
                                 </div>
+                                <p x-show="fieldErrors.guest_phone" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.guest_phone ? fieldErrors.guest_phone[0] : ''"></span>
+                                </p>
                             </div>
                             
                             <!-- Class -->
@@ -1126,8 +1161,14 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Student's Class / Grade <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-graduation-cap text-sm"></i></span>
-                                    <input type="text" name="student_class" minlength="1" maxlength="50" placeholder="e.g. Class 10 / Class 1-5 / Nursery" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="student_class" minlength="1" maxlength="50" placeholder="e.g. Class 10 / Class 1-5 / Nursery" required 
+                                        @input="if(fieldErrors.student_class) { delete fieldErrors.student_class; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.student_class ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
                                 </div>
+                                <p x-show="fieldErrors.student_class" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.student_class ? fieldErrors.student_class[0] : ''"></span>
+                                </p>
                             </div>
                             
                             <!-- Board -->
@@ -1135,7 +1176,10 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Education Board <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-book text-sm"></i></span>
-                                    <select name="board" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
+                                    <select name="board" required 
+                                        @change="if(fieldErrors.board) { delete fieldErrors.board; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.board ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
                                         <option value="">Select Education Board</option>
                                         <option value="CBSE">CBSE Board</option>
                                         <option value="ICSE">ICSE / ISC Board</option>
@@ -1145,6 +1189,9 @@
                                     </select>
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
                                 </div>
+                                <p x-show="fieldErrors.board" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.board ? fieldErrors.board[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- Subjects -->
@@ -1152,8 +1199,14 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Subjects Needed <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-pencil-alt text-sm"></i></span>
-                                    <input type="text" name="subjects" required minlength="2" maxlength="150" placeholder="e.g. Mathematics, Physics, English, or All Subjects" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="subjects" required minlength="2" maxlength="150" 
+                                        @input="if(fieldErrors.subjects) { delete fieldErrors.subjects; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.subjects ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        placeholder="e.g. Mathematics, Physics, English, or All Subjects" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
                                 </div>
+                                <p x-show="fieldErrors.subjects" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.subjects ? fieldErrors.subjects[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- Location -->
@@ -1161,8 +1214,14 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Complete Location / Area <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-map-marker-alt text-sm"></i></span>
-                                    <input type="text" name="location" required minlength="3" maxlength="200" placeholder="e.g. Kankarbagh, Patna or Area name" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="location" required minlength="3" maxlength="200" 
+                                        @input="if(fieldErrors.location) { delete fieldErrors.location; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.location ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        placeholder="e.g. Kankarbagh, Patna or Area name" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
                                 </div>
+                                <p x-show="fieldErrors.location" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.location ? fieldErrors.location[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- Pincode -->
@@ -1170,8 +1229,15 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Pincode</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-mail-bulk text-sm"></i></span>
-                                    <input type="text" name="pincode" maxlength="6" pattern="^[0-9]{6}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);" title="Please enter a valid 6-digit Pincode." placeholder="Enter 6-digit Pincode" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm font-mono">
+                                    <input type="text" name="pincode" maxlength="6" 
+                                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);" 
+                                        @input="if(fieldErrors.pincode) { delete fieldErrors.pincode; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.pincode ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        placeholder="e.g. 800001" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm font-mono">
                                 </div>
+                                <p x-show="fieldErrors.pincode" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.pincode ? fieldErrors.pincode[0] : ''"></span>
+                                </p>
                             </div>
                         </div>
 
@@ -1198,8 +1264,14 @@
                             <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Job Title / Position Name <span class="text-rose-500">*</span></label>
                             <div class="relative">
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-briefcase text-sm"></i></span>
-                                <input type="text" name="title" required minlength="3" maxlength="150" placeholder="e.g. Senior Physics Teacher / PRT All Subjects / Academic Coordinator" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                <input type="text" name="title" required minlength="3" maxlength="150" 
+                                    @input="if(fieldErrors.title) { delete fieldErrors.title; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                    :class="fieldErrors.title ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                    placeholder="e.g. Senior Physics Teacher / PRT All Subjects / Academic Coordinator" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
                             </div>
+                            <p x-show="fieldErrors.title" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.title ? fieldErrors.title[0] : ''"></span>
+                            </p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1208,8 +1280,14 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">School / Institution Name <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-school text-sm"></i></span>
-                                    <input type="text" name="school_name" required minlength="3" maxlength="150" placeholder="e.g. St. Xavier's High School / Apex Academy" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="school_name" required minlength="3" maxlength="150" 
+                                        @input="if(fieldErrors.school_name) { delete fieldErrors.school_name; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.school_name ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        placeholder="e.g. St. Xavier's High School / Apex Academy" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
                                 </div>
+                                <p x-show="fieldErrors.school_name" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.school_name ? fieldErrors.school_name[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- Contact Person -->
@@ -1217,8 +1295,14 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Contact Person & Designation <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user-tie text-sm"></i></span>
-                                    <input type="text" name="contact_person" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" title="Please enter a valid contact person name (letters only)." placeholder="e.g. Ramesh Kumar (Principal / HR Head)" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="text" name="contact_person" required minlength="3" maxlength="80" 
+                                        @input="if(fieldErrors.contact_person) { delete fieldErrors.contact_person; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.contact_person ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        placeholder="e.g. Ramesh Kumar (Principal / HR Head)" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
                                 </div>
+                                <p x-show="fieldErrors.contact_person" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.contact_person ? fieldErrors.contact_person[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- Phone -->
@@ -1226,8 +1310,15 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Contact Phone / Mobile <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-phone-alt text-sm"></i></span>
-                                    <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." placeholder="Enter 10-digit mobile number" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="tel" name="phone" required minlength="10" maxlength="10" 
+                                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" 
+                                        @input="if(fieldErrors.phone) { delete fieldErrors.phone; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.phone ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        placeholder="e.g. 9876543210" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
                                 </div>
+                                <p x-show="fieldErrors.phone" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.phone ? fieldErrors.phone[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- Email -->
@@ -1235,8 +1326,14 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Official Email (Optional)</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-envelope text-sm"></i></span>
-                                    <input type="email" name="email" placeholder="e.g. hr@schoolname.org" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                    <input type="email" name="email" 
+                                        @input="if(fieldErrors.email) { delete fieldErrors.email; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.email ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        placeholder="e.g. hr@schoolname.org" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
                                 </div>
+                                <p x-show="fieldErrors.email" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.email ? fieldErrors.email[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- Job Category -->
@@ -1244,7 +1341,9 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Job Category <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-layer-group text-sm"></i></span>
-                                    <select name="category_id" x-model="school_category_id" @change="fetchSchoolSubjects()" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
+                                    <select name="category_id" x-model="school_category_id" @change="fetchSchoolSubjects(); if(fieldErrors.category_id) { delete fieldErrors.category_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }" required 
+                                        :class="fieldErrors.category_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
                                         <option value="">Select Category</option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -1252,6 +1351,9 @@
                                     </select>
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
                                 </div>
+                                <p x-show="fieldErrors.category_id" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.category_id ? fieldErrors.category_id[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- Subject (Dynamic based on Category) -->
@@ -1259,7 +1361,10 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Subject <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-book text-sm"></i></span>
-                                    <select name="subject_id" x-model="school_subject_id" :disabled="!school_category_id || loadingSchoolSubjects" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
+                                    <select name="subject_id" x-model="school_subject_id" :disabled="!school_category_id || loadingSchoolSubjects" required 
+                                        @change="if(fieldErrors.subject_id) { delete fieldErrors.subject_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.subject_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
                                         <option value="" x-text="!school_category_id ? '— First Select Category —' : (loadingSchoolSubjects ? 'Loading subjects...' : 'Select Subject')"></option>
                                         <template x-for="subj in school_subjects" :key="subj.id">
                                             <option :value="subj.id" x-text="subj.name"></option>
@@ -1267,6 +1372,9 @@
                                     </select>
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
                                 </div>
+                                <p x-show="fieldErrors.subject_id" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.subject_id ? fieldErrors.subject_id[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- Required Qualification -->
@@ -1274,7 +1382,10 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Required Qualification <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-graduation-cap text-sm"></i></span>
-                                    <select name="qualification_id" x-model="school_qualification_id" :disabled="!school_subject_id" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
+                                    <select name="qualification_id" x-model="school_qualification_id" :disabled="!school_subject_id" required 
+                                        @change="if(fieldErrors.qualification_id) { delete fieldErrors.qualification_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.qualification_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
                                         <option value="" x-text="!school_subject_id ? '— First Select Subject —' : 'Select Qualification'"></option>
                                         @foreach($qualifications as $qualification)
                                             <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
@@ -1282,6 +1393,9 @@
                                     </select>
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
                                 </div>
+                                <p x-show="fieldErrors.qualification_id" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.qualification_id ? fieldErrors.qualification_id[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- State -->
@@ -1289,7 +1403,9 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">State <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-map text-sm"></i></span>
-                                    <select name="state_id" x-model="school_state_id" @change="fetchSchoolCities()" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
+                                    <select name="state_id" x-model="school_state_id" @change="fetchSchoolCities(); if(fieldErrors.state_id) { delete fieldErrors.state_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }" required 
+                                        :class="fieldErrors.state_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
                                         <option value="">Select State</option>
                                         @foreach($states as $state)
                                             <option value="{{ $state->id }}">{{ $state->name }}</option>
@@ -1297,6 +1413,9 @@
                                     </select>
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
                                 </div>
+                                <p x-show="fieldErrors.state_id" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.state_id ? fieldErrors.state_id[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- City (Dynamic based on State) -->
@@ -1304,7 +1423,10 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">City <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-city text-sm"></i></span>
-                                    <select name="city_id" x-model="school_city_id" :disabled="!school_state_id || loadingSchoolCities" required class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-10 py-3.5 text-[#031b4e] font-medium focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
+                                    <select name="city_id" x-model="school_city_id" :disabled="!school_state_id || loadingSchoolCities" required 
+                                        @change="if(fieldErrors.city_id) { delete fieldErrors.city_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                        :class="fieldErrors.city_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                        class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
                                         <option value="" x-text="!school_state_id ? '— First Select State —' : (loadingSchoolCities ? 'Loading cities...' : 'Select City')"></option>
                                         <template x-for="city in school_cities" :key="city.id">
                                             <option :value="city.id" x-text="city.name"></option>
@@ -1312,6 +1434,9 @@
                                     </select>
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
                                 </div>
+                                <p x-show="fieldErrors.city_id" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
+                                    <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.city_id ? fieldErrors.city_id[0] : ''"></span>
+                                </p>
                             </div>
 
                             <!-- Salary Range -->
@@ -1338,7 +1463,7 @@
                                     <span class="inline-flex items-center gap-2">Submit Job for Approval <i class="fas fa-arrow-right text-sm"></i></span>
                                 </template>
                                 <template x-if="loading">
-                                    <span class="inline-flex items-center gap-2"><i class="fas fa-circle-notch fa-spin"></i> Submitting for Approval...</span>
+                                    <span class="inline-flex items-center gap-2"><i class="fas fa-circle-notch fa-spin"></i> Submitting...</span>
                                 </template>
                             </button>
                         </div>
@@ -1354,6 +1479,7 @@
                     submitted: false,
                     successMessage: '',
                     errorMessage: '',
+                    fieldErrors: {},
 
                     // School form dynamic state
                     school_category_id: '',
@@ -1383,11 +1509,13 @@
                     switchTab(newTab) {
                         this.tab = newTab;
                         this.errorMessage = '';
+                        this.fieldErrors = {};
                     },
                     resetForm() {
                         this.submitted = false;
                         this.successMessage = '';
                         this.errorMessage = '';
+                        this.fieldErrors = {};
                         this.$nextTick(() => {
                             this.scrollToSection();
                         });
@@ -1444,35 +1572,51 @@
                         const formData = new FormData(form);
                         this.loading = true;
                         this.errorMessage = '';
+                        this.fieldErrors = {};
 
                         try {
+                            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || formData.get('_token') || '';
                             const response = await fetch(form.action, {
                                 method: 'POST',
                                 headers: {
                                     'X-Requested-With': 'XMLHttpRequest',
                                     'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken
                                 },
                                 body: formData
                             });
 
-                            const data = await response.json();
+                            let data = {};
+                            const contentType = response.headers.get('content-type') || '';
+                            if (contentType.includes('application/json')) {
+                                data = await response.json();
+                            } else {
+                                const text = await response.text();
+                                try { data = JSON.parse(text); } catch (e) { data = {}; }
+                            }
 
                             if (response.ok && data.success) {
                                 this.submitted = true;
                                 this.successMessage = data.message || 'Your tuition requirement has been posted successfully! Our team will contact you soon.';
                                 form.reset();
+                                this.fieldErrors = {};
                                 this.scrollToSection();
                             } else {
-                                if (data.errors) {
-                                    const firstErr = Object.values(data.errors)[0];
-                                    this.errorMessage = Array.isArray(firstErr) ? firstErr[0] : firstErr;
+                                if (response.status === 419) {
+                                    this.errorMessage = 'Your browser session has expired. Please refresh the page (F5) and submit again.';
+                                } else if (data.errors && typeof data.errors === 'object' && Object.keys(data.errors).length > 0) {
+                                    this.fieldErrors = data.errors;
+                                    this.errorMessage = data.message || 'Please correct the highlighted fields below.';
+                                } else if (data.message) {
+                                    this.errorMessage = data.message;
                                 } else {
-                                    this.errorMessage = data.message || 'Something went wrong. Please check the fields and try again.';
+                                    this.errorMessage = 'Please check the entered details and correct any errors.';
                                 }
                                 this.scrollToSection();
                             }
                         } catch (err) {
-                            this.errorMessage = 'Network connection error. Please try again.';
+                            console.error('Tuition submission error:', err);
+                            this.errorMessage = 'Unable to complete request. Please verify your connection or refresh the page.';
                             this.scrollToSection();
                         } finally {
                             this.loading = false;
@@ -1483,23 +1627,34 @@
                         const formData = new FormData(form);
                         this.loading = true;
                         this.errorMessage = '';
+                        this.fieldErrors = {};
 
                         try {
+                            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || formData.get('_token') || '';
                             const response = await fetch(form.action, {
                                 method: 'POST',
                                 headers: {
                                     'X-Requested-With': 'XMLHttpRequest',
                                     'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken
                                 },
                                 body: formData
                             });
 
-                            const data = await response.json();
+                            let data = {};
+                            const contentType = response.headers.get('content-type') || '';
+                            if (contentType.includes('application/json')) {
+                                data = await response.json();
+                            } else {
+                                const text = await response.text();
+                                try { data = JSON.parse(text); } catch (e) { data = {}; }
+                            }
 
                             if (response.ok && data.success) {
                                 this.submitted = true;
                                 this.successMessage = data.message || 'Your job requirement has been submitted for approval! Our administration team will review and approve it shortly.';
                                 form.reset();
+                                this.fieldErrors = {};
                                 this.school_subjects = [];
                                 this.school_cities = [];
                                 this.school_category_id = '';
@@ -1509,16 +1664,21 @@
                                 this.school_city_id = '';
                                 this.scrollToSection();
                             } else {
-                                if (data.errors) {
-                                    const firstErr = Object.values(data.errors)[0];
-                                    this.errorMessage = Array.isArray(firstErr) ? firstErr[0] : firstErr;
+                                if (response.status === 419) {
+                                    this.errorMessage = 'Your browser session has expired. Please refresh the page (F5) and submit again.';
+                                } else if (data.errors && typeof data.errors === 'object' && Object.keys(data.errors).length > 0) {
+                                    this.fieldErrors = data.errors;
+                                    this.errorMessage = data.message || 'Please correct the highlighted fields below.';
+                                } else if (data.message) {
+                                    this.errorMessage = data.message;
                                 } else {
-                                    this.errorMessage = data.message || 'Something went wrong. Please check your details and try again.';
+                                    this.errorMessage = 'Please check the entered details and correct any errors.';
                                 }
                                 this.scrollToSection();
                             }
                         } catch (err) {
-                            this.errorMessage = 'Network connection error. Please try again.';
+                            console.error('School submission error:', err);
+                            this.errorMessage = 'Unable to complete request. Please verify your connection or refresh the page.';
                             this.scrollToSection();
                         } finally {
                             this.loading = false;

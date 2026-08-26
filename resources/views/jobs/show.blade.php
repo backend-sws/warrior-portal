@@ -393,11 +393,11 @@
                         Have queries about this vacancy or want guidance regarding demo preparations? Talk to our placement manager.
                     </p>
                     <div class="space-y-2 text-xs font-semibold">
-                        <a href="tel:+919798617029" class="flex items-center gap-2 text-sky-300 hover:underline">
-                            <i class="fas fa-phone-alt text-[10px]"></i> +91 97986 17029
+                        <a href="tel:+918210545286" class="flex items-center gap-2 text-sky-300 hover:underline">
+                            <i class="fas fa-phone-alt text-[10px]"></i> +91 82105 45286
                         </a>
-                        <a href="mailto:support@warriorseducare.com" class="flex items-center gap-2 text-slate-300 hover:underline">
-                            <i class="fas fa-envelope text-[10px]"></i> support@warriorseducare.com
+                        <a href="mailto:info@warriorseducare.in" class="flex items-center gap-2 text-slate-300 hover:underline">
+                            <i class="fas fa-envelope text-[10px]"></i> support@warriorseducare.in
                         </a>
                     </div>
                 </div>
