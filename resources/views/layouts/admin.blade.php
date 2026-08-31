@@ -162,6 +162,15 @@
                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-5 mb-2 px-4">School Jobs & Hiring
                 </div>
 
+                <a href="{{ route('admin.schools.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.schools.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
+                    <i class="fas fa-school w-5 text-center"></i> Schools & Colleges
+                    @php $schoolsCount = \App\Models\EmployerProfile::count(); @endphp
+                    @if($schoolsCount > 0)
+                        <span class="ml-auto bg-blue-500/20 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-400/20">{{ $schoolsCount }}</span>
+                    @endif
+                </a>
+
                 <a href="{{ route('admin.jobs.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.jobs.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
                     <i class="fas fa-briefcase w-5 text-center"></i> All Jobs
@@ -179,12 +188,12 @@
                     <i class="fas fa-users-cog w-5 text-center"></i> Candidates CRM
                 </a>
 
-                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-5 mb-2 px-4">Home Tuitions
+                <div class="text-[10px] uppercase font-bold tracking-widest text-white/30 mt-5 mb-2 px-4">Parents & Home Tuitions
                 </div>
 
                 <a href="{{ route('admin.tuition-leads.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.tuition-leads.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-chalkboard-teacher w-5 text-center"></i> All Tuitions
+                    <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Parents & Tuitions
                     @php $pendingTuitionsCount = \App\Models\HomeTuitionLead::where('status', 'New Lead')->count(); @endphp
                     @if($pendingTuitionsCount > 0)
                         <span class="ml-auto bg-emerald-400 text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingTuitionsCount }}</span>

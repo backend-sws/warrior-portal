@@ -29,7 +29,6 @@ class ProfileController extends Controller
             && !empty($profile->address) 
             && !empty($profile->preferred_state_id) 
             && !empty($profile->preferred_city_id) 
-            && !empty($profile->subject_id) 
             && !empty($profile->highest_qualification_id);
 
         $isJobProfileReady = $isTuitionProfileReady 
@@ -59,7 +58,7 @@ class ProfileController extends Controller
             'preferred_state_id' => 'required|exists:states,id',
             'preferred_city_id' => 'required|exists:cities,id',
             'highest_qualification_id' => 'required|exists:qualifications,id',
-            'subject_id' => 'required|exists:subjects,id',
+            'subject_id' => 'nullable|exists:subjects,id',
 
             // School Job Requirements (Optional for 11th/12th home tutors, required when applying for school jobs)
             'category_id' => 'nullable|exists:categories,id',
@@ -87,24 +86,28 @@ class ProfileController extends Controller
             $profile->profile_photo_path = $path;
         }
 
-        $profile->update([
-            'date_of_birth' => $request->date_of_birth,
-            'gender' => $request->gender,
-            'address' => $request->address,
-            'preferred_state_id' => $request->preferred_state_id,
-            'preferred_city_id' => $request->preferred_city_id,
-            'highest_qualification_id' => $request->highest_qualification_id,
-            'subject_id' => $request->subject_id,
-            'category_id' => $request->category_id,
-            'experience_years' => $request->experience_years ?? 0,
-            'current_salary' => $request->current_salary,
-            'expected_salary' => $request->expected_salary,
-            'current_school' => $request->current_school,
-            'english_fluency' => $request->english_fluency,
-            'residential_preference' => $request->residential_preference,
-            'availability_to_join' => $request->availability_to_join,
-            'is_profile_complete' => true,
-        ]);
+        $profile->update(array_merge(
+            $request->only([
+                'date_of_birth',
+                'gender',
+                'address',
+                'preferred_state_id',
+                'preferred_city_id',
+                'highest_qualification_id',
+                'subject_id',
+                'category_id',
+                'experience_years',
+                'current_salary',
+                'expected_salary',
+                'current_school',
+                'english_fluency',
+                'residential_preference',
+                'availability_to_join',
+            ]),
+            [
+                'is_profile_complete' => true,
+            ]
+        ));
 
         return redirect()->route('candidate.profile.edit')->with('success', 'Profile details updated successfully.');
     }

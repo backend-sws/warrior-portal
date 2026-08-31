@@ -292,6 +292,30 @@
                     <p class="text-xs text-slate-500">(Authorized Signatory)</p>
                 </div>
                 <div class="text-left sm:text-left bg-slate-50 p-3.5 rounded-xl border border-slate-200" style="font-family: 'Times New Roman', Times, serif; font-size: 12px; color: #000; line-height: 1.35;">
+                    @php
+                        $tuitionSigData = null;
+                        if (!empty($sigMeta['signature_data'])) {
+                            $tuitionSigData = $sigMeta['signature_data'];
+                        } elseif (!empty($profile?->signature_data)) {
+                            $tuitionSigData = $profile->signature_data;
+                        }
+                        $tuitionSigType = $sigMeta['signature_type'] ?? $profile?->signature_type ?? 'draw';
+                    @endphp
+
+                    @if(!empty($tuitionSigData))
+                        <div class="mb-2 p-2 bg-white rounded-xl border border-slate-200 inline-block">
+                            @if(str_starts_with($tuitionSigData, 'data:image'))
+                                <img src="{{ $tuitionSigData }}" alt="Digital Signature" class="max-h-12 w-auto object-contain">
+                            @elseif(Storage::disk('public')->exists($tuitionSigData))
+                                <img src="{{ asset('storage/' . $tuitionSigData) }}" alt="Digital Signature" class="max-h-12 w-auto object-contain">
+                            @elseif($tuitionSigType === 'type')
+                                <span class="font-serif italic text-xl text-blue-900 font-bold tracking-wide" style="font-family: 'Brush Script MT', 'Dancing Script', cursive, Georgia, serif;">
+                                    {{ $tuitionSigData }}
+                                </span>
+                            @endif
+                        </div>
+                    @endif
+
                     <div class="flex items-center gap-1.5 mb-1 text-[11px] font-sans font-bold text-emerald-700">
                         <i class="fas fa-certificate text-emerald-600"></i> DIGITALLY SIGNED & VERIFIED
                     </div>
@@ -316,8 +340,8 @@
                     <button type="button" onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 text-xs sm:text-sm">
                         Cancel
                     </button>
-                    <button type="button" @click="step = 2; $nextTick(() => detectAgreementLocation());" class="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2">
-                        <span>Proceed to Sign (Photo & GPS)</span> <i class="fas fa-arrow-right text-xs"></i>
+                    <button type="button" @click="step = 2; $nextTick(() => { detectAgreementLocation(); initTuitionPad(); });" class="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2">
+                        <span>Proceed to Sign (Photo, GPS & Signature)</span> <i class="fas fa-arrow-right text-xs"></i>
                     </button>
                 </div>
             @else
@@ -334,13 +358,15 @@
         <!-- STEP 2: LIVE CAMERA & GPS VERIFICATION & FINAL SIGN (Dedicated Spacious View) -->
         @if(!$isAgreementSigned)
             <div x-show="step === 2" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between bg-slate-50" style="display: none;">
-                <form id="signTuitionAgreementForm" action="{{ route('candidate.tuitions.sign-agreement') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateTuitionAgreementForm(event)" class="p-4 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
+                <form id="signTuitionAgreementForm" action="{{ route('candidate.tuitions.sign-agreement') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateTuitionAgreementForm(event)" class="p-4 sm:p-6 space-y-4 flex-1 flex flex-col justify-between" x-data="tuitionSignatureBox()">
                     @csrf
                     <!-- Hidden Inputs for Verification Data -->
                     <input type="hidden" name="live_photo" id="livePhotoInput" value="">
                     <input type="hidden" name="latitude" id="latitudeInput" value="">
                     <input type="hidden" name="longitude" id="longitudeInput" value="">
                     <input type="hidden" name="location_name" id="locationNameInput" value="">
+                    <input type="hidden" name="signature_type" :value="mode">
+                    <input type="hidden" name="signature_data" id="tuition_signature_data_input" :value="signatureData">
 
                     <div class="space-y-4">
                         <!-- Candidate Quick Summary Strip -->
@@ -359,10 +385,21 @@
                             </button>
                         </div>
 
+                        <!-- Inline Alert Notification Banner (Replaces popup alerts) -->
+                        <div id="tuitionAgreementErrorBanner" class="hidden p-3.5 bg-red-50 border-2 border-red-400 rounded-2xl flex items-start gap-3 text-xs text-red-900 shadow-sm transition-all duration-300">
+                            <div class="w-6 h-6 rounded-lg bg-red-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fas fa-exclamation-triangle text-xs"></i>
+                            </div>
+                            <div class="flex-1 font-semibold leading-relaxed" id="tuitionAgreementErrorMessage"></div>
+                            <button type="button" onclick="document.getElementById('tuitionAgreementErrorBanner').classList.add('hidden')" class="text-red-400 hover:text-red-700 ml-1.5 shrink-0">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                        </div>
+
                         <!-- Verification Cards Grid -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- 1. Live Camera Snapshot Box -->
-                            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-3">
+                            <div id="cameraBoxContainer" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-3 transition-all">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs font-bold text-[#031b4e] flex items-center gap-1.5">
                                         <i class="fas fa-camera text-blue-600"></i> 1. Live Camera Selfie
@@ -437,23 +474,112 @@
                             </div>
                         </div>
 
+                        <!-- 3. Digital E-Signature Card -->
+                        <div id="signatureBoxContainer" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4 transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-[#031b4e] flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-bold">
+                                        <i class="fas fa-signature"></i>
+                                    </span>
+                                    <span>3. Digital Signature (E-Sign)</span>
+                                </span>
+                                @if(!empty($profile?->signature_data))
+                                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                                        <i class="fas fa-check-circle text-emerald-600"></i> Profile Signature Linked
+                                    </span>
+                                @else
+                                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                                        Sign Below
+                                    </span>
+                                @endif
+                            </div>
+
+                            {{-- Mode Switcher Tabs --}}
+                            <div class="flex p-1 bg-slate-100 rounded-xl max-w-sm border border-slate-200/60">
+                                <button type="button" @click="setMode('draw')" :class="mode === 'draw' ? 'bg-white text-indigo-700 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'" class="flex-1 py-2 text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <i class="fas fa-pen-nib text-xs"></i> <span>Draw</span>
+                                </button>
+                                <button type="button" @click="setMode('type')" :class="mode === 'type' ? 'bg-white text-indigo-700 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'" class="flex-1 py-2 text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <i class="fas fa-font text-xs"></i> <span>Type</span>
+                                </button>
+                                @if(!empty($profile?->signature_data))
+                                    <button type="button" @click="setMode('profile')" :class="mode === 'profile' ? 'bg-white text-indigo-700 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'" class="flex-1 py-2 text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                        <i class="fas fa-check-double text-xs"></i> <span>Saved Profile</span>
+                                    </button>
+                                @endif
+                            </div>
+
+                            <!-- Mode 1: Draw on Canvas -->
+                            <div x-show="mode === 'draw'" class="space-y-2">
+                                <div class="relative bg-white border-2 border-dashed border-indigo-200 hover:border-indigo-400 rounded-2xl p-2 transition-colors">
+                                    <div style="height: 140px; width: 100%; position: relative;">
+                                        <canvas id="tuition-signature-pad" style="width: 100%; height: 140px; display: block; touch-action: none;" class="rounded-xl cursor-crosshair bg-white"></canvas>
+                                        <span class="absolute bottom-2 right-3 text-[10px] font-mono text-slate-300 pointer-events-none select-none">Sign here ✍️</span>
+                                    </div>
+                                    <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 px-1">
+                                        <p class="text-[11px] text-slate-400 flex items-center gap-1">
+                                            <i class="fas fa-info-circle text-indigo-400"></i> Draw with your finger on mobile or mouse on desktop.
+                                        </p>
+                                        <button type="button" @click="clearPad()" class="px-2.5 py-1 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 rounded-lg text-xs font-bold border border-slate-200 transition-colors flex items-center gap-1 cursor-pointer" title="Clear signature">
+                                            <i class="fas fa-eraser text-xs"></i> Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mode 2: Type Name -->
+                            <div x-show="mode === 'type'" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Type your full name:</label>
+                                    <input type="text" x-model="typedName" @input="updateTypedSignature()" placeholder="{{ auth()->user()->name }}" 
+                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                                </div>
+                                <div class="p-4 bg-slate-50/80 rounded-2xl border border-indigo-100 flex items-center justify-center min-h-[85px] shadow-inner">
+                                    <span class="text-3xl text-indigo-900 font-serif italic tracking-wide" style="font-family: 'Brush Script MT', 'Dancing Script', cursive, Georgia, serif;" x-text="typedName || '{{ auth()->user()->name }}'"></span>
+                                </div>
+                            </div>
+
+                            <!-- Mode 3: Saved Profile Signature -->
+                            @if(!empty($profile?->signature_data))
+                                <div x-show="mode === 'profile'" class="p-3 bg-indigo-50/50 rounded-2xl border border-indigo-200 flex items-center justify-between gap-4">
+                                    <div class="space-y-0.5">
+                                        <span class="text-xs font-bold text-[#031b4e] flex items-center gap-1.5">
+                                            <i class="fas fa-shield-check text-emerald-600"></i> Using Verified Profile Signature
+                                        </span>
+                                        <span class="text-[11px] text-slate-500 block">Your signature from candidate profile will be attached automatically.</span>
+                                    </div>
+                                    <div class="shrink-0 p-2 bg-white rounded-xl border border-indigo-100 shadow-sm flex items-center justify-center min-w-[100px] min-h-[50px]">
+                                        @if(str_starts_with($profile->signature_data, 'data:image'))
+                                            <img src="{{ $profile->signature_data }}" class="max-h-10 w-auto object-contain">
+                                        @elseif(Storage::disk('public')->exists($profile->signature_data))
+                                            <img src="{{ asset('storage/' . $profile->signature_data) }}" class="max-h-10 w-auto object-contain">
+                                        @elseif($profile->signature_type === 'type')
+                                            <span class="text-xl text-indigo-900 font-serif italic" style="font-family: 'Brush Script MT', cursive;">{{ $profile->signature_data }}</span>
+                                        @else
+                                            <span class="text-xs font-mono font-bold text-slate-700">{{ $profile->signature_data }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
                         <!-- Terms Acceptance Checkbox -->
-                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-indigo-200 transition-colors">
                             <label class="flex items-start gap-3 cursor-pointer text-left">
-                                <input type="checkbox" name="accept_terms" required value="1" class="w-5 h-5 text-[#031b4e] rounded border-gray-300 focus:ring-accent-blue mt-0.5 cursor-pointer shrink-0">
-                                <span class="text-xs text-[#031b4e] font-bold leading-relaxed">
-                                    I declare that the captured photo & GPS location are authentic, and I voluntarily accept all terms, validity, refund and payment clauses of this Home Tuition Tutor Service Agreement.
+                                <input type="checkbox" name="accept_terms" required value="1" class="w-5 h-5 text-indigo-600 rounded-lg border-gray-300 focus:ring-indigo-500 mt-0.5 cursor-pointer shrink-0">
+                                <span class="text-xs text-[#031b4e] font-semibold leading-relaxed">
+                                    I declare that the captured photo, GPS location and digital signature are authentic, and I voluntarily accept all terms, validity, refund and payment clauses of this Home Tuition Tutor Service Agreement.
                                 </span>
                             </label>
                         </div>
                     </div>
 
                     <!-- STEP 2 ACTIONS FOOTER -->
-                    <div class="pt-3 border-t border-slate-200 flex items-center justify-between gap-3">
-                        <button type="button" @click="step = 1" class="px-4 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5">
+                    <div class="pt-4 border-t border-slate-200 flex items-center justify-between gap-3">
+                        <button type="button" @click="step = 1" class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5">
                             <i class="fas fa-arrow-left text-xs"></i> <span>Back to Terms</span>
                         </button>
-                        <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition-all flex items-center gap-2">
+                        <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2">
                             <i class="fas fa-check-circle"></i> <span>Accept & Sign Agreement</span>
                         </button>
                     </div>
@@ -463,8 +589,110 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 <script>
 let agreementStream = null;
+let tuitionPad = null;
+
+function tuitionSignatureBox() {
+    return {
+        mode: '{{ !empty($profile?->signature_data) ? "profile" : "draw" }}',
+        signatureData: '{{ !empty($profile?->signature_data) ? $profile->signature_data : "" }}',
+        typedName: '{{ $profile?->signature_type === "type" ? $profile->signature_data : auth()->user()->name }}',
+        
+        init() {
+            this.$nextTick(() => {
+                if (this.mode === 'draw') {
+                    initTuitionPad();
+                }
+            });
+        },
+
+        setMode(m) {
+            this.mode = m;
+            if (m === 'draw') {
+                this.$nextTick(() => {
+                    initTuitionPad();
+                });
+            } else if (m === 'type') {
+                this.signatureData = this.typedName || '{{ auth()->user()->name }}';
+            } else if (m === 'profile') {
+                this.signatureData = '{{ !empty($profile?->signature_data) ? $profile->signature_data : "" }}';
+            }
+        },
+
+        clearPad() {
+            if (tuitionPad) {
+                tuitionPad.clear();
+                this.signatureData = '';
+                const dataInput = document.getElementById('tuition_signature_data_input');
+                if (dataInput) dataInput.value = '';
+            }
+        },
+
+        updateTypedSignature() {
+            this.signatureData = this.typedName;
+            const dataInput = document.getElementById('tuition_signature_data_input');
+            if (dataInput) dataInput.value = this.signatureData;
+        }
+    };
+}
+
+function initTuitionPad() {
+    setTimeout(() => {
+        const canvas = document.getElementById('tuition-signature-pad');
+        if (!canvas) return;
+
+        const container = canvas.parentElement;
+        const width = container ? container.offsetWidth : canvas.offsetWidth || 500;
+        const height = 140;
+
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = width * ratio;
+        canvas.height = height * ratio;
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+
+        const ctx = canvas.getContext("2d");
+        ctx.scale(ratio, ratio);
+
+        if (!tuitionPad) {
+            tuitionPad = new SignaturePad(canvas, {
+                backgroundColor: 'rgb(255, 255, 255)',
+                penColor: 'rgb(3, 27, 78)',
+                minWidth: 1.5,
+                maxWidth: 3.5,
+            });
+
+            tuitionPad.addEventListener("endStroke", () => {
+                const data = tuitionPad.toDataURL('image/png');
+                const dataInput = document.getElementById('tuition_signature_data_input');
+                if (dataInput) dataInput.value = data;
+            });
+        } else {
+            tuitionPad.clear();
+        }
+    }, 100);
+}
+
+function showTuitionInlineError(message, targetBoxId = null) {
+    const banner = document.getElementById('tuitionAgreementErrorBanner');
+    const msg = document.getElementById('tuitionAgreementErrorMessage');
+    if (banner && msg) {
+        msg.innerHTML = message;
+        banner.classList.remove('hidden');
+        banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    if (targetBoxId) {
+        const box = document.getElementById(targetBoxId);
+        if (box) {
+            box.classList.add('ring-2', 'ring-red-500', 'border-red-500');
+            setTimeout(() => {
+                box.classList.remove('ring-2', 'ring-red-500', 'border-red-500');
+            }, 5000);
+        }
+    }
+}
 
 function validateTuitionAgreementForm(e) {
     const livePhotoInput = document.getElementById('livePhotoInput');
@@ -476,7 +704,7 @@ function validateTuitionAgreementForm(e) {
 
     if (!hasCaptured && !hasUploaded && !hasExistingPhoto) {
         if (e) e.preventDefault();
-        alert('📸 Live Camera Photo Capture is MANDATORY!\n\nPlease click "Open Camera" and capture your selfie (or use "Upload Photo") to verify your identity before signing the agreement.');
+        showTuitionInlineError('<strong>📸 Live Photo Required:</strong> Please click <u>"Open Camera"</u> to take your selfie (or click <u>"Upload Photo"</u>) to verify your identity before signing.', 'cameraBoxContainer');
         const badge = document.getElementById('cameraStatusBadge');
         if (badge) {
             badge.textContent = 'Photo Mandatory ⚠️';
@@ -508,10 +736,10 @@ function startAgreementCamera() {
                 console.warn('Camera access error:', err);
                 badge.textContent = 'Use File Upload';
                 badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700';
-                alert('Camera permission was denied or camera not found. Please click "Upload Photo" below to select/snap your photo.');
+                showTuitionInlineError('<strong>⚠️ Camera Access Denied:</strong> Camera permission was blocked or not found. Please click <u>"Upload Photo"</u> below to select your photo.', 'cameraBoxContainer');
             });
     } else {
-        alert('Direct webcam stream is not supported in this browser. Please use the "Upload Photo" link.');
+        showTuitionInlineError('<strong>⚠️ Camera Unavailable:</strong> Direct camera stream is not supported in this browser. Please use the <u>"Upload Photo"</u> option.', 'cameraBoxContainer');
     }
 }
 

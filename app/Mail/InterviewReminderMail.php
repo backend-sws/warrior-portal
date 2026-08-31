@@ -15,6 +15,9 @@ class InterviewReminderMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    public $tries = 3;
+    public $backoff = [15, 60, 180];
+
     public $application;
 
     /**

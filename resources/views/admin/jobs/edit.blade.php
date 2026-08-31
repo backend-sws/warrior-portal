@@ -174,6 +174,55 @@
         }
     });
 
+    function updateDynamicSelect(selectEl, options, placeholder = 'Select Option') {
+        if (!selectEl) return;
+        let html = `<option value="">${placeholder}</option>`;
+        options.forEach(item => {
+            html += `<option value="${item.id}">${item.name}</option>`;
+        });
+        selectEl.innerHTML = html;
+        selectEl.disabled = false;
+
+        if (selectEl._slimSelect) {
+            try {
+                const ssData = [
+                    { text: placeholder, value: '', placeholder: true },
+                    ...options.map(item => ({ text: item.name, value: String(item.id) }))
+                ];
+                selectEl._slimSelect.setData(ssData);
+                selectEl._slimSelect.enable();
+            } catch (e) {
+                if (typeof window.refreshSearchableSelect === 'function') {
+                    window.refreshSearchableSelect(selectEl);
+                }
+            }
+        }
+    }
+
+    function setSelectLoading(selectEl, placeholder = 'Loading...') {
+        if (!selectEl) return;
+        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+        selectEl.disabled = true;
+        if (selectEl._slimSelect) {
+            try {
+                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
+                selectEl._slimSelect.disable();
+            } catch (e) {}
+        }
+    }
+
+    function resetDynamicSelect(selectEl, placeholder = '— First Select Option —') {
+        if (!selectEl) return;
+        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+        selectEl.disabled = true;
+        if (selectEl._slimSelect) {
+            try {
+                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
+                selectEl._slimSelect.disable();
+            } catch (e) {}
+        }
+    }
+
     // Category -> Subject
     const categorySelect = document.getElementById('category_id');
     const subjectSelect = document.getElementById('subject_id');
@@ -181,49 +230,46 @@
     if (categorySelect && subjectSelect) {
         categorySelect.addEventListener('change', function() {
             let categoryId = this.value;
-            subjectSelect.innerHTML = '<option value="">Loading subjects...</option>';
-
             if (categoryId) {
+                setSelectLoading(subjectSelect, 'Loading subjects...');
                 fetch(`/api/categories/${categoryId}/subjects`)
                     .then(response => response.json())
                     .then(data => {
-                        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
-                        data.forEach(subject => {
-                            subjectSelect.innerHTML += `<option value="${subject.id}">${subject.name}</option>`;
-                        });
+                        updateDynamicSelect(subjectSelect, data, 'Select Subject');
                     })
                     .catch(error => {
                         console.error('Error fetching subjects:', error);
-                        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                        updateDynamicSelect(subjectSelect, [], 'Select Subject');
                     });
             } else {
-                subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                resetDynamicSelect(subjectSelect, 'Select Subject');
             }
         });
     }
 
-    document.getElementById('state_id').addEventListener('change', function() {
-        let stateId = this.value;
-        let citySelect = document.getElementById('city_id');
-        citySelect.innerHTML = '<option value="">Loading...</option>';
-        
-        if(stateId) {
-            fetch(`/api/states/${stateId}/cities`)
-                .then(response => response.json())
-                .then(data => {
-                    citySelect.innerHTML = '<option value="">Select City</option>';
-                    data.forEach(city => {
-                        citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
+    // State -> City
+    const stateSelect = document.getElementById('state_id');
+    const citySelect = document.getElementById('city_id');
+
+    if (stateSelect && citySelect) {
+        stateSelect.addEventListener('change', function() {
+            let stateId = this.value;
+            if (stateId) {
+                setSelectLoading(citySelect, 'Loading cities...');
+                fetch(`/api/states/${stateId}/cities`)
+                    .then(response => response.json())
+                    .then(data => {
+                        updateDynamicSelect(citySelect, data, 'Select City');
+                    })
+                    .catch(error => {
+                        console.error('Error fetching cities:', error);
+                        updateDynamicSelect(citySelect, [], 'Select City');
                     });
-                })
-                .catch(error => {
-                    console.error('Error fetching cities:', error);
-                    citySelect.innerHTML = '<option value="">Select City</option>';
-                });
-        } else {
-            citySelect.innerHTML = '<option value="">Select City</option>';
-        }
-    });
+            } else {
+                resetDynamicSelect(citySelect, 'Select City');
+            }
+        });
+    }
 </script>
 @endpush
 @endsection

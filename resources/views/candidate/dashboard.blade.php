@@ -37,6 +37,64 @@
             </div>
         @endif
 
+        {{-- ================= PROFILE COMPLETION PROGRESS / STATUS BANNER ================= --}}
+        @if(($profile?->completion_percentage ?? 0) < 100)
+            <div class="bg-gradient-to-r from-amber-50 via-orange-50/60 to-amber-50 border-2 border-amber-200/80 rounded-3xl p-6 mb-8 shadow-sm reveal">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div class="flex items-start sm:items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-amber-500/20">
+                            <i class="fas fa-user-clock animate-pulse"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-xs">Profile Pending</span>
+                                <span class="text-xs font-bold text-amber-800 font-mono">{{ $profile?->completion_percentage ?? 0 }}% Completed</span>
+                            </div>
+                            <h3 class="font-extrabold text-[#031b4e] text-base sm:text-lg">Please Complete Your Educator Profile</h3>
+                            <p class="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
+                                Missing fields: <strong class="text-amber-900">{{ !empty($profile?->missing_profile_fields) ? implode(', ', $profile->missing_profile_fields) : 'Basic details' }}</strong>. Complete your profile details to unlock direct applications for school jobs and home tuitions.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 shrink-0">
+                        <div class="bg-white px-4 py-2.5 rounded-2xl border border-amber-200 shadow-2xs">
+                            <div class="flex justify-between text-[11px] font-bold text-slate-700 mb-1">
+                                <span>Progress</span>
+                                <span class="text-amber-600 font-black">{{ $profile?->completion_percentage ?? 0 }}%</span>
+                            </div>
+                            <div class="w-full sm:w-36 bg-amber-100 rounded-full h-2.5 overflow-hidden">
+                                <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500" style="width: {{ $profile?->completion_percentage ?? 0 }}%"></div>
+                            </div>
+                        </div>
+
+                        <a href="{{ route('candidate.profile.edit') }}" class="px-6 py-3 bg-[#031b4e] hover:bg-blue-900 text-white rounded-2xl text-xs font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                            <span>Complete Profile Now</span>
+                            <i class="fas fa-arrow-right text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-emerald-500/10 border border-emerald-300 rounded-3xl p-5 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm reveal">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-lg shrink-0 shadow-md shadow-emerald-500/20">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-extrabold text-[#031b4e] text-sm sm:text-base">100% Profile Completed</h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">Verified & Active</span>
+                        </div>
+                        <p class="text-xs text-slate-600">Your profile is complete, verified, and actively visible to top schools & tuition inquiries.</p>
+                    </div>
+                </div>
+                <a href="{{ route('candidate.profile.edit') }}" class="px-4 py-2 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 flex items-center gap-1.5">
+                    <i class="fas fa-edit text-xs"></i> Update Details
+                </a>
+            </div>
+        @endif
+
         {{-- ================= FULLY REGISTERED DASHBOARD ================= --}}
 
         {{-- Welcome Banner --}}
@@ -126,15 +184,25 @@
                 <div class="text-center md:text-left flex-1">
                     <h1 class="text-3xl font-bold mb-1 flex items-center flex-wrap gap-2">
                         Welcome back, {{ auth()->user()->name }}!
-                        @if($profile?->is_verified)
+                        @if(($profile?->completion_percentage ?? 0) >= 100)
                             <span
-                                class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/20 border border-blue-400/50 text-blue-300 text-xs font-bold uppercase tracking-wider rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]"
-                                title="Verified Profile">
-                                <i class="fas fa-check-circle"></i> Verified
+                                class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-xs font-bold uppercase tracking-wider rounded-full shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                                title="100% Complete Profile">
+                                <i class="fas fa-check-circle"></i> Profile 100% Complete
+                            </span>
+                        @else
+                            <span
+                                class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-bold uppercase tracking-wider rounded-full"
+                                title="Profile Incomplete">
+                                <i class="fas fa-clock"></i> {{ $profile?->completion_percentage ?? 0 }}% Complete
                             </span>
                         @endif
                     </h1>
-                    <p class="text-white/80 text-lg">Your profile is active and visible to top schools.</p>
+                    @if(($profile?->completion_percentage ?? 0) >= 100)
+                        <p class="text-white/80 text-lg">Your profile is complete and actively visible to top schools.</p>
+                    @else
+                        <p class="text-amber-200/90 text-sm font-medium mt-1">Complete your remaining profile details to increase interview calls from top schools.</p>
+                    @endif
                 </div>
                 <div class="mt-4 md:mt-0 flex gap-3">
                     <a href="{{ route('jobs') }}"
@@ -293,26 +361,43 @@
                         </div>
                         <div class="flex justify-between items-center py-2 border-b border-slate-100">
                             <span class="text-slate-500"><i class="fas fa-graduation-cap mr-2 w-4"></i> Education</span>
-                            <span class="font-semibold text-[#031b4e]">{{ $profile?->highest_qualification ?? 'N/A' }}</span>
+                            <span class="font-semibold text-[#031b4e]">{{ $profile?->highestQualification?->name ?? 'Not Provided' }}</span>
                         </div>
                         <div class="flex justify-between items-center py-2 border-b border-slate-100">
                             <span class="text-slate-500"><i class="fas fa-briefcase mr-2 w-4"></i> Experience</span>
-                            <span class="font-semibold text-[#031b4e]">{{ $profile?->years_of_experience ?? 0 }} Years</span>
+                            <span class="font-semibold text-[#031b4e]">{{ $profile?->experience_years ?? 0 }} Years</span>
                         </div>
                         <div class="flex justify-between items-center py-2">
                             <span class="text-slate-500"><i class="fas fa-map-marker-alt mr-2 w-4"></i> Location</span>
-                            <span class="font-semibold text-[#031b4e]">{{ $profile?->city ?? 'N/A' }}</span>
+                            <span class="font-semibold text-[#031b4e]">{{ $profile?->preferredCity?->name ? ($profile->preferredCity->name . ', ' . ($profile->preferredState?->name ?? '')) : 'Not Selected' }}</span>
                         </div>
                     </div>
 
                     <div class="mt-5 pt-4 border-t border-slate-100">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold text-[#031b4e]">Profile Completion</span>
-                            <span class="text-xs font-extrabold text-emerald-600">{{ $profile?->profile_completion_percentage ?? 80 }}%</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2">
-                            <div class="bg-emerald-500 h-2 rounded-full transition-all" style="width: {{ $profile?->profile_completion_percentage ?? 80 }}%"></div>
-                        </div>
+                        @if(($profile?->completion_percentage ?? 0) >= 100)
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-[#031b4e] flex items-center gap-1.5">
+                                    <i class="fas fa-check-circle text-emerald-500"></i> Profile Status
+                                </span>
+                                <span class="text-xs font-extrabold text-emerald-600">100% Completed</span>
+                            </div>
+                            <div class="w-full bg-emerald-100 rounded-full h-2">
+                                <div class="bg-emerald-500 h-2 rounded-full transition-all" style="width: 100%"></div>
+                            </div>
+                        @else
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-[#031b4e] flex items-center gap-1.5">
+                                    <i class="fas fa-clock text-amber-500"></i> Profile Status
+                                </span>
+                                <span class="text-xs font-extrabold text-amber-600">{{ $profile?->completion_percentage ?? 0 }}% (Pending)</span>
+                            </div>
+                            <div class="w-full bg-amber-100 rounded-full h-2 overflow-hidden">
+                                <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all" style="width: {{ $profile?->completion_percentage ?? 0 }}%"></div>
+                            </div>
+                            <a href="{{ route('candidate.profile.edit') }}" class="block text-center mt-3 text-[11px] font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 py-1.5 rounded-lg border border-amber-200 transition-colors">
+                                Complete Missing Details →
+                            </a>
+                        @endif
                     </div>
                 </div>
 

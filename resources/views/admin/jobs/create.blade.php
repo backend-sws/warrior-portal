@@ -25,28 +25,28 @@
                 <!-- School Name -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">School/Institution Name</label>
-                    <input type="text" name="school_name" value="{{ old('school_name') }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. Delhi Public School">
+                    <input type="text" name="school_name" value="{{ old('school_name', request('school_name')) }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. Delhi Public School">
                     @error('school_name') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- Contact Person -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Contact Person</label>
-                    <input type="text" name="contact_person" value="{{ old('contact_person') }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. Mr. Sharma">
+                    <input type="text" name="contact_person" value="{{ old('contact_person', request('contact_person')) }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. Mr. Sharma">
                     @error('contact_person') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- Email -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Email Address</label>
-                    <input type="email" name="email" value="{{ old('email') }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. hr@school.com">
+                    <input type="email" name="email" value="{{ old('email', request('email')) }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. hr@school.com">
                     @error('email') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- Phone -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Phone Number</label>
-                    <input type="text" name="phone" value="{{ old('phone') }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. 9876543210">
+                    <input type="text" name="phone" value="{{ old('phone', request('phone')) }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. 9876543210">
                     @error('phone') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -87,11 +87,11 @@
                     @error('subject_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <!-- Qualification (Enabled once Subject is selected) -->
+                <!-- Qualification -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Required Qualification *</label>
-                    <select name="qualification_id" id="qualification_id" required {{ (old('subject_id') || old('category_id')) ? '' : 'disabled' }} class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all disabled:opacity-50 cursor-pointer">
-                        <option value="">{{ (old('subject_id') || old('category_id')) ? 'Select Qualification' : '— First Select Subject —' }}</option>
+                    <select name="qualification_id" id="qualification_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
+                        <option value="">Select Qualification</option>
                         @foreach($qualifications as $qualification)
                             <option value="{{ $qualification->id }}" {{ old('qualification_id') == $qualification->id ? 'selected' : '' }}>{{ $qualification->name }}</option>
                         @endforeach
@@ -102,10 +102,10 @@
                 <!-- State -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">State *</label>
-                    <select name="state_id" id="state_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                    <select name="state_id" id="state_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
                         <option value="">Select State</option>
                         @foreach($states as $state)
-                            <option value="{{ $state->id }}" {{ old('state_id') == $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
+                            <option value="{{ $state->id }}" {{ old('state_id', request('state_id')) == $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
                         @endforeach
                     </select>
                     @error('state_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
@@ -114,7 +114,7 @@
                 <!-- City -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">City *</label>
-                    <select name="city_id" id="city_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+                    <select name="city_id" id="city_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
                         <option value="">Select City</option>
                     </select>
                     @error('city_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
@@ -148,9 +148,7 @@
 
             <div class="mt-8 flex justify-end gap-3">
                 <a href="{{ route('admin.jobs.index') }}" class="px-6 py-3 rounded-xl font-bold text-sm text-text-main bg-secondary-bg border border-card-border hover:bg-card-border/50 transition-all">Cancel</a>
-                <button type="submit" class="px-6 py-3 rounded-xl font-bold text-sm text-white bg-accent-blue hover:bg-accent-blue-hover shadow-lg shadow-accent-blue/30 transition-all">
-                    Post Job Now
-                </button>
+                <button type="submit" class="px-8 py-3 rounded-xl font-bold text-sm text-white bg-accent-blue hover:bg-accent-blue/90 shadow-lg shadow-accent-blue/20 transition-all">Post Job</button>
             </div>
         </form>
     </div>
@@ -183,81 +181,115 @@
         }
     });
 
-    // Category -> Subject -> Qualification
+    function updateDynamicSelect(selectEl, options, placeholder = 'Select Option') {
+        if (!selectEl) return;
+        let html = `<option value="">${placeholder}</option>`;
+        options.forEach(item => {
+            html += `<option value="${item.id}">${item.name}</option>`;
+        });
+        selectEl.innerHTML = html;
+        selectEl.disabled = false;
+
+        if (selectEl._slimSelect) {
+            try {
+                const ssData = [
+                    { text: placeholder, value: '', placeholder: true },
+                    ...options.map(item => ({ text: item.name, value: String(item.id) }))
+                ];
+                selectEl._slimSelect.setData(ssData);
+                selectEl._slimSelect.enable();
+            } catch (e) {
+                if (typeof window.refreshSearchableSelect === 'function') {
+                    window.refreshSearchableSelect(selectEl);
+                }
+            }
+        }
+    }
+
+    function setSelectLoading(selectEl, placeholder = 'Loading...') {
+        if (!selectEl) return;
+        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+        selectEl.disabled = true;
+        if (selectEl._slimSelect) {
+            try {
+                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
+                selectEl._slimSelect.disable();
+            } catch (e) {}
+        }
+    }
+
+    function resetDynamicSelect(selectEl, placeholder = '— First Select Option —') {
+        if (!selectEl) return;
+        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+        selectEl.disabled = true;
+        if (selectEl._slimSelect) {
+            try {
+                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
+                selectEl._slimSelect.disable();
+            } catch (e) {}
+        }
+    }
+
+    // Category -> Subject
     const categorySelect = document.getElementById('category_id');
     const subjectSelect = document.getElementById('subject_id');
-    const qualificationSelect = document.getElementById('qualification_id');
 
     if (categorySelect && subjectSelect) {
         categorySelect.addEventListener('change', function() {
             let categoryId = this.value;
-            subjectSelect.innerHTML = '<option value="">Loading subjects...</option>';
-            subjectSelect.disabled = true;
-            if (qualificationSelect) {
-                qualificationSelect.disabled = true;
-                qualificationSelect.innerHTML = '<option value="">— First Select Subject —</option>';
-            }
-
             if (categoryId) {
+                setSelectLoading(subjectSelect, 'Loading subjects...');
                 fetch(`/api/categories/${categoryId}/subjects`)
                     .then(response => response.json())
                     .then(data => {
-                        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
-                        data.forEach(subject => {
-                            subjectSelect.innerHTML += `<option value="${subject.id}">${subject.name}</option>`;
-                        });
-                        subjectSelect.disabled = false;
+                        updateDynamicSelect(subjectSelect, data, 'Select Subject');
                     })
                     .catch(error => {
                         console.error('Error fetching subjects:', error);
-                        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
-                        subjectSelect.disabled = false;
+                        updateDynamicSelect(subjectSelect, [], 'Select Subject');
                     });
             } else {
-                subjectSelect.innerHTML = '<option value="">— First Select Category —</option>';
+                resetDynamicSelect(subjectSelect, '— First Select Category —');
             }
         });
     }
 
-    if (subjectSelect && qualificationSelect) {
-        subjectSelect.addEventListener('change', function() {
-            if (this.value) {
-                qualificationSelect.disabled = false;
-                qualificationSelect.innerHTML = `
-                    <option value="">Select Qualification</option>
-                    @foreach($qualifications as $qualification)
-                        <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
-                    @endforeach
-                `;
-            } else {
-                qualificationSelect.disabled = true;
-                qualificationSelect.innerHTML = '<option value="">— First Select Subject —</option>';
-            }
-        });
-    }
+    // State -> City
+    const stateSelect = document.getElementById('state_id');
+    const citySelect = document.getElementById('city_id');
+    const defaultStateId = "{{ old('state_id', request('state_id')) }}";
+    const defaultCityId = "{{ old('city_id', request('city_id')) }}";
 
-    document.getElementById('state_id').addEventListener('change', function() {
-        let stateId = this.value;
-        let citySelect = document.getElementById('city_id');
-        citySelect.innerHTML = '<option value="">Loading...</option>';
-        
-        if(stateId) {
+    function loadStateCities(stateId, selectedCityId = null) {
+        if (!citySelect) return;
+        if (stateId) {
+            setSelectLoading(citySelect, 'Loading cities...');
             fetch(`/api/states/${stateId}/cities`)
                 .then(response => response.json())
                 .then(data => {
-                    citySelect.innerHTML = '<option value="">Select City</option>';
-                    data.forEach(city => {
-                        citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
-                    });
+                    updateDynamicSelect(citySelect, data, 'Select City');
+                    if (selectedCityId && citySelect._slimSelect) {
+                        citySelect._slimSelect.setSelected(String(selectedCityId));
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching cities:', error);
-                    citySelect.innerHTML = '<option value="">Select City</option>';
+                    updateDynamicSelect(citySelect, [], 'Select City');
                 });
         } else {
-            citySelect.innerHTML = '<option value="">Select City</option>';
+            resetDynamicSelect(citySelect, 'Select City');
         }
-    });
+    }
+
+    if (stateSelect && citySelect) {
+        stateSelect.addEventListener('change', function() {
+            loadStateCities(this.value);
+        });
+
+        if (defaultStateId) {
+            loadStateCities(defaultStateId, defaultCityId);
+        }
+    }
 </script>
 @endpush
 @endsection

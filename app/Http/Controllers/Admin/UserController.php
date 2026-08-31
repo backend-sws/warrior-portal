@@ -130,7 +130,9 @@ class UserController extends Controller
                   ->orWhere('phone', 'like', "%{$search}%")
                   ->orWhereHas('profile', function($pq) use ($search) {
                       $pq->where('address', 'like', "%{$search}%")
-                         ->orWhere('city', 'like', "%{$search}%");
+                         ->orWhereHas('preferredCity', function($cq) use ($search) {
+                             $cq->where('name', 'like', "%{$search}%");
+                         });
                   });
             });
         }

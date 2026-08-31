@@ -256,12 +256,12 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-                            Primary Subject You Teach <span class="text-red-500">*</span>
+                            Primary Subject You Teach <span class="text-xs font-normal text-slate-400 normal-case">(Optional)</span>
                         </label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-book text-sm"></i></span>
-                            <select name="subject_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
-                                <option value="">Select Primary Subject</option>
+                            <select name="subject_id" id="subject_id" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
+                                <option value="">Select Primary Subject (Optional)</option>
                                 @foreach($subjects as $subject)
                                     <option value="{{ $subject->id }}" {{ old('subject_id', $profile->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
                                 @endforeach
@@ -412,26 +412,93 @@
 
 @push('scripts')
 <script>
-    document.getElementById('preferred_state_id').addEventListener('change', function() {
-        let stateId = this.value;
-        let citySelect = document.getElementById('preferred_city_id');
-        citySelect.innerHTML = '<option value="">Loading...</option>';
-        
-        if(stateId) {
-            fetch(`/api/states/${stateId}/cities`)
-                .then(response => response.json())
-                .then(data => {
-                    citySelect.innerHTML = '<option value="">Select City</option>';
-                    data.forEach(city => {
-                        citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
+    function updateDynamicSelect(selectEl, options, placeholder = 'Select City', selectedId = null) {
+        if (!selectEl) return;
+        let html = `<option value="">${placeholder}</option>`;
+        options.forEach(item => {
+            const isSelected = selectedId && String(selectedId) === String(item.id) ? 'selected' : '';
+            html += `<option value="${item.id}" ${isSelected}>${item.name}</option>`;
+        });
+        selectEl.innerHTML = html;
+        selectEl.disabled = false;
+
+        if (selectEl._slimSelect) {
+            try {
+                const ssData = [
+                    { text: placeholder, value: '', placeholder: true },
+                    ...options.map(item => ({ 
+                        text: item.name, 
+                        value: String(item.id),
+                        selected: selectedId && String(selectedId) === String(item.id)
+                    }))
+                ];
+                selectEl._slimSelect.setData(ssData);
+                selectEl._slimSelect.enable();
+            } catch (e) {
+                if (typeof window.refreshSearchableSelect === 'function') {
+                    window.refreshSearchableSelect(selectEl);
+                }
+            }
+        }
+    }
+
+    function setSelectLoading(selectEl, placeholder = 'Loading...') {
+        if (!selectEl) return;
+        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+        selectEl.disabled = true;
+        if (selectEl._slimSelect) {
+            try {
+                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
+                selectEl._slimSelect.disable();
+            } catch (e) {}
+        }
+    }
+
+    function resetDynamicSelect(selectEl, placeholder = 'Select City') {
+        if (!selectEl) return;
+        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+        selectEl.disabled = false;
+        if (selectEl._slimSelect) {
+            try {
+                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
+                selectEl._slimSelect.enable();
+            } catch (e) {}
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const stateSelect = document.getElementById('preferred_state_id');
+        const citySelect = document.getElementById('preferred_city_id');
+        const defaultStateId = "{{ old('preferred_state_id', $profile->preferred_state_id) }}";
+        const defaultCityId = "{{ old('preferred_city_id', $profile->preferred_city_id) }}";
+
+        function loadCities(stateId, selectedCityId = null) {
+            if (!citySelect) return;
+            if (stateId) {
+                setSelectLoading(citySelect, 'Loading cities...');
+                fetch(`/api/states/${stateId}/cities`)
+                    .then(response => response.json())
+                    .then(data => {
+                        updateDynamicSelect(citySelect, data, 'Select City', selectedCityId);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching cities:', error);
+                        resetDynamicSelect(citySelect, 'Select City');
                     });
-                })
-                .catch(error => {
-                    console.error('Error fetching cities:', error);
-                    citySelect.innerHTML = '<option value="">Select City</option>';
-                });
-        } else {
-            citySelect.innerHTML = '<option value="">Select City</option>';
+            } else {
+                resetDynamicSelect(citySelect, 'Select City');
+            }
+        }
+
+        if (stateSelect && citySelect) {
+            stateSelect.addEventListener('change', function() {
+                loadCities(this.value);
+            });
+
+            // Initial load if state already selected
+            if (defaultStateId) {
+                loadCities(defaultStateId, defaultCityId);
+            }
         }
     });
 </script>
