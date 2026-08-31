@@ -46,8 +46,8 @@
 
                 <!-- Phone -->
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Phone Number</label>
-                    <input type="text" name="phone" value="{{ old('phone', $job->phone) }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. 9876543210">
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Phone Number <span class="text-xs text-text-dark/40 font-normal lowercase">(optional)</span></label>
+                    <input type="text" name="phone" value="{{ old('phone', $job->phone) }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. 9876543210 (optional)">
                     @error('phone') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>

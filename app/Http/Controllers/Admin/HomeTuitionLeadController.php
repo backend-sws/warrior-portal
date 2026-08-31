@@ -110,7 +110,7 @@ class HomeTuitionLeadController extends Controller
     {
         $validated = $request->validate([
             'parent_name'   => 'required|string|max:255',
-            'parent_mobile' => 'required|string|max:20',
+            'parent_mobile' => 'nullable|string|max:20',
             'class'         => 'required|string|max:255',
             'board'         => 'required|string|max:255',
             'subjects'      => 'required|string|max:255',
@@ -122,22 +122,25 @@ class HomeTuitionLeadController extends Controller
 
         $validated['is_featured'] = $request->has('is_featured') ? true : false;
 
-        $cleanMobile = preg_replace('/[^0-9]/', '', $validated['parent_mobile']);
+        if (!empty($validated['parent_mobile'])) {
+            $cleanMobile = preg_replace('/[^0-9]/', '', $validated['parent_mobile']);
 
-        $user = \App\Models\User::where('phone', $validated['parent_mobile'])->first();
+            $user = \App\Models\User::where('phone', $validated['parent_mobile'])->first();
 
-        if (!$user) {
-            $user = \App\Models\User::create([
-                'name'      => $validated['parent_name'],
-                'phone'     => $validated['parent_mobile'],
-                'email'     => 'parent_' . $cleanMobile . '_' . time() . '@warriorseducare.com',
-                'password'  => bcrypt('12345678'),
-                'role'      => 'parent',
-                'is_active' => true,
-            ]);
+            if (!$user) {
+                $user = \App\Models\User::create([
+                    'name'      => $validated['parent_name'],
+                    'phone'     => $validated['parent_mobile'],
+                    'email'     => 'parent_' . $cleanMobile . '_' . time() . '@warriorseducare.com',
+                    'password'  => bcrypt('12345678'),
+                    'role'      => 'parent',
+                    'is_active' => true,
+                ]);
+            }
+            $validated['user_id'] = $user->id;
+        } else {
+            $validated['user_id'] = null;
         }
-
-        $validated['user_id'] = $user->id;
 
         $lead = HomeTuitionLead::create($validated);
 
@@ -163,7 +166,7 @@ class HomeTuitionLeadController extends Controller
         
         $validated = $request->validate([
             'parent_name' => 'required|string|max:255',
-            'parent_mobile' => 'required|string|max:20',
+            'parent_mobile' => 'nullable|string|max:20',
             'class' => 'required|string|max:255',
             'board' => 'required|string|max:255',
             'subjects' => 'required|string|max:255',

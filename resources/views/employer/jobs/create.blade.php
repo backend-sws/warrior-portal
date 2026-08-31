@@ -55,8 +55,8 @@
                             <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Phone Number</label>
-                            <input type="text" name="phone" value="{{ old('phone', auth()->user()->phone) }}" class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
+                            <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Phone Number <span class="text-xs text-[#031b4e]/40 font-normal lowercase">(optional)</span></label>
+                            <input type="text" name="phone" value="{{ old('phone', auth()->user()->phone) }}" class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors" placeholder="e.g. 9876543210 (optional)">
                         </div>
                     </div>
                 </div>
