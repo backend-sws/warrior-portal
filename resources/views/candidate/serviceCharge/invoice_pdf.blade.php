@@ -132,6 +132,9 @@
 </head>
 <body>
     @php
+        $user = $user ?? $invoice->candidate;
+    @endphp
+    @php
         $logoPath = public_path('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg');
         $logoBase64 = file_exists($logoPath) ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($logoPath)) : null;
     @endphp

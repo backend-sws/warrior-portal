@@ -701,20 +701,56 @@
                 <div class="divide-y divide-card-border">
                     @forelse($invoices as $inv)
                         <div class="p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
-                            <div>
+                            {{-- Invoice Info --}}
+                            <div class="flex-1">
                                 <div class="flex items-center gap-2">
                                     <h5 class="text-sm font-black text-text-main">₹{{ number_format($inv->amount, 2) }}</h5>
                                     <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full {{ $inv->status === 'paid' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($inv->status === 'overdue' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200') }}">
                                         {{ ucfirst($inv->status) }}
                                     </span>
+                                    @if($inv->late_fee > 0)
+                                        <span class="text-[10px] font-bold text-red-500">+₹{{ number_format($inv->late_fee, 0) }} late fee</span>
+                                    @endif
                                 </div>
                                 <p class="text-xs text-text-dark/60 mt-0.5">{{ $inv->description ?: 'Placement Service Charge' }}</p>
                                 <p class="text-[10px] text-text-dark/40">Due: {{ \Carbon\Carbon::parse($inv->due_date)->format('d M Y') }}</p>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <a href="{{ route('admin.serviceCharge.invoice', $inv->id) }}" target="_blank" class="px-3 py-1.5 bg-secondary-bg hover:bg-card-bg border border-card-border text-text-main rounded-lg text-xs font-bold transition-colors">
-                                    <i class="fas fa-file-pdf"></i> View PDF
-                                </a>
+
+                            {{-- Action Buttons --}}
+                            <div class="flex items-center gap-1.5 flex-shrink-0">
+                                @if($inv->status === 'paid')
+                                    <a href="{{ route('admin.serviceCharge.invoice', $inv->id) }}" target="_blank" class="px-2.5 py-1.5 bg-secondary-bg hover:bg-card-bg border border-card-border text-text-main rounded-lg text-[11px] font-bold transition-colors" title="View PDF">
+                                        <i class="fas fa-file-pdf text-red-400 mr-0.5"></i> PDF
+                                    </a>
+                                @endif
+
+                                @if($inv->status !== 'paid')
+                                    {{-- Edit Button --}}
+                                    <button type="button" onclick="openEditInvoiceModal({{ $inv->id }}, '{{ $inv->amount }}', '{{ \Carbon\Carbon::parse($inv->due_date)->format('Y-m-d') }}', '{{ addslashes($inv->description ?? '') }}', '{{ $inv->status }}')" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-lg text-[11px] font-bold transition-colors cursor-pointer" title="Edit Invoice">
+                                        <i class="fas fa-pen text-[10px]"></i> Edit
+                                    </button>
+
+                                    {{-- Mark Paid Button --}}
+                                    <form action="{{ route('admin.tuition-service-charges.mark-paid', $inv->id) }}" method="POST" class="inline" onsubmit="return confirm('Mark this invoice as Paid?')">
+                                        @csrf
+                                        <button type="submit" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 rounded-lg text-[11px] font-bold transition-colors cursor-pointer" title="Mark as Paid">
+                                            <i class="fas fa-check text-[10px]"></i> Paid
+                                        </button>
+                                    </form>
+
+                                    {{-- Delete Button --}}
+                                    <form action="{{ route('admin.tuition-service-charges.destroy', $inv->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this invoice? This cannot be undone.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 rounded-lg text-[11px] font-bold transition-colors cursor-pointer" title="Delete Invoice">
+                                            <i class="fas fa-trash text-[10px]"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="px-2.5 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-lg text-[10px] font-bold">
+                                        <i class="fas fa-check-circle text-[10px]"></i> Paid
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     @empty
@@ -839,5 +875,118 @@
         </div>
     </div>
 </div>
+
+{{-- Edit Invoice Modal --}}
+<div id="editInvoiceModal" class="fixed inset-0 z-[99999] hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200">
+        <!-- Header -->
+        <div class="bg-[#031b4e] p-5 sm:p-6 text-white flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-amber-300">
+                    <i class="fas fa-file-invoice-dollar text-base"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 block">Edit Placement Charge</span>
+                    <h3 class="text-base font-bold text-white tracking-tight" id="editModalTitle">Edit Invoice</h3>
+                </div>
+            </div>
+            <button type="button" onclick="closeEditInvoiceModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer">
+                <i class="fas fa-times text-xs"></i>
+            </button>
+        </div>
+
+        <!-- Form Body -->
+        <form id="editInvoiceForm" method="POST" action="" class="p-6 space-y-4 bg-white">
+            @csrf
+            @method('PUT')
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Amount -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        Amount (₹) <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" step="0.01" name="amount" id="editAmount" required
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-[#031b4e] font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+
+                <!-- Due Date -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        Due Date <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date" name="due_date" id="editDueDate" required
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    Status <span class="text-red-500">*</span>
+                </label>
+                <select name="status" id="editStatus" required
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer">
+                    <option value="pending">Pending</option>
+                    <option value="paid">Paid</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    Description <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="description" id="editDesc" required placeholder="e.g. Placement Service Charge"
+                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                <button type="button" onclick="closeEditInvoiceModal()"
+                        class="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-save"></i>
+                    <span>Update Invoice</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditInvoiceModal(invId, amount, dueDate, description, status) {
+    const modal = document.getElementById('editInvoiceModal');
+    if (modal && modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+    }
+    document.getElementById('editInvoiceForm').action = `/admin/tuition-service-charges/${invId}`;
+    document.getElementById('editModalTitle').innerText = `Edit Invoice #${invId}`;
+    document.getElementById('editAmount').value = amount;
+    document.getElementById('editDueDate').value = dueDate;
+    document.getElementById('editDesc').value = description;
+    document.getElementById('editStatus').value = status;
+    modal.classList.remove('hidden');
+}
+
+function closeEditInvoiceModal() {
+    document.getElementById('editInvoiceModal').classList.add('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('editInvoiceModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeEditInvoiceModal();
+            }
+        });
+    }
+});
+</script>
 
 @endsection

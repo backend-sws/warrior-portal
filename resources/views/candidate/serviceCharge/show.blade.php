@@ -110,9 +110,13 @@
 
                     {{-- Actions --}}
                     <div class="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-[#031b4e]/10 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-                        <a href="{{ route('candidate.serviceCharge.invoice', $invoice->id) }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-[#031b4e] rounded-xl text-xs sm:text-sm font-semibold transition-all">
-                            <i class="fas fa-file-pdf text-red-500"></i> Download Invoice PDF
-                        </a>
+                        @if($invoice->status === 'paid')
+                            <a href="{{ route('candidate.serviceCharge.invoice', $invoice->id) }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-[#031b4e] rounded-xl text-xs sm:text-sm font-semibold transition-all">
+                                <i class="fas fa-file-pdf text-red-500"></i> Download Invoice PDF
+                            </a>
+                        @else
+                            <div></div>
+                        @endif
                         
                         @if($invoice->status !== 'paid')
                             <a href="{{ route('candidate.serviceCharge.checkout', $invoice->id) }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-green-500 text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-green-600 hover:-translate-y-0.5 transition-all shadow-md active:scale-95">
