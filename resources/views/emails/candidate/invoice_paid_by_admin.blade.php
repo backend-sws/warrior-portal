@@ -6,7 +6,7 @@ Dear {{ $candidate->name }},
 This is to inform you that your **Service Charge invoice** has been marked as **Paid** by the Warriors Educare team.
 
 ### Invoice Details
-**Invoice ID:** #{{ $invoice->id }}  
+**Invoice Number:** #{{ $invoice->invoice_no }}  
 **Amount:** ₹{{ number_format($invoice->amount, 2) }}  
 **Status:** ✅ Paid  
 **Updated Date:** {{ now()->format('d M Y') }}

@@ -37,4 +37,9 @@ class ServiceChargeInvoice extends Model
     {
         return $this->belongsTo(TuitionApplication::class, 'tuition_application_id');
     }
+
+    public function getInvoiceNoAttribute()
+    {
+        return $this->invoice_number ?: ('INV-SC-' . str_pad($this->id, 5, '0', STR_PAD_LEFT));
+    }
 }

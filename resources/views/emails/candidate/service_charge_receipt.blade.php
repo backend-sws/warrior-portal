@@ -7,7 +7,7 @@ Thank you! Your **Service Charge payment** has been successfully received.
 
 ### Payment Details
 **Amount Paid:** ₹{{ number_format($amountPaid, 2) }}  
-**Invoice ID:** #{{ $invoice->id }}  
+**Invoice Number:** #{{ $invoice->invoice_no }}  
 **Payment Date:** {{ now()->format('d M Y, h:i A') }}  
 **Status:** ✅ Paid
 
