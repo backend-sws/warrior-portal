@@ -33,15 +33,17 @@ class PhonePeService implements PaymentGatewayInterface
         $this->clientSecret   = config('services.phonepe.client_secret', env('PHONEPE_CLIENT_SECRET', ''));
         $this->clientVersion  = config('services.phonepe.client_version', env('PHONEPE_CLIENT_VERSION', '1'));
         $this->webhookSecret  = config('services.phonepe.webhook_secret', env('PHONEPE_WEBHOOK_SECRET', ''));
-        $this->env            = config('services.phonepe.env', env('PHONEPE_ENV', 'UAT'));
+        $this->env            = strtoupper(config('services.phonepe.env', env('PHONEPE_ENV', 'UAT')));
         $this->currency       = config('services.phonepe.currency', env('PHONEPE_CURRENCY', 'INR'));
         $this->merchantName   = config('services.phonepe.merchant_name', env('PHONEPE_MERCHANT_NAME', 'Warriors Educare'));
 
-        $this->authUrl = $this->env === 'PRODUCTION'
+        $isProduction = $this->env === 'PRODUCTION';
+
+        $this->authUrl = $isProduction
             ? 'https://api.phonepe.com/apis/identity-manager/v1/oauth/token'
             : 'https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token';
 
-        $this->baseUrl = $this->env === 'PRODUCTION'
+        $this->baseUrl = $isProduction
             ? 'https://api.phonepe.com/apis/pg'
             : 'https://api-preprod.phonepe.com/apis/pg-sandbox';
     }
