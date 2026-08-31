@@ -5,6 +5,20 @@
 
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
 
+        {{-- Flash Messages --}}
+        @if(session('error'))
+            <div class="mb-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm font-semibold flex items-center gap-2">
+                <i class="fas fa-exclamation-triangle text-red-500"></i>
+                {{ session('error') }}
+            </div>
+        @endif
+        @if(session('success'))
+            <div class="mb-4 p-4 rounded-xl bg-green-50 border border-green-200 text-green-800 text-sm font-semibold flex items-center gap-2">
+                <i class="fas fa-check-circle text-green-500"></i>
+                {{ session('success') }}
+            </div>
+        @endif
+
         {{-- Page Header --}}
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8 reveal">
             <div class="flex items-center gap-3">
