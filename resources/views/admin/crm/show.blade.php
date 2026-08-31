@@ -364,6 +364,33 @@
                             @endif
                         </div>
 
+                        @php
+                            $adminSig = $profile?->signature_data ?? ($tuitionMeta['signature_data'] ?? null);
+                            $adminSigType = $profile?->signature_type ?? ($tuitionMeta['signature_type'] ?? 'draw');
+                        @endphp
+
+                        @if($adminSig)
+                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-blue-100">
+                                <div class="shrink-0 p-1.5 bg-slate-50 rounded-lg border border-slate-200">
+                                    @if(str_starts_with($adminSig, 'data:image'))
+                                        <img src="{{ $adminSig }}" alt="Digital Signature" class="max-h-10 w-auto object-contain">
+                                    @elseif(Storage::disk('public')->exists($adminSig))
+                                        <img src="{{ asset('storage/' . $adminSig) }}" alt="Digital Signature" class="max-h-10 w-auto object-contain">
+                                    @elseif($adminSigType === 'type')
+                                        <span class="text-base font-serif italic text-blue-900 font-bold" style="font-family: 'Brush Script MT', 'Dancing Script', cursive;">{{ $adminSig }}</span>
+                                    @else
+                                        <span class="text-xs font-mono font-bold">{{ $adminSig }}</span>
+                                    @endif
+                                </div>
+                                <div class="min-w-0 text-xs">
+                                    <p class="font-bold text-indigo-900 flex items-center gap-1">
+                                        <i class="fas fa-signature text-indigo-600 text-[10px]"></i> Digital E-Signature
+                                    </p>
+                                    <p class="text-[10px] text-text-dark/60 mt-0.5">Verified candidate signature attached to agreement.</p>
+                                </div>
+                            </div>
+                        @endif
+
                         @if($livePhoto)
                             <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-blue-100">
                                 <a href="{{ Storage::url($livePhoto) }}" target="_blank" class="relative group shrink-0">

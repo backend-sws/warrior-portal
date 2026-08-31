@@ -113,7 +113,8 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
 
     Route::get('/dashboard', function () {
         $user = auth()->user();
-        $profile = $user->profile ?? $user->profile()->create([]);
+        $profile = $user->profile()->with(['highestQualification', 'preferredState', 'preferredCity', 'subject', 'category'])->first()
+            ?? $user->profile()->create([]);
         return view('candidate.dashboard', compact('profile'));
     })->name('dashboard');
 });
@@ -217,11 +218,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('tuitions', \App\Http\Controllers\Admin\TuitionController::class);
     Route::post('jobs/{job}/approve', [\App\Http\Controllers\Admin\JobController::class, 'approve'])->name('jobs.approve');
     Route::post('jobs/{job}/reject', [\App\Http\Controllers\Admin\JobController::class, 'reject'])->name('jobs.reject');
-    Route::prefix('candidates')->name('candidates.')->group(function () {
-        Route::post('/{id}/verify', [\App\Http\Controllers\Admin\CrmController::class, 'verify'])->name('verify');
-        Route::post('/{id}/upload-agreement', [\App\Http\Controllers\Admin\CrmController::class, 'uploadAgreement'])->name('upload-agreement');
-        Route::post('/{id}/update-agreement-status', [\App\Http\Controllers\Admin\CrmController::class, 'updateAgreementStatus'])->name('update-agreement-status');
-    });
+    // Schools & Educational Institutes CRM (Manual Entry & Records)
+    Route::get('/schools', [\App\Http\Controllers\Admin\SchoolController::class, 'index'])->name('schools.index');
+    Route::get('/schools/create', [\App\Http\Controllers\Admin\SchoolController::class, 'create'])->name('schools.create');
+    Route::post('/schools', [\App\Http\Controllers\Admin\SchoolController::class, 'store'])->name('schools.store');
+    Route::get('/schools/{id}', [\App\Http\Controllers\Admin\SchoolController::class, 'show'])->name('schools.show');
+    Route::get('/schools/{id}/edit', [\App\Http\Controllers\Admin\SchoolController::class, 'edit'])->name('schools.edit');
+    Route::put('/schools/{id}', [\App\Http\Controllers\Admin\SchoolController::class, 'update'])->name('schools.update');
+    Route::delete('/schools/{id}', [\App\Http\Controllers\Admin\SchoolController::class, 'destroy'])->name('schools.destroy');
+    Route::post('/schools/{id}/follow-up', [\App\Http\Controllers\Admin\SchoolController::class, 'addFollowUp'])->name('schools.followup.store');
+    Route::post('/schools/{id}/post-job', [\App\Http\Controllers\Admin\SchoolController::class, 'storeJob'])->name('schools.job.store');
 
     // Candidates CRM
     Route::get('/candidates/create', [\App\Http\Controllers\Admin\CrmController::class, 'create'])->name('crm.create');
@@ -336,6 +342,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/profile',         [\App\Http\Controllers\Admin\ReminderController::class, 'sendProfileCompletionReminder'])->name('profile');
         Route::post('/late-fee',        [\App\Http\Controllers\Admin\ReminderController::class, 'sendLateFeeAlert'])->name('late-fee');
         Route::post('/custom',          [\App\Http\Controllers\Admin\ReminderController::class, 'sendCustomMessage'])->name('custom');
+        Route::post('/process-batch',   [\App\Http\Controllers\Admin\ReminderController::class, 'processBatch'])->name('process-batch');
     });
 });
 

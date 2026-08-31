@@ -219,6 +219,19 @@
                     </div>
                 </td>
                 <td style="width: 50%; text-align: left; padding-left: 25%; padding-top: 30px;">
+                    @if(!empty($profile->signature_data))
+                        <div style="margin-bottom: 8px;">
+                            @if(str_starts_with($profile->signature_data, 'data:image'))
+                                <img src="{{ $profile->signature_data }}" alt="Signature" style="max-height: 45px; max-width: 160px; object-fit: contain;">
+                            @elseif(Storage::disk('public')->exists($profile->signature_data))
+                                <img src="{{ public_path('storage/' . $profile->signature_data) }}" alt="Signature" style="max-height: 45px; max-width: 160px; object-fit: contain;">
+                            @elseif($profile->signature_type === 'type')
+                                <span style="font-family: 'Brush Script MT', 'Dancing Script', cursive, sans-serif; font-size: 20px; color: #1e3a8a; font-weight: bold;">
+                                    {{ $profile->signature_data }}
+                                </span>
+                            @endif
+                        </div>
+                    @endif
                     <div style="font-family: 'Times New Roman', Times, serif; font-size: 13px; color: #000; line-height: 1.35;">
                         <div style="font-family: Arial, sans-serif; font-size: 11px; font-weight: bold; color: #059669; margin-bottom: 4px;">
                             DIGITALLY SIGNED & VERIFIED

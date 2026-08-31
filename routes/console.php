@@ -29,3 +29,7 @@ Schedule::command('notifications:service-charge-reminders')->dailyAt('09:00');
 
 // Renewal reminders — candidates with expired plans
 Schedule::command('notifications:renewal-reminders')->dailyAt('10:00');
+
+// Auto-process background queue jobs (Optimized for Shared Hosting crons)
+Schedule::command('queue:work --stop-when-empty --tries=3 --timeout=60')->everyMinute()->withoutOverlapping();
+

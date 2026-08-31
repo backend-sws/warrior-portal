@@ -109,28 +109,30 @@ class HomeTuitionLeadController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'parent_name' => 'required|string|max:255',
+            'parent_name'   => 'required|string|max:255',
             'parent_mobile' => 'required|string|max:20',
-            'class' => 'required|string|max:255',
-            'board' => 'required|string|max:255',
-            'subjects' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            'pincode' => 'nullable|string|max:20',
-            'status' => 'required|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
-            'is_featured' => 'nullable|boolean',
+            'class'         => 'required|string|max:255',
+            'board'         => 'required|string|max:255',
+            'subjects'      => 'required|string|max:255',
+            'location'      => 'required|string|max:255',
+            'pincode'       => 'nullable|string|max:20',
+            'status'        => 'required|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
+            'is_featured'   => 'nullable|boolean',
         ]);
 
         $validated['is_featured'] = $request->has('is_featured') ? true : false;
+
+        $cleanMobile = preg_replace('/[^0-9]/', '', $validated['parent_mobile']);
 
         $user = \App\Models\User::where('phone', $validated['parent_mobile'])->first();
 
         if (!$user) {
             $user = \App\Models\User::create([
-                'name' => $validated['parent_name'],
-                'phone' => $validated['parent_mobile'],
-                'email' => $validated['parent_mobile'] . '@warriorseducare.com', // Auto-generated
-                'password' => bcrypt('12345678'), // Default password
-                'role' => 'parent',
+                'name'      => $validated['parent_name'],
+                'phone'     => $validated['parent_mobile'],
+                'email'     => 'parent_' . $cleanMobile . '_' . time() . '@warriorseducare.com',
+                'password'  => bcrypt('12345678'),
+                'role'      => 'parent',
                 'is_active' => true,
             ]);
         }

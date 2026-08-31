@@ -173,7 +173,8 @@ class ReminderController extends Controller
             );
 
             try {
-                Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
+                $delay = $count * 2; // Stagger by 2 seconds to avoid rate limiting
+                Mail::to($candidate->email)->later(now()->addSeconds($delay), new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
             } catch (\Exception $e) {
                 Log::error("School Placement Fee Reminder email failed for {$candidate->email}: " . $e->getMessage());
             }
@@ -183,7 +184,7 @@ class ReminderController extends Controller
 
         $this->logReminderAction('job_service_charge', $count, null);
 
-        return back()->with('success', "✅ Placement fee reminders sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Placement fee reminders queued in background for {$count} candidate(s).");
     }
 
     /**
@@ -226,7 +227,8 @@ class ReminderController extends Controller
             );
 
             try {
-                Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
+                $delay = $count * 2; // Stagger by 2 seconds to avoid rate limiting
+                Mail::to($candidate->email)->later(now()->addSeconds($delay), new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
             } catch (\Exception $e) {
                 Log::error("Tuition Service Charge Reminder email failed for {$candidate->email}: " . $e->getMessage());
             }
@@ -236,7 +238,7 @@ class ReminderController extends Controller
 
         $this->logReminderAction('tuition_service_charge', $count, null);
 
-        return back()->with('success', "✅ Tuition service charge reminders sent to {$count} tutor(s).");
+        return back()->with('success', "✅ Tuition service charge reminders queued in background for {$count} tutor(s).");
     }
 
     /**
@@ -319,7 +321,8 @@ class ReminderController extends Controller
 
             try {
                 if ($candidate->email) {
-                    Mail::to($candidate->email)->send(new \App\Mail\AgreementPendingMail($candidate));
+                    $delay = $count * 2; // Stagger by 2 seconds
+                    Mail::to($candidate->email)->later(now()->addSeconds($delay), new \App\Mail\AgreementPendingMail($candidate));
                 }
             } catch (\Exception $e) {
                 Log::error("Agreement reminder email failed for {$candidate->email}: " . $e->getMessage());
@@ -330,7 +333,7 @@ class ReminderController extends Controller
 
         $this->logReminderAction('agreement_signing', $count, null);
 
-        return back()->with('success', "✅ Agreement signing reminders (Notification + Email) sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Agreement signing reminders queued in background for {$count} candidate(s).");
     }
 
     /**
@@ -376,7 +379,8 @@ class ReminderController extends Controller
 
             try {
                 if ($candidate->email) {
-                    Mail::to($candidate->email)->send(new \App\Mail\InterviewReminderMail($application));
+                    $delay = $count * 2;
+                    Mail::to($candidate->email)->later(now()->addSeconds($delay), new \App\Mail\InterviewReminderMail($application));
                 }
             } catch (\Exception $e) {
                 Log::error("Interview reminder email failed: " . $e->getMessage());
@@ -387,7 +391,7 @@ class ReminderController extends Controller
 
         $this->logReminderAction('interview', $count, null);
 
-        return back()->with('success', "✅ Interview reminders (Notification + Email) sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Interview reminders queued in background for {$count} candidate(s).");
     }
 
     /**
@@ -432,7 +436,8 @@ class ReminderController extends Controller
 
             try {
                 if ($candidate->email) {
-                    Mail::to($candidate->email)->send(new \App\Mail\TuitionDemoReminderMail($app));
+                    $delay = $count * 2;
+                    Mail::to($candidate->email)->later(now()->addSeconds($delay), new \App\Mail\TuitionDemoReminderMail($app));
                 }
             } catch (\Exception $e) {
                 Log::error("Tuition demo reminder email failed for {$candidate->email}: " . $e->getMessage());
@@ -443,7 +448,7 @@ class ReminderController extends Controller
 
         $this->logReminderAction('tuition_demo', $count, null);
 
-        return back()->with('success', "✅ Tuition demo reminders (Notification + Email) sent to {$count} tutor(s).");
+        return back()->with('success', "✅ Tuition demo reminders queued in background for {$count} tutor(s).");
     }
 
     /**
@@ -490,7 +495,8 @@ class ReminderController extends Controller
 
             try {
                 if ($candidate->email) {
-                    Mail::to($candidate->email)->send(new \App\Mail\ProfileCompletionReminderMail($candidate, $missing));
+                    $delay = $count * 2; // Stagger by 2 seconds
+                    Mail::to($candidate->email)->later(now()->addSeconds($delay), new \App\Mail\ProfileCompletionReminderMail($candidate, $missing));
                 }
             } catch (\Exception $e) {
                 Log::error("Profile completion reminder email failed for {$candidate->email}: " . $e->getMessage());
@@ -501,7 +507,7 @@ class ReminderController extends Controller
 
         $this->logReminderAction('profile_completion', $count, null);
 
-        return back()->with('success', "✅ Profile completion reminders (Notification + Email) sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Profile completion reminders queued in background for {$count} candidate(s).");
     }
 
     /**
@@ -542,7 +548,8 @@ class ReminderController extends Controller
             );
 
             try {
-                Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
+                $delay = $count * 2;
+                Mail::to($candidate->email)->later(now()->addSeconds($delay), new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
             } catch (\Exception $e) {
                 Log::error("LateFeeAlert email failed: " . $e->getMessage());
             }
@@ -552,7 +559,7 @@ class ReminderController extends Controller
 
         $this->logReminderAction('late_fee', $count, null);
 
-        return back()->with('success', "✅ Late fee alerts sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Late fee alerts queued in background for {$count} candidate(s).");
     }
 
     /**
@@ -589,7 +596,9 @@ class ReminderController extends Controller
 
             if ($request->boolean('send_email') && $candidate->email) {
                 try {
-                    Mail::to($candidate->email)->send(
+                    $delay = $count * 2;
+                    Mail::to($candidate->email)->later(
+                        now()->addSeconds($delay),
                         new \App\Mail\CustomAdminMessageMail($candidate, $request->title, $request->message)
                     );
                 } catch (\Exception $e) {
@@ -602,7 +611,297 @@ class ReminderController extends Controller
 
         $this->logReminderAction('custom', $count, null, $request->title);
 
-        return back()->with('success', "✅ Custom message sent to {$count} candidate(s).");
+        return back()->with('success', "✅ Custom message broadcast queued in background for {$count} candidate(s).");
+    }
+
+    /**
+     * Safe AJAX Batch Processor (100% Hostinger & Shared Hosting Friendly)
+     * Processes 2-3 emails per call, preventing timeouts and Google SMTP rate limits.
+     */
+    public function processBatch(Request $request)
+    {
+        $request->validate([
+            'type'   => 'required|string',
+            'ids'    => 'required|array',
+            'ids.*'  => 'integer',
+        ]);
+
+        $type = $request->input('type');
+        $ids  = $request->input('ids');
+        $results = [];
+        $successCount = 0;
+
+        foreach ($ids as $id) {
+            try {
+                $res = $this->dispatchSingleReminder($type, $id, $request->all());
+                $results[] = $res;
+                if (($res['status'] ?? '') === 'success') {
+                    $successCount++;
+                }
+            } catch (\Exception $e) {
+                Log::error("Error processing {$type} reminder for ID {$id}: " . $e->getMessage());
+                $results[] = [
+                    'id'      => $id,
+                    'name'    => "ID #{$id}",
+                    'status'  => 'error',
+                    'message' => $e->getMessage(),
+                ];
+            }
+        }
+
+        if ($successCount > 0) {
+            $this->logReminderAction($type, $successCount, count($ids) === 1 ? $ids[0] : null, $request->input('title'));
+        }
+
+        return response()->json([
+            'success'      => true,
+            'processed'    => $results,
+            'successCount' => $successCount,
+        ]);
+    }
+
+    /**
+     * Dispatch a single reminder with isolated try-catch
+     */
+    private function dispatchSingleReminder(string $type, int $id, array $payload): array
+    {
+        switch ($type) {
+            case 'service-charge':
+            case 'job_service_charge':
+                $invoice = ServiceChargeInvoice::with(['candidate', 'jobApplication.jobPost'])->find($id);
+                if (!$invoice || !$invoice->candidate) {
+                    return ['id' => $id, 'name' => 'Invoice #' . $id, 'status' => 'skipped', 'message' => 'Invoice or candidate not found'];
+                }
+                $candidate = $invoice->candidate;
+                $dueDate  = Carbon::parse($invoice->due_date)->format('d M Y');
+                $totalAmt = number_format($invoice->amount + $invoice->late_fee, 2);
+                $jobTitle = $invoice->jobApplication?->jobPost?->title ?? 'School Placement';
+
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    '💼 School Placement Service Charge Due: ₹' . $totalAmt,
+                    "Admin reminder: Your placement fee for '{$jobTitle}' is ₹{$totalAmt}, due by {$dueDate}. Please pay to keep your account active.",
+                    route('candidate.serviceCharge.show'),
+                    'fas fa-file-invoice-dollar'
+                );
+
+                $emailSent = false;
+                if ($candidate->email) {
+                    try {
+                        Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
+                        $emailSent = true;
+                    } catch (\Exception $e) {
+                        Log::error("Email failed for {$candidate->email}: " . $e->getMessage());
+                    }
+                }
+                return ['id' => $id, 'name' => $candidate->name, 'email' => $candidate->email, 'status' => 'success', 'email_sent' => $emailSent];
+
+            case 'tuition-service':
+            case 'tuition_service_charge':
+                $invoice = ServiceChargeInvoice::with(['candidate', 'tuitionLead'])->find($id);
+                if (!$invoice || !$invoice->candidate) {
+                    return ['id' => $id, 'name' => 'Invoice #' . $id, 'status' => 'skipped', 'message' => 'Invoice or candidate not found'];
+                }
+                $candidate = $invoice->candidate;
+                $dueDate  = Carbon::parse($invoice->due_date)->format('d M Y');
+                $totalAmt = number_format($invoice->amount + $invoice->late_fee, 2);
+                $tuitionDesc = $invoice->tuitionLead ? ("Class " . $invoice->tuitionLead->class . " in " . $invoice->tuitionLead->location) : "Home Tuition Assignment";
+
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    '🏠 Tuition Service Charge Due: ₹' . $totalAmt,
+                    "Admin reminder: Your service charge for tuition ({$tuitionDesc}) is ₹{$totalAmt}, due by {$dueDate}. Please pay immediately.",
+                    route('candidate.serviceCharge.show'),
+                    'fas fa-chalkboard-teacher'
+                );
+
+                $emailSent = false;
+                if ($candidate->email) {
+                    try {
+                        Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
+                        $emailSent = true;
+                    } catch (\Exception $e) {
+                        Log::error("Email failed for {$candidate->email}: " . $e->getMessage());
+                    }
+                }
+                return ['id' => $id, 'name' => $candidate->name, 'email' => $candidate->email, 'status' => 'success', 'email_sent' => $emailSent];
+
+            case 'agreement':
+            case 'agreement_signing':
+                $candidate = User::with('profile')->find($id);
+                if (!$candidate) {
+                    return ['id' => $id, 'name' => 'Candidate #' . $id, 'status' => 'skipped', 'message' => 'Candidate not found'];
+                }
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    '✍️ Action Required: Sign Candidate Agreement',
+                    'Admin reminder: Please review and digitally sign your Teacher Placement & Tuition Agreement to unlock direct applications and hiring.',
+                    route('candidate.agreement.show'),
+                    'fas fa-file-signature'
+                );
+                if ($candidate->profile && $candidate->profile->agreement_status !== 'signed') {
+                    $candidate->profile->update(['agreement_status' => 'pending_signature']);
+                }
+                $emailSent = false;
+                if ($candidate->email) {
+                    try {
+                        Mail::to($candidate->email)->send(new \App\Mail\AgreementPendingMail($candidate));
+                        $emailSent = true;
+                    } catch (\Exception $e) {
+                        Log::error("Email failed for {$candidate->email}: " . $e->getMessage());
+                    }
+                }
+                return ['id' => $id, 'name' => $candidate->name, 'email' => $candidate->email, 'status' => 'success', 'email_sent' => $emailSent];
+
+            case 'interview':
+                $application = JobApplication::with(['candidate', 'jobPost'])->find($id);
+                if (!$application || !$application->candidate) {
+                    return ['id' => $id, 'name' => 'Application #' . $id, 'status' => 'skipped', 'message' => 'Application or candidate not found'];
+                }
+                $candidate = $application->candidate;
+                $interviewDt = Carbon::parse($application->interview_date)->format('d M Y, h:i A');
+                $jobTitle    = $application->jobPost->title ?? 'Teacher Position';
+                $schoolName  = $application->jobPost->school_name ?? 'School';
+
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    '🎯 Upcoming School Interview Reminder',
+                    "Admin reminder: Your interview for '{$jobTitle}' at {$schoolName} is scheduled on {$interviewDt}. Please ensure you are prepared.",
+                    route('candidate.applications.index'),
+                    'fas fa-calendar-check'
+                );
+
+                $emailSent = false;
+                if ($candidate->email) {
+                    try {
+                        Mail::to($candidate->email)->send(new \App\Mail\InterviewReminderMail($application));
+                        $emailSent = true;
+                    } catch (\Exception $e) {
+                        Log::error("Email failed for {$candidate->email}: " . $e->getMessage());
+                    }
+                }
+                return ['id' => $id, 'name' => $candidate->name, 'email' => $candidate->email, 'status' => 'success', 'email_sent' => $emailSent];
+
+            case 'tuition-demo':
+            case 'tuition_demo':
+                $app = TuitionApplication::with(['candidate', 'tuitionLead'])->find($id);
+                if (!$app || !$app->candidate) {
+                    return ['id' => $id, 'name' => 'Tuition Application #' . $id, 'status' => 'skipped', 'message' => 'Application or candidate not found'];
+                }
+                $candidate = $app->candidate;
+                $demoDt = Carbon::parse($app->demo_date)->format('d M Y, h:i A');
+                $leadInfo = $app->tuitionLead ? ("Class " . $app->tuitionLead->class . " in " . $app->tuitionLead->location) : "Home Tuition";
+
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    '🎓 Home Tuition Demo Class Reminder',
+                    "Admin reminder: Your trial demo session for {$leadInfo} is scheduled on {$demoDt}. Please contact parent and arrive on time.",
+                    route('candidate.tuitions.index'),
+                    'fas fa-chalkboard-teacher'
+                );
+
+                $emailSent = false;
+                if ($candidate->email) {
+                    try {
+                        Mail::to($candidate->email)->send(new \App\Mail\TuitionDemoReminderMail($app));
+                        $emailSent = true;
+                    } catch (\Exception $e) {
+                        Log::error("Email failed for {$candidate->email}: " . $e->getMessage());
+                    }
+                }
+                return ['id' => $id, 'name' => $candidate->name, 'email' => $candidate->email, 'status' => 'success', 'email_sent' => $emailSent];
+
+            case 'profile':
+            case 'profile_completion':
+                $candidate = User::with('profile')->find($id);
+                if (!$candidate) {
+                    return ['id' => $id, 'name' => 'Candidate #' . $id, 'status' => 'skipped', 'message' => 'Candidate not found'];
+                }
+                $profile = $candidate->profile;
+                $missing = [];
+                if (!$profile?->highest_qualification_id) $missing[] = 'Qualification';
+                if (!$profile?->subject_id) $missing[] = 'Primary Subject';
+                if (!$profile?->preferred_city_id) $missing[] = 'Preferred City';
+                if (!$profile?->resume_path) $missing[] = 'Resume';
+
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    '📝 Complete Your Teaching Profile',
+                    'Admin reminder: Your profile is missing: ' . (implode(', ', $missing) ?: 'details') . '. Complete it now to get shortlisted for teaching jobs and home tuitions.',
+                    route('candidate.profile.edit'),
+                    'fas fa-user-edit'
+                );
+
+                $emailSent = false;
+                if ($candidate->email) {
+                    try {
+                        Mail::to($candidate->email)->send(new \App\Mail\ProfileCompletionReminderMail($candidate, $missing));
+                        $emailSent = true;
+                    } catch (\Exception $e) {
+                        Log::error("Email failed for {$candidate->email}: " . $e->getMessage());
+                    }
+                }
+                return ['id' => $id, 'name' => $candidate->name, 'email' => $candidate->email, 'status' => 'success', 'email_sent' => $emailSent];
+
+            case 'late-fee':
+            case 'late_fee':
+                $invoice = ServiceChargeInvoice::with('candidate')->find($id);
+                if (!$invoice || !$invoice->candidate) {
+                    return ['id' => $id, 'name' => 'Invoice #' . $id, 'status' => 'skipped', 'message' => 'Invoice or candidate not found'];
+                }
+                $candidate = $invoice->candidate;
+                $totalAmt = number_format($invoice->amount + $invoice->late_fee, 2);
+
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    '🚨 Urgent: Late Fee Applied on Service Charge',
+                    'Admin alert: A late fee of ₹' . number_format($invoice->late_fee, 2) . ' is applied. Total due: ₹' . $totalAmt . '. Clear your dues immediately to avoid legal hold.',
+                    route('candidate.serviceCharge.show'),
+                    'fas fa-exclamation-circle'
+                );
+
+                $emailSent = false;
+                if ($candidate->email) {
+                    try {
+                        Mail::to($candidate->email)->send(new \App\Mail\LateFeeAlertMail($invoice, $invoice->late_fee));
+                        $emailSent = true;
+                    } catch (\Exception $e) {
+                        Log::error("Email failed for {$candidate->email}: " . $e->getMessage());
+                    }
+                }
+                return ['id' => $id, 'name' => $candidate->name, 'email' => $candidate->email, 'status' => 'success', 'email_sent' => $emailSent];
+
+            case 'custom':
+                $candidate = User::find($id);
+                if (!$candidate) {
+                    return ['id' => $id, 'name' => 'User #' . $id, 'status' => 'skipped', 'message' => 'User not found'];
+                }
+                $title = $payload['title'] ?? 'Notification from Admin';
+                $message = $payload['message'] ?? '';
+                $sendEmail = filter_var($payload['send_email'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+                NotificationHelper::notifyUser(
+                    $candidate->id,
+                    $title,
+                    $message,
+                    route('candidate.dashboard'),
+                    'fas fa-bullhorn'
+                );
+
+                $emailSent = false;
+                if ($sendEmail && $candidate->email) {
+                    try {
+                        Mail::to($candidate->email)->send(new \App\Mail\CustomAdminMessageMail($candidate, $title, $message));
+                        $emailSent = true;
+                    } catch (\Exception $e) {
+                        Log::error("Email failed for {$candidate->email}: " . $e->getMessage());
+                    }
+                }
+                return ['id' => $id, 'name' => $candidate->name, 'email' => $candidate->email, 'status' => 'success', 'email_sent' => $emailSent];
+
+            default:
+                throw new \InvalidArgumentException("Unknown reminder type: {$type}");
+        }
     }
 
     /**

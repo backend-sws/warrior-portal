@@ -79,6 +79,20 @@ class TuitionController extends Controller
 
             $locationName = $request->input('location_name') ?: ($request->input('latitude') ? 'GPS: ' . $request->input('latitude') . ', ' . $request->input('longitude') : ($profile->address ?? 'Location not shared'));
 
+            $sigData = $profile->signature_data;
+            $sigType = $profile->signature_type ?? 'draw';
+
+            if ($request->filled('signature_type')) {
+                $reqSigType = $request->signature_type;
+                if ($reqSigType === 'draw' && $request->filled('signature_data') && str_starts_with($request->signature_data, 'data:image')) {
+                    $sigData = $request->signature_data;
+                    $sigType = 'draw';
+                } elseif ($reqSigType === 'type' && $request->filled('signature_data')) {
+                    $sigData = $request->signature_data;
+                    $sigType = 'type';
+                }
+            }
+
             $signatureMeta = [
                 'name' => auth()->user()->name,
                 'phone' => auth()->user()->phone,
@@ -90,6 +104,8 @@ class TuitionController extends Controller
                 'location' => $locationName,
                 'signed_at' => now()->toIso8601String(),
                 'photo_path' => $photoPath,
+                'signature_data' => $sigData,
+                'signature_type' => $sigType,
             ];
 
             $updateData = [
@@ -101,6 +117,14 @@ class TuitionController extends Controller
                 'tuition_longitude' => $request->input('longitude'),
                 'tuition_location_name' => $locationName,
             ];
+
+            // If profile has no digital signature yet and one was drawn/typed here, persist to profile
+            if (!$profile->signature_data && $sigData) {
+                $updateData['signature_data'] = $sigData;
+                $updateData['signature_type'] = $sigType;
+                $updateData['signature_date_time'] = now();
+                $updateData['is_agreement_signed'] = true;
+            }
 
             // If profile has no live photo yet, set it
             if (!$profile->live_photo_path && $photoPath) {
@@ -125,8 +149,8 @@ class TuitionController extends Controller
     {
         $profile = auth()->user()->profile;
 
-        if (!$profile || !$profile->gender || !$profile->date_of_birth || !$profile->address || !$profile->preferred_state_id || !$profile->preferred_city_id || !$profile->subject_id || !$profile->highest_qualification_id) {
-            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your Basic Profile (Date of Birth, Gender, Address, Location, Qualification & Subject) before applying for home tuitions.');
+        if (!$profile || !$profile->gender || !$profile->date_of_birth || !$profile->address || !$profile->preferred_state_id || !$profile->preferred_city_id || !$profile->highest_qualification_id) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your Basic Profile (Date of Birth, Gender, Address, Location & Qualification) before applying for home tuitions.');
         }
 
         if (!$profile->is_tuition_agreement_signed) {

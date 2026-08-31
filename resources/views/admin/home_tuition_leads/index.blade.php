@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'Home Tuitions')
-@section('subtitle', 'Manage tuition requirements, approve to publish live on website, and assign verified teachers.')
+@section('title', 'Parents & Home Tuitions')
+@section('subtitle', 'Manage offline/walk-in parent inquiries, approve requirements live, and assign verified tutors.')
 
 @section('actions')
-    <a href="{{ route('admin.tuition-leads.create') }}" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition-all shadow flex items-center gap-2">
-        <i class="fas fa-plus"></i> <span>Add Tuition Requirement</span>
+    <a href="{{ route('admin.tuition-leads.create') }}" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow flex items-center gap-2">
+        <i class="fas fa-plus"></i> <span>Add Parent Requirement (Manual Entry)</span>
     </a>
 @endsection
 
@@ -61,32 +61,51 @@
 </div>
 
 {{-- Filter/Search Bar --}}
-<div class="bg-card-bg rounded-t-2xl border-x border-t border-card-border p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-    <div class="text-sm text-text-dark/50 font-medium whitespace-nowrap">
-        Showing {{ $leads->firstItem() ?? 0 }} to {{ $leads->lastItem() ?? 0 }} of {{ $leads->total() }} entries
+<div class="bg-card-bg rounded-t-2xl border-x border-t border-card-border p-4 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
+    <div class="flex items-center gap-2 text-xs sm:text-sm text-text-dark/60 font-medium whitespace-nowrap">
+        <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span>Showing <strong>{{ $leads->firstItem() ?? 0 }}–{{ $leads->lastItem() ?? 0 }}</strong> of <strong>{{ $leads->total() }}</strong> entries</span>
     </div>
-    <form action="{{ url()->current() }}" method="GET" class="w-full flex flex-col sm:flex-row items-center justify-end gap-3 flex-wrap">
-        <div class="relative w-full sm:w-64">
-            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-text-dark/40 text-sm"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Tuition ID (e.g. TUI-0001), name, phone..." 
-                   class="w-full pl-9 pr-4 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+
+    <form action="{{ url()->current() }}" method="GET" class="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
+        {{-- Search Input --}}
+        <div class="relative w-full sm:w-72">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+            <input type="text" name="search" value="{{ request('search') }}" 
+                   placeholder="Tuition ID, parent, mobile, location..." 
+                   class="w-full pl-8 pr-8 py-2 bg-secondary-bg border border-card-border rounded-xl text-xs sm:text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/40 transition-all">
+            @if(request('search'))
+                <a href="{{ route('admin.tuition-leads.index', ['status' => request('status')]) }}" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-dark/40 hover:text-red-500 transition-colors">
+                    <i class="fas fa-times-circle text-xs"></i>
+                </a>
+            @endif
         </div>
         
-        <select name="status" class="w-full sm:w-auto px-3 py-2 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50">
-            <option value="">All Statuses</option>
-            <option value="New Lead" {{ request('status') == 'New Lead' ? 'selected' : '' }}>Pending Approval</option>
-            <option value="Approved" {{ request('status') == 'Approved' ? 'selected' : '' }}>Live on Website</option>
-            <option value="Confirmed" {{ request('status') == 'Confirmed' ? 'selected' : '' }}>Teacher Assigned</option>
-            <option value="Cancelled" {{ request('status') == 'Cancelled' ? 'selected' : '' }}>Closed</option>
-        </select>
+        {{-- Status Filter --}}
+        <div class="w-full sm:w-48 shrink-0">
+            <select name="status" class="w-full py-2 px-3 bg-secondary-bg border border-card-border rounded-xl text-xs sm:text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/40">
+                <option value="">All Statuses</option>
+                <option value="New Lead" {{ request('status') == 'New Lead' ? 'selected' : '' }}>Pending Approval</option>
+                <option value="Approved" {{ request('status') == 'Approved' ? 'selected' : '' }}>Live on Website</option>
+                <option value="Confirmed" {{ request('status') == 'Confirmed' ? 'selected' : '' }}>Teacher Assigned</option>
+                <option value="Cancelled" {{ request('status') == 'Cancelled' ? 'selected' : '' }}>Closed</option>
+            </select>
+        </div>
 
-        <button type="submit" class="w-full sm:w-auto bg-accent-blue text-white rounded-xl px-4 py-2 text-sm font-bold shadow hover:bg-accent-blue-hover transition-colors whitespace-nowrap">Filter</button>
-        
-        @if(request()->anyFilled(['search', 'status']))
-            <a href="{{ route('admin.tuition-leads.index') }}" class="text-text-dark/40 hover:text-red-400 transition-colors w-full sm:w-auto text-center" title="Clear Filters">
-                <i class="fas fa-times"></i>
-            </a>
-        @endif
+        {{-- Filter Submit & Reset Buttons --}}
+        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+            <button type="submit" class="flex-1 sm:flex-none px-4 py-2 bg-accent-blue hover:bg-accent-blue-hover text-white rounded-xl text-xs sm:text-sm font-bold shadow transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                <i class="fas fa-filter text-xs"></i>
+                <span>Filter</span>
+            </button>
+            
+            @if(request()->anyFilled(['search', 'status']))
+                <a href="{{ route('admin.tuition-leads.index') }}" class="px-3 py-2 bg-secondary-bg hover:bg-red-50 text-text-dark/60 hover:text-red-600 border border-card-border rounded-xl text-xs sm:text-sm font-bold transition-colors flex items-center justify-center gap-1 cursor-pointer" title="Clear all filters">
+                    <i class="fas fa-undo text-xs"></i>
+                    <span class="sm:hidden">Reset</span>
+                </a>
+            @endif
+        </div>
     </form>
 </div>
 
