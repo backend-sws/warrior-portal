@@ -65,11 +65,11 @@ return [
         'currency'        => env('PHONEPE_CURRENCY', 'INR'),
         'merchant_name'   => env('PHONEPE_MERCHANT_NAME', 'Warriors Educare'),
         // V2 Auth Token URL
-        'auth_url'        => env('PHONEPE_ENV', 'UAT') === 'PRODUCTION'
+        'auth_url'        => strtoupper(env('PHONEPE_ENV', 'UAT')) === 'PRODUCTION'
                               ? 'https://api.phonepe.com/apis/identity-manager/v1/oauth/token'
                               : 'https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token',
         // V2 Base API URL
-        'base_url'        => env('PHONEPE_ENV', 'UAT') === 'PRODUCTION'
+        'base_url'        => strtoupper(env('PHONEPE_ENV', 'UAT')) === 'PRODUCTION'
                               ? 'https://api.phonepe.com/apis/pg'
                               : 'https://api-preprod.phonepe.com/apis/pg-sandbox',
     ],
