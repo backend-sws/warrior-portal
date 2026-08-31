@@ -60,10 +60,10 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Phone Number <span class="text-red-500">*</span></label>
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Phone Number <span class="text-xs text-text-dark/40 font-normal lowercase">(optional)</span></label>
                         <div class="relative">
                             <i class="fas fa-phone-alt absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
-                            <input type="text" name="parent_mobile" value="{{ old('parent_mobile', $lead->parent_mobile) }}" required placeholder="Enter phone number"
+                            <input type="text" name="parent_mobile" value="{{ old('parent_mobile', $lead->parent_mobile) }}" placeholder="Enter phone number (optional)"
                                    class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
                         </div>
                         @error('parent_mobile') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
