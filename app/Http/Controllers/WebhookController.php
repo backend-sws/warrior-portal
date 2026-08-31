@@ -81,7 +81,11 @@ class WebhookController extends Controller
         }
 
         try {
-            if ($state === 'COMPLETED' || ($payload['code'] ?? '') === 'PAYMENT_SUCCESS') {
+            $isSuccess = $state === 'COMPLETED'
+                || ($payload['code'] ?? '') === 'PAYMENT_SUCCESS'
+                || in_array(strtolower($type), ['checkout.order.completed', 'pg.order.completed', 'payment.page.order.completed', 'paylink.order.completed']);
+
+            if ($isSuccess) {
                 $this->handlePhonePeSuccess($orderId, $providerTxn, $amountInRs, $paymentType, $utr, $payload);
             } else {
                 $errorMsg = $data['errorContext']['description'] ?? ($payload['message'] ?? 'Payment failed');
