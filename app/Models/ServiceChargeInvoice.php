@@ -12,10 +12,10 @@ class ServiceChargeInvoice extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'due_date' => 'date',
-        'paid_at' => 'datetime',
-        'amount' => 'decimal:2',
-        'late_fee' => 'decimal:2',
+        'due_date'     => 'date',
+        'payment_date' => 'datetime',
+        'amount'       => 'decimal:2',
+        'late_fee'     => 'decimal:2',
     ];
 
     public function candidate()

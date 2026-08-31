@@ -281,6 +281,10 @@ class ServiceChargeController extends Controller
             ->with(['candidate.profile', 'jobApplication.jobPost', 'tuitionLead'])
             ->firstOrFail();
 
+        if ($invoice->status !== 'paid') {
+            return redirect()->route('candidate.serviceCharge.show')->with('error', 'Invoice can only be downloaded after payment is completed.');
+        }
+
         if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('candidate.serviceCharge.invoice_pdf', compact('invoice', 'user'));
             return $pdf->download('Invoice_' . ($invoice->invoice_number ?: $invoice->id) . '.pdf');

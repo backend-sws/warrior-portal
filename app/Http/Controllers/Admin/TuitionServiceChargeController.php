@@ -6,10 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\ServiceChargeInvoice;
 use App\Models\HomeTuitionLead;
 use App\Models\User;
+use App\Models\PaymentTransaction;
+use App\Models\CandidatePaymentAccount;
+use App\Models\CandidatePaymentRecord;
 use App\Helpers\NotificationHelper;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class TuitionServiceChargeController extends Controller
 {
@@ -136,15 +141,20 @@ class TuitionServiceChargeController extends Controller
             return back()->with('info', 'Invoice is already marked as paid.');
         }
 
+        $amount = (float)($invoice->amount + ($invoice->late_fee ?? 0));
+
         $invoice->update([
-            'status'         => 'paid',
-            'paid_at'        => now(),
-            'payment_method' => $request->input('payment_method', 'Manual / Cash / Direct UPI'),
+            'status'       => 'paid',
+            'payment_date' => now(),
         ]);
 
         if ($invoice->candidate && $invoice->candidate->profile) {
             $invoice->candidate->profile->decrement('pending_amount', min($invoice->amount, $invoice->candidate->profile->pending_amount));
+            $invoice->candidate->profile->update(['is_fee_paid' => true]);
         }
+
+        // Record Transaction and Candidate Payment Ledger
+        $this->recordTransactionAndAccount($invoice, $amount, 'Cash / Direct Admin Collection');
 
         NotificationHelper::notifyUser(
             $invoice->candidate_id,
@@ -154,7 +164,7 @@ class TuitionServiceChargeController extends Controller
             'fas fa-check-circle'
         );
 
-        return back()->with('success', "Invoice #{$invoice->id} marked as Paid successfully.");
+        return back()->with('success', "Invoice #{$invoice->id} marked as Paid & transaction record created successfully.");
     }
 
     public function sendReminder(Request $request, $id)
@@ -196,11 +206,11 @@ class TuitionServiceChargeController extends Controller
         $oldStatus = $invoice->status;
 
         $invoice->update([
-            'amount'      => $request->amount,
-            'due_date'    => $request->due_date,
-            'description' => $request->description,
-            'status'      => $request->status,
-            'paid_at'     => $request->status === 'paid' ? ($invoice->paid_at ?? now()) : null,
+            'amount'       => $request->amount,
+            'due_date'     => $request->due_date,
+            'description'  => $request->description,
+            'status'       => $request->status,
+            'payment_date' => $request->status === 'paid' ? ($invoice->payment_date ?? now()) : null,
         ]);
 
         // Adjust profile balance
@@ -208,6 +218,9 @@ class TuitionServiceChargeController extends Controller
             $profile = $invoice->candidate->profile;
             if ($oldStatus !== 'paid' && $request->status === 'paid') {
                 $profile->decrement('pending_amount', min($oldAmount, $profile->pending_amount));
+                $profile->update(['is_fee_paid' => true]);
+                // Record transaction
+                $this->recordTransactionAndAccount($invoice, (float)$request->amount, 'Manual / Direct Admin Update');
             } elseif ($oldStatus === 'paid' && $request->status !== 'paid') {
                 $profile->increment('pending_amount', $request->amount);
             } elseif ($oldStatus !== 'paid' && $request->status !== 'paid') {
@@ -223,10 +236,75 @@ class TuitionServiceChargeController extends Controller
         return back()->with('success', "Invoice #{$invoice->id} updated successfully.");
     }
 
+    private function recordTransactionAndAccount($invoice, $amount, $paymentMode = 'Manual / Direct Admin')
+    {
+        try {
+            // 1. PaymentTransaction for Online & Offline ledger
+            PaymentTransaction::create([
+                'candidate_id'   => $invoice->candidate_id,
+                'amount'         => $amount,
+                'currency'       => 'INR',
+                'order_id'       => 'ADM_SC_' . $invoice->id . '_' . time(),
+                'transaction_id' => 'MANUAL_' . $invoice->id . '_' . time(),
+                'payment_id'     => 'MANUAL_' . $invoice->id . '_' . time(),
+                'type'           => 'service_charge',
+                'status'         => 'success',
+                'gateway'        => 'manual_admin',
+                'payment_method' => $paymentMode,
+                'invoice_id'     => $invoice->id,
+                'tuition_lead_id'=> $invoice->home_tuition_lead_id,
+                'ip_address'     => request()->ip(),
+            ]);
+
+            // 2. CandidatePaymentAccount & CandidatePaymentRecord for Admin Candidate Payments Ledger
+            $candidate = $invoice->candidate ?? User::find($invoice->candidate_id);
+            if ($candidate) {
+                $account = CandidatePaymentAccount::firstOrCreate(
+                    ['candidate_id' => $candidate->id],
+                    [
+                        'candidate_name' => $candidate->name,
+                        'mobile_number'  => $candidate->phone ?? 'N/A',
+                        'role'           => $invoice->jobApplication?->jobPost?->title ?? ($invoice->tuitionLead ? 'Home Tutor' : 'Teacher'),
+                        'school_name'    => $invoice->jobApplication?->jobPost?->school_name ?? ($invoice->tuitionLead ? 'Home Tuition' : 'Private Placement'),
+                        'total_service_charge' => $amount,
+                        'paid_amount'    => 0,
+                        'pending_amount' => $amount,
+                        'status'         => 'active',
+                    ]
+                );
+
+                $account->paid_amount += $amount;
+                $account->pending_amount = max(0, $account->pending_amount - $amount);
+                if ($account->pending_amount <= 0) {
+                    $account->status = 'completed';
+                }
+                $account->save();
+
+                CandidatePaymentRecord::create([
+                    'candidate_payment_account_id' => $account->id,
+                    'amount'         => $amount,
+                    'payment_mode'   => $paymentMode,
+                    'transaction_id' => 'MANUAL_' . $invoice->id . '_' . time(),
+                    'payment_date'   => now(),
+                    'received_by'    => auth()->user()?->name ?? 'Super Admin',
+                    'notes'          => 'Service Charge Invoice #' . $invoice->id . ' marked as Paid (' . ($invoice->description ?: 'Placement Service Charge') . ')',
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error recording payment transaction for Invoice #' . $invoice->id . ': ' . $e->getMessage());
+        }
+    }
+
     public function showInvoice($id)
     {
         $invoice = ServiceChargeInvoice::with(['candidate.profile', 'jobApplication.jobPost', 'tuitionLead'])->findOrFail($id);
-        return view('candidate.serviceCharge.invoice', compact('invoice'));
+
+        if ($invoice->status !== 'paid') {
+            return back()->with('error', 'Invoice can only be viewed or downloaded after payment is completed.');
+        }
+
+        $user = $invoice->candidate;
+        return view('candidate.serviceCharge.invoice_pdf', compact('invoice', 'user'));
     }
 
     public function destroy($id)
