@@ -136,7 +136,9 @@
             <!-- Hidden Form Submitted Upon PhonePe Callback -->
             <form id="phonepe-callback-form" action="{{ route('candidate.serviceCharge.callback') }}" method="POST" class="hidden">
                 @csrf
+                <input type="hidden" name="merchantOrderId" id="cb_merchantOrderId" value="{{ $order['order_id'] }}">
                 <input type="hidden" name="merchantTransactionId" id="cb_merchantTransactionId" value="{{ $order['order_id'] }}">
+                <input type="hidden" name="orderId" id="cb_orderId">
                 <input type="hidden" name="transactionId" id="cb_transactionId">
                 <input type="hidden" name="code" id="cb_code" value="PAYMENT_SUCCESS">
             </form>
@@ -195,8 +197,10 @@
         const isMock = orderData.is_mock || !orderData.redirect_url;
 
         function triggerCallback(paymentId, orderId) {
-            document.getElementById('cb_transactionId').value = paymentId;
+            document.getElementById('cb_merchantOrderId').value = orderId;
             document.getElementById('cb_merchantTransactionId').value = orderId;
+            document.getElementById('cb_orderId').value = paymentId;
+            document.getElementById('cb_transactionId').value = paymentId;
             document.getElementById('cb_code').value = 'PAYMENT_SUCCESS';
             
             const btn = document.getElementById('phonepe-pay-button');

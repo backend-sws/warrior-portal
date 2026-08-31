@@ -131,12 +131,14 @@ class ServiceChargeController extends Controller
 
     public function callback(Request $request)
     {
-        $orderId = $request->input('merchantTransactionId')
+        $orderId = $request->input('merchantOrderId')
+            ?? $request->input('merchantTransactionId')
             ?? $request->input('order_id')
             ?? $request->input('razorpay_order_id')
             ?? session('active_parent_order_id');
 
-        $paymentId = $request->input('transactionId')
+        $paymentId = $request->input('orderId')
+            ?? $request->input('transactionId')
             ?? $request->input('payment_id')
             ?? $request->input('razorpay_payment_id')
             ?? ($orderId ? 'PP_' . $orderId : null);
