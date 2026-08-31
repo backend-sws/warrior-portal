@@ -56,16 +56,22 @@ return [
     |--------------------------------------------------------------------------
     */
     'phonepe' => [
-        'merchant_id'    => env('PHONEPE_MERCHANT_ID', 'PGTESTPAYUAT86'),
-        'salt_key'       => env('PHONEPE_SALT_KEY', '96434309-7796-489d-8924-ab56988a6076'),
-        'salt_index'     => env('PHONEPE_SALT_INDEX', '1'),
-        'env'            => env('PHONEPE_ENV', 'UAT'), // 'UAT' or 'PRODUCTION'
-        'currency'       => env('PHONEPE_CURRENCY', 'INR'),
-        'merchant_name'  => env('PHONEPE_MERCHANT_NAME', 'Warriors Educare'),
-        // Base API URL
-        'base_url'       => env('PHONEPE_ENV', 'UAT') === 'PRODUCTION'
-                            ? 'https://api.phonepe.com/apis/hermes'
-                            : 'https://api-preprod.phonepe.com/apis/pg-sandbox',
+        // V2 Credentials (from PhonePe Business Dashboard)
+        'client_id'       => env('PHONEPE_CLIENT_ID', ''),
+        'client_secret'   => env('PHONEPE_CLIENT_SECRET', ''),
+        'client_version'  => env('PHONEPE_CLIENT_VERSION', '1'),
+        'webhook_secret'  => env('PHONEPE_WEBHOOK_SECRET', ''),
+        'env'             => env('PHONEPE_ENV', 'UAT'), // 'UAT' or 'PRODUCTION'
+        'currency'        => env('PHONEPE_CURRENCY', 'INR'),
+        'merchant_name'   => env('PHONEPE_MERCHANT_NAME', 'Warriors Educare'),
+        // V2 Auth Token URL
+        'auth_url'        => env('PHONEPE_ENV', 'UAT') === 'PRODUCTION'
+                              ? 'https://api.phonepe.com/apis/identity-manager/v1/oauth/token'
+                              : 'https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token',
+        // V2 Base API URL
+        'base_url'        => env('PHONEPE_ENV', 'UAT') === 'PRODUCTION'
+                              ? 'https://api.phonepe.com/apis/pg'
+                              : 'https://api-preprod.phonepe.com/apis/pg-sandbox',
     ],
 
 ];

@@ -22,72 +22,79 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle incoming PhonePe webhook events (Server-to-Server)
+     * Handle incoming PhonePe V2 webhook events (Server-to-Server)
+     *
+     * V2 sends plain JSON body (not base64 encoded)
+     * Signature: x-phonepe-checksum-signature header with HMAC SHA256
      */
     public function handlePhonePe(Request $request)
     {
         $rawContent = $request->getContent();
-        $signature  = $request->header('X-VERIFY') ?: $request->header('x-verify');
+        $signature  = $request->header('x-phonepe-checksum-signature')
+                   ?: $request->header('X-PHONEPE-CHECKSUM-SIGNATURE')
+                   ?: $request->header('X-VERIFY')       // fallback for older format
+                   ?: $request->header('x-verify');
         $rawInput   = $request->all();
 
-        Log::info('PhonePe Webhook Received', [
+        Log::info('PhonePe V2 Webhook Received', [
             'signature' => $signature ? 'Present' : 'Missing',
             'has_raw'   => !empty($rawContent),
         ]);
 
-        $base64Response = $rawInput['response'] ?? null;
+        // V2 sends direct JSON payload (no base64 encoding)
+        $payload = $rawInput;
 
-        // If response is nested in json body
-        if (!$base64Response && !empty($rawContent)) {
-            $decodedJson = json_decode($rawContent, true);
-            $base64Response = $decodedJson['response'] ?? null;
+        // If payload is empty, try decoding raw content
+        if (empty($payload) && !empty($rawContent)) {
+            $payload = json_decode($rawContent, true);
         }
 
-        if (!$base64Response) {
-            Log::warning('PhonePe Webhook Missing Base64 Response Payload', $rawInput);
-            return response()->json(['success' => false, 'message' => 'Missing response payload'], 400);
+        if (empty($payload)) {
+            Log::warning('PhonePe V2 Webhook Missing Payload', ['raw' => $rawContent]);
+            return response()->json(['success' => false, 'message' => 'Missing payload'], 400);
         }
 
-        // Verify PhonePe signature if present
-        if ($signature && !$this->phonepe->verifyWebhookSignature($base64Response, $signature)) {
-            Log::warning('PhonePe Webhook Signature Verification Failed');
+        // Verify HMAC signature if present
+        if ($signature && !$this->phonepe->verifyWebhookSignature($rawContent, $signature)) {
+            Log::warning('PhonePe V2 Webhook Signature Verification Failed');
             return response()->json(['success' => false, 'message' => 'Invalid signature'], 400);
         }
 
-        // Decode Base64 JSON Payload
-        $decodedPayload = json_decode(base64_decode($base64Response), true);
+        Log::info('PhonePe V2 Webhook Decoded Payload', ['payload' => $payload]);
 
-        if (!$decodedPayload || !isset($decodedPayload['code'])) {
-            Log::warning('PhonePe Webhook Failed to Decode Base64 Payload', ['payload' => $base64Response]);
-            return response()->json(['success' => false, 'message' => 'Invalid JSON in base64 response'], 400);
+        // V2 payload structure
+        $type        = $payload['type'] ?? 'PG_ORDER_COMPLETED';
+        $data        = $payload['payload'] ?? $payload['data'] ?? $payload;
+        $orderId     = $data['merchantOrderId'] ?? $data['merchantTransactionId'] ?? '';
+        $providerTxn = $data['orderId'] ?? $data['transactionId'] ?? '';
+        $state       = $data['state'] ?? '';
+        $amountInRs  = isset($data['amount']) ? ($data['amount'] / 100) : 0;
+
+        // Extract payment method from paymentDetails
+        $paymentType = 'PHONEPE_ONLINE';
+        $utr         = '';
+        $paymentDetails = $data['paymentDetails'] ?? [];
+        if (!empty($paymentDetails) && is_array($paymentDetails)) {
+            $latestPayment = end($paymentDetails);
+            $paymentType   = $latestPayment['paymentMode'] ?? ($latestPayment['rail']['type'] ?? 'PHONEPE_ONLINE');
+            $utr           = $latestPayment['rail']['utr'] ?? ($latestPayment['rail']['pgTransactionId'] ?? '');
         }
 
-        Log::info('PhonePe Webhook Decoded Payload', ['payload' => $decodedPayload]);
-
-        $code        = $decodedPayload['code'] ?? '';
-        $data        = $decodedPayload['data'] ?? [];
-        $merchantId  = $data['merchantId'] ?? '';
-        $orderId     = $data['merchantTransactionId'] ?? '';
-        $providerTxn = $data['transactionId'] ?? '';
-        $amountInRs  = isset($data['amount']) ? ($data['amount'] / 100) : 0;
-        $state       = $data['state'] ?? '';
-        $paymentType = $data['paymentInstrument']['type'] ?? 'PHONEPE_ONLINE';
-        $utr         = $data['paymentInstrument']['utr'] ?? ($data['paymentInstrument']['pgTransactionId'] ?? '');
-
         try {
-            if ($code === 'PAYMENT_SUCCESS' || $state === 'COMPLETED') {
-                $this->handlePhonePeSuccess($orderId, $providerTxn, $amountInRs, $paymentType, $utr, $decodedPayload);
+            if ($state === 'COMPLETED' || ($payload['code'] ?? '') === 'PAYMENT_SUCCESS') {
+                $this->handlePhonePeSuccess($orderId, $providerTxn, $amountInRs, $paymentType, $utr, $payload);
             } else {
-                $this->handlePhonePeFailed($orderId, $providerTxn, $code, $decodedPayload['message'] ?? 'Payment failed', $decodedPayload);
+                $errorMsg = $data['errorContext']['description'] ?? ($payload['message'] ?? 'Payment failed');
+                $this->handlePhonePeFailed($orderId, $providerTxn, $state, $errorMsg, $payload);
             }
 
             return response()->json([
                 'success' => true,
-                'message' => 'PhonePe webhook processed successfully',
+                'message' => 'PhonePe V2 webhook processed successfully',
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error("PhonePe Webhook Processing Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            Log::error("PhonePe V2 Webhook Processing Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
