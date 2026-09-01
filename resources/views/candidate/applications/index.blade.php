@@ -79,9 +79,15 @@
                         <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-[#031b4e] border border-blue-100 flex items-center justify-center text-sm font-black shrink-0">
-                                        {{ strtoupper(substr($app->jobPost->school_name ?? 'SC', 0, 2)) }}
-                                    </div>
+                                    @if(in_array($app->status, ['shortlisted', 'hired']) || $app->interview_date)
+                                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center justify-center text-sm font-black shrink-0">
+                                            {{ strtoupper(substr($app->jobPost->school_name ?: 'SC', 0, 2)) }}
+                                        </div>
+                                    @else
+                                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-[#031b4e] border border-blue-100 flex items-center justify-center text-lg font-black shrink-0">
+                                            <i class="fas fa-school text-sky-500"></i>
+                                        </div>
+                                    @endif
                                     <div>
                                         <div class="flex items-center gap-1.5 mb-1">
                                             <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
@@ -94,7 +100,11 @@
                                             </a>
                                         </h3>
                                         <p class="text-xs text-slate-500 mt-0.5">
-                                            <i class="fas fa-school mr-1 text-slate-400"></i> {{ $app->jobPost->school_name }} &bull;
+                                            @if(in_array($app->status, ['shortlisted', 'hired']) || $app->interview_date)
+                                                <i class="fas fa-university mr-1 text-indigo-600"></i> <strong class="text-[#031b4e]">{{ $app->jobPost->school_name }}</strong> &bull;
+                                            @else
+                                                <i class="fas fa-shield-alt mr-1 text-[#0ea5e9]"></i> Verified Educational Institution &bull;
+                                            @endif
                                             <i class="fas fa-map-marker-alt ml-1 mr-0.5 text-red-500"></i> {{ $app->jobPost->city?->name ?? 'N/A' }}
                                         </p>
                                     </div>
@@ -103,7 +113,7 @@
                                 <div class="flex items-center gap-2 self-start sm:self-auto">
                                     @if($app->status === 'hired')
                                         <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
-                                            <i class="fas fa-trophy text-emerald-600"></i> Selected & Placed
+                                            <i class="fas fa-trophy text-emerald-600"></i> Selected & Placed 🎉
                                         </span>
                                     @elseif($app->status === 'rejected')
                                         <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-red-100 text-red-700 border border-red-200">
@@ -121,23 +131,42 @@
                                 </div>
                             </div>
 
-                            @if($app->interview_date)
-                                <div class="mb-4 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-between text-xs">
-                                    <div class="flex items-center gap-2 text-amber-900 font-bold">
-                                        <i class="fas fa-calendar-check text-amber-600 text-sm"></i>
-                                        <span>Interview Scheduled: {{ $app->interview_date->format('l, d M Y \a\t h:i A') }}</span>
+                            @if($app->interview_date || in_array($app->status, ['shortlisted', 'hired']))
+                                <div class="mb-4 p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-xs">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2 text-amber-950 font-black text-sm">
+                                                <i class="fas fa-university text-amber-600"></i>
+                                                <span>Institution: {{ $app->jobPost->school_name }}</span>
+                                            </div>
+                                            @if($app->interview_date)
+                                                <div class="text-amber-800 font-bold flex items-center gap-1.5">
+                                                    <i class="fas fa-calendar-check text-amber-600"></i>
+                                                    <span>Interview Scheduled: {{ $app->interview_date->format('l, d M Y \a\t h:i A') }}</span>
+                                                </div>
+                                            @endif
+                                            @if($app->jobPost->contact_person || $app->jobPost->phone)
+                                                <div class="text-slate-600 font-medium text-[11px]">
+                                                    Contact Person: {{ $app->jobPost->contact_person ?? 'HR / Principal' }} 
+                                                    @if($app->jobPost->phone) &bull; 📞 {{ $app->jobPost->phone }} @endif
+                                                </div>
+                                            @endif
+                                        </div>
+                                        @if($app->interview_link)
+                                            <a href="{{ $app->interview_link }}" target="_blank" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-extrabold shadow-sm transition-all flex items-center gap-1.5 whitespace-nowrap">
+                                                <span>Join Interview</span> <i class="fas fa-arrow-right text-xs"></i>
+                                            </a>
+                                        @endif
                                     </div>
-                                    @if($app->interview_link)
-                                        <a href="{{ $app->interview_link }}" target="_blank" class="px-3 py-1 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 transition-colors">
-                                            Join Interview &rarr;
-                                        </a>
-                                    @endif
                                 </div>
                             @endif
 
                             {{-- Rejection Feedback or Admin Notes --}}
                             @if($app->status === 'rejected' && $app->remarks)
                                 <div class="mb-4 p-3.5 rounded-2xl bg-red-50/80 border border-red-200 text-xs text-red-900">
+                                    <p class="font-bold mb-1">Feedback from Institution:</p>
+                                    <p>{{ $app->remarks }}</p>
+                                </div>
                             @elseif($app->remarks)
                                 <div class="mb-4 p-3 rounded-xl bg-slate-100/80 border border-slate-200 text-xs text-slate-700">
                                     <strong>Admin Note:</strong> "{{ $app->remarks }}"
@@ -229,21 +258,34 @@
                                 </div>
                             </div>
 
-                            {{-- Location & Parent Details if Assigned --}}
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 p-3.5 bg-slate-50 rounded-2xl text-xs text-slate-700">
+                            {{-- Location & Parent Details if Assigned or Shortlisted --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 p-3.5 bg-slate-50 rounded-2xl text-xs text-slate-700 border border-slate-100">
                                 <div class="flex items-center gap-2">
                                     <i class="fas fa-map-marker-alt text-red-500 shrink-0"></i>
-                                    <span class="line-clamp-1"><strong>Location:</strong> {{ $lead?->location ?? 'N/A' }}</span>
+                                    <span class="line-clamp-1"><strong>Location:</strong> {{ $lead?->location ?? 'N/A' }} {{ $lead?->pincode ? '(' . $lead->pincode . ')' : '' }}</span>
                                 </div>
                                 <div>
-                                    @if($status === 'Assigned' && $lead?->parent_mobile)
-                                        <div class="flex items-center gap-2 text-emerald-800 font-bold">
-                                            <i class="fas fa-user-check text-emerald-600"></i>
-                                            <span>Parent: {{ $lead->parent_name }} ({{ $lead->parent_mobile }})</span>
+                                    @if(in_array($status, ['Assigned', 'Shortlisted']) && ($lead?->parent_name || $lead?->parent_mobile))
+                                        <div class="flex items-center justify-between flex-wrap gap-2 text-emerald-800 font-bold bg-emerald-50/80 p-2 rounded-xl border border-emerald-200">
+                                            <div class="flex items-center gap-1.5 truncate">
+                                                <i class="fas fa-user-check text-emerald-600"></i>
+                                                <span class="truncate">Parent: {{ $lead->parent_name ?: 'Parent' }} ({{ $lead->parent_mobile ?: 'N/A' }})</span>
+                                            </div>
+                                            @if($lead?->parent_mobile)
+                                                <div class="flex items-center gap-1.5 shrink-0">
+                                                    <a href="tel:{{ $lead->parent_mobile }}" class="px-2 py-1 bg-emerald-600 text-white rounded-lg text-[11px] hover:bg-emerald-700 flex items-center gap-1">
+                                                        <i class="fas fa-phone-alt text-[9px]"></i> Call
+                                                    </a>
+                                                    <a href="https://wa.me/91{{ preg_replace('/[^0-9]/', '', $lead->parent_mobile) }}" target="_blank" class="px-2 py-1 bg-green-500 text-white rounded-lg text-[11px] hover:bg-green-600 flex items-center gap-1">
+                                                        <i class="fab fa-whatsapp text-[10px]"></i> WhatsApp
+                                                    </a>
+                                                </div>
+                                            @endif
                                         </div>
                                     @else
-                                        <div class="text-slate-500">
-                                            <i class="fas fa-lock text-slate-400 mr-1"></i> Parent details revealed upon tutor confirmation
+                                        <div class="text-slate-500 flex items-center gap-1.5 py-1">
+                                            <i class="fas fa-lock text-slate-400"></i>
+                                            <span>Parent contact details will unlock upon Shortlisting / Assignment</span>
                                         </div>
                                     @endif
                                 </div>

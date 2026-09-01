@@ -115,7 +115,23 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
         $user = auth()->user();
         $profile = $user->profile()->with(['highestQualification', 'preferredState', 'preferredCity', 'subject', 'category'])->first()
             ?? $user->profile()->create([]);
-        return view('candidate.dashboard', compact('profile'));
+
+        $activeJobInterviews = $user->applications()
+            ->with(['jobPost.city', 'jobPost.state', 'jobPost.subject', 'jobPost.category'])
+            ->where(function($q) {
+                $q->whereIn('status', ['shortlisted', 'hired'])
+                  ->orWhereNotNull('interview_date');
+            })
+            ->latest('updated_at')
+            ->get();
+
+        $activeTuitionAssignments = \App\Models\TuitionApplication::with('tuitionLead')
+            ->where('candidate_id', $user->id)
+            ->whereIn('status', ['Assigned', 'Shortlisted'])
+            ->latest('updated_at')
+            ->get();
+
+        return view('candidate.dashboard', compact('profile', 'activeJobInterviews', 'activeTuitionAssignments'));
     })->name('dashboard');
 });
 
