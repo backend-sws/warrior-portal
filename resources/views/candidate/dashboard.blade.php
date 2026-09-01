@@ -293,6 +293,156 @@
                     </a>
                 </div>
 
+                {{-- ================= ACTIVE PLACEMENTS, INTERVIEWS & ASSIGNED TUITIONS ================= --}}
+                @if((isset($activeJobInterviews) && $activeJobInterviews->isNotEmpty()) || (isset($activeTuitionAssignments) && $activeTuitionAssignments->isNotEmpty()))
+                    <div class="space-y-4 reveal">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base sm:text-lg font-black text-[#031b4e] flex items-center gap-2">
+                                <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-sm shadow-xs">
+                                    <i class="fas fa-bullhorn"></i>
+                                </span>
+                                Active Placements, Interviews & Assignments
+                            </h3>
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full animate-pulse">
+                                Action Required / Active
+                            </span>
+                        </div>
+
+                        {{-- 1. Assigned Tuitions Cards --}}
+                        @if(isset($activeTuitionAssignments) && $activeTuitionAssignments->isNotEmpty())
+                            <div class="space-y-3">
+                                @foreach($activeTuitionAssignments as $tAssigned)
+                                    @php $lead = $tAssigned->tuitionLead; @endphp
+                                    <div class="bg-gradient-to-r from-emerald-50/90 via-teal-50/50 to-white border-2 border-emerald-300 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+                                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-lg font-black shrink-0 shadow-md shadow-emerald-500/20">
+                                                    <i class="fas fa-chalkboard-teacher"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-mono text-[10px] font-extrabold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-lg border border-emerald-200">
+                                                            {{ $lead?->tuition_id ?: 'TUI-' . str_pad($lead?->id ?? 0, 4, '0', STR_PAD_LEFT) }}
+                                                        </span>
+                                                        <h4 class="font-black text-[#031b4e] text-base">Class {{ $lead?->class ?? 'N/A' }} ({{ $lead?->subjects }})</h4>
+                                                    </div>
+                                                    <p class="text-xs text-emerald-800 font-semibold mt-0.5">
+                                                        <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> {{ $lead?->location }} {{ $lead?->pincode ? '(' . $lead->pincode . ')' : '' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                @if($tAssigned->status === 'Assigned')
+                                                    <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-600 text-white shadow-xs">
+                                                        <i class="fas fa-check-circle mr-1"></i> Assigned Tutor 🎉
+                                                    </span>
+                                                @else
+                                                    <span class="px-3 py-1 rounded-full text-xs font-black bg-amber-500 text-white shadow-xs">
+                                                        <i class="fas fa-star mr-1"></i> Shortlisted for Demo
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        {{-- Parent Contact Details (Unlocked!) --}}
+                                        <div class="bg-white/90 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+                                            <div class="space-y-1">
+                                                <div class="flex items-center gap-2 text-xs font-black text-[#031b4e]">
+                                                    <i class="fas fa-user-circle text-emerald-600 text-sm"></i>
+                                                    <span>Parent / Student: {{ $lead?->parent_name ?: 'Parent Contact' }}</span>
+                                                </div>
+                                                <div class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                                                    <i class="fas fa-phone-alt text-emerald-600 text-xs"></i>
+                                                    <span>Mobile: <strong class="text-emerald-900 font-mono">{{ $lead?->parent_mobile ?: 'Contact Coordinator' }}</strong></span>
+                                                </div>
+                                            </div>
+
+                                            @if($lead?->parent_mobile)
+                                                <div class="flex items-center gap-2 w-full sm:w-auto">
+                                                    <a href="tel:{{ $lead->parent_mobile }}" class="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5">
+                                                        <i class="fas fa-phone-alt text-[10px]"></i> Call Parent
+                                                    </a>
+                                                    <a href="https://wa.me/91{{ preg_replace('/[^0-9]/', '', $lead->parent_mobile) }}?text={{ urlencode('Namaskar ' . $lead->parent_name . ', Warriors Educare se aapki tuition ke liye contact kar raha hu.') }}" target="_blank" class="flex-1 sm:flex-none px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5">
+                                                        <i class="fab fa-whatsapp text-sm"></i> WhatsApp
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        {{-- 2. Job Interviews & Selections Cards --}}
+                        @if(isset($activeJobInterviews) && $activeJobInterviews->isNotEmpty())
+                            <div class="space-y-3">
+                                @foreach($activeJobInterviews as $jApp)
+                                    <div class="bg-gradient-to-r from-amber-50/90 via-orange-50/50 to-white border-2 border-amber-300 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+                                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-lg font-black shrink-0 shadow-md shadow-indigo-600/20">
+                                                    <i class="fas fa-university"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-mono text-[10px] font-extrabold text-indigo-800 bg-indigo-100 px-2.5 py-0.5 rounded-lg border border-indigo-200">
+                                                            {{ $jApp->jobPost->job_id ?: 'JOB-' . str_pad($jApp->jobPost->id, 4, '0', STR_PAD_LEFT) }}
+                                                        </span>
+                                                        <h4 class="font-black text-[#031b4e] text-base">{{ $jApp->jobPost->title }}</h4>
+                                                    </div>
+                                                    <p class="text-xs text-indigo-900 font-extrabold mt-0.5 flex items-center gap-1.5">
+                                                        <i class="fas fa-school text-indigo-600"></i>
+                                                        <span>{{ $jApp->jobPost->school_name }}</span> &bull;
+                                                        <span class="text-slate-500 font-semibold">{{ $jApp->jobPost->city?->name }}, {{ $jApp->jobPost->state?->name }}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                @if($jApp->status === 'hired')
+                                                    <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-600 text-white shadow-xs">
+                                                        <i class="fas fa-trophy mr-1"></i> Selected & Placed 🎉
+                                                    </span>
+                                                @else
+                                                    <span class="px-3 py-1 rounded-full text-xs font-black bg-amber-600 text-white shadow-xs">
+                                                        <i class="fas fa-calendar-check mr-1"></i> Interview Scheduled 📅
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        {{-- School Contact & Interview Link --}}
+                                        <div class="bg-white/90 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+                                            <div class="space-y-1 text-xs">
+                                                @if($jApp->interview_date)
+                                                    <div class="font-black text-amber-900 flex items-center gap-1.5">
+                                                        <i class="fas fa-clock text-amber-600"></i>
+                                                        <span>Interview Date: {{ $jApp->interview_date->format('l, d M Y \a\t h:i A') }}</span>
+                                                    </div>
+                                                @endif
+                                                <div class="text-slate-600 font-medium">
+                                                    Institution Contact: <strong>{{ $jApp->jobPost->contact_person ?? 'HR / Principal' }}</strong>
+                                                    @if($jApp->jobPost->phone) &bull; 📞 <strong class="text-indigo-900">{{ $jApp->jobPost->phone }}</strong> @endif
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                                @if($jApp->interview_link)
+                                                    <a href="{{ $jApp->interview_link }}" target="_blank" class="flex-1 sm:flex-none px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5">
+                                                        <i class="fas fa-video"></i> Join Online Interview
+                                                    </a>
+                                                @endif
+                                                <a href="{{ route('candidate.applications.index') }}" class="flex-1 sm:flex-none px-4 py-2 bg-[#031b4e] hover:bg-blue-900 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5">
+                                                    <span>View Application</span> <i class="fas fa-arrow-right text-[10px]"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
                 {{-- Financial & Pending Charges --}}
                 @if(($profile?->pending_amount ?? 0) > 0)
                     <div class="bg-blue-50/50 border border-blue-200/50 rounded-2xl p-6 flex items-center justify-between shadow-sm reveal reveal-delay-2">

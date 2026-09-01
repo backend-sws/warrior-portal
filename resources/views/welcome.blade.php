@@ -759,11 +759,11 @@
                         <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#031b4e] via-[#0ea5e9] to-[#38bdf8] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         
                         <div>
-                            <!-- Header Row: School Name & Status -->
+                            <!-- Header Row: Confidential Institution & Status -->
                             <div class="flex items-center justify-between gap-2 mb-3">
                                 <span class="text-xs font-bold text-slate-500 flex items-center gap-1.5 truncate">
-                                    <i class="fas fa-school text-[#0ea5e9] text-xs shrink-0"></i>
-                                    <span class="truncate">{{ $job->school_name ?? 'Educational Institution' }}</span>
+                                    <i class="fas fa-shield-alt text-[#0ea5e9] text-xs shrink-0"></i>
+                                    <span class="truncate">Verified Educational Institution</span>
                                 </span>
                                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active

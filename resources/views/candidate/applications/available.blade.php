@@ -169,8 +169,7 @@
                     @php
                         $score = $job->match_score ?? 0;
                         $salaryText = $job->salary_range ?: ($job->min_salary ? '₹' . number_format($job->min_salary) . ($job->max_salary ? ' - ₹' . number_format($job->max_salary) : '') . ' / mo' : 'Negotiable');
-                        $schoolInitial = strtoupper(substr($job->school_name ?: 'SC', 0, 2));
-                        $searchHaystack = strtolower($job->title . ' ' . $job->school_name . ' ' . ($job->subject?->name ?? '') . ' ' . ($job->city?->name ?? '') . ' ' . ($job->category?->name ?? ''));
+                        $searchHaystack = strtolower($job->title . ' ' . ($job->subject?->name ?? '') . ' ' . ($job->city?->name ?? '') . ' ' . ($job->category?->name ?? ''));
                     @endphp
 
                     <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-[#0ea5e9]/40 hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden group"
@@ -204,16 +203,16 @@
 
                             {{-- School Avatar & Title Header --}}
                             <div class="flex items-start gap-3.5 mb-3.5">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#031b4e] to-[#0a3880] text-white flex items-center justify-center text-sm font-black shrink-0 shadow-md shadow-[#031b4e]/15 group-hover:scale-105 transition-transform">
-                                    {{ $schoolInitial }}
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#031b4e] to-[#0a3880] text-sky-400 flex items-center justify-center text-lg font-black shrink-0 shadow-md shadow-[#031b4e]/15 group-hover:scale-105 transition-transform">
+                                    <i class="fas fa-school"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <h3 class="font-extrabold text-base sm:text-[17px] text-[#031b4e] group-hover:text-[#0ea5e9] transition-colors leading-tight truncate" title="{{ $job->title }}">
                                         {{ $job->title ?: 'Teacher Required' }}
                                     </h3>
                                     <p class="text-xs font-semibold text-slate-500 mt-1 flex items-center gap-1.5 truncate">
-                                        <i class="fas fa-school text-[11px] text-slate-400"></i>
-                                        <span>{{ $job->school_name ?: 'Educational Institution' }}</span>
+                                        <i class="fas fa-shield-alt text-[11px] text-sky-500"></i>
+                                        <span>Verified Institution (Confidential)</span>
                                     </p>
                                 </div>
                             </div>
