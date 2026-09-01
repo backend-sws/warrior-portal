@@ -22,6 +22,7 @@ class CandidateProfile extends Model
         'tuition_agreement_signed_at' => 'datetime',
         'plan_started_at' => 'datetime',
         'agreement_status' => 'string',
+        'tuition_agreement_status' => 'string',
     ];
 
     public function user()

@@ -98,14 +98,20 @@
     </div>
 
     {{-- Tuition Agreement --}}
-    <div class="bg-card-bg border {{ $profile?->is_tuition_agreement_signed ? 'border-teal-500/40 bg-teal-50/10' : 'border-red-500/40 bg-red-50/10' }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl {{ $profile?->is_tuition_agreement_signed ? 'bg-teal-500/10 text-teal-600' : 'bg-red-500/10 text-red-500' }} flex items-center justify-center font-bold text-lg shrink-0">
+    <div class="bg-card-bg border {{ ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed) ? 'border-teal-500/40 bg-teal-50/10' : ($profile?->tuition_agreement_status === 'pending_signature' ? 'border-amber-500/40 bg-amber-50/10' : 'border-slate-300/40 bg-slate-50/20') }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl {{ ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed) ? 'bg-teal-500/10 text-teal-600' : ($profile?->tuition_agreement_status === 'pending_signature' ? 'bg-amber-500/10 text-amber-600' : 'bg-slate-200 text-slate-500') }} flex items-center justify-center font-bold text-lg shrink-0">
             <i class="fas fa-file-signature"></i>
         </div>
         <div>
             <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider">Tuition Agreement</p>
-            <h4 class="text-sm font-black {{ $profile?->is_tuition_agreement_signed ? 'text-teal-600' : 'text-red-500' }}">
-                {{ $profile?->is_tuition_agreement_signed ? 'Tuition Signed' : 'Pending Signature' }}
+            <h4 class="text-sm font-black {{ ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed) ? 'text-teal-600' : ($profile?->tuition_agreement_status === 'pending_signature' ? 'text-amber-600' : 'text-slate-500') }}">
+                @if($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed)
+                    Tuition Signed
+                @elseif($profile?->tuition_agreement_status === 'pending_signature')
+                    Active / Pending Sign
+                @else
+                    Inactive
+                @endif
             </h4>
         </div>
     </div>
@@ -308,30 +314,75 @@
                     <div class="bg-secondary-bg p-4 rounded-2xl border border-card-border space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-text-main">Home Tuition Agreement:</span>
-                            @if($profile?->is_tuition_agreement_signed)
+                            @if($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed)
                                 <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
                                     <i class="fas fa-check-circle mr-0.5"></i> Signed & Valid
                                 </span>
+                            @elseif($profile?->tuition_agreement_status === 'pending_signature')
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                                    <i class="fas fa-hourglass-half mr-0.5"></i> Active on Candidate Panel
+                                </span>
                             @else
                                 <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-card-border/50 text-text-dark/60 border border-card-border">
-                                    <i class="fas fa-clock mr-0.5"></i> Pending
+                                    <i class="fas fa-ban mr-0.5"></i> Inactive / Not Sent
                                 </span>
                             @endif
                         </div>
 
-                        <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                        {{-- 1-Click Action Buttons for Tuition Agreement --}}
+                        @if(!$profile?->is_tuition_agreement_signed && $profile?->tuition_agreement_status !== 'pending_signature')
+                            <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="tuition_agreement_status" value="pending_signature">
+                                <button type="submit" class="w-full py-2.5 px-3 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+                                    <i class="fas fa-paper-plane"></i> <span>Activate Tuition Agreement on Candidate Panel</span>
+                                </button>
+                                <p class="text-[10px] text-text-dark/50 mt-1.5 leading-tight">Enables digital signing wizard for candidate on home tuitions page.</p>
+                            </form>
+                        @elseif($profile?->tuition_agreement_status === 'pending_signature')
+                            <div class="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-800 space-y-2">
+                                <p class="font-bold flex items-center gap-1.5"><i class="fas fa-bell"></i> Tuition Agreement is LIVE on candidate portal</p>
+                                <div class="flex items-center gap-2">
+                                    <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST" class="flex-1">
+                                        @csrf
+                                        <input type="hidden" name="tuition_agreement_status" value="signed">
+                                        <button type="submit" class="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+                                            <i class="fas fa-check-double mr-1"></i> Mark Signed
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST" class="flex-1">
+                                        @csrf
+                                        <input type="hidden" name="tuition_agreement_status" value="not_required">
+                                        <button type="submit" class="w-full py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-all">
+                                            <i class="fas fa-times mr-1"></i> Deactivate
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @else
+                            <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="tuition_agreement_status" value="not_required">
+                                <button type="submit" class="w-full py-1.5 px-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+                                    <i class="fas fa-ban"></i> <span>Revoke / Reset Tuition Agreement</span>
+                                </button>
+                            </form>
+                        @endif
+
+                        {{-- Status Selector Dropdown for Tuition Agreement --}}
+                        <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST" class="pt-2 border-t border-card-border flex items-center justify-between gap-2">
                             @csrf
-                            @if($profile?->is_tuition_agreement_signed)
-                                <input type="hidden" name="is_tuition_agreement_signed" value="0">
-                                <button type="submit" class="w-full py-2 px-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
-                                    <i class="fas fa-ban"></i> <span>Revoke Tuition Agreement</span>
+                            <label class="text-[11px] font-bold text-text-dark/70">Change Status:</label>
+                            <div class="flex items-center gap-1.5">
+                                <select name="tuition_agreement_status" class="text-xs bg-card-bg border border-card-border rounded-lg py-1 px-2 text-text-main font-semibold focus:ring-1 focus:ring-accent-blue">
+                                    <option value="not_required" {{ ($profile?->tuition_agreement_status === 'not_required' || (!$profile?->tuition_agreement_status && !$profile?->is_tuition_agreement_signed)) ? 'selected' : '' }}>Not Required / Inactive</option>
+                                    <option value="pending_signature" {{ $profile?->tuition_agreement_status === 'pending_signature' ? 'selected' : '' }}>Pending Signature (Active)</option>
+                                    <option value="signed" {{ ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed) ? 'selected' : '' }}>Signed & Approved</option>
+                                </select>
+                                <button type="submit" class="px-2.5 py-1 bg-text-main hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors">
+                                    Set
                                 </button>
-                            @else
-                                <input type="hidden" name="is_tuition_agreement_signed" value="1">
-                                <button type="submit" class="w-full py-2.5 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
-                                    <i class="fas fa-check-circle"></i> <span>Activate / Approve Tuition Agreement</span>
-                                </button>
-                            @endif
+                            </div>
                         </form>
                     </div>
 

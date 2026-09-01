@@ -15,7 +15,9 @@ class TuitionController extends Controller
     public function index(Request $request)
     {
         $profile = auth()->user()->profile;
-        $isAgreementSigned = (bool) ($profile?->is_tuition_agreement_signed);
+        $tuitionAgreementStatus = $profile?->tuition_agreement_status ?? 'not_required';
+        $isAgreementSigned = ($tuitionAgreementStatus === 'signed' || (bool) $profile?->is_tuition_agreement_signed);
+        $isAgreementActive = ($tuitionAgreementStatus === 'pending_signature');
 
         $query = HomeTuitionLead::where('status', 'Approved');
 
@@ -39,7 +41,7 @@ class TuitionController extends Controller
             ->pluck('home_tuition_lead_id')
             ->toArray();
 
-        return view('candidate.tuitions.index', compact('tuitions', 'appliedTuitionIds', 'profile', 'isAgreementSigned'));
+        return view('candidate.tuitions.index', compact('tuitions', 'appliedTuitionIds', 'profile', 'isAgreementSigned', 'isAgreementActive', 'tuitionAgreementStatus'));
     }
 
     public function signAgreement(Request $request)
@@ -52,6 +54,15 @@ class TuitionController extends Controller
         ]);
 
         $profile = auth()->user()->profile;
+        if (!$profile) {
+            return back()->with('error', 'Candidate profile not found.');
+        }
+
+        // Candidate can only sign if admin has activated the tuition agreement
+        if ($profile->tuition_agreement_status !== 'pending_signature' && !$profile->is_tuition_agreement_signed) {
+            return back()->with('error', 'Home Tuition Agreement signing has not been activated by the admin yet.');
+        }
+
         if ($profile) {
             $photoPath = $profile->tuition_live_photo_path ?? $profile->live_photo_path;
 
@@ -110,6 +121,7 @@ class TuitionController extends Controller
 
             $updateData = [
                 'is_tuition_agreement_signed' => true,
+                'tuition_agreement_status' => 'signed',
                 'tuition_agreement_signed_at' => now(),
                 'tuition_signature_data' => json_encode($signatureMeta),
                 'tuition_live_photo_path' => $photoPath,
@@ -137,12 +149,12 @@ class TuitionController extends Controller
         NotificationHelper::notifyUser(
             auth()->id(),
             'Tuition Agreement Signed & Verified ✅',
-            'You have successfully signed the Home Tuition Tutor Service Agreement with live verification. You can now apply for all home tuitions.',
+            'You have successfully signed the Home Tuition Tutor Service Agreement with live verification.',
             route('candidate.tuitions.index'),
             'fas fa-file-signature'
         );
 
-        return back()->with('success', 'Home Tuition Tutor Service Agreement signed and digitally verified! All tuitions are now unlocked for you.');
+        return back()->with('success', 'Home Tuition Tutor Service Agreement signed and digitally verified!');
     }
 
     public function apply(Request $request, $id)
@@ -151,10 +163,6 @@ class TuitionController extends Controller
 
         if (!$profile || !$profile->gender || !$profile->date_of_birth || !$profile->address || !$profile->preferred_state_id || !$profile->preferred_city_id || !$profile->highest_qualification_id) {
             return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your Basic Profile (Date of Birth, Gender, Address, Location & Qualification) before applying for home tuitions.');
-        }
-
-        if (!$profile->is_tuition_agreement_signed) {
-            return redirect()->route('candidate.tuitions.index')->with('error', 'Please review and digitally sign the Home Tuition Tutor Service Agreement before applying.');
         }
 
         $tuition = HomeTuitionLead::findOrFail($id);

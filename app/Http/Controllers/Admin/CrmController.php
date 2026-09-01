@@ -719,6 +719,7 @@ class CrmController extends Controller
     {
         $request->validate([
             'agreement_status'            => 'nullable|in:not_required,pending_signature,signed',
+            'tuition_agreement_status'    => 'nullable|in:not_required,pending_signature,signed',
             'is_tuition_agreement_signed' => 'nullable|boolean',
         ]);
 
@@ -726,6 +727,7 @@ class CrmController extends Controller
         if ($user->profile) {
             $updates = [];
             
+            // 1. Placement / School Job Agreement Status
             if ($request->filled('agreement_status')) {
                 $status = $request->agreement_status;
                 $updates['agreement_status'] = $status;
@@ -753,17 +755,45 @@ class CrmController extends Controller
                 }
             }
 
-            if ($request->has('is_tuition_agreement_signed')) {
+            // 2. Home Tuition Agreement Status
+            if ($request->filled('tuition_agreement_status')) {
+                $tStatus = $request->tuition_agreement_status;
+                $updates['tuition_agreement_status'] = $tStatus;
+                $updates['is_tuition_agreement_signed'] = ($tStatus === 'signed');
+
+                if ($tStatus === 'signed') {
+                    $updates['tuition_agreement_signed_at'] = now();
+                    NotificationHelper::notifyUser(
+                        $user->id,
+                        'Tuition Agreement Approved & Verified! ✅',
+                        'Your Home Tuition Tutor Service Agreement is verified by admin.',
+                        route('candidate.tuitions.index'),
+                        'fas fa-check-circle'
+                    );
+                } elseif ($tStatus === 'pending_signature') {
+                    $updates['tuition_agreement_signed_at'] = null;
+                    NotificationHelper::notifyUser(
+                        $user->id,
+                        'Action Required: Sign Home Tuition Agreement ✍️',
+                        'Warriors Educare admin has activated your Home Tuition Agreement. Please review and digitally sign it.',
+                        route('candidate.tuitions.index'),
+                        'fas fa-file-signature'
+                    );
+                } elseif ($tStatus === 'not_required') {
+                    $updates['tuition_agreement_signed_at'] = null;
+                }
+            } elseif ($request->has('is_tuition_agreement_signed')) {
                 $isTuitionSigned = $request->boolean('is_tuition_agreement_signed');
                 $updates['is_tuition_agreement_signed'] = $isTuitionSigned;
+                $updates['tuition_agreement_status'] = $isTuitionSigned ? 'signed' : 'not_required';
                 $updates['tuition_agreement_signed_at'] = $isTuitionSigned ? now() : null;
 
                 if ($isTuitionSigned) {
                     NotificationHelper::notifyUser(
                         $user->id,
                         'Tuition Agreement Approved! 🏠',
-                        'Your Home Tuition Agreement is verified. You can now apply for home tuition assignments.',
-                        route('tuitions.index'),
+                        'Your Home Tuition Agreement is verified.',
+                        route('candidate.tuitions.index'),
                         'fas fa-chalkboard-teacher'
                     );
                 }
