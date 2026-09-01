@@ -28,27 +28,7 @@
 @endif
 
 <!-- Tuition Agreement Status Banner -->
-@if(!$isAgreementSigned)
-    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-        <div class="flex items-start gap-3 sm:gap-4">
-            <div class="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl shrink-0 shadow-md shadow-amber-500/20">
-                <i class="fas fa-lock"></i>
-            </div>
-            <div>
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-200/60 text-amber-900 text-[11px] font-extrabold uppercase tracking-wider mb-1">
-                    Agreement Required to Unlock Tuitions
-                </div>
-                <h3 class="text-base sm:text-lg font-black text-[#031b4e]">Home Tuition Tutor Service Agreement (Unsigned)</h3>
-                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">Please review and digitally sign the agreement below to unlock application access for all home tuitions.</p>
-            </div>
-        </div>
-        <div class="shrink-0">
-            <button onclick="document.getElementById('tuitionAgreementModal').classList.remove('hidden')" class="w-full sm:w-auto px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs sm:text-sm font-extrabold transition-all shadow-md flex items-center justify-center gap-2">
-                <i class="fas fa-file-signature"></i> <span>Review & Sign Agreement</span>
-            </button>
-        </div>
-    </div>
-@else
+@if($isAgreementSigned)
     <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 shadow-sm p-4 sm:p-6 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
         <div class="flex items-start sm:items-center gap-3 sm:gap-4">
             <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center text-lg sm:text-xl shrink-0 mt-0.5 sm:mt-0">
@@ -71,10 +51,50 @@
             </button>
         </div>
     </div>
+@elseif($isAgreementActive)
+    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-start gap-3 sm:gap-4">
+            <div class="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl shrink-0 shadow-md shadow-amber-500/20">
+                <i class="fas fa-file-signature"></i>
+            </div>
+            <div>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-200/60 text-amber-900 text-[11px] font-extrabold uppercase tracking-wider mb-1 animate-pulse">
+                    ⚡ Action Required: Agreement Activated by Admin
+                </div>
+                <h3 class="text-base sm:text-lg font-black text-[#031b4e]">Home Tuition Tutor Service Agreement (Pending Signature)</h3>
+                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">Warriors Educare admin has activated your agreement. Please review and digitally sign it with live verification.</p>
+            </div>
+        </div>
+        <div class="shrink-0">
+            <button onclick="document.getElementById('tuitionAgreementModal').classList.remove('hidden')" class="w-full sm:w-auto px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs sm:text-sm font-extrabold transition-all shadow-md flex items-center justify-center gap-2">
+                <i class="fas fa-pen-nib"></i> <span>Review & Sign Agreement</span>
+            </button>
+        </div>
+    </div>
+@else
+    <div class="bg-blue-50/60 border border-blue-200/80 rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-start sm:items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#031b4e]/10 text-[#031b4e] flex items-center justify-center text-lg sm:text-xl shrink-0 mt-0.5 sm:mt-0">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h3 class="text-sm sm:text-base font-bold text-[#031b4e] leading-snug">Home Tuition – Tutor Service Agreement</h3>
+                    <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Available to Read</span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">You can browse and apply for all home tuitions freely below. Read agreement terms anytime.</p>
+            </div>
+        </div>
+        <div class="shrink-0">
+            <button onclick="document.getElementById('tuitionAgreementModal').classList.remove('hidden')" class="w-full sm:w-auto px-5 py-2.5 bg-white border border-[#031b4e]/20 text-[#031b4e] rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm flex items-center justify-center gap-2">
+                <i class="fas fa-book-open text-xs"></i> <span>View Agreement Terms</span>
+            </button>
+        </div>
+    </div>
 @endif
 
-<!-- Modal for Tuition Agreement (2-Step Mobile-Friendly Signing Wizard) -->
-<div id="tuitionAgreementModal" x-data="{ step: 1, isSigned: {{ $isAgreementSigned ? 'true' : 'false' }} }" class="fixed inset-0 z-[9999] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+<!-- Modal for Tuition Agreement -->
+<div id="tuitionAgreementModal" x-data="{ step: 1, isSigned: {{ $isAgreementSigned ? 'true' : 'false' }}, isActive: {{ $isAgreementActive ? 'true' : 'false' }} }" class="fixed inset-0 z-[9999] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
     <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden relative border border-slate-200">
         
         <!-- Modal Header with Step Navigation -->
@@ -89,8 +109,8 @@
                 </button>
             </div>
 
-            <!-- Step Switcher Tabs (Shown only if agreement is unsigned) -->
-            @if(!$isAgreementSigned)
+            <!-- Step Switcher Tabs (Shown only if agreement is active for signing) -->
+            @if($isAgreementActive)
                 <div class="flex items-center gap-1 bg-white/10 p-1 rounded-xl self-start sm:self-auto">
                     <button type="button" @click="step = 1" :class="step === 1 ? 'bg-white text-[#031b4e] font-black shadow-sm' : 'text-white/80 hover:text-white font-bold'" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs">
                         <i class="fas fa-file-alt text-xs"></i> <span>Step 1: Read Terms</span>
@@ -334,8 +354,17 @@
             </div> <!-- End relative z-10 -->
         </div> <!-- End #printableTuitionAgreement -->
 
-            <!-- STEP 1 FOOTER (When Unsigned) -->
-            @if(!$isAgreementSigned)
+            <!-- STEP 1 FOOTER -->
+            @if($isAgreementSigned)
+                <!-- SIGNED FOOTER (Print & Close) -->
+                <div class="p-3 sm:p-4 border-t border-[#031b4e]/10 bg-gray-50 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 rounded-b-2xl shrink-0">
+                    <button type="button" onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="w-full sm:w-auto px-5 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors text-xs sm:text-sm">Close</button>
+                    <button type="button" onclick="printTuitionAgreement()" class="w-full sm:w-auto px-5 py-2.5 bg-[#0ea5e9] text-white rounded-xl font-semibold hover:bg-[#0ea5e9]/90 transition-colors shadow-sm flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <i class="fas fa-download"></i> Download / Print PDF
+                    </button>
+                </div>
+            @elseif($isAgreementActive)
+                <!-- ACTIVE FOR SIGNING FOOTER -->
                 <div class="p-3.5 sm:p-4 border-t border-[#031b4e]/10 bg-gray-50 flex items-center justify-between gap-3 shrink-0">
                     <button type="button" onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 text-xs sm:text-sm">
                         Cancel
@@ -345,18 +374,21 @@
                     </button>
                 </div>
             @else
-                <!-- SIGNED FOOTER (Print & Close) -->
-                <div class="p-3 sm:p-4 border-t border-[#031b4e]/10 bg-gray-50 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 rounded-b-2xl shrink-0">
-                    <button type="button" onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="w-full sm:w-auto px-5 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors text-xs sm:text-sm">Close</button>
-                    <button type="button" onclick="printTuitionAgreement()" class="w-full sm:w-auto px-5 py-2.5 bg-[#0ea5e9] text-white rounded-xl font-semibold hover:bg-[#0ea5e9]/90 transition-colors shadow-sm flex items-center justify-center gap-2 text-xs sm:text-sm">
-                        <i class="fas fa-download"></i> Download / Print PDF
+                <!-- READ-ONLY / NOT ACTIVATED SIGNING FOOTER -->
+                <div class="p-3.5 sm:p-4 border-t border-[#031b4e]/10 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+                    <div class="flex items-center gap-2 text-xs text-slate-500">
+                        <i class="fas fa-shield-alt text-blue-600"></i>
+                        <span>Digital signing is activated by admin when you are shortlisted / assigned.</span>
+                    </div>
+                    <button type="button" onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="w-full sm:w-auto px-6 py-2.5 bg-[#031b4e] text-white rounded-xl font-bold hover:bg-[#021338] transition-colors text-xs sm:text-sm">
+                        Close
                     </button>
                 </div>
             @endif
         </div> <!-- End Step 1 View -->
 
         <!-- STEP 2: LIVE CAMERA & GPS VERIFICATION & FINAL SIGN (Dedicated Spacious View) -->
-        @if(!$isAgreementSigned)
+        @if($isAgreementActive)
             <div x-show="step === 2" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between bg-slate-50" style="display: none;">
                 <form id="signTuitionAgreementForm" action="{{ route('candidate.tuitions.sign-agreement') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateTuitionAgreementForm(event)" class="p-4 sm:p-6 space-y-4 flex-1 flex flex-col justify-between" x-data="tuitionSignatureBox()">
                     @csrf
@@ -961,11 +993,7 @@ function printTuitionAgreement() {
                     <i class="far fa-clock mr-1"></i> {{ $tuition->created_at->diffForHumans() }}
                 </span>
 
-                @if(!$isAgreementSigned)
-                    <button type="button" onclick="document.getElementById('tuitionAgreementModal').classList.remove('hidden')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-xl text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5">
-                        <i class="fas fa-lock text-xs"></i> Sign Agreement to Apply
-                    </button>
-                @elseif(in_array($tuition->id, $appliedTuitionIds))
+                @if(in_array($tuition->id, $appliedTuitionIds))
                     <button disabled class="bg-gray-100 text-[#031b4e]/80 font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm cursor-not-allowed">
                         Applied <i class="fas fa-check ml-1 text-green-600"></i>
                     </button>

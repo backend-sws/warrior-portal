@@ -1,26 +1,24 @@
 @extends('layouts.admin')
 
 @section('title', 'Candidate Payment Account Details')
+@section('subtitle', 'Manage fees and payments for ' . $account->candidate_name . '.')
 
-@section('content')
-<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-    <div>
-        <h1 class="text-2xl font-black text-text-main">Candidate Payment Account Details</h1>
-        <p class="text-text-dark/60 text-sm mt-1">Manage fees and payments for {{ $account->candidate_name }}.</p>
-    </div>
-    <div class="flex gap-2">
-        <a href="{{ route('admin.candidate-payments.index') }}" class="bg-secondary-bg border border-card-border text-text-main px-4 py-2 rounded-xl font-bold hover:bg-gray-100 transition-colors flex items-center gap-2">
-            <i class="fas fa-arrow-left"></i> Back
+@section('actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('admin.candidate-payments.index') }}" class="bg-card-bg border border-card-border text-text-main px-4 py-2 rounded-xl text-xs sm:text-sm font-bold hover:bg-slate-100 transition-colors flex items-center gap-1.5 shadow-sm">
+            <i class="fas fa-arrow-left text-xs"></i> <span>Back</span>
         </a>
         <form action="{{ route('admin.candidate-payments.destroy', $account->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this account?');">
             @csrf
             @method('DELETE')
-            <button type="submit" class="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-bold transition-colors">
-                <i class="fas fa-trash-alt"></i>
+            <button type="submit" class="bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm flex items-center justify-center">
+                <i class="fas fa-trash-alt text-xs"></i>
             </button>
         </form>
     </div>
-</div>
+@endsection
+
+@section('content')
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Left Column: Profile info -->

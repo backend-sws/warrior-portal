@@ -1,14 +1,15 @@
 @extends('layouts.admin')
 
 @section('title', 'Candidate Payments')
+@section('subtitle', 'Track payouts and commission collections for candidates.')
+
+@section('actions')
+    <a href="{{ route('admin.candidate-payments.create') }}" class="bg-[#031b4e] hover:bg-[#021338] text-white px-4 py-2 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition-all flex items-center gap-2">
+        <i class="fas fa-plus text-xs"></i> <span>Add Account</span>
+    </a>
+@endsection
 
 @section('content')
-<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-    <div>
-        <h1 class="text-2xl font-black text-text-main">Candidate Payments</h1>
-        <p class="text-text-dark/60 text-sm mt-1">Track payouts and commission collections for candidates.</p>
-    </div>
-</div>
 
 <!-- Dashboard Metrics (Clickable Filters) -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

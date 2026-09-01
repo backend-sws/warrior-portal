@@ -1,17 +1,15 @@
 @extends('layouts.admin')
 
 @section('title', 'Add Candidate Payment Account')
+@section('subtitle', 'Create a new payment profile for a candidate.')
+
+@section('actions')
+    <a href="{{ route('admin.candidate-payments.index') }}" class="bg-card-bg border border-card-border text-text-main px-4 py-2 rounded-xl text-xs sm:text-sm font-bold hover:bg-slate-100 transition-colors flex items-center gap-1.5 shadow-sm">
+        <i class="fas fa-arrow-left text-xs"></i> <span>Back to Accounts</span>
+    </a>
+@endsection
 
 @section('content')
-<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-    <div>
-        <h1 class="text-2xl font-black text-text-main">Add Candidate Payment Account</h1>
-        <p class="text-text-dark/60 text-sm mt-1">Create a new payment profile for a candidate.</p>
-    </div>
-    <a href="{{ route('admin.candidate-payments.index') }}" class="bg-secondary-bg border border-card-border text-text-main px-5 py-2.5 rounded-xl font-bold hover:bg-gray-100 transition-colors flex items-center gap-2">
-        <i class="fas fa-arrow-left"></i> Back to Accounts
-    </a>
-</div>
 
 <form action="{{ route('admin.candidate-payments.store') }}" method="POST" class="bg-white rounded-xl shadow-sm border border-card-border p-6 max-w-3xl">
     @csrf
