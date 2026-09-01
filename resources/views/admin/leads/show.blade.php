@@ -4,9 +4,18 @@
 @section('subtitle', 'View contact details and manage follow-ups')
 
 @section('actions')
-    <a href="{{ route('admin.leads.index') }}" class="text-sm text-text-dark/60 hover:text-accent-blue transition-colors flex items-center gap-2">
-        <i class="fas fa-arrow-left"></i> Back to Leads
-    </a>
+    <div class="flex items-center gap-2">
+        <a href="{{ route('admin.leads.index') }}" class="bg-card-bg border border-card-border text-text-main px-4 py-2 rounded-xl text-xs sm:text-sm font-bold hover:bg-slate-100 transition-colors flex items-center gap-1.5 shadow-sm">
+            <i class="fas fa-arrow-left text-xs"></i> <span>Back to Leads</span>
+        </a>
+        <form action="{{ route('admin.leads.destroy', $lead->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this contact query? This action cannot be undone.');" class="inline">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="px-3 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border border-red-200 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm flex items-center gap-1.5">
+                <i class="fas fa-trash-alt text-xs"></i> <span>Delete Query</span>
+            </button>
+        </form>
+    </div>
 @endsection
 
 @section('content')

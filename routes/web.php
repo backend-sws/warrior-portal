@@ -255,9 +255,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Contact Leads
     Route::get('/leads', [\App\Http\Controllers\Admin\ContactLeadController::class, 'index'])->name('leads.index');
+    Route::post('/leads/bulk-delete', [\App\Http\Controllers\Admin\ContactLeadController::class, 'bulkDelete'])->name('leads.bulk-delete');
     Route::get('/leads/{id}', [\App\Http\Controllers\Admin\ContactLeadController::class, 'show'])->name('leads.show');
     Route::put('/leads/{id}/status', [\App\Http\Controllers\Admin\ContactLeadController::class, 'updateStatus'])->name('leads.status.update');
     Route::post('/leads/{id}/follow-up', [\App\Http\Controllers\Admin\ContactLeadController::class, 'storeFollowUp'])->name('leads.followup.store');
+    Route::delete('/leads/{id}', [\App\Http\Controllers\Admin\ContactLeadController::class, 'destroy'])->name('leads.destroy');
 
     // Home Tuition Leads
     Route::get('/tuition-leads', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'index'])->name('tuition-leads.index');

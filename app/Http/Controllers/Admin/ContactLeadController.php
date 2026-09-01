@@ -88,4 +88,26 @@ class ContactLeadController extends Controller
 
         return back()->with('success', 'Follow-up added successfully.');
     }
+
+    public function destroy($id)
+    {
+        $lead = ContactLead::findOrFail($id);
+        $lead->followUps()->delete();
+        $lead->delete();
+
+        return redirect()->route('admin.leads.index')->with('success', 'Contact query deleted successfully.');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:contact_leads,id',
+        ]);
+
+        \App\Models\LeadFollowUp::whereIn('lead_id', $request->ids)->delete();
+        ContactLead::whereIn('id', $request->ids)->delete();
+
+        return back()->with('success', count($request->ids) . ' contact queries deleted successfully.');
+    }
 }
