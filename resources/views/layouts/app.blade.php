@@ -23,6 +23,34 @@
     <meta name="twitter:description" content="@yield('meta_description', 'India’s trusted education network. Hire verified home tutors for all subjects, recruit top school & college faculty, or apply for high-paying teaching jobs.')">
     <meta name="twitter:image" content="{{ asset('adobe.png') }}">
 
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18341660766"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'AW-18341660766');
+
+      // Global Lead Conversion Tracking helper
+      window.trackLeadConversion = function() {
+        if (typeof gtag === 'function') {
+          gtag('event', 'conversion', {'send_to': 'AW-18341660766/PKtyCPXh8uscEN6Q_qlE'});
+        }
+      };
+    </script>
+
+    @if(session('tuition_success') || session('school_success') || session('contact_success') || session('success') || session('lead_success'))
+        <!-- Event snippet for Submit lead form (2) conversion page -->
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            if (typeof window.trackLeadConversion === 'function') {
+              window.trackLeadConversion();
+            }
+          });
+        </script>
+    @endif
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link

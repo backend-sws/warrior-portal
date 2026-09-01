@@ -280,6 +280,9 @@
                     .then(response => response.json())
                     .then(data => {
                         if(data.success) {
+                            if (typeof window.trackLeadConversion === 'function') {
+                                window.trackLeadConversion();
+                            }
                             alert(data.message);
                             showDemoModal = false;
                             $event.target.reset();

@@ -154,6 +154,9 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
             msgBox.classList.remove('hidden', 'bg-red-50', 'text-red-700');
             msgBox.classList.add('bg-green-50', 'text-green-700');
             msgBox.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ' + (data.message || 'Message sent successfully!');
+            if (typeof window.trackLeadConversion === 'function') {
+                window.trackLeadConversion();
+            }
             this.reset();
         } else {
             let errorText = data.message || 'Something went wrong. Please check your inputs.';
