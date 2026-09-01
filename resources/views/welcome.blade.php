@@ -1598,6 +1598,9 @@
                             if (response.ok && data.success) {
                                 this.submitted = true;
                                 this.successMessage = data.message || 'Your tuition requirement has been posted successfully! Our team will contact you soon.';
+                                if (typeof window.trackLeadConversion === 'function') {
+                                    window.trackLeadConversion();
+                                }
                                 form.reset();
                                 this.fieldErrors = {};
                                 this.scrollToSection();
@@ -1653,6 +1656,9 @@
                             if (response.ok && data.success) {
                                 this.submitted = true;
                                 this.successMessage = data.message || 'Your job requirement has been submitted for approval! Our administration team will review and approve it shortly.';
+                                if (typeof window.trackLeadConversion === 'function') {
+                                    window.trackLeadConversion();
+                                }
                                 form.reset();
                                 this.fieldErrors = {};
                                 this.school_subjects = [];

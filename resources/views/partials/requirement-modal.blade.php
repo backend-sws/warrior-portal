@@ -96,6 +96,9 @@ function globalRequirementModal() {
 
                 if (response.ok && data.success) {
                     this.successMessage = data.message || 'Your tuition requirement has been submitted for review! Our academic team will verify and post it shortly.';
+                    if (typeof window.trackLeadConversion === 'function') {
+                        window.trackLeadConversion();
+                    }
                     form.reset();
                     this.fieldErrors = {};
                 } else {
@@ -149,6 +152,9 @@ function globalRequirementModal() {
 
                 if (response.ok && data.success) {
                     this.successMessage = data.message || 'Your teacher hiring requirement has been submitted for approval! Our team will review and approve it shortly.';
+                    if (typeof window.trackLeadConversion === 'function') {
+                        window.trackLeadConversion();
+                    }
                     form.reset();
                     this.fieldErrors = {};
                     this.selectedCategory = '';
