@@ -47,6 +47,11 @@ class JobPost extends Model
         return $this->belongsTo(Specialization::class);
     }
 
+    public function getSpecializationDisplayAttribute()
+    {
+        return $this->specialization_name ?: ($this->specialization?->name ?: 'Not Specified');
+    }
+
     public function qualification()
     {
         return $this->belongsTo(Qualification::class);
@@ -69,7 +74,7 @@ class JobPost extends Model
 
     public function getSuggestedCandidates($limit = 5)
     {
-        return CandidateProfile::with(['user', 'category', 'subject', 'highestQualification', 'preferredState', 'preferredCity'])
+        return CandidateProfile::with(['user', 'category', 'subject', 'highestQualification', 'preferredState', 'preferredCity', 'specialization'])
             ->where('is_profile_complete', true)
             ->get()
             ->map(function ($candidate) {
@@ -77,19 +82,23 @@ class JobPost extends Model
                 $matched = [];
                 
                 if ($this->category_id && $candidate->category_id == $this->category_id) {
-                    $score += 30;
+                    $score += 25;
                     $matched[] = 'category';
                 }
                 if ($this->subject_id && $candidate->subject_id == $this->subject_id) {
-                    $score += 50;
+                    $score += 45;
                     $matched[] = 'subject';
                 }
+                if ($this->specialization_id && $candidate->specialization_id == $this->specialization_id) {
+                    $score += 15;
+                    $matched[] = 'specialization';
+                }
                 if ($this->qualification_id && $candidate->highest_qualification_id == $this->qualification_id) {
-                    $score += 20;
+                    $score += 15;
                     $matched[] = 'qualification';
                 }
                 
-                $candidate->match_percentage = $score;
+                $candidate->match_percentage = min(100, $score);
                 $candidate->matched_criteria = $matched;
                 return $candidate;
             })

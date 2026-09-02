@@ -127,8 +127,8 @@
                             <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
                                 <i class="fas fa-award text-amber-500"></i> Specialization
                             </span>
-                            <span class="font-extrabold text-[#031b4e] text-xs sm:text-sm truncate" title="{{ $job->specialization?->name ?? 'None' }}">
-                                {{ $job->specialization?->name ?? 'Not Specified' }}
+                            <span class="font-extrabold text-[#031b4e] text-xs sm:text-sm truncate" title="{{ $job->specialization_name ?: ($job->specialization?->name ?? 'Not Specified') }}">
+                                {{ $job->specialization_name ?: ($job->specialization?->name ?? 'Not Specified') }}
                             </span>
                         </div>
 

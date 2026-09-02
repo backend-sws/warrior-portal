@@ -34,16 +34,21 @@
         </div>
 
         <!-- Job Details Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-card-border bg-white/30">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 md:divide-x divide-card-border bg-white/30">
             <div class="p-6 text-center">
                 <div class="w-10 h-10 rounded-full bg-accent-blue/10 text-accent-blue flex items-center justify-center mx-auto mb-3 text-lg"><i class="fas fa-book"></i></div>
                 <h4 class="text-xs font-bold text-[#031b4e]/70 uppercase tracking-wider mb-1">Subject</h4>
-                <p class="font-semibold text-[#031b4e]">{{ $job->subject->name }}</p>
+                <p class="font-semibold text-[#031b4e]">{{ $job->subject?->name ?? 'N/A' }}</p>
             </div>
             <div class="p-6 text-center">
                 <div class="w-10 h-10 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center mx-auto mb-3 text-lg"><i class="fas fa-graduation-cap"></i></div>
                 <h4 class="text-xs font-bold text-[#031b4e]/70 uppercase tracking-wider mb-1">Qualification</h4>
-                <p class="font-semibold text-[#031b4e]">{{ $job->qualification->name }}</p>
+                <p class="font-semibold text-[#031b4e]">{{ $job->qualification?->name ?? 'N/A' }}</p>
+            </div>
+            <div class="p-6 text-center">
+                <div class="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto mb-3 text-lg"><i class="fas fa-award"></i></div>
+                <h4 class="text-xs font-bold text-[#031b4e]/70 uppercase tracking-wider mb-1">Specialization</h4>
+                <p class="font-semibold text-[#031b4e]">{{ $job->specialization_name ?: ($job->specialization?->name ?? 'Not Specified') }}</p>
             </div>
             <div class="p-6 text-center">
                 <div class="w-10 h-10 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center mx-auto mb-3 text-lg"><i class="fas fa-rupee-sign"></i></div>

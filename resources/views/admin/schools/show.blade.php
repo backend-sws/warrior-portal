@@ -349,6 +349,11 @@
                     </div>
                 </div>
 
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Specialization <span class="text-xs text-slate-400 font-normal lowercase">(optional)</span></label>
+                    <input type="text" name="specialization_name" placeholder="e.g. Physics / Maths / English Spoken / Admission Sales" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-800 font-medium focus:bg-white focus:outline-none">
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Qualification *</label>
@@ -529,13 +534,42 @@
             }
         }
 
-        // Modal Category -> Subject sync
+        // Modal Category -> Subject -> Specialization sync
         const modalCatSelect = document.getElementById('modal_category_id');
         const modalSubSelect = document.getElementById('modal_subject_id');
+        const modalSpecWrapper = document.getElementById('modal_specialization_wrapper');
+        const modalSpecSelect = document.getElementById('modal_specialization_id');
+
+        function loadModalSpecializations(subjectId) {
+            if (!modalSpecSelect || !modalSpecWrapper) return;
+            if (subjectId) {
+                fetch(`/api/subjects/${subjectId}/specializations`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            modalSpecWrapper.style.display = 'block';
+                            updateDynamicSelect(modalSpecSelect, data, 'Select Specialization (Optional)');
+                        } else {
+                            modalSpecWrapper.style.display = 'none';
+                            modalSpecSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error fetching specializations:', err);
+                        modalSpecWrapper.style.display = 'none';
+                    });
+            } else {
+                modalSpecWrapper.style.display = 'none';
+                modalSpecSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+            }
+        }
 
         if (modalCatSelect && modalSubSelect) {
             modalCatSelect.addEventListener('change', function() {
                 let catId = this.value;
+                if (modalSpecWrapper) modalSpecWrapper.style.display = 'none';
+                if (modalSpecSelect) modalSpecSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+
                 if (catId) {
                     setSelectLoading(modalSubSelect, 'Loading subjects...');
                     fetch(`/api/categories/${catId}/subjects`)
@@ -550,6 +584,12 @@
                 } else {
                     resetDynamicSelect(modalSubSelect, 'Select Subject');
                 }
+            });
+        }
+
+        if (modalSubSelect) {
+            modalSubSelect.addEventListener('change', function() {
+                loadModalSpecializations(this.value);
             });
         }
     });

@@ -86,6 +86,13 @@
                     @error('subject_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
+                <!-- Specialization (Text Input) -->
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Specialization <span class="text-xs text-text-dark/40 font-normal lowercase">(optional)</span></label>
+                    <input type="text" name="specialization_name" value="{{ old('specialization_name', $job->specialization_name ?: ($job->specialization?->name ?? '')) }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. Physics / Botany / Admission Sales / Vedic Maths">
+                    @error('specialization_name') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
                 <!-- Qualification -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Required Qualification *</label>
@@ -226,10 +233,51 @@
     // Category -> Subject
     const categorySelect = document.getElementById('category_id');
     const subjectSelect = document.getElementById('subject_id');
+    const specializationWrapper = document.getElementById('specialization_wrapper');
+    const specializationSelect = document.getElementById('specialization_id');
+    const defaultSpecId = "{{ old('specialization_id', $job->specialization_id ?? '') }}";
+
+    function loadSubjectSpecializations(subjectId, selectedSpecId = null) {
+        if (!specializationSelect || !specializationWrapper) return;
+        if (subjectId) {
+            fetch(`/api/subjects/${subjectId}/specializations`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        specializationWrapper.style.display = 'block';
+                        updateDynamicSelect(specializationSelect, data, 'Select Specialization (Optional)');
+                        if (selectedSpecId) {
+                            specializationSelect.value = selectedSpecId;
+                            if (specializationSelect._slimSelect) {
+                                specializationSelect._slimSelect.setSelected(String(selectedSpecId));
+                            }
+                        }
+                    } else {
+                        specializationWrapper.style.display = 'none';
+                        specializationSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+                        specializationSelect.value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching specializations:', error);
+                    specializationWrapper.style.display = 'none';
+                });
+        } else {
+            specializationWrapper.style.display = 'none';
+            specializationSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+            specializationSelect.value = '';
+        }
+    }
 
     if (categorySelect && subjectSelect) {
         categorySelect.addEventListener('change', function() {
             let categoryId = this.value;
+            if (specializationWrapper) specializationWrapper.style.display = 'none';
+            if (specializationSelect) {
+                specializationSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+                specializationSelect.value = '';
+            }
+
             if (categoryId) {
                 setSelectLoading(subjectSelect, 'Loading subjects...');
                 fetch(`/api/categories/${categoryId}/subjects`)
@@ -245,6 +293,17 @@
                 resetDynamicSelect(subjectSelect, 'Select Subject');
             }
         });
+    }
+
+    if (subjectSelect) {
+        subjectSelect.addEventListener('change', function() {
+            loadSubjectSpecializations(this.value);
+        });
+
+        // If subject is selected but specializations not loaded yet in slimselect
+        if (subjectSelect.value && !defaultSpecId) {
+            loadSubjectSpecializations(subjectSelect.value, null);
+        }
     }
 
     // State -> City

@@ -62,7 +62,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Job Category <span class="text-red-500">*</span></label>
-                                <select name="category_id" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
+                                <select name="category_id" id="category_id" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
                                     <option value="">Select Category</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}" {{ old('category_id', $job->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
@@ -71,12 +71,16 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Subject <span class="text-red-500">*</span></label>
-                                <select name="subject_id" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
+                                <select name="subject_id" id="subject_id" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
                                     <option value="">Select Subject</option>
                                     @foreach($subjects as $subject)
                                         <option value="{{ $subject->id }}" {{ old('subject_id', $job->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Specialization <span class="text-xs text-[#031b4e]/40 font-normal lowercase">(optional)</span></label>
+                                <input type="text" name="specialization_name" value="{{ old('specialization_name', $job->specialization_name ?: ($job->specialization?->name ?? '')) }}" class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors" placeholder="e.g. Physics / Botany / Admission Sales / Vedic Maths">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Required Qualification <span class="text-red-500">*</span></label>
@@ -154,6 +158,76 @@
                 .catch(error => console.error('CKEditor init error:', error));
         }
     });
+
+    const categorySelect = document.getElementById('category_id');
+    const subjectSelect = document.getElementById('subject_id');
+    const specializationWrapper = document.getElementById('specialization_wrapper');
+    const specializationSelect = document.getElementById('specialization_id');
+    const defaultSpecId = "{{ old('specialization_id', $job->specialization_id ?? '') }}";
+
+    function loadSpecializations(subjectId, selectedSpecId = null) {
+        if (!specializationSelect || !specializationWrapper) return;
+        if (subjectId) {
+            fetch(`/api/subjects/${subjectId}/specializations`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        specializationWrapper.style.display = 'block';
+                        let html = '<option value="">Select Specialization (Optional)</option>';
+                        data.forEach(spec => {
+                            const isSel = selectedSpecId && String(selectedSpecId) === String(spec.id) ? 'selected' : '';
+                            html += `<option value="${spec.id}" ${isSel}>${spec.name}</option>`;
+                        });
+                        specializationSelect.innerHTML = html;
+                    } else {
+                        specializationWrapper.style.display = 'none';
+                        specializationSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+                        specializationSelect.value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching specializations:', error);
+                    specializationWrapper.style.display = 'none';
+                });
+        } else {
+            specializationWrapper.style.display = 'none';
+            specializationSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+            specializationSelect.value = '';
+        }
+    }
+
+    if (categorySelect && subjectSelect) {
+        categorySelect.addEventListener('change', function() {
+            let catId = this.value;
+            subjectSelect.innerHTML = '<option value="">Loading subjects...</option>';
+            if (specializationWrapper) specializationWrapper.style.display = 'none';
+            if (specializationSelect) specializationSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+
+            if (catId) {
+                fetch(`/api/categories/${catId}/subjects`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let html = '<option value="">Select Subject</option>';
+                        data.forEach(sub => {
+                            html += `<option value="${sub.id}">${sub.name}</option>`;
+                        });
+                        subjectSelect.innerHTML = html;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching subjects:', error);
+                        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                    });
+            } else {
+                subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+            }
+        });
+    }
+
+    if (subjectSelect) {
+        subjectSelect.addEventListener('change', function() {
+            loadSpecializations(this.value);
+        });
+    }
 
     document.getElementById('state_id').addEventListener('change', function() {
         let stateId = this.value;

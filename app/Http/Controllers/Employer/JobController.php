@@ -44,6 +44,8 @@ class JobController extends Controller
             'jobs.*.description' => 'required|string',
             'jobs.*.category_id' => 'required|exists:categories,id',
             'jobs.*.subject_id' => 'required|exists:subjects,id',
+            'jobs.*.specialization_name' => 'nullable|string|max:255',
+            'jobs.*.specialization_id' => 'nullable|exists:specializations,id',
             'jobs.*.qualification_id' => 'required|exists:qualifications,id',
             'jobs.*.state_id' => 'required|exists:states,id',
             'jobs.*.city_id' => 'required|exists:cities,id',
@@ -61,6 +63,8 @@ class JobController extends Controller
                 'description' => $jobData['description'],
                 'category_id' => $jobData['category_id'],
                 'subject_id' => $jobData['subject_id'],
+                'specialization_name' => $jobData['specialization_name'] ?? null,
+                'specialization_id' => $jobData['specialization_id'] ?? null,
                 'qualification_id' => $jobData['qualification_id'],
                 'state_id' => $jobData['state_id'],
                 'city_id' => $jobData['city_id'],
@@ -96,11 +100,12 @@ class JobController extends Controller
 
         $categories = Category::where('is_active', true)->get();
         $subjects = Subject::where('is_active', true)->get();
+        $specializations = $job->subject_id ? \App\Models\Specialization::where('subject_id', $job->subject_id)->where('is_active', true)->get() : collect();
         $qualifications = Qualification::where('is_active', true)->get();
         $states = State::where('is_active', true)->get();
         $cities = City::where('state_id', $job->state_id)->where('is_active', true)->get();
 
-        return view('employer.jobs.edit', compact('job', 'categories', 'subjects', 'qualifications', 'states', 'cities'));
+        return view('employer.jobs.edit', compact('job', 'categories', 'subjects', 'specializations', 'qualifications', 'states', 'cities'));
     }
 
     public function update(Request $request, $id)
@@ -116,6 +121,8 @@ class JobController extends Controller
             'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'subject_id' => 'required|exists:subjects,id',
+            'specialization_name' => 'nullable|string|max:255',
+            'specialization_id' => 'nullable|exists:specializations,id',
             'qualification_id' => 'required|exists:qualifications,id',
             'state_id' => 'required|exists:states,id',
             'city_id' => 'required|exists:cities,id',
@@ -123,7 +130,7 @@ class JobController extends Controller
         ]);
 
         $job->update($request->only([
-            'title', 'description', 'category_id', 'subject_id', 'qualification_id', 'state_id', 'city_id', 'salary_range'
+            'title', 'description', 'category_id', 'subject_id', 'specialization_name', 'specialization_id', 'qualification_id', 'state_id', 'city_id', 'salary_range'
         ]));
 
         return redirect()->route('employer.jobs.index')->with('success', 'Job updated successfully.');

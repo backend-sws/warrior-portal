@@ -105,6 +105,12 @@
                                     </select>
                                 </div>
 
+                                <!-- Specialization (Text Input) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Specialization <span class="text-xs text-[#031b4e]/40 font-normal lowercase">(optional)</span></label>
+                                    <input type="text" :name="`jobs[${index}][specialization_name]`" x-model="job.specialization_name" class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors" placeholder="e.g. Physics / Botany / Admission Sales / Vedic Maths">
+                                </div>
+
                                 <!-- Qualification (Enabled once Subject is selected) -->
                                 <div>
                                     <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Required Qualification <span class="text-red-500">*</span></label>
@@ -175,6 +181,8 @@
                     id: Date.now(),
                     category_id: '',
                     subject_id: '',
+                    specialization_name: '',
+                    specialization_id: '',
                     qualification_id: '',
                     state_id: '',
                     city_id: '',
@@ -190,6 +198,8 @@
                     id: Date.now(),
                     category_id: '',
                     subject_id: '',
+                    specialization_name: '',
+                    specialization_id: '',
                     qualification_id: '',
                     state_id: '',
                     city_id: '',
