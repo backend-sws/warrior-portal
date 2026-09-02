@@ -61,6 +61,11 @@
                         <span class="inline-flex items-center px-2.5 py-1 rounded bg-purple-50 text-purple-700 text-sm border border-purple-100">
                             <i class="fas fa-book mr-1.5 text-purple-400"></i> {{ $job->subject?->name ?? 'N/A' }}
                         </span>
+                        @if($job->specialization_name || $job->specialization)
+                            <span class="inline-flex items-center px-2.5 py-1 rounded bg-amber-50 text-amber-700 text-sm border border-amber-100">
+                                <i class="fas fa-award mr-1.5 text-amber-400"></i> {{ $job->specialization_name ?: $job->specialization->name }}
+                            </span>
+                        @endif
                         <span class="inline-flex items-center px-2.5 py-1 rounded bg-orange-50 text-orange-700 text-sm border border-orange-100">
                             <i class="fas fa-graduation-cap mr-1.5 text-orange-400"></i> {{ $job->qualification?->name ?? 'N/A' }}
                         </span>

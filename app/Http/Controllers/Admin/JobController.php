@@ -217,6 +217,8 @@ class JobController extends Controller
             'phone' => 'nullable|string|max:20',
             'category_id' => 'required|exists:categories,id',
             'subject_id' => 'required|exists:subjects,id',
+            'specialization_name' => 'nullable|string|max:255',
+            'specialization_id' => 'nullable|exists:specializations,id',
             'qualification_id' => 'required|exists:qualifications,id',
             'state_id' => 'required|exists:states,id',
             'city_id' => 'required|exists:cities,id',
@@ -235,12 +237,13 @@ class JobController extends Controller
     public function edit(JobPost $job)
     {
         $categories = \App\Models\Category::where('is_active', true)->get();
-        $subjects = \App\Models\Subject::where('is_active', true)->get();
+        $subjects = ($job->category_id && $job->category) ? $job->category->subjects()->where('is_active', true)->get() : \App\Models\Subject::where('is_active', true)->get();
+        $specializations = $job->subject_id ? \App\Models\Specialization::where('subject_id', $job->subject_id)->where('is_active', true)->get() : collect();
         $qualifications = \App\Models\Qualification::where('is_active', true)->get();
         $states = \App\Models\State::where('is_active', true)->get();
-        $cities = \App\Models\City::where('state_id', $job->state_id)->where('is_active', true)->get();
+        $cities = $job->state_id ? \App\Models\City::where('state_id', $job->state_id)->where('is_active', true)->get() : collect();
 
-        return view('admin.jobs.edit', compact('job', 'categories', 'subjects', 'qualifications', 'states', 'cities'));
+        return view('admin.jobs.edit', compact('job', 'categories', 'subjects', 'specializations', 'qualifications', 'states', 'cities'));
     }
 
     public function update(Request $request, JobPost $job)
@@ -253,6 +256,8 @@ class JobController extends Controller
             'phone' => 'nullable|string|max:20',
             'category_id' => 'required|exists:categories,id',
             'subject_id' => 'required|exists:subjects,id',
+            'specialization_name' => 'nullable|string|max:255',
+            'specialization_id' => 'nullable|exists:specializations,id',
             'qualification_id' => 'required|exists:qualifications,id',
             'state_id' => 'required|exists:states,id',
             'city_id' => 'required|exists:cities,id',

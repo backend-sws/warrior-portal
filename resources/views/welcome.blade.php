@@ -2154,6 +2154,9 @@
                 .then(async (response) => {
                     const data = await response.json().catch(() => ({}));
                     if (response.ok && (data.success || response.status === 200)) {
+                        if (typeof window.trackLeadConversion === 'function') {
+                            window.trackLeadConversion();
+                        }
                         if (msgBox) {
                             msgBox.className = 'w-full mb-6 p-4 rounded-xl text-sm font-semibold bg-green-100/80 text-green-800 border border-green-300 flex items-center gap-3 shadow-sm';
                             msgBox.innerHTML = '<i class="fas fa-check-circle text-green-600 text-lg shrink-0"></i> <div><p class="font-bold text-green-900 mb-0.5">Message Sent Successfully!</p><p class="text-xs text-green-800 mb-0">' + (data.message || 'Thank you for contacting us. Our team will get in touch with you within 30 minutes.') + '</p></div>';

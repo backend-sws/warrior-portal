@@ -35,13 +35,17 @@
       // Global Lead Conversion Tracking helper
       window.trackLeadConversion = function() {
         if (typeof gtag === 'function') {
-          gtag('event', 'conversion', {'send_to': 'AW-18341660766/PKtyCPXh8uscEN6Q_qlE'});
+          gtag('event', 'conversion', {
+              'send_to': 'AW-18341660766/ydOdCKzYuuwcEN6Q_qlE',
+              'value': 1.0,
+              'currency': 'INR'
+          });
         }
       };
     </script>
 
     @if(session('tuition_success') || session('school_success') || session('contact_success') || session('success') || session('lead_success'))
-        <!-- Event snippet for Submit lead form (2) conversion page -->
+        <!-- Event snippet for Submit lead form (3) conversion page -->
         <script>
           document.addEventListener('DOMContentLoaded', function() {
             if (typeof window.trackLeadConversion === 'function') {
