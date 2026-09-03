@@ -23,13 +23,13 @@ Our team reviews each post to ensure quality and relevance for our candidate poo
 - Ensure all required fields are filled correctly
 - Contact us if you need clarification or wish to resubmit
 
-<x-mail::button :url="'mailto:info@warriorseducare.in'">
+<x-mail::button :url="'mailto:support@warriorseducare.com'">
 Contact Us to Resubmit
 </x-mail::button>
 
 <x-mail::panel>
 We value your partnership and hope to assist you with your recruitment needs.  
-**Email:** info@warriorseducare.in | **Phone:** +91-8210545286
+**Email:** support@warriorseducare.com | **Phone:** +91-8210545286
 </x-mail::panel>
 
 Best regards,<br>

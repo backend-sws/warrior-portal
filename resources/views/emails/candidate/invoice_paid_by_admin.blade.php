@@ -24,7 +24,7 @@ View Payment History
 
 <x-mail::panel>
 **Warriors Educare**  
-**Email:** info@warriorseducare.in | **Phone:** +91-8210545286
+**Email:** support@warriorseducare.com | **Phone:** +91-8210545286
 </x-mail::panel>
 
 Best regards,<br>

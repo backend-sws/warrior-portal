@@ -18,7 +18,7 @@ Login to Dashboard
 
 <x-mail::panel>
 If you have any questions, please contact us:  
-**Email:** info@warriorseducare.in  
+**Email:** support@warriorseducare.com  
 **Phone:** +91-8210545286
 </x-mail::panel>
 

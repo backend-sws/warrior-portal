@@ -20,7 +20,7 @@ Renew My Registration
 
 <x-mail::panel>
 Have questions? Contact us:  
-**Email:** info@warriorseducare.in | **Phone:** +91-8210545286
+**Email:** support@warriorseducare.com | **Phone:** +91-8210545286
 </x-mail::panel>
 
 Best regards,<br>

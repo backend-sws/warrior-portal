@@ -18,7 +18,7 @@ Retry Payment
 
 <x-mail::panel>
 If the amount was deducted but registration wasn't completed, please contact us immediately:  
-**Email:** info@warriorseducare.in  
+**Email:** support@warriorseducare.com  
 **Phone:** +91-8210545286
 </x-mail::panel>
 

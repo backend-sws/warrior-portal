@@ -101,13 +101,13 @@
             </div>
 
             <!-- Email -->
-            <a href="mailto:info@warriorseducare.in" class="light-metallic-blue-card border-0 p-8 rounded-2xl flex flex-col items-center text-center gap-4 hover:shadow-xl transition-all duration-300 group block overflow-hidden">
+            <a href="mailto:support@warriorseducare.com" class="light-metallic-blue-card border-0 p-8 rounded-2xl flex flex-col items-center text-center gap-4 hover:shadow-xl transition-all duration-300 group block overflow-hidden">
                 <div class="w-14 h-14 bg-[#031b4e]/10 text-[#031b4e] rounded-full flex items-center justify-center text-xl shrink-0 group-hover:scale-110 group-hover:bg-[#031b4e] group-hover:text-white transition-all">
                     <i class="fas fa-envelope"></i>
                 </div>
                 <div class="relative z-10">
                     <h4 class="text-[#031b4e] font-bold mb-2">Email Us</h4>
-                    <span class="text-sm text-[#031b4e]/70">info@warriorseducare.in</span>
+                    <span class="text-sm text-[#031b4e]/70">support@warriorseducare.com</span>
                 </div>
             </a>
 

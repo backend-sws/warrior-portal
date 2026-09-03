@@ -275,9 +275,9 @@
 
         <p class="text-text-secondary leading-7 mb-4">
             Website:
-            <a href="https://www.warriorseducare.in" target="_blank" rel="noopener noreferrer"
+            <a href="https://warriorseducare.com" target="_blank" rel="noopener noreferrer"
                 class="text-primary hover:underline break-all">
-                www.warriorseducare.in
+                warriorseducare.com
             </a>
         </p>
 
