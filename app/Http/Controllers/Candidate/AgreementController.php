@@ -42,6 +42,11 @@ class AgreementController extends Controller
         $user = auth()->user();
         $profile = $user->profile;
 
+        // Check if agreement is activated for signing
+        if (!$profile || ($profile->agreement_status !== 'pending_signature' && !$profile->is_agreement_signed)) {
+            return back()->with('error', 'Agreement signing is currently locked. Please request agreement activation from admin.');
+        }
+
         // Ensure signature is valid base64 image data
         if (preg_match('/^data:image\/(\w+);base64,/', $request->signature, $type)) {
             $signatureData = substr($request->signature, strpos($request->signature, ',') + 1);

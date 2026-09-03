@@ -33,17 +33,40 @@
         </div>
     @endif
 
-    {{-- Agreement Card --}}
-    @if($profile->is_agreement_signed || $profile->agreement_status === 'pending_signature')
-        <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 overflow-hidden shadow-sm reveal reveal-delay-1 bg-white">
+    @if(session('success'))
+        <div class="mb-5 sm:mb-6 bg-emerald-500/10 border border-emerald-500/30 p-3.5 sm:p-4 rounded-xl flex items-center gap-3 justify-center reveal">
+            <i class="fas fa-check-circle text-emerald-600 text-sm sm:text-base"></i>
+            <span class="text-xs sm:text-sm text-emerald-800 font-medium">{{ session('success') }}</span>
+        </div>
+    @endif
 
-            {{-- Terms Section (Visible only when Active or Signed) --}}
-            <div class="p-4 sm:p-6 md:p-8 border-b border-[#031b4e]/10">
-                <div class="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-5">
+    {{-- Agreement Card (Always Visible so Candidate Can Read Terms) --}}
+    <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 overflow-hidden shadow-sm reveal reveal-delay-1 bg-white">
+
+        {{-- Terms Section (Always Readable) --}}
+        <div class="p-4 sm:p-6 md:p-8 border-b border-[#031b4e]/10">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-5">
+                <div class="flex items-center gap-2.5 sm:gap-3">
                     <span class="w-8 h-8 rounded-lg bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-xs"><i class="fas fa-scroll"></i></span>
                     <h2 class="text-base sm:text-lg font-bold text-[#031b4e]">Terms and Conditions</h2>
                 </div>
-                <div class="h-96 overflow-y-auto pr-2 sm:pr-4 text-xs sm:text-sm text-[#031b4e]/80 space-y-3 sm:space-y-4 custom-scrollbar bg-slate-50 rounded-xl p-4 sm:p-6 border border-slate-200">
+                <div>
+                    @if($profile->is_agreement_signed)
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <i class="fas fa-check-circle text-emerald-600"></i> Status: Digitally Signed & Verified
+                        </span>
+                    @elseif($profile->agreement_status === 'pending_signature')
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                            <i class="fas fa-pen-fancy text-blue-600"></i> Status: Active for Signing
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                            <i class="fas fa-lock text-amber-600"></i> Status: Read-Only (Signing Locked)
+                        </span>
+                    @endif
+                </div>
+            </div>
+            <div class="h-96 sm:h-[480px] overflow-y-auto pr-2 sm:pr-4 text-xs sm:text-sm text-[#031b4e]/80 space-y-3 sm:space-y-4 custom-scrollbar bg-slate-50 rounded-xl p-4 sm:p-6 border border-slate-200">
                     <div class="text-center mb-6">
                         <h3 class="text-base sm:text-lg font-black text-[#031b4e]">WARRIORS EDUCARE</h3>
                         <h4 class="font-bold text-sm text-[#0ea5e9] tracking-wider uppercase">TEACHER PLACEMENT SERVICE AGREEMENT</h4>
@@ -408,32 +431,33 @@
                     </div>
                 </form>
             </div>
+            @else
+                {{-- READ-ONLY / SIGNING LOCKED NOTICE --}}
+                <div class="p-6 sm:p-8 bg-gradient-to-b from-slate-50 to-white text-center border-t border-slate-200">
+                    <div class="max-w-xl mx-auto">
+                        <div class="w-14 h-14 bg-amber-50 border-2 border-amber-200 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xs text-xl">
+                            <i class="fas fa-lock"></i>
+                        </div>
+
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-xs font-bold mb-2">
+                            <i class="fas fa-shield-alt text-amber-600"></i> Digital Signing Currently Locked
+                        </div>
+
+                        <h3 class="text-base sm:text-lg font-black text-[#031b4e] mb-2">Agreement Available for Reading Only</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-5">
+                            You can read and review all the terms and conditions above. Digital signing, live photo identity verification, and agreement submission will be enabled here once Warriors Educare admin activates your agreement (when you are assigned or shortlisted for a school job opportunity).
+                        </p>
+
+                        <form action="{{ route('candidate.agreement.request') }}" method="POST" class="inline-block">
+                            @csrf
+                            <button type="submit" class="px-6 py-3 bg-[#031b4e] hover:bg-[#021338] text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2 text-xs sm:text-sm cursor-pointer">
+                                <i class="fas fa-paper-plane text-xs text-sky-400"></i> <span>Request Agreement Activation</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             @endif
         </div>
-    @else
-        {{-- LOCKED / NOT ACTIVATED STATE (No terms or contract lines visible at all) --}}
-        <div class="light-metallic-blue-card rounded-3xl border border-[#031b4e]/10 overflow-hidden shadow-xl reveal reveal-delay-1 bg-white p-8 sm:p-12 text-center">
-            <div class="w-20 h-20 bg-slate-100 border-2 border-slate-200 text-slate-400 rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-sm text-3xl">
-                <i class="fas fa-lock text-slate-400"></i>
-            </div>
-            
-            <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-xs font-bold mb-3">
-                <i class="fas fa-shield-alt text-amber-600"></i> Agreement Status: Locked / Inactive
-            </div>
-
-            <h2 class="text-xl sm:text-2xl font-black text-[#031b4e] mb-3">Agreement Not Activated Yet</h2>
-            <p class="text-xs sm:text-sm text-slate-500 mb-8 max-w-lg mx-auto leading-relaxed">
-                Your candidate placement agreement is currently locked. Warriors Educare admin will activate your agreement when you are assigned or shortlisted for a school job or tuition opportunity. Once activated, complete contract terms, live identity verification, and signing will be available here.
-            </p>
-            
-            <form action="{{ route('candidate.agreement.request') }}" method="POST" class="inline-block">
-                @csrf
-                <button type="submit" class="px-8 py-3.5 bg-[#031b4e] hover:bg-[#021338] text-white font-bold rounded-2xl transition-all shadow-lg hover:shadow-xl inline-flex items-center gap-2.5 text-sm cursor-pointer">
-                    <i class="fas fa-paper-plane text-xs text-sky-400"></i> <span>Request Agreement Activation</span>
-                </button>
-            </form>
-        </div>
-    @endif
 </div>
 
 <style>

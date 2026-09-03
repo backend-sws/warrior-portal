@@ -88,19 +88,7 @@
 }
 
 @layer base {
-        :root, [data-theme="dark"] {
-        --theme-primary-bg: #0042a3;
-        --theme-secondary-bg: #00317a;
-        --theme-accent-blue: #0052cc;
-        --theme-accent-blue-hover: #0062f5;
-        --theme-accent-yellow: #0052cc;
-        --theme-text-dark: #e2e8f0;
-        --theme-text-main: #ffffff;
-        --theme-card-bg: #002152;
-        --theme-card-border: rgba(255, 255, 255, 0.05);
-    }
-
-    [data-theme="light"] {
+        :root, [data-theme="light"] {
         --theme-primary-bg: #f8fafc;
         --theme-secondary-bg: #ffffff;
         --theme-accent-blue: #0062f5;
@@ -110,6 +98,18 @@
         --theme-text-main: #0f172a;
         --theme-card-bg: #ffffff;
         --theme-card-border: #e2e8f0;
+    }
+
+    [data-theme="dark"] {
+        --theme-primary-bg: #0042a3;
+        --theme-secondary-bg: #00317a;
+        --theme-accent-blue: #0052cc;
+        --theme-accent-blue-hover: #0062f5;
+        --theme-accent-yellow: #0052cc;
+        --theme-text-dark: #e2e8f0;
+        --theme-text-main: #ffffff;
+        --theme-card-bg: #002152;
+        --theme-card-border: rgba(255, 255, 255, 0.05);
     }
 
     [data-theme="midnight"] {
@@ -278,15 +278,15 @@
     align-items: center !important;
     justify-content: space-between !important;
     width: 100% !important;
-    min-height: 44px !important;
-    padding: 0.55rem 0.875rem !important;
-    background-color: var(--theme-secondary-bg, #f8fafc) !important;
-    border: 1px solid var(--theme-card-border, #cbd5e1) !important;
+    min-height: 48px !important;
+    padding: 0.65rem 0.875rem !important;
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
     border-radius: 0.75rem !important; /* rounded-xl */
     font-family: inherit !important;
     font-size: 0.875rem !important;
     font-weight: 500 !important;
-    color: var(--theme-text-main, #0f172a) !important;
+    color: #031b4e !important;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     cursor: pointer !important;
@@ -297,9 +297,9 @@
 .ss-main:focus,
 .ss-main.ss-open-below,
 .ss-main.ss-open-above {
-    border-color: #3b82f6 !important;
+    border-color: #031b4e !important;
     background-color: #ffffff !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18) !important;
+    box-shadow: 0 0 0 3px rgba(3, 27, 78, 0.15) !important;
 }
 
 .ss-main.ss-disabled {
@@ -326,12 +326,36 @@
 }
 
 .ss-main .ss-values .ss-single {
-    color: var(--theme-text-main, #0f172a) !important;
+    color: #031b4e !important;
     font-size: 0.875rem !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+}
+
+/* Accommodate absolute left icon if present inside a relative wrapper */
+.relative:has(> .absolute.left-4) > .ss-main {
+    padding-left: 2.75rem !important;
+}
+.relative:has(> .ss-main) > span.absolute.right-4 {
+    display: none !important;
+}
+
+/* Dark mode overrides when explicitly under [data-theme="dark"] */
+[data-theme="dark"] .ss-main {
+    background-color: var(--theme-secondary-bg, #00317a) !important;
+    border-color: var(--theme-card-border, rgba(255, 255, 255, 0.1)) !important;
+    color: #ffffff !important;
+}
+[data-theme="dark"] .ss-main .ss-values .ss-single {
+    color: #ffffff !important;
+}
+[data-theme="dark"] .ss-main:focus,
+[data-theme="dark"] .ss-main.ss-open-below,
+[data-theme="dark"] .ss-main.ss-open-above {
+    background-color: #002152 !important;
+    border-color: #3b82f6 !important;
 }
 
 .ss-main .ss-values .ss-value {
