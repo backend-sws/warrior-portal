@@ -23,17 +23,53 @@
     <meta name="twitter:description" content="@yield('meta_description', 'India’s trusted education network. Hire verified home tutors for all subjects, recruit top school & college faculty, or apply for high-paying teaching jobs.')">
     <meta name="twitter:image" content="{{ asset('adobe.png') }}">
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18341660766"></script>
+    @php
+        $gtmId = env('GTM_CONTAINER_ID') ?: env('GTM_ID');
+        $googleTagId = env('GOOGLE_TAG_ID', 'GT-T9HC6XV6');
+        $googleAdsId = env('GOOGLE_ADS_ID', 'AW-18341660766');
+        $ga4Id = env('GA4_MEASUREMENT_ID') ?: env('GA4_ID');
+        $metaPixelId = env('META_PIXEL_ID');
+    @endphp
+
+    @if($gtmId && str_starts_with($gtmId, 'GTM-'))
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','{{ $gtmId }}');</script>
+    <!-- End Google Tag Manager -->
+    @endif
+
+    <!-- Google Tag (gtag.js) for Google Tag & Google Ads -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $googleTagId }}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'AW-18341660766');
+      gtag('config', '{{ $googleTagId }}');
+      gtag('config', '{{ $googleAdsId }}');
+      @if($ga4Id)
+      gtag('config', '{{ $ga4Id }}');
+      @endif
 
-      // Global Lead Conversion Tracking helper
-      window.trackLeadConversion = function() {
+      // Unified Lead Conversion Tracking helper (DataLayer, Google Ads, Meta Pixel)
+      window.trackLeadConversion = function(leadType, extraData) {
+        leadType = leadType || 'home_tuition';
+        extraData = extraData || {};
+
+        // 1. Push generate_lead event to GTM Data Layer
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push(Object.assign({
+            'event': 'generate_lead',
+            'lead_type': leadType,
+            'value': 1.0,
+            'currency': 'INR',
+            'page_path': window.location.pathname
+        }, extraData));
+
+        // 2. Direct Google Ads Conversion event
         if (typeof gtag === 'function') {
           gtag('event', 'conversion', {
               'send_to': 'AW-18341660766/ydOdCKzYuuwcEN6Q_qlE',
@@ -41,15 +77,45 @@
               'currency': 'INR'
           });
         }
+
+        // 3. Direct Meta Pixel Lead event
+        if (typeof fbq === 'function') {
+          fbq('track', 'Lead', {
+              content_name: leadType,
+              currency: 'INR',
+              value: 1.0
+          });
+        }
       };
     </script>
 
+    @if($metaPixelId)
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '{{ $metaPixelId }}');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id={{ $metaPixelId }}&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+    @endif
+
     @if(session('tuition_success') || session('school_success') || session('contact_success') || session('success') || session('lead_success'))
-        <!-- Event snippet for Submit lead form (3) conversion page -->
+        <!-- Event snippet for Lead Form Submission -->
         <script>
           document.addEventListener('DOMContentLoaded', function() {
             if (typeof window.trackLeadConversion === 'function') {
-              window.trackLeadConversion();
+              var type = "{{ session('school_success') ? 'school_hiring' : (session('tuition_success') ? 'home_tuition' : 'general_lead') }}";
+              window.trackLeadConversion(type);
             }
           });
         </script>
@@ -298,6 +364,12 @@
 </head>
 
 <body class="{{ request()->is('candidate*') || request()->is('employer*') ? 'bg-[#f4f7f5] text-gray-900' : 'bg-secondary-bg text-text-dark' }} {{ session()->has('impersonate_admin_id') ? 'pt-10' : '' }}">
+    @if(!empty($gtmId) && str_starts_with($gtmId, 'GTM-'))
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    @endif
 
     <!-- Preloader removed per user request -->
 

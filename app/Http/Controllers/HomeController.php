@@ -100,11 +100,12 @@ class HomeController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Thank you! Your tuition requirement has been submitted successfully. Our team will review, match verified tutors, and contact you shortly.'
+                'message' => 'Thank you! Your tuition requirement has been submitted successfully. Our team will review, match verified tutors, and contact you shortly.',
+                'redirect_url' => route('tuition.success')
             ]);
         }
 
-        return redirect()->to(url()->previous() . '#quick-request-form')->with('tuition_success', 'Your tuition requirement has been posted successfully! Our team will contact you soon.');
+        return redirect()->route('tuition.success')->with('tuition_success', 'Your tuition requirement has been posted successfully! Our team will contact you soon.');
     }
 
     public function storeSchoolRequirement(Request $request)
@@ -168,10 +169,11 @@ class HomeController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Thank you! Your teacher requirement has been submitted for approval. Our administration team will review and approve it shortly.'
+                'message' => 'Thank you! Your teacher requirement has been submitted for approval. Our administration team will review and approve it shortly.',
+                'redirect_url' => route('school.requirement.success')
             ]);
         }
-        return redirect()->to(url()->previous() . '#quick-request-form')->with('school_success', 'Your teacher requirement has been submitted for approval! Our team will review and approve it shortly.');
+        return redirect()->route('school.requirement.success')->with('school_success', 'Your teacher requirement has been submitted for approval! Our team will review and approve it shortly.');
     }
 
     public function categoryJobs($id)

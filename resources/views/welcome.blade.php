@@ -1175,7 +1175,7 @@
                             <div>
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Education Board <span class="text-rose-500">*</span></label>
                                 <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-book text-sm"></i></span>
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-book text-sm"></i></span>
                                     <select name="board" required 
                                         @change="if(fieldErrors.board) { delete fieldErrors.board; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
                                         :class="fieldErrors.board ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
@@ -1596,11 +1596,17 @@
                             }
 
                             if (response.ok && data.success) {
+                                if (typeof window.trackLeadConversion === 'function') {
+                                    window.trackLeadConversion('home_tuition', {
+                                        form_name: 'Homepage Tuition Form'
+                                    });
+                                }
+                                if (data.redirect_url) {
+                                    window.location.href = data.redirect_url;
+                                    return;
+                                }
                                 this.submitted = true;
                                 this.successMessage = data.message || 'Your tuition requirement has been posted successfully! Our team will contact you soon.';
-                                if (typeof window.trackLeadConversion === 'function') {
-                                    window.trackLeadConversion();
-                                }
                                 form.reset();
                                 this.fieldErrors = {};
                                 this.scrollToSection();
@@ -1654,11 +1660,17 @@
                             }
 
                             if (response.ok && data.success) {
+                                if (typeof window.trackLeadConversion === 'function') {
+                                    window.trackLeadConversion('school_hiring', {
+                                        form_name: 'Homepage School Hiring Form'
+                                    });
+                                }
+                                if (data.redirect_url) {
+                                    window.location.href = data.redirect_url;
+                                    return;
+                                }
                                 this.submitted = true;
                                 this.successMessage = data.message || 'Your job requirement has been submitted for approval! Our administration team will review and approve it shortly.';
-                                if (typeof window.trackLeadConversion === 'function') {
-                                    window.trackLeadConversion();
-                                }
                                 form.reset();
                                 this.fieldErrors = {};
                                 this.school_subjects = [];

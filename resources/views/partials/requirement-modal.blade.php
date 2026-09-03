@@ -95,10 +95,16 @@ function globalRequirementModal() {
                 }
 
                 if (response.ok && data.success) {
-                    this.successMessage = data.message || 'Your tuition requirement has been submitted for review! Our academic team will verify and post it shortly.';
                     if (typeof window.trackLeadConversion === 'function') {
-                        window.trackLeadConversion();
+                        window.trackLeadConversion('home_tuition', {
+                            form_name: 'Modal Tuition Form'
+                        });
                     }
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                        return;
+                    }
+                    this.successMessage = data.message || 'Your tuition requirement has been submitted for review! Our academic team will verify and post it shortly.';
                     form.reset();
                     this.fieldErrors = {};
                 } else {
@@ -151,10 +157,16 @@ function globalRequirementModal() {
                 }
 
                 if (response.ok && data.success) {
-                    this.successMessage = data.message || 'Your teacher hiring requirement has been submitted for approval! Our team will review and approve it shortly.';
                     if (typeof window.trackLeadConversion === 'function') {
-                        window.trackLeadConversion();
+                        window.trackLeadConversion('school_hiring', {
+                            form_name: 'Modal School Requirement Form'
+                        });
                     }
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                        return;
+                    }
+                    this.successMessage = data.message || 'Your teacher hiring requirement has been submitted for approval! Our team will review and approve it shortly.';
                     form.reset();
                     this.fieldErrors = {};
                     this.selectedCategory = '';

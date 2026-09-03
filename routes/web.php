@@ -5,7 +5,14 @@ use App\Http\Controllers\HomeController;
 
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::post('/tuition/post', [App\Http\Controllers\HomeController::class, 'storeTuition'])->name('tuition.post');
+Route::get('/home-tuition-success', function () {
+    return view('pages.home-tuition-success');
+})->name('tuition.success');
+
 Route::post('/school-requirement/post', [\App\Http\Controllers\HomeController::class, 'storeSchoolRequirement'])->name('school.requirement.post');
+Route::get('/school-hiring-success', function () {
+    return view('pages.school-hiring-success');
+})->name('school.requirement.success');
 Route::get('/jobs', [\App\Http\Controllers\HomeController::class, 'jobs'])->name('jobs');
 Route::get('/tuitions', [\App\Http\Controllers\HomeController::class, 'tuitions'])->name('tuitions');
 Route::get('/tutors/search', [\App\Http\Controllers\TutorSearchController::class, 'search'])->name('tutors.search');
