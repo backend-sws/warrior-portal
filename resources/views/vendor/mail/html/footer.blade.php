@@ -8,7 +8,7 @@
                     </p>
                     <p style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.6;">
                         📞 <strong>Phone:</strong> <a href="tel:+918210545286" style="color: #031b4e; text-decoration: none; font-weight: 600;">+91 82105 45286</a> &nbsp;|&nbsp; 
-                        ✉️ <strong>Email:</strong> <a href="mailto:info@warriorseducare.in" style="color: #0ea5e9; text-decoration: none; font-weight: 600;">info@warriorseducare.in</a>
+                        ✉️ <strong>Email:</strong> <a href="mailto:support@warriorseducare.com" style="color: #0ea5e9; text-decoration: none; font-weight: 600;">support@warriorseducare.com</a>
                     </p>
                 </td>
             </tr>

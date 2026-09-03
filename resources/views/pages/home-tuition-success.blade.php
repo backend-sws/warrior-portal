@@ -79,12 +79,15 @@
                         <i class="fas fa-headset text-yellow-400"></i> Need Immediate Assistance?
                     </h3>
                     <p class="text-xs sm:text-sm text-blue-200">Connect with our dedicated parent support team right away.</p>
+                    <p class="text-xs text-blue-200 mt-1.5 flex items-center gap-1.5">
+                        <i class="fas fa-envelope text-yellow-400"></i> <a href="mailto:support@warriorseducare.com" class="underline hover:text-white transition-colors">support@warriorseducare.com</a>
+                    </p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                    <a href="tel:+919934444923" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 font-bold text-xs rounded-xl transition-all shadow-sm" style="background-color: #facc15; color: #031b4e;">
-                        <i class="fas fa-phone-alt"></i> Call +91 99344 44923
+                    <a href="tel:+918210545286" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 font-bold text-xs rounded-xl transition-all shadow-sm" style="background-color: #facc15; color: #031b4e;">
+                        <i class="fas fa-phone-alt"></i> Call +91 82105 45286
                     </a>
-                    <a href="https://wa.me/919934444923?text=Hi%20Warriors%20Educare%2C%20I%20have%20submitted%20a%20home%20tuition%20requirement%20and%20need%20quick%20assistance." target="_blank" rel="noopener noreferrer" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs rounded-xl transition-all shadow-sm">
+                    <a href="https://wa.me/918210545286?text=Hi%20Warriors%20Educare%2C%20I%20have%20submitted%20a%20home%20tuition%20requirement%20and%20need%20quick%20assistance." target="_blank" rel="noopener noreferrer" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs rounded-xl transition-all shadow-sm">
                         <i class="fab fa-whatsapp text-sm"></i> WhatsApp Us
                     </a>
                 </div>

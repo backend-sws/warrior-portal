@@ -199,7 +199,7 @@
 
         <div class="footer">
             <p style="margin: 0 0 6px 0; font-weight: 600; color: #64748b;">
-                📞 Support: +91 82105 45286 &nbsp;|&nbsp; ✉️ <a href="mailto:info@warriorseducare.in">info@warriorseducare.in</a>
+                📞 Support: +91 82105 45286 &nbsp;|&nbsp; ✉️ <a href="mailto:support@warriorseducare.com">support@warriorseducare.com</a>
             </p>
             <p style="margin: 0;">&copy; {{ date('Y') }} Warriors Educare. All rights reserved.</p>
         </div>

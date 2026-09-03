@@ -11,7 +11,7 @@ Go to Dashboard
 
 <x-mail::panel>
 This message was sent by the Warriors Educare team.  
-**Email:** info@warriorseducare.in | **Phone:** +91-8210545286
+**Email:** support@warriorseducare.com | **Phone:** +91-8210545286
 </x-mail::panel>
 
 Best regards,<br>

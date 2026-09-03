@@ -20,7 +20,7 @@ We wish you the best of luck with your current applications! If you have any que
 Career Point Building, 2nd floor,  
 Patna, 800001, Bihar
 
-**Email:** info@warriorseducare.in  
+**Email:** support@warriorseducare.com  
 **Phone:** +91-8210545286
 </x-mail::panel>
 

@@ -57,7 +57,7 @@ View Your Applications on Dashboard
 **Warriors Educare Support**  
 Sardar Patel Colony, Sandalpur Rd, Kumhrar, Patna, Bihar  
 **Phone:** +91-8210545286  
-**Email:** info@warriorseducare.in
+**Email:** support@warriorseducare.com
 </x-mail::panel>
 
 Best regards,<br>
