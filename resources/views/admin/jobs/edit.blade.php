@@ -105,6 +105,13 @@
                     @error('qualification_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
+                <!-- Other / Additional Qualification -->
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Other / Additional Qualification <span class="text-xs text-text-dark/40 font-normal lowercase">(optional)</span></label>
+                    <input type="text" name="other_qualification" value="{{ old('other_qualification', $job->other_qualification) }}" class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all" placeholder="e.g. CTET, STET, NTT, or specific requirements">
+                    @error('other_qualification') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
                 <!-- State -->
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">State *</label>

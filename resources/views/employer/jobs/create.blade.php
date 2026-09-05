@@ -114,12 +114,18 @@
                                 <!-- Qualification (Enabled once Subject is selected) -->
                                 <div>
                                     <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Required Qualification <span class="text-red-500">*</span></label>
-                                    <select :name="`jobs[${index}][qualification_id]`" x-model="job.qualification_id" :disabled="!job.subject_id" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors disabled:opacity-50 disabled:bg-slate-100 cursor-pointer">
-                                        <option value="" x-text="!job.subject_id ? '— First Select Subject —' : 'Select Qualification'"></option>
+                                    <select :name="`jobs[${index}][qualification_id]`" x-model="job.qualification_id" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors cursor-pointer">
+                                        <option value="">Select Qualification</option>
                                         @foreach($qualifications as $qualification)
                                             <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
                                         @endforeach
                                     </select>
+                                </div>
+
+                                <!-- Other / Additional Qualification -->
+                                <div>
+                                    <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Other / Additional Qualification <span class="text-xs text-[#031b4e]/40 font-normal lowercase">(optional)</span></label>
+                                    <input type="text" :name="`jobs[${index}][other_qualification]`" x-model="job.other_qualification" class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors" placeholder="e.g. CTET, STET, or specific experience">
                                 </div>
 
                                 <!-- State -->
@@ -184,6 +190,7 @@
                     specialization_name: '',
                     specialization_id: '',
                     qualification_id: '',
+                    other_qualification: '',
                     state_id: '',
                     city_id: '',
                     subjects: [],
@@ -201,6 +208,7 @@
                     specialization_name: '',
                     specialization_id: '',
                     qualification_id: '',
+                    other_qualification: '',
                     state_id: '',
                     city_id: '',
                     subjects: [],

@@ -137,7 +137,12 @@
                 </td>
                 <td>
                     <div class="text-sm text-text-main font-medium">{{ $job->subject?->name ?? 'N/A' }}</div>
-                    <div class="text-[10px] text-text-dark/40 uppercase tracking-wider mt-1">{{ $job->category?->name ?? 'N/A' }}</div>
+                    <div class="text-[10px] text-text-dark/50 uppercase tracking-wider mt-0.5">
+                        {{ $job->category?->name ?? 'N/A' }}
+                        @if($job->qualification)
+                            • <span class="font-semibold text-text-main/70">{{ $job->qualification->name }}@if($job->other_qualification) (+{{ Str::limit($job->other_qualification, 12) }})@endif</span>
+                        @endif
+                    </div>
                 </td>
                 <td>
                     <div class="text-sm text-text-main flex items-center gap-1.5">

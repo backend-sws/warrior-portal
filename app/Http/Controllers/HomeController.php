@@ -119,6 +119,7 @@ class HomeController extends Controller
             'category_id' => ['required', 'exists:categories,id'],
             'subject_id' => ['required', 'exists:subjects,id'],
             'qualification_id' => ['required', 'exists:qualifications,id'],
+            'other_qualification' => ['nullable', 'string', 'max:255'],
             'state_id' => ['required', 'exists:states,id'],
             'city_id' => ['required', 'exists:cities,id'],
             'salary_range' => ['nullable', 'string', 'max:100'],
@@ -140,6 +141,8 @@ class HomeController extends Controller
             'city_id.required' => 'Please select a city.',
         ]);
 
+        $baseDescription = $validated['description'] ?? 'Submitted via website quick requirement form';
+
         // 1. Create JobPost with pending approval status
         $jobPost = \App\Models\JobPost::create([
             'user_id' => (auth()->check() && auth()->user()->role === 'employer') ? auth()->id() : null,
@@ -151,10 +154,11 @@ class HomeController extends Controller
             'category_id' => $validated['category_id'],
             'subject_id' => $validated['subject_id'],
             'qualification_id' => $validated['qualification_id'],
+            'other_qualification' => !empty($validated['other_qualification']) ? trim($validated['other_qualification']) : null,
             'state_id' => $validated['state_id'],
             'city_id' => $validated['city_id'],
-            'salary_range' => $validated['salary_range'],
-            'description' => $validated['description'] ?? 'Submitted via website quick requirement form',
+            'salary_range' => $validated['salary_range'] ?? null,
+            'description' => $baseDescription,
             'status' => 'pending',
         ]);
 

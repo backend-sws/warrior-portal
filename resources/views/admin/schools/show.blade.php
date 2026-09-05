@@ -198,7 +198,7 @@
                                 <div class="text-xs text-text-dark/60 mt-1 flex flex-wrap items-center gap-3">
                                     <span><i class="fas fa-book-open text-xs mr-1 text-slate-400"></i> {{ $job->subject?->name ?? 'Any Subject' }}</span>
                                     <span>•</span>
-                                    <span><i class="fas fa-graduation-cap text-xs mr-1 text-slate-400"></i> {{ $job->qualification?->name ?? 'Any' }}</span>
+                                    <span title="{{ $job->qualification_display }}"><i class="fas fa-graduation-cap text-xs mr-1 text-slate-400"></i> {{ $job->qualification?->name ?? 'Any' }}@if($job->other_qualification) (+{{ $job->other_qualification }})@endif</span>
                                     @if($job->salary_range)
                                         <span>•</span>
                                         <span class="font-bold text-emerald-600">{{ $job->salary_range }}</span>
@@ -366,10 +366,16 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Salary Range</label>
-                        <input type="text" name="salary_range" placeholder="e.g. ₹35,000 - ₹50,000 / month"
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Other / Additional Qualification</label>
+                        <input type="text" name="other_qualification" placeholder="e.g. CTET, STET, or experience"
                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-800 font-medium focus:bg-white focus:outline-none">
                     </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Salary Range</label>
+                    <input type="text" name="salary_range" placeholder="e.g. ₹35,000 - ₹50,000 / month"
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-800 font-medium focus:bg-white focus:outline-none">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">

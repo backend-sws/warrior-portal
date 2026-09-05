@@ -47,6 +47,7 @@ class JobController extends Controller
             'jobs.*.specialization_name' => 'nullable|string|max:255',
             'jobs.*.specialization_id' => 'nullable|exists:specializations,id',
             'jobs.*.qualification_id' => 'required|exists:qualifications,id',
+            'jobs.*.other_qualification' => 'nullable|string|max:255',
             'jobs.*.state_id' => 'required|exists:states,id',
             'jobs.*.city_id' => 'required|exists:cities,id',
             'jobs.*.salary_range' => 'nullable|string|max:255',
@@ -66,6 +67,7 @@ class JobController extends Controller
                 'specialization_name' => $jobData['specialization_name'] ?? null,
                 'specialization_id' => $jobData['specialization_id'] ?? null,
                 'qualification_id' => $jobData['qualification_id'],
+                'other_qualification' => !empty($jobData['other_qualification']) ? trim($jobData['other_qualification']) : null,
                 'state_id' => $jobData['state_id'],
                 'city_id' => $jobData['city_id'],
                 'salary_range' => $jobData['salary_range'] ?? null,
@@ -124,13 +126,14 @@ class JobController extends Controller
             'specialization_name' => 'nullable|string|max:255',
             'specialization_id' => 'nullable|exists:specializations,id',
             'qualification_id' => 'required|exists:qualifications,id',
+            'other_qualification' => 'nullable|string|max:255',
             'state_id' => 'required|exists:states,id',
             'city_id' => 'required|exists:cities,id',
             'salary_range' => 'nullable|string|max:255',
         ]);
 
         $job->update($request->only([
-            'title', 'description', 'category_id', 'subject_id', 'specialization_name', 'specialization_id', 'qualification_id', 'state_id', 'city_id', 'salary_range'
+            'title', 'description', 'category_id', 'subject_id', 'specialization_name', 'specialization_id', 'qualification_id', 'other_qualification', 'state_id', 'city_id', 'salary_range'
         ]));
 
         return redirect()->route('employer.jobs.index')->with('success', 'Job updated successfully.');

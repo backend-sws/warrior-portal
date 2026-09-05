@@ -789,9 +789,9 @@
                                         <i class="fas fa-book text-[9px] text-purple-600"></i> {{ $job->subject->name }}
                                     </span>
                                 @endif
-                                @if($job->qualification)
-                                    <span class="bg-amber-50 text-amber-900 border border-amber-200/60 px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1">
-                                        <i class="fas fa-graduation-cap text-[9px] text-amber-600"></i> {{ $job->qualification->name }}
+                                @if($job->qualification || $job->other_qualification)
+                                    <span class="bg-amber-50 text-amber-900 border border-amber-200/60 px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1" title="{{ $job->qualification_display }}">
+                                        <i class="fas fa-graduation-cap text-[9px] text-amber-600"></i> {{ $job->qualification_display }}
                                     </span>
                                 @endif
                             </div>
@@ -1361,14 +1361,12 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Subject <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-book text-sm"></i></span>
-                                    <select name="subject_id" x-model="school_subject_id" :disabled="!school_category_id || loadingSchoolSubjects" required 
-                                        @change="if(fieldErrors.subject_id) { delete fieldErrors.subject_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                    <select name="subject_id" id="school_subject_id" x-model="school_subject_id" 
+                                        @change="onSubjectChange($event); if(fieldErrors.subject_id) { delete fieldErrors.subject_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }" 
+                                        :disabled="!school_category_id || loadingSchoolSubjects" required 
                                         :class="fieldErrors.subject_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
                                         class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
-                                        <option value="" x-text="!school_category_id ? '— First Select Category —' : (loadingSchoolSubjects ? 'Loading subjects...' : 'Select Subject')"></option>
-                                        <template x-for="subj in school_subjects" :key="subj.id">
-                                            <option :value="subj.id" x-text="subj.name"></option>
-                                        </template>
+                                        <option value="">— First Select Category —</option>
                                     </select>
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
                                 </div>
@@ -1382,11 +1380,11 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Required Qualification <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-graduation-cap text-sm"></i></span>
-                                    <select name="qualification_id" x-model="school_qualification_id" :disabled="!school_subject_id" required 
+                                    <select name="qualification_id" id="school_qualification_id" x-model="school_qualification_id" required 
                                         @change="if(fieldErrors.qualification_id) { delete fieldErrors.qualification_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
                                         :class="fieldErrors.qualification_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
-                                        class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
-                                        <option value="" x-text="!school_subject_id ? '— First Select Subject —' : 'Select Qualification'"></option>
+                                        class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
+                                        <option value="">Select Qualification</option>
                                         @foreach($qualifications as $qualification)
                                             <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
                                         @endforeach
@@ -1398,12 +1396,29 @@
                                 </p>
                             </div>
 
+                            <!-- Other / Additional Qualification (Writable) -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider">Other / Additional Qualification</label>
+                                    <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Optional</span>
+                                </div>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-pencil-alt text-sm"></i></span>
+                                    <input type="text" name="other_qualification" id="school_other_qualification" x-model="school_other_qualification" maxlength="150" 
+                                        placeholder="e.g. B.Ed, CTET qualified, NTT, 2+ Yrs Exp..." 
+                                        class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                                <p class="mt-1.5 text-[11px] text-slate-500 font-medium">
+                                    Specify any additional degrees, certifications or experience requirements here.
+                                </p>
+                            </div>
+
                             <!-- State -->
                             <div>
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">State <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-map text-sm"></i></span>
-                                    <select name="state_id" x-model="school_state_id" @change="fetchSchoolCities(); if(fieldErrors.state_id) { delete fieldErrors.state_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }" required 
+                                    <select name="state_id" id="school_state_id" x-model="school_state_id" @change="fetchSchoolCities(); if(fieldErrors.state_id) { delete fieldErrors.state_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }" required 
                                         :class="fieldErrors.state_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
                                         class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
                                         <option value="">Select State</option>
@@ -1423,14 +1438,12 @@
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">City <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-city text-sm"></i></span>
-                                    <select name="city_id" x-model="school_city_id" :disabled="!school_state_id || loadingSchoolCities" required 
-                                        @change="if(fieldErrors.city_id) { delete fieldErrors.city_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                    <select name="city_id" id="school_city_id" x-model="school_city_id" 
+                                        @change="if(fieldErrors.city_id) { delete fieldErrors.city_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }" 
+                                        :disabled="!school_state_id || loadingSchoolCities" required 
                                         :class="fieldErrors.city_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
                                         class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
-                                        <option value="" x-text="!school_state_id ? '— First Select State —' : (loadingSchoolCities ? 'Loading cities...' : 'Select City')"></option>
-                                        <template x-for="city in school_cities" :key="city.id">
-                                            <option :value="city.id" x-text="city.name"></option>
-                                        </template>
+                                        <option value="">— First Select State —</option>
                                     </select>
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
                                 </div>
@@ -1440,7 +1453,7 @@
                             </div>
 
                             <!-- Salary Range -->
-                            <div>
+                            <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Salary Range / Budget (Monthly)</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-rupee-sign text-sm"></i></span>
@@ -1485,6 +1498,7 @@
                     school_category_id: '',
                     school_subject_id: '',
                     school_qualification_id: '',
+                    school_other_qualification: '',
                     school_state_id: '',
                     school_city_id: '',
                     school_subjects: [],
@@ -1504,12 +1518,29 @@
                         if (tabParam === 'school' || tabParam === 'tuition') {
                             this.switchTab(tabParam);
                         }
+
+                        this.$nextTick(() => {
+                            const sub = document.getElementById('school_subject_id');
+                            if (sub && sub._slimSelect && !this.school_category_id) sub._slimSelect.disable();
+                            const city = document.getElementById('school_city_id');
+                            if (city && city._slimSelect && !this.school_state_id) city._slimSelect.disable();
+                        });
                     },
 
                     switchTab(newTab) {
                         this.tab = newTab;
                         this.errorMessage = '';
                         this.fieldErrors = {};
+                        this.$nextTick(() => {
+                            const formContainer = document.getElementById('quick-request-form');
+                            if (formContainer && typeof window.initSearchableSelects === 'function') {
+                                window.initSearchableSelects(formContainer);
+                            }
+                            const sub = document.getElementById('school_subject_id');
+                            if (sub && sub._slimSelect && !this.school_category_id) sub._slimSelect.disable();
+                            const city = document.getElementById('school_city_id');
+                            if (city && city._slimSelect && !this.school_state_id) city._slimSelect.disable();
+                        });
                     },
                     resetForm() {
                         this.submitted = false;
@@ -1526,45 +1557,130 @@
                             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
                     },
+                    setSelectLoading(selectEl, placeholder) {
+                        if (!selectEl) return;
+                        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+                        selectEl.disabled = true;
+                        if (selectEl._slimSelect) {
+                            selectEl._isUpdatingFromSlim = true;
+                            try {
+                                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
+                                selectEl._slimSelect.disable();
+                            } catch (e) {
+                                console.warn(e);
+                            } finally {
+                                setTimeout(() => { selectEl._isUpdatingFromSlim = false; }, 30);
+                            }
+                        }
+                    },
+                    updateSelectOptions(selectEl, items, placeholder, selectedValue = '') {
+                        if (!selectEl) return;
+                        let html = `<option value="">${placeholder}</option>`;
+                        items.forEach(item => {
+                            const isSel = selectedValue && String(selectedValue) === String(item.id);
+                            html += `<option value="${item.id}" ${isSel ? 'selected' : ''}>${item.name}</option>`;
+                        });
+                        selectEl.innerHTML = html;
+                        selectEl.disabled = false;
+
+                        if (selectEl._slimSelect) {
+                            selectEl._isUpdatingFromSlim = true;
+                            try {
+                                const ssData = [
+                                    { text: placeholder, value: '', placeholder: true },
+                                    ...items.map(item => ({
+                                        text: item.name,
+                                        value: String(item.id),
+                                        selected: selectedValue && String(selectedValue) === String(item.id)
+                                    }))
+                                ];
+                                selectEl._slimSelect.setData(ssData);
+                                if (selectedValue) {
+                                    selectEl._slimSelect.setSelected(String(selectedValue), false);
+                                } else {
+                                    selectEl._slimSelect.setSelected('', false);
+                                }
+                                selectEl._slimSelect.enable();
+                            } catch (e) {
+                                console.warn(e);
+                            } finally {
+                                setTimeout(() => { selectEl._isUpdatingFromSlim = false; }, 30);
+                            }
+                        }
+                    },
+                    resetSelect(selectEl, placeholder) {
+                        if (!selectEl) return;
+                        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+                        selectEl.value = '';
+                        selectEl.disabled = true;
+                        if (selectEl._slimSelect) {
+                            selectEl._isUpdatingFromSlim = true;
+                            try {
+                                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
+                                selectEl._slimSelect.setSelected('', false);
+                                selectEl._slimSelect.disable();
+                            } catch (e) {
+                                console.warn(e);
+                            } finally {
+                                setTimeout(() => { selectEl._isUpdatingFromSlim = false; }, 30);
+                            }
+                        }
+                    },
                     fetchSchoolSubjects() {
                         this.school_subject_id = '';
-                        this.school_qualification_id = '';
+                        const subjectSelect = document.getElementById('school_subject_id');
+
                         if (this.school_category_id) {
                             this.loadingSchoolSubjects = true;
+                            this.setSelectLoading(subjectSelect, 'Loading subjects...');
+
                             fetch(`/api/categories/${this.school_category_id}/subjects`)
                                 .then(res => res.json())
                                 .then(data => {
                                     this.school_subjects = data;
+                                    this.updateSelectOptions(subjectSelect, data, 'Select Subject');
                                 })
                                 .catch(err => {
                                     console.error('Error fetching subjects:', err);
                                     this.school_subjects = [];
+                                    this.updateSelectOptions(subjectSelect, [], 'Select Subject');
                                 })
                                 .finally(() => {
                                     this.loadingSchoolSubjects = false;
                                 });
                         } else {
                             this.school_subjects = [];
+                            this.resetSelect(subjectSelect, '— First Select Category —');
                         }
+                    },
+                    onSubjectChange(event) {
+                        this.school_subject_id = event && event.target ? event.target.value : '';
                     },
                     fetchSchoolCities() {
                         this.school_city_id = '';
+                        const citySelect = document.getElementById('school_city_id');
+
                         if (this.school_state_id) {
                             this.loadingSchoolCities = true;
+                            this.setSelectLoading(citySelect, 'Loading cities...');
+
                             fetch(`/api/states/${this.school_state_id}/cities`)
                                 .then(res => res.json())
                                 .then(data => {
                                     this.school_cities = data;
+                                    this.updateSelectOptions(citySelect, data, 'Select City');
                                 })
                                 .catch(err => {
                                     console.error('Error fetching cities:', err);
                                     this.school_cities = [];
+                                    this.updateSelectOptions(citySelect, [], 'Select City');
                                 })
                                 .finally(() => {
                                     this.loadingSchoolCities = false;
                                 });
                         } else {
                             this.school_cities = [];
+                            this.resetSelect(citySelect, '— First Select State —');
                         }
                     },
                     async submitTuitionForm(event) {
@@ -1678,8 +1794,11 @@
                                 this.school_category_id = '';
                                 this.school_subject_id = '';
                                 this.school_qualification_id = '';
+                                this.school_other_qualification = '';
                                 this.school_state_id = '';
                                 this.school_city_id = '';
+                                const otherQual = document.getElementById('school_other_qualification');
+                                if (otherQual) otherQual.value = '';
                                 this.scrollToSection();
                             } else {
                                 if (response.status === 419) {

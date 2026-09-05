@@ -44,6 +44,9 @@
                 <div class="w-10 h-10 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center mx-auto mb-3 text-lg"><i class="fas fa-graduation-cap"></i></div>
                 <h4 class="text-xs font-bold text-[#031b4e]/70 uppercase tracking-wider mb-1">Qualification</h4>
                 <p class="font-semibold text-[#031b4e]">{{ $job->qualification?->name ?? 'N/A' }}</p>
+                @if($job->other_qualification)
+                    <p class="text-xs text-purple-700 font-semibold mt-1" title="Additional Qualification">+ {{ $job->other_qualification }}</p>
+                @endif
             </div>
             <div class="p-6 text-center">
                 <div class="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto mb-3 text-lg"><i class="fas fa-award"></i></div>

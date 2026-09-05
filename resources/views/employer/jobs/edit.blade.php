@@ -92,6 +92,10 @@
                                 </select>
                             </div>
                             <div>
+                                <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Other / Additional Qualification <span class="text-xs text-[#031b4e]/40 font-normal lowercase">(optional)</span></label>
+                                <input type="text" name="other_qualification" value="{{ old('other_qualification', $job->other_qualification) }}" class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors" placeholder="e.g. CTET, STET, or specific experience">
+                            </div>
+                            <div>
                                 <label class="block text-xs font-bold text-[#031b4e]/70 mb-2 uppercase tracking-wider">State <span class="text-red-500">*</span></label>
                                 <select name="state_id" id="state_id" required class="w-full bg-white border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:border-accent-yellow transition-colors">
                                     <option value="">Select State</option>
@@ -200,8 +204,12 @@
         categorySelect.addEventListener('change', function() {
             let catId = this.value;
             subjectSelect.innerHTML = '<option value="">Loading subjects...</option>';
+            if (typeof window.refreshSearchableSelect === 'function') window.refreshSearchableSelect(subjectSelect);
             if (specializationWrapper) specializationWrapper.style.display = 'none';
-            if (specializationSelect) specializationSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+            if (specializationSelect) {
+                specializationSelect.innerHTML = '<option value="">Select Specialization (Optional)</option>';
+                if (typeof window.refreshSearchableSelect === 'function') window.refreshSearchableSelect(specializationSelect);
+            }
 
             if (catId) {
                 fetch(`/api/categories/${catId}/subjects`)
@@ -212,13 +220,16 @@
                             html += `<option value="${sub.id}">${sub.name}</option>`;
                         });
                         subjectSelect.innerHTML = html;
+                        if (typeof window.refreshSearchableSelect === 'function') window.refreshSearchableSelect(subjectSelect);
                     })
                     .catch(error => {
                         console.error('Error fetching subjects:', error);
                         subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                        if (typeof window.refreshSearchableSelect === 'function') window.refreshSearchableSelect(subjectSelect);
                     });
             } else {
                 subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                if (typeof window.refreshSearchableSelect === 'function') window.refreshSearchableSelect(subjectSelect);
             }
         });
     }
@@ -233,6 +244,7 @@
         let stateId = this.value;
         let citySelect = document.getElementById('city_id');
         citySelect.innerHTML = '<option value="">Loading...</option>';
+        if (typeof window.refreshSearchableSelect === 'function') window.refreshSearchableSelect(citySelect);
         
         if(stateId) {
             fetch(`/api/states/${stateId}/cities`)
@@ -242,13 +254,16 @@
                     data.forEach(city => {
                         citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
                     });
+                    if (typeof window.refreshSearchableSelect === 'function') window.refreshSearchableSelect(citySelect);
                 })
                 .catch(error => {
                     console.error('Error fetching cities:', error);
                     citySelect.innerHTML = '<option value="">Select City</option>';
+                    if (typeof window.refreshSearchableSelect === 'function') window.refreshSearchableSelect(citySelect);
                 });
         } else {
             citySelect.innerHTML = '<option value="">Select City</option>';
+            if (typeof window.refreshSearchableSelect === 'function') window.refreshSearchableSelect(citySelect);
         }
     });
 </script>

@@ -57,6 +57,18 @@ class JobPost extends Model
         return $this->belongsTo(Qualification::class);
     }
 
+    public function getQualificationDisplayAttribute()
+    {
+        $base = $this->qualification?->name ?? '';
+        if (!empty($this->other_qualification)) {
+            if (empty($base) || str_starts_with(strtolower($base), 'other')) {
+                return $this->other_qualification;
+            }
+            return $base . ' (' . $this->other_qualification . ')';
+        }
+        return $base ?: 'Any Graduate';
+    }
+
     public function state()
     {
         return $this->belongsTo(State::class);
