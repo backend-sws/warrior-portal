@@ -118,9 +118,14 @@
                             <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
                                 <i class="fas fa-graduation-cap text-purple-500"></i> Qualification
                             </span>
-                            <span class="font-extrabold text-[#031b4e] text-xs sm:text-sm truncate" title="{{ $job->qualification?->name ?? 'Any Graduate' }}">
+                            <span class="font-extrabold text-[#031b4e] text-xs sm:text-sm truncate" title="{{ $job->qualification_display }}">
                                 {{ $job->qualification?->name ?? 'Any Graduate' }}
                             </span>
+                            @if($job->other_qualification)
+                                <span class="text-[11px] font-semibold text-purple-600 truncate mt-0.5" title="{{ $job->other_qualification }}">
+                                    + {{ $job->other_qualification }}
+                                </span>
+                            @endif
                         </div>
 
                         <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 border border-slate-200/60 flex flex-col justify-center">

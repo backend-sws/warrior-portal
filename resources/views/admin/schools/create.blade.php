@@ -259,6 +259,12 @@
                             </select>
                         </div>
 
+                        <div>
+                            <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1">Other / Additional Qualification</label>
+                            <input type="text" name="other_qualification" value="{{ old('other_qualification') }}" placeholder="e.g. CTET, STET, or experience requirements"
+                                   class="w-full px-4 py-2 bg-white border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/30">
+                        </div>
+
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1">Salary Range</label>
                             <input type="text" name="salary_range" value="{{ old('salary_range') }}" placeholder="e.g. ₹35,000 - ₹45,000 / month"

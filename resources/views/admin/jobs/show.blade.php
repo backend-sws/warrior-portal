@@ -69,6 +69,11 @@
                         <span class="inline-flex items-center px-2.5 py-1 rounded bg-orange-50 text-orange-700 text-sm border border-orange-100">
                             <i class="fas fa-graduation-cap mr-1.5 text-orange-400"></i> {{ $job->qualification?->name ?? 'N/A' }}
                         </span>
+                        @if($job->other_qualification)
+                            <span class="inline-flex items-center px-2.5 py-1 rounded bg-purple-50 text-purple-700 text-sm border border-purple-100" title="Other / Additional Qualification">
+                                <i class="fas fa-plus mr-1.5 text-purple-400"></i> {{ $job->other_qualification }}
+                            </span>
+                        @endif
                         <span class="inline-flex items-center px-2.5 py-1 rounded bg-green-50 text-green-700 text-sm border border-green-100">
                             <i class="fas fa-map-marker-alt mr-1.5 text-green-400"></i> {{ $job->city?->name ?? 'N/A' }}, {{ $job->state?->name ?? 'N/A' }}
                         </span>

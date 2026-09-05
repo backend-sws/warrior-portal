@@ -113,8 +113,8 @@
                             <span class="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-600 flex items-center gap-1.5 transition-colors">
                                 <i class="fas fa-book text-accent-blue"></i> {{ Str::limit($job->subject?->name ?? 'N/A', 15) }}
                             </span>
-                            <span class="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-600 flex items-center gap-1.5 transition-colors">
-                                <i class="fas fa-graduation-cap text-accent-blue"></i> {{ Str::limit($job->qualification?->name ?? 'N/A', 15) }}
+                            <span class="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-600 flex items-center gap-1.5 transition-colors" title="{{ $job->qualification_display }}">
+                                <i class="fas fa-graduation-cap text-accent-blue"></i> {{ $job->qualification_display }}
                             </span>
                         </div>
                     </div>

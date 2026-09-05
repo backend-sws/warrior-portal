@@ -264,6 +264,15 @@
                                 </div>
                             </div>
 
+                            {{-- Qualification / Eligibility Tag --}}
+                            @if($job->qualification || $job->other_qualification)
+                                <div class="mb-3 flex items-center gap-1.5 text-xs text-slate-600 bg-amber-50/60 border border-amber-200/60 px-2.5 py-1.5 rounded-xl" title="{{ $job->qualification_display }}">
+                                    <i class="fas fa-user-graduate text-amber-600 text-xs"></i>
+                                    <span class="font-bold text-slate-700">Eligible:</span>
+                                    <span class="truncate font-semibold">{{ $job->qualification?->name ?? 'Any' }}@if($job->other_qualification) (+{{ $job->other_qualification }})@endif</span>
+                                </div>
+                            @endif
+
                             {{-- Description Snippet --}}
                             @if($job->description)
                                 <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4 bg-slate-50/50 p-2 rounded-lg border border-slate-100">

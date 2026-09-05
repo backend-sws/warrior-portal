@@ -70,8 +70,8 @@
                                     <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-amber-500 shrink-0">
                                         <i class="fas fa-graduation-cap"></i>
                                     </div>
-                                    <span class="truncate" title="{{ $job->qualification->name ?? 'Not Specified' }}">
-                                        {{ $job->qualification->name ?? 'Not Specified' }}
+                                    <span class="truncate" title="{{ $job->qualification_display }}">
+                                        {{ $job->qualification_display }}
                                     </span>
                                 </div>
 

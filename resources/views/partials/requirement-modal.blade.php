@@ -24,6 +24,15 @@ function globalRequirementModal() {
         loadingCities: false,
 
         init() {
+            this.$watch('tab', () => {
+                this.$nextTick(() => {
+                    const modalEl = document.getElementById('requirement-modal');
+                    if (modalEl && typeof window.initSearchableSelects === 'function') {
+                        window.initSearchableSelects(modalEl);
+                    }
+                });
+            });
+
             window.addEventListener('open-requirement-modal', (e) => {
                 this.openPostModal = true;
                 if (e.detail && e.detail.tab) {
@@ -32,37 +41,145 @@ function globalRequirementModal() {
                 this.successMessage = '';
                 this.errorMessage = '';
                 this.fieldErrors = {};
+                this.$nextTick(() => {
+                    const modalEl = document.getElementById('requirement-modal');
+                    if (modalEl && typeof window.initSearchableSelects === 'function') {
+                        window.initSearchableSelects(modalEl);
+                    }
+                });
             });
         },
 
+        setSelectLoading(selectEl, placeholder) {
+            if (!selectEl) return;
+            selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+            selectEl.disabled = true;
+            if (selectEl._slimSelect) {
+                selectEl._isUpdatingFromSlim = true;
+                try {
+                    selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
+                    selectEl._slimSelect.disable();
+                } catch (e) {
+                    console.warn(e);
+                } finally {
+                    setTimeout(() => { selectEl._isUpdatingFromSlim = false; }, 30);
+                }
+            }
+        },
+
+        updateSelectOptions(selectEl, items, placeholder, selectedValue = '') {
+            if (!selectEl) return;
+            let html = `<option value="">${placeholder}</option>`;
+            items.forEach(item => {
+                const isSel = selectedValue && String(selectedValue) === String(item.id);
+                html += `<option value="${item.id}" ${isSel ? 'selected' : ''}>${item.name}</option>`;
+            });
+            selectEl.innerHTML = html;
+            selectEl.disabled = false;
+
+            if (selectEl._slimSelect) {
+                selectEl._isUpdatingFromSlim = true;
+                try {
+                    const ssData = [
+                        { text: placeholder, value: '', placeholder: true },
+                        ...items.map(item => ({
+                            text: item.name,
+                            value: String(item.id),
+                            selected: selectedValue && String(selectedValue) === String(item.id)
+                        }))
+                    ];
+                    selectEl._slimSelect.setData(ssData);
+                    if (selectedValue) {
+                        selectEl._slimSelect.setSelected(String(selectedValue), false);
+                    } else {
+                        selectEl._slimSelect.setSelected('', false);
+                    }
+                    selectEl._slimSelect.enable();
+                } catch (e) {
+                    console.warn(e);
+                } finally {
+                    setTimeout(() => { selectEl._isUpdatingFromSlim = false; }, 30);
+                }
+            } else if (typeof window.initSearchableSelects === 'function') {
+                window.initSearchableSelects(selectEl.parentElement || document);
+            }
+        },
+
+        resetSelect(selectEl, placeholder) {
+            if (!selectEl) return;
+            selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+            selectEl.value = '';
+            selectEl.disabled = true;
+            if (selectEl._slimSelect) {
+                selectEl._isUpdatingFromSlim = true;
+                try {
+                    selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
+                    selectEl._slimSelect.setSelected('', false);
+                    selectEl._slimSelect.disable();
+                } catch (e) {
+                    console.warn(e);
+                } finally {
+                    setTimeout(() => { selectEl._isUpdatingFromSlim = false; }, 30);
+                }
+            }
+        },
+
         fetchSubjects() {
-            if (!this.selectedCategory) {
+            const catSelect = document.getElementById('modal_category_id');
+            const catVal = (catSelect && catSelect.value) ? catSelect.value : this.selectedCategory;
+            this.selectedCategory = catVal;
+            const subSelect = document.getElementById('modal_subject_id');
+
+            if (!catVal) {
                 this.subjects = [];
+                this.resetSelect(subSelect, 'Select Subject');
                 return;
             }
             this.loadingSubjects = true;
-            fetch(`/api/categories/${this.selectedCategory}/subjects`)
+            this.setSelectLoading(subSelect, 'Loading subjects...');
+            fetch(`/api/categories/${catVal}/subjects`)
                 .then(res => res.json())
                 .then(data => {
-                    this.subjects = data;
-                    this.loadingSubjects = false;
+                    this.subjects = Array.isArray(data) ? data : [];
+                    this.updateSelectOptions(subSelect, this.subjects, 'Select Subject');
                 })
-                .catch(() => { this.loadingSubjects = false; });
+                .catch(err => {
+                    console.error('Error fetching modal subjects:', err);
+                    this.subjects = [];
+                    this.updateSelectOptions(subSelect, [], 'Select Subject');
+                })
+                .finally(() => {
+                    this.loadingSubjects = false;
+                });
         },
 
         fetchCities() {
-            if (!this.selectedState) {
+            const stateSelect = document.getElementById('modal_state_id');
+            const stateVal = (stateSelect && stateSelect.value) ? stateSelect.value : this.selectedState;
+            this.selectedState = stateVal;
+            const citySelect = document.getElementById('modal_city_id');
+
+            if (!stateVal) {
                 this.cities = [];
+                this.resetSelect(citySelect, 'Select City');
                 return;
             }
             this.loadingCities = true;
-            fetch(`/api/states/${this.selectedState}/cities`)
+            this.setSelectLoading(citySelect, 'Loading cities...');
+            fetch(`/api/states/${stateVal}/cities`)
                 .then(res => res.json())
                 .then(data => {
-                    this.cities = data;
-                    this.loadingCities = false;
+                    this.cities = Array.isArray(data) ? data : [];
+                    this.updateSelectOptions(citySelect, this.cities, 'Select City');
                 })
-                .catch(() => { this.loadingCities = false; });
+                .catch(err => {
+                    console.error('Error fetching modal cities:', err);
+                    this.cities = [];
+                    this.updateSelectOptions(citySelect, [], 'Select City');
+                })
+                .finally(() => {
+                    this.loadingCities = false;
+                });
         },
 
         async submitTuitionForm(e) {
@@ -173,6 +290,18 @@ function globalRequirementModal() {
                     this.selectedState = '';
                     this.subjects = [];
                     this.cities = [];
+                    const catSelect = document.getElementById('modal_category_id');
+                    const subSelect = document.getElementById('modal_subject_id');
+                    const qualSelect = document.getElementById('modal_qualification_id');
+                    const stateSelect = document.getElementById('modal_state_id');
+                    const citySelect = document.getElementById('modal_city_id');
+                    if (catSelect && catSelect._slimSelect) catSelect._slimSelect.setSelected('', false);
+                    this.resetSelect(subSelect, 'Select Subject');
+                    if (qualSelect && qualSelect._slimSelect) qualSelect._slimSelect.setSelected('', false);
+                    if (stateSelect && stateSelect._slimSelect) stateSelect._slimSelect.setSelected('', false);
+                    this.resetSelect(citySelect, 'Select City');
+                    const otherQual = document.getElementById('modal_other_qualification');
+                    if (otherQual) otherQual.value = '';
                 } else {
                     if (response.status === 419) {
                         this.errorMessage = 'Your browser session has expired. Please refresh the page (F5) and submit again.';
@@ -196,7 +325,8 @@ function globalRequirementModal() {
 }
 </script>
 
-<div x-data="globalRequirementModal()" 
+<div id="requirement-modal" 
+     x-data="globalRequirementModal()" 
      x-on:open-requirement-modal.window="openPostModal = true; if($event.detail && $event.detail.tab) { tab = $event.detail.tab; } successMessage = ''; errorMessage = ''; fieldErrors = {};"
      class="relative z-[9999]">
 
@@ -365,7 +495,7 @@ function globalRequirementModal() {
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Job Category <span class="text-red-500">*</span></label>
-                                <select name="category_id" x-model="selectedCategory" @change="fetchSubjects()" required 
+                                <select name="category_id" id="modal_category_id" x-model="selectedCategory" @change="fetchSubjects()" required 
                                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer">
                                     <option value="">Select Category</option>
                                     @foreach($modalCategories as $cat)
@@ -375,17 +505,14 @@ function globalRequirementModal() {
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Subject <span class="text-red-500">*</span></label>
-                                <select name="subject_id" required :disabled="loadingSubjects" 
+                                <select name="subject_id" id="modal_subject_id" required :disabled="loadingSubjects" 
                                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer disabled:opacity-50">
                                     <option value="">Select Subject</option>
-                                    <template x-for="subj in subjects" :key="subj.id">
-                                        <option :value="subj.id" x-text="subj.name"></option>
-                                    </template>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Required Qualification <span class="text-red-500">*</span></label>
-                                <select name="qualification_id" required 
+                                <select name="qualification_id" id="modal_qualification_id" required 
                                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer">
                                     <option value="">Select Qualification</option>
                                     @foreach($modalQualifications as $qual)
@@ -394,13 +521,21 @@ function globalRequirementModal() {
                                 </select>
                             </div>
                             <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Other / Additional Qualification</label>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">Optional</span>
+                                </div>
+                                <input type="text" name="other_qualification" id="modal_other_qualification" maxlength="150" placeholder="e.g. B.Ed, CTET, NTT, 2+ Yrs Exp..." 
+                                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
+                            </div>
+                            <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Salary Range / Budget</label>
                                 <input type="text" name="salary_range" maxlength="80" placeholder="e.g. ₹25,000 - ₹35,000" 
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">State <span class="text-red-500">*</span></label>
-                                <select name="state_id" x-model="selectedState" @change="fetchCities()" required 
+                                <select name="state_id" id="modal_state_id" x-model="selectedState" @change="fetchCities()" required 
                                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer">
                                     <option value="">Select State</option>
                                     @foreach($modalStates as $st)
@@ -410,12 +545,9 @@ function globalRequirementModal() {
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">City <span class="text-red-500">*</span></label>
-                                <select name="city_id" required :disabled="loadingCities" 
+                                <select name="city_id" id="modal_city_id" required :disabled="loadingCities" 
                                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer disabled:opacity-50">
                                     <option value="">Select City</option>
-                                    <template x-for="city in cities" :key="city.id">
-                                        <option :value="city.id" x-text="city.name"></option>
-                                    </template>
                                 </select>
                             </div>
                         </div>

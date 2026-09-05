@@ -46,4 +46,48 @@ class PaymentTransaction extends Model
     {
         return $query->where('status', 'failed');
     }
+
+    public function getCategoryAttribute()
+    {
+        if (!empty($this->tuition_lead_id) 
+            || ($this->invoice && (!empty($this->invoice->home_tuition_lead_id) || !empty($this->invoice->tuition_application_id) || stripos($this->invoice->description ?? '', 'tuition') !== false)) 
+            || $this->type === 'parent_service_charge') {
+            return 'tuition';
+        }
+        return 'job';
+    }
+
+    public function getCategoryLabelAttribute()
+    {
+        return $this->category === 'tuition' ? 'Home Tuition' : 'School Job';
+    }
+
+    public function scopeForCategory($query, $category)
+    {
+        if ($category === 'tuition') {
+            return $query->where(function ($q) {
+                $q->whereNotNull('tuition_lead_id')
+                  ->orWhere('type', 'parent_service_charge')
+                  ->orWhereHas('invoice', function ($invQ) {
+                      $invQ->whereNotNull('home_tuition_lead_id')
+                           ->orWhereNotNull('tuition_application_id')
+                           ->orWhere('description', 'like', '%tuition%');
+                  });
+            });
+        } elseif ($category === 'job') {
+            return $query->where(function ($q) {
+                $q->where('type', 'registration_fee')
+                  ->orWhere(function ($subQ) {
+                      $subQ->whereNull('tuition_lead_id')
+                           ->where('type', '!=', 'parent_service_charge')
+                           ->whereHas('invoice', function ($invQ) {
+                               $invQ->whereNull('home_tuition_lead_id')
+                                    ->whereNull('tuition_application_id')
+                                    ->where('description', 'not like', '%tuition%');
+                           });
+                  });
+            });
+        }
+        return $query;
+    }
 }

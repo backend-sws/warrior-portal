@@ -58,6 +58,43 @@
 
                 select.dataset.slimSelectInitialized = 'true';
                 select._slimSelect = slim;
+
+                // Automatically watch for dynamic option additions/removals, text changes, or disabled state changes
+                if (window.MutationObserver && !select._slimObserver) {
+                    const observer = new MutationObserver((mutations) => {
+                        if (select._isUpdatingFromSlim) return;
+                        let shouldRefresh = false;
+                        for (let i = 0; i < mutations.length; i++) {
+                            const m = mutations[i];
+                            if (m.type === 'childList') {
+                                shouldRefresh = true;
+                                break;
+                            }
+                            if (m.type === 'attributes' && m.attributeName === 'disabled') {
+                                shouldRefresh = true;
+                                break;
+                            }
+                            if (m.type === 'characterData') {
+                                shouldRefresh = true;
+                                break;
+                            }
+                        }
+                        if (shouldRefresh) {
+                            clearTimeout(select._refreshDebounce);
+                            select._refreshDebounce = setTimeout(() => {
+                                window.refreshSearchableSelect(select);
+                            }, 25);
+                        }
+                    });
+                    observer.observe(select, {
+                        childList: true,
+                        subtree: true,
+                        characterData: true,
+                        attributes: true,
+                        attributeFilter: ['disabled']
+                    });
+                    select._slimObserver = observer;
+                }
             } catch (err) {
                 console.warn('SlimSelect initialization error on select:', select, err);
             }
@@ -65,16 +102,74 @@
     };
 
     window.refreshSearchableSelect = function (select) {
-        if (select && select._slimSelect) {
-            try {
-                select._slimSelect.setData(select._slimSelect.getDataFromSelect());
-            } catch (e) {
-                try {
-                    select._slimSelect.destroy();
-                    delete select.dataset.slimSelectInitialized;
-                    window.initSearchableSelects(select.parentElement || document);
-                } catch (err) {}
+        if (!select || !select._slimSelect) return;
+        try {
+            const slim = select._slimSelect;
+            select._isUpdatingFromSlim = true;
+
+            let placeholderText =
+                select.getAttribute('placeholder') ||
+                select.getAttribute('data-placeholder');
+
+            const optionsData = [];
+            let hasSelected = false;
+
+            Array.from(select.options).forEach((opt, idx) => {
+                const isPlaceholder =
+                    opt.value === '' &&
+                    (idx === 0 ||
+                        opt.text.toLowerCase().includes('select') ||
+                        opt.text.toLowerCase().includes('first') ||
+                        opt.text.toLowerCase().includes('loading') ||
+                        opt.text.toLowerCase().includes('choose') ||
+                        opt.text.toLowerCase().includes('any'));
+
+                if (isPlaceholder && !placeholderText) {
+                    placeholderText = opt.text;
+                }
+
+                const isSelected = opt.selected || opt.hasAttribute('selected');
+                optionsData.push({
+                    text: opt.text,
+                    value: opt.value,
+                    selected: isSelected,
+                    placeholder: isPlaceholder,
+                    disabled: opt.disabled,
+                });
+
+                if (isSelected && opt.value !== '') {
+                    hasSelected = true;
+                }
+            });
+
+            slim.setData(optionsData);
+
+            if (select.value && select.value !== '') {
+                slim.setSelected(String(select.value), false);
+            } else if (!hasSelected) {
+                slim.setSelected('', false);
             }
+
+            if (select.disabled) {
+                slim.disable();
+            } else {
+                slim.enable();
+            }
+        } catch (e) {
+            console.warn('Error refreshing SlimSelect:', e);
+            try {
+                if (select._slimObserver) {
+                    select._slimObserver.disconnect();
+                    delete select._slimObserver;
+                }
+                select._slimSelect.destroy();
+                delete select.dataset.slimSelectInitialized;
+                window.initSearchableSelects(select.parentElement || document);
+            } catch (err) {}
+        } finally {
+            setTimeout(() => {
+                if (select) select._isUpdatingFromSlim = false;
+            }, 60);
         }
     };
 

@@ -196,6 +196,18 @@
                                     @endforeach
                                 </select>
                             </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                    Other / Additional Qualification <span class="text-xs text-slate-400 font-normal lowercase">(optional)</span>
+                                </label>
+                                <input type="text" name="other_qualification" value="{{ old('other_qualification') }}" 
+                                    class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all placeholder:text-slate-400 font-medium" 
+                                    placeholder="e.g. CTET, STET, NTT, or 2+ Yrs Experience">
+                                @error('other_qualification')
+                                    <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -337,11 +349,17 @@
                         citySelect.appendChild(option);
                     });
                     citySelect.disabled = false;
+                    if (typeof window.refreshSearchableSelect === 'function') {
+                        window.refreshSearchableSelect(citySelect);
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching cities:', error);
                     citySelect.innerHTML = '<option value="">Select City</option>';
                     citySelect.disabled = false;
+                    if (typeof window.refreshSearchableSelect === 'function') {
+                        window.refreshSearchableSelect(citySelect);
+                    }
                 });
         }
 
@@ -362,7 +380,15 @@
                 const categoryId = this.value;
                 
                 jobSubject.innerHTML = '<option value="">Loading subjects...</option>';
-                if (jobSpecialization) jobSpecialization.innerHTML = '<option value="">Select Specialization</option>';
+                if (typeof window.refreshSearchableSelect === 'function') {
+                    window.refreshSearchableSelect(jobSubject);
+                }
+                if (jobSpecialization) {
+                    jobSpecialization.innerHTML = '<option value="">Select Specialization</option>';
+                    if (typeof window.refreshSearchableSelect === 'function') {
+                        window.refreshSearchableSelect(jobSpecialization);
+                    }
+                }
                 if (specializationContainer) specializationContainer.style.display = 'none';
                 
                 if (categoryId) {
@@ -376,13 +402,22 @@
                                 option.textContent = subject.name;
                                 jobSubject.appendChild(option);
                             });
+                            if (typeof window.refreshSearchableSelect === 'function') {
+                                window.refreshSearchableSelect(jobSubject);
+                            }
                         })
                         .catch(error => {
                             console.error('Error fetching subjects:', error);
                             jobSubject.innerHTML = '<option value="">Select Subject</option>';
+                            if (typeof window.refreshSearchableSelect === 'function') {
+                                window.refreshSearchableSelect(jobSubject);
+                            }
                         });
                 } else {
                     jobSubject.innerHTML = '<option value="">Select Subject</option>';
+                    if (typeof window.refreshSearchableSelect === 'function') {
+                        window.refreshSearchableSelect(jobSubject);
+                    }
                 }
             });
         }
@@ -411,6 +446,9 @@
                                 }
                                 jobSpecialization.appendChild(option);
                             });
+                            if (typeof window.refreshSearchableSelect === 'function') {
+                                window.refreshSearchableSelect(jobSpecialization);
+                            }
                         }
                     })
                     .catch(error => console.error('Error fetching specializations:', error));
