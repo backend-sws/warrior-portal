@@ -102,7 +102,11 @@
 </div>
 
 <script>
-    window.openTeacherModal = function() {
+    window.openTeacherModal = function(cat = 'teacher') {
+        if (typeof window.openRequirementModal === 'function') {
+            window.openRequirementModal(cat);
+            return;
+        }
         const popup = document.getElementById('jobRegPopup');
         if (popup) {
             const content = popup.querySelector('.popup-content');
@@ -145,10 +149,6 @@
                 }
             });
         }
-
-        @if($errors->any() && old('name'))
-            window.openTeacherModal();
-        @endif
     });
 </script>
 @endguest

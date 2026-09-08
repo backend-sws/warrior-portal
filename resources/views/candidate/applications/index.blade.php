@@ -17,15 +17,22 @@
                 </div>
             </div>
             
+            @php
+                $appCat = auth()->user()->profile?->candidate_category ?: 'both';
+            @endphp
             <div class="flex items-center gap-2 w-full sm:w-auto">
-                <a href="{{ route('candidate.applications.available') }}"
-                    class="flex-1 sm:flex-initial px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-[#031b4e] border border-blue-200 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
-                    <i class="fas fa-briefcase text-xs"></i> <span>School Jobs</span>
-                </a>
-                <a href="{{ route('candidate.tuitions.index') }}"
-                    class="flex-1 sm:flex-initial px-4 py-2.5 bg-[#031b4e] hover:bg-[#021338] text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
-                    <i class="fas fa-book-reader text-xs"></i> <span>Home Tuitions</span>
-                </a>
+                @if(in_array($appCat, ['school_job', 'both']))
+                    <a href="{{ route('candidate.applications.available') }}"
+                        class="flex-1 sm:flex-initial px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-[#031b4e] border border-blue-200 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+                        <i class="fas fa-briefcase text-xs"></i> <span>School Jobs</span>
+                    </a>
+                @endif
+                @if(in_array($appCat, ['home_tutor', 'both']))
+                    <a href="{{ route('candidate.tuitions.index') }}"
+                        class="flex-1 sm:flex-initial px-4 py-2.5 bg-[#031b4e] hover:bg-[#021338] text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+                        <i class="fas fa-book-reader text-xs"></i> <span>Home Tuitions</span>
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -36,26 +43,28 @@
             </div>
         @endif
 
-        {{-- Dual Switcher Tabs --}}
-        <div class="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3 overflow-x-auto">
-            <a href="{{ route('candidate.applications.index', ['tab' => 'jobs']) }}" 
-               class="px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all whitespace-nowrap {{ ($activeTab ?? 'jobs') === 'jobs' ? 'bg-[#031b4e] text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
-                <i class="fas fa-school text-xs"></i>
-                <span>School Teaching Jobs</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ ($activeTab ?? 'jobs') === 'jobs' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700' }}">
-                    {{ $jobCount }}
-                </span>
-            </a>
+        {{-- Switcher Tabs --}}
+        @if($appCat === 'both')
+            <div class="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3 overflow-x-auto">
+                <a href="{{ route('candidate.applications.index', ['tab' => 'jobs']) }}" 
+                   class="px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all whitespace-nowrap {{ ($activeTab ?? 'jobs') === 'jobs' ? 'bg-[#031b4e] text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                    <i class="fas fa-school text-xs"></i>
+                    <span>School Teaching Jobs</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ ($activeTab ?? 'jobs') === 'jobs' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700' }}">
+                        {{ $jobCount }}
+                    </span>
+                </a>
 
-            <a href="{{ route('candidate.applications.index', ['tab' => 'tuitions']) }}" 
-               class="px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all whitespace-nowrap {{ ($activeTab ?? 'jobs') === 'tuitions' ? 'bg-[#031b4e] text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
-                <i class="fas fa-chalkboard-teacher text-xs"></i>
-                <span>Home Tuition Applications</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ ($activeTab ?? 'jobs') === 'tuitions' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700' }}">
-                    {{ $tuitionCount }}
-                </span>
-            </a>
-        </div>
+                <a href="{{ route('candidate.applications.index', ['tab' => 'tuitions']) }}" 
+                   class="px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all whitespace-nowrap {{ ($activeTab ?? 'jobs') === 'tuitions' ? 'bg-[#031b4e] text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                    <i class="fas fa-chalkboard-teacher text-xs"></i>
+                    <span>Home Tuition Applications</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ ($activeTab ?? 'jobs') === 'tuitions' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700' }}">
+                        {{ $tuitionCount }}
+                    </span>
+                </a>
+            </div>
+        @endif
 
         {{-- TAB 1: SCHOOL TEACHING JOBS --}}
         @if(($activeTab ?? 'jobs') === 'jobs')

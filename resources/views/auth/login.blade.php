@@ -4,7 +4,7 @@
 @section('meta_description', 'Log in to your Warriors Educare account to access verified home tuition leads, school teaching jobs, and faculty recruitment services across India.')
 
 @section('content')
-<div x-data="loginRequirementModal()" class="min-h-[85vh] flex items-center justify-center bg-[#f4f7f5] py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
+<div x-data="{}" class="min-h-[85vh] flex items-center justify-center bg-[#f4f7f5] py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
     <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden reveal">
         
         {{-- Left Panel - Branding --}}
@@ -156,23 +156,70 @@
                 <p class="mt-1 text-xs sm:text-sm text-gray-500">Enter your credentials to access your account</p>
             </div>
 
-            {{-- 1. Post Requirement Card (For Parents & Schools) --}}
+            {{-- 4 Requirement & Registration Cards Above Login Form --}}
             <div class="mb-6">
-                <button type="button" @click="$dispatch('open-requirement-modal')"
-                    class="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 border border-purple-200/80 hover:border-purple-500 hover:shadow-md transition-all group cursor-pointer text-left">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-md shadow-purple-600/20 group-hover:scale-105 transition-transform shrink-0">
-                            <i class="fas fa-bullhorn text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="text-xs sm:text-sm font-extrabold text-[#031b4e]">Need a Teacher or Home Tutor?</div>
-                            <div class="text-[11px] text-slate-500 font-medium">Post school job or home tuition requirement</div>
-                        </div>
-                    </div>
-                    <span class="inline-flex items-center gap-1 text-xs font-bold text-purple-700 bg-white px-2.5 py-1 rounded-lg border border-purple-100 shadow-xs shrink-0">
-                        Post Free <i class="fas fa-arrow-right text-[10px]"></i>
+                <div class="flex items-center justify-between mb-2.5">
+                    <span class="text-[11px] font-black uppercase tracking-wider text-[#031b4e]">
+                        <i class="fas fa-layer-group text-blue-600 mr-1"></i> Apply / Post Requirement
                     </span>
-                </button>
+                    <span class="text-[10px] font-bold text-slate-400">Choose your category</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    {{-- Button 1: Home Tuition --}}
+                    <button type="button" onclick="openRequirementModal('tuition')"
+                            class="flex items-center gap-2.5 p-3 rounded-2xl bg-sky-50/90 hover:bg-sky-100 border border-sky-200/80 hover:border-sky-400 hover:shadow-md hover:-translate-y-0.5 transition-all text-left group cursor-pointer">
+                        <div class="w-9 h-9 rounded-xl bg-[#0ea5e9] text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-xs font-black text-[#031b4e] leading-tight truncate">Home Tuition</div>
+                            <div class="text-[10px] text-slate-500 font-medium truncate">Tutor / Parent</div>
+                        </div>
+                    </button>
+
+                    {{-- Button 2: School Hiring --}}
+                    <button type="button" onclick="openRequirementModal('school')"
+                            class="flex items-center gap-2.5 p-3 rounded-2xl bg-purple-50/90 hover:bg-purple-100 border border-purple-200/80 hover:border-purple-400 hover:shadow-md hover:-translate-y-0.5 transition-all text-left group cursor-pointer">
+                        <div class="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-xs font-black text-[#031b4e] leading-tight truncate">School Hiring</div>
+                            <div class="text-[10px] text-slate-500 font-medium truncate">Post Vacancy</div>
+                        </div>
+                    </button>
+
+                    {{-- Button 3: Join as Teacher --}}
+                    <button type="button" onclick="openRequirementModal('teacher')"
+                            class="flex items-center gap-2.5 p-3 rounded-2xl bg-amber-50/90 hover:bg-amber-100 border border-amber-200/80 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 transition-all text-left group cursor-pointer">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-xs font-black text-[#031b4e] leading-tight truncate">Join as Teacher</div>
+                            <div class="text-[10px] text-slate-500 font-medium truncate">School Job</div>
+                        </div>
+                    </button>
+
+                    {{-- Button 4: Both --}}
+                    <button type="button" onclick="openRequirementModal('both')"
+                            class="flex items-center gap-2.5 p-3 rounded-2xl bg-emerald-50/90 hover:bg-emerald-100 border border-emerald-200/80 hover:border-emerald-400 hover:shadow-md hover:-translate-y-0.5 transition-all text-left group cursor-pointer">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-xs font-black text-[#031b4e] leading-tight truncate">Both</div>
+                            <div class="text-[10px] text-slate-500 font-medium truncate">Dual Profile</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="relative flex py-1 items-center mb-5">
+                <div class="flex-grow border-t border-gray-200"></div>
+                <span class="flex-shrink mx-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Or Sign In with Account</span>
+                <div class="flex-grow border-t border-gray-200"></div>
             </div>
 
             @if($errors->any())
@@ -232,14 +279,18 @@
                 </button>
             </form>
 
-            {{-- Register as Teacher Card (Placed below Sign In as requested) --}}
+            {{-- Quick Requirement / Registration Links Below Sign In --}}
             <div class="mt-6 pt-5 border-t border-gray-100 text-center">
-                <p class="text-xs text-gray-500 mb-2.5 font-medium">New educator looking for teaching opportunities?</p>
-                <a href="{{ route('candidate.register') }}"
-                    class="w-full flex items-center justify-center gap-2.5 p-3.5 rounded-2xl font-extrabold text-xs sm:text-sm text-[#031b4e] bg-blue-50/80 hover:bg-blue-100 border border-blue-200 hover:border-accent-blue transition-all shadow-sm group">
-                    <i class="fas fa-user-plus text-accent-blue group-hover:scale-110 transition-transform"></i>
-                    <span>Register as Teacher (For Tuition & School Jobs) &rarr;</span>
-                </a>
+                <p class="text-xs text-gray-500 mb-2 font-medium">New to Warriors Educare? Register or post requirement:</p>
+                <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-[#031b4e]">
+                    <button type="button" onclick="openRequirementModal('teacher')" class="hover:text-amber-600 transition-colors cursor-pointer">Teacher Registration</button>
+                    <span class="text-gray-300">•</span>
+                    <button type="button" onclick="openRequirementModal('tuition')" class="hover:text-blue-600 transition-colors cursor-pointer">Home Tutor</button>
+                    <span class="text-gray-300">•</span>
+                    <button type="button" onclick="openRequirementModal('school')" class="hover:text-purple-600 transition-colors cursor-pointer">School Hiring</button>
+                    <span class="text-gray-300">•</span>
+                    <button type="button" onclick="openRequirementModal('both')" class="hover:text-emerald-600 transition-colors cursor-pointer">Both</button>
+                </div>
             </div>
         </div>
     </div>
@@ -264,6 +315,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleIcon.classList.add('fa-eye-slash');
             }
         });
+    }
+
+    // Clean query parameters from URL if any were passed
+    if (window.location.search && (window.location.search.includes('tab=') || window.location.search.includes('apply_for='))) {
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
 });
 </script>

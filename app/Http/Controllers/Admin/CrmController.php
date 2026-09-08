@@ -16,6 +16,7 @@ use App\Helpers\NotificationHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -71,6 +72,7 @@ class CrmController extends Controller
                 'name'              => $request->name,
                 'email'             => $request->email,
                 'phone'             => $request->phone,
+                'whatsapp_no'       => $request->whatsapp_no ?? $request->phone,
                 'role'              => 'candidate',
                 'password'          => Hash::make($request->password),
                 'email_verified_at' => now(),
@@ -92,6 +94,8 @@ class CrmController extends Controller
             // 3. Create Candidate Profile
             $profile = CandidateProfile::create([
                 'user_id'                    => $user->id,
+                'candidate_category'         => $request->candidate_category ?? 'both',
+                'whatsapp_no'                => $request->whatsapp_no ?? $request->phone,
                 'gender'                     => $request->gender,
                 'date_of_birth'              => $request->date_of_birth,
                 'address'                    => $request->address,
@@ -132,6 +136,9 @@ class CrmController extends Controller
                 'tuition_agreement_signed_at'=> $isTuitionAgreementSigned ? now() : null,
             ]);
 
+            $profile->profile_completion_percentage = $profile->completion_percentage;
+            $profile->save();
+
             // 4. Create Payment Transaction if fee was collected
             if ($request->filled('payment_amount') && $request->payment_amount > 0 && $request->payment_method) {
                 PaymentTransaction::create([
@@ -163,7 +170,7 @@ class CrmController extends Controller
                     new \App\Mail\WelcomeCandidateMail($user, $request->password)
                 );
             } catch (\Throwable $emailEx) {
-                \Log::error('WelcomeCandidate Email Error: ' . $emailEx->getMessage());
+                Log::error('WelcomeCandidate Email Error: ' . $emailEx->getMessage());
             }
 
             // Admin confirmation notify
@@ -177,7 +184,7 @@ class CrmController extends Controller
             return redirect()->route('admin.crm.show', $user->id)->with('success', 'Candidate onboarded successfully.');
             
         } catch (\Exception $e) {
-            \Log::error('Manual Onboard Error: ' . $e->getMessage());
+            Log::error('Manual Onboard Error: ' . $e->getMessage());
             return back()->withInput()->withErrors(['error' => 'Failed to onboard candidate: ' . $e->getMessage()]);
         }
     }
@@ -204,21 +211,38 @@ class CrmController extends Controller
             'name'                     => 'required|string|max:255',
             'email'                    => 'required|email|unique:users,email,' . $id,
             'phone'                    => 'required|string|max:20|unique:users,phone,' . $id,
+            'whatsapp_no'              => 'nullable|string|max:20',
+            'candidate_category'       => 'nullable|in:home_tutor,school_job,both',
             'gender'                   => 'required|in:Male,Female,Other',
             'date_of_birth'            => 'required|date',
             'address'                  => 'required|string',
-            'highest_qualification_id' => 'required|exists:qualifications,id',
-            'subject_id'               => 'required|exists:subjects,id',
+            'highest_qualification_id' => 'nullable|exists:qualifications,id',
+            'highest_qualification_name' => 'nullable|string|max:255',
+            'subject_id'               => 'nullable|exists:subjects,id',
             'category_id'              => 'nullable|exists:categories,id',
             'experience_years'         => 'nullable|integer|min:0',
-            'preferred_state_id'       => 'required|exists:states,id',
-            'preferred_city_id'        => 'required|exists:cities,id',
+            'experience_range'         => 'nullable|string|max:100',
+            'preferred_state_id'       => 'nullable|exists:states,id',
+            'preferred_city_id'        => 'nullable|exists:cities,id',
             'current_salary'           => 'nullable|string',
             'expected_salary'          => 'nullable|string',
             'english_fluency'          => 'nullable|string',
             'residential_preference'   => 'nullable|string',
             'availability_to_join'     => 'nullable|string',
             'current_school'           => 'nullable|string',
+            'tuition_subjects'         => 'nullable|array',
+            'classes_interested'       => 'nullable|array',
+            'teaching_mode'            => 'nullable|string',
+            'preferred_areas'          => 'nullable|string',
+            'available_time_slot'      => 'nullable|string',
+            'b_ed_status'              => 'nullable|string',
+            'd_el_ed_status'           => 'nullable|string',
+            'subject_specialization'   => 'nullable|string',
+            'position_applying_for'    => 'nullable|string',
+            'last_school_name'         => 'nullable|string',
+            'last_designation'         => 'nullable|string',
+            'last_drawn_salary'        => 'nullable|string',
+            'preferred_locations'      => 'nullable|array',
             'resume'                   => 'nullable|mimes:pdf,doc,docx|max:5120',
             'profile_photo'            => 'nullable|image|max:5120',
             'live_photo'               => 'nullable|image|max:5120',
@@ -229,9 +253,10 @@ class CrmController extends Controller
 
         try {
             $userData = [
-                'name'  => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
+                'name'        => $request->name,
+                'email'       => $request->email,
+                'phone'       => $request->phone,
+                'whatsapp_no' => $request->whatsapp_no ?? $request->phone,
             ];
             
             if ($request->filled('password')) {
@@ -241,13 +266,17 @@ class CrmController extends Controller
             $user->update($userData);
 
             $updates = [
+                'candidate_category'       => $request->candidate_category ?? 'both',
+                'whatsapp_no'              => $request->whatsapp_no ?? $request->phone,
                 'gender'                   => $request->gender,
                 'date_of_birth'            => $request->date_of_birth,
                 'address'                  => $request->address,
                 'category_id'              => $request->category_id,
                 'subject_id'               => $request->subject_id,
                 'highest_qualification_id' => $request->highest_qualification_id,
+                'highest_qualification_name' => $request->highest_qualification_name,
                 'experience_years'         => $request->experience_years ?? 0,
+                'experience_range'         => $request->experience_range,
                 'current_salary'           => $request->current_salary,
                 'expected_salary'          => $request->expected_salary,
                 'preferred_state_id'       => $request->preferred_state_id,
@@ -256,6 +285,19 @@ class CrmController extends Controller
                 'residential_preference'   => $request->residential_preference,
                 'availability_to_join'     => $request->availability_to_join,
                 'current_school'           => $request->current_school,
+                'tuition_subjects'         => $request->tuition_subjects ?? [],
+                'classes_interested'       => $request->classes_interested ?? [],
+                'teaching_mode'            => $request->teaching_mode,
+                'preferred_areas'          => $request->preferred_areas,
+                'available_time_slot'      => $request->available_time_slot,
+                'b_ed_status'              => $request->b_ed_status,
+                'd_el_ed_status'           => $request->d_el_ed_status,
+                'subject_specialization'   => $request->subject_specialization,
+                'position_applying_for'    => $request->position_applying_for,
+                'last_school_name'         => $request->last_school_name,
+                'last_designation'         => $request->last_designation,
+                'last_drawn_salary'        => $request->last_drawn_salary,
+                'preferred_locations'      => $request->preferred_locations ?? [],
                 'total_allowed_applications' => 9999,
             ];
 
@@ -282,9 +324,14 @@ class CrmController extends Controller
 
             if ($user->profile) {
                 $user->profile->update($updates);
+                $profile = $user->profile->fresh();
+                $profile->profile_completion_percentage = $profile->completion_percentage;
+                $profile->save();
             } else {
                 $updates['user_id'] = $user->id;
-                CandidateProfile::create($updates);
+                $profile = CandidateProfile::create($updates);
+                $profile->profile_completion_percentage = $profile->completion_percentage;
+                $profile->save();
             }
 
             NotificationHelper::notifyUser(
@@ -298,7 +345,7 @@ class CrmController extends Controller
             return redirect()->route('admin.crm.show', $user->id)->with('success', 'Candidate profile updated successfully.');
             
         } catch (\Exception $e) {
-            \Log::error('Profile Update Error: ' . $e->getMessage());
+            Log::error('Profile Update Error: ' . $e->getMessage());
             return back()->withInput()->withErrors(['error' => 'Failed to update candidate profile: ' . $e->getMessage()]);
         }
     }
@@ -315,25 +362,140 @@ class CrmController extends Controller
                 'applications.jobPost',
             ]);
 
-        // Search text
+        // Search text (Name, Email, Phone, WhatsApp)
         if ($search = $request->input('search')) {
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('whatsapp_no', 'like', "%{$search}%");
             });
         }
 
-        // Advanced Filters
+        // 1. Candidate Category Filter (Home Tutor, School Job, Both)
+        if ($category = $request->input('candidate_category')) {
+            $query->whereHas('profile', function($q) use ($category) {
+                if ($category === 'both') {
+                    $q->where(function($sq) {
+                        $sq->where('candidate_category', 'both')
+                           ->orWhereNull('candidate_category')
+                           ->orWhere('candidate_category', '');
+                    });
+                } else {
+                    $q->where('candidate_category', $category);
+                }
+            });
+        }
+
+        // 2. Position Filter (PRT, TGT, PGT, Coordinator, Principal, etc.)
+        if ($position = $request->input('position')) {
+            $query->whereHas('profile', function($q) use ($position) {
+                $q->where('position_applying_for', 'like', "%{$position}%")
+                  ->orWhere('last_designation', 'like', "%{$position}%");
+            });
+        }
+
+        // 3. Subject Filter (Subject dropdown or specialization / tuition subjects)
+        if ($subject = $request->input('subject')) {
+            $query->whereHas('profile', function($q) use ($subject) {
+                $q->where('subject_id', $subject)
+                  ->orWhere('subject_specialization', 'like', "%{$subject}%")
+                  ->orWhere('tuition_subjects', 'like', "%{$subject}%")
+                  ->orWhereHas('subject', fn($sq) => $sq->where('name', 'like', "%{$subject}%"));
+            });
+        }
+
+        // 4. Qualification Filter
+        if ($qualification = $request->input('qualification')) {
+            $query->whereHas('profile', function($q) use ($qualification) {
+                $q->where('highest_qualification_id', $qualification)
+                  ->orWhere('highest_qualification_name', 'like', "%{$qualification}%");
+            });
+        }
+
+        // 5. Experience Filter
+        if ($exp = $request->input('experience')) {
+            $query->whereHas('profile', function($q) use ($exp) {
+                if ($exp === 'Fresher' || $exp === 'fresher') {
+                    $q->where(function($sq) {
+                        $sq->where('experience_range', 'like', '%Fresher%')
+                           ->orWhere('experience_years', 0);
+                    });
+                } elseif ($exp === '1-3') {
+                    $q->where(function($sq) {
+                        $sq->where('experience_range', 'like', '%1-3%')
+                           ->orWhereBetween('experience_years', [1, 3]);
+                    });
+                } elseif ($exp === '3-5') {
+                    $q->where(function($sq) {
+                        $sq->where('experience_range', 'like', '%3-5%')
+                           ->orWhereBetween('experience_years', [3, 5]);
+                    });
+                } elseif ($exp === '5-10') {
+                    $q->where(function($sq) {
+                        $sq->where('experience_range', 'like', '%5-10%')
+                           ->orWhereBetween('experience_years', [5, 10]);
+                    });
+                } elseif ($exp === '10+') {
+                    $q->where(function($sq) {
+                        $sq->where('experience_range', 'like', '%10+%')
+                           ->orWhere('experience_years', '>=', 10);
+                    });
+                } else {
+                    $q->where('experience_range', 'like', "%{$exp}%")
+                      ->orWhere('experience_years', '>=', (int)$exp);
+                }
+            });
+        }
+
+        // 6. Preferred Location Filter (JSON array, areas text, city/state)
+        if ($loc = $request->input('location')) {
+            $query->whereHas('profile', function($q) use ($loc) {
+                $q->where('preferred_areas', 'like', "%{$loc}%")
+                  ->orWhere('preferred_locations', 'like', "%{$loc}%")
+                  ->orWhereHas('preferredCity', fn($cq) => $cq->where('name', 'like', "%{$loc}%"))
+                  ->orWhereHas('preferredState', fn($sq) => $sq->where('name', 'like', "%{$loc}%"));
+            });
+        }
+
+        // 7. Profile Completion Filter (<50, 50-80, >80, 100)
+        if ($comp = $request->input('profile_completion')) {
+            $query->whereHas('profile', function($q) use ($comp) {
+                if ($comp === '<50') {
+                    $q->where('profile_completion_percentage', '<', 50);
+                } elseif ($comp === '50-80') {
+                    $q->whereBetween('profile_completion_percentage', [50, 80]);
+                } elseif ($comp === '>80') {
+                    $q->where('profile_completion_percentage', '>', 80);
+                } elseif ($comp === '100') {
+                    $q->where('profile_completion_percentage', '>=', 100);
+                }
+            });
+        }
+
+        // 8. Salary Expectation Filter (<15k, 15k-25k, 25k-40k, 40k-60k, >60k)
+        if ($sal = $request->input('salary_range')) {
+            $query->whereHas('profile', function($q) use ($sal) {
+                if ($sal === '<15k') {
+                    $q->whereRaw('CAST(expected_salary AS UNSIGNED) < 15000 AND expected_salary IS NOT NULL AND expected_salary != ""');
+                } elseif ($sal === '15k-25k') {
+                    $q->whereRaw('CAST(expected_salary AS UNSIGNED) BETWEEN 15000 AND 25000');
+                } elseif ($sal === '25k-40k') {
+                    $q->whereRaw('CAST(expected_salary AS UNSIGNED) BETWEEN 25000 AND 40000');
+                } elseif ($sal === '40k-60k') {
+                    $q->whereRaw('CAST(expected_salary AS UNSIGNED) BETWEEN 40000 AND 60000');
+                } elseif ($sal === '>60k') {
+                    $q->whereRaw('CAST(expected_salary AS UNSIGNED) > 60000');
+                } else {
+                    $q->where('expected_salary', 'like', "%{$sal}%");
+                }
+            });
+        }
+
+        // Legacy / Standard filters
         if ($subjectId = $request->input('subject_id')) {
             $query->whereHas('profile', function($q) use ($subjectId) {
                 $q->where('subject_id', $subjectId);
-            });
-        }
-
-        if ($experience = $request->input('experience')) {
-            $query->whereHas('profile', function($q) use ($experience) {
-                $q->where('experience_years', '>=', $experience);
             });
         }
 
@@ -394,7 +556,8 @@ class CrmController extends Controller
             $baseQuery->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('whatsapp_no', 'like', "%{$search}%");
             });
         }
 
@@ -781,6 +944,9 @@ class CrmController extends Controller
                     );
                 } elseif ($tStatus === 'not_required') {
                     $updates['tuition_agreement_signed_at'] = null;
+                    $updates['is_tuition_agreement_signed'] = false;
+                    $updates['tuition_signature_data'] = null;
+                    $updates['tuition_live_photo_path'] = null;
                 }
             } elseif ($request->has('is_tuition_agreement_signed')) {
                 $isTuitionSigned = $request->boolean('is_tuition_agreement_signed');

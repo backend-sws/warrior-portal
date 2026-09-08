@@ -19,29 +19,37 @@ class TuitionController extends Controller
         $isAgreementSigned = ($tuitionAgreementStatus === 'signed' || (bool) $profile?->is_tuition_agreement_signed);
         $isAgreementActive = ($tuitionAgreementStatus === 'pending_signature');
 
-        $query = HomeTuitionLead::where('status', 'Approved');
+        $completionPercentage = $profile?->completion_percentage ?? 0;
+        $isProfileUnder80 = $completionPercentage < 80;
 
-        if ($search = $request->input('search')) {
-            $query->where(function($q) use ($search) {
-                $q->where('tuition_id', 'like', "%{$search}%")
-                  ->orWhere('class', 'like', "%{$search}%")
-                  ->orWhere('subjects', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%");
-                if (is_numeric($search)) {
-                    $q->orWhere('id', $search);
-                }
-            });
+        if ($isProfileUnder80) {
+            $tuitions = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 12);
+            $appliedTuitionIds = [];
+        } else {
+            $query = HomeTuitionLead::where('status', 'Approved');
+
+            if ($search = $request->input('search')) {
+                $query->where(function($q) use ($search) {
+                    $q->where('tuition_id', 'like', "%{$search}%")
+                      ->orWhere('class', 'like', "%{$search}%")
+                      ->orWhere('subjects', 'like', "%{$search}%")
+                      ->orWhere('location', 'like', "%{$search}%");
+                    if (is_numeric($search)) {
+                        $q->orWhere('id', $search);
+                    }
+                });
+            }
+
+            $tuitions = $query->latest()
+                ->paginate(12)
+                ->withQueryString();
+
+            $appliedTuitionIds = TuitionApplication::where('candidate_id', auth()->id())
+                ->pluck('home_tuition_lead_id')
+                ->toArray();
         }
 
-        $tuitions = $query->latest()
-            ->paginate(12)
-            ->withQueryString();
-
-        $appliedTuitionIds = TuitionApplication::where('candidate_id', auth()->id())
-            ->pluck('home_tuition_lead_id')
-            ->toArray();
-
-        return view('candidate.tuitions.index', compact('tuitions', 'appliedTuitionIds', 'profile', 'isAgreementSigned', 'isAgreementActive', 'tuitionAgreementStatus'));
+        return view('candidate.tuitions.index', compact('tuitions', 'appliedTuitionIds', 'profile', 'isAgreementSigned', 'isAgreementActive', 'tuitionAgreementStatus', 'isProfileUnder80', 'completionPercentage'));
     }
 
     public function signAgreement(Request $request)
@@ -161,8 +169,12 @@ class TuitionController extends Controller
     {
         $profile = auth()->user()->profile;
 
-        if (!$profile || !$profile->gender || !$profile->date_of_birth || !$profile->address || !$profile->preferred_state_id || !$profile->preferred_city_id || !$profile->highest_qualification_id) {
-            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your Basic Profile (Date of Birth, Gender, Address, Location & Qualification) before applying for home tuitions.');
+        if (($profile?->completion_percentage ?? 0) < 80) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Registration Pending: Your profile must be at least 80% complete to apply for home tuitions.');
+        }
+
+        if (!$profile || !$profile->gender || !$profile->date_of_birth || !$profile->highest_qualification_name) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your Basic Profile (Date of Birth, Gender & Qualification) before applying for home tuitions.');
         }
 
         $tuition = HomeTuitionLead::findOrFail($id);

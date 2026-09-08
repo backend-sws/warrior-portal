@@ -16,9 +16,10 @@ class AgreementController extends Controller
         $user = auth()->user();
         $profile = $user->profile;
 
-        // We no longer require the profile to be complete just to view the agreement status
-
-        // We no longer redirect to wizard because agreement is optional during registration
+        // If candidate registered exclusively as Home Tutor, their agreement is the Home Tuition Agreement
+        if ($profile?->candidate_category === 'home_tutor') {
+            return redirect()->route('candidate.tuitions.index', ['open_agreement' => 1]);
+        }
 
         // If already signed, we will just show the signed state in the view.
         return view('candidate.agreement.show', compact('user', 'profile'));

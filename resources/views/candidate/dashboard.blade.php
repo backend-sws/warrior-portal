@@ -38,21 +38,39 @@
         @endif
 
         {{-- ================= PROFILE COMPLETION PROGRESS / STATUS BANNER ================= --}}
-        @if(($profile?->completion_percentage ?? 0) < 100)
-            <div class="bg-gradient-to-r from-amber-50 via-orange-50/60 to-amber-50 border-2 border-amber-200/80 rounded-3xl p-6 mb-8 shadow-sm reveal">
+        @php
+            $completionPct = $profile?->completion_percentage ?? 0;
+            $catLabel = match($profile?->candidate_category) {
+                'home_tutor' => 'Home Tutor',
+                'school_job' => 'School Job',
+                default => 'Both (Home Tutor + School Job)',
+            };
+            $catBadgeColor = match($profile?->candidate_category) {
+                'home_tutor' => 'bg-amber-100 text-amber-900 border-amber-300',
+                'school_job' => 'bg-blue-100 text-blue-900 border-blue-300',
+                default => 'bg-emerald-100 text-emerald-900 border-emerald-300',
+            };
+        @endphp
+
+        @if($completionPct < 80)
+            <div class="bg-gradient-to-r from-amber-50 via-orange-50/70 to-amber-50 border-2 border-amber-300 rounded-3xl p-6 mb-8 shadow-sm reveal">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                     <div class="flex items-start sm:items-center gap-4">
                         <div class="w-14 h-14 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-amber-500/20">
                             <i class="fas fa-user-clock animate-pulse"></i>
                         </div>
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-xs">Profile Pending</span>
-                                <span class="text-xs font-bold text-amber-800 font-mono">{{ $profile?->completion_percentage ?? 0 }}% Completed</span>
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-xs">Registration Pending</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black border {{ $catBadgeColor }}">{{ $catLabel }}</span>
+                                <span class="text-xs font-bold text-amber-900 font-mono">{{ $completionPct }}% Completed (80% Required for Leads)</span>
                             </div>
-                            <h3 class="font-extrabold text-[#031b4e] text-base sm:text-lg">Please Complete Your Educator Profile</h3>
+                            <h3 class="font-extrabold text-[#031b4e] text-base sm:text-lg">Action Required: Complete Profile to Unlock Tuition Leads</h3>
                             <p class="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
-                                Missing fields: <strong class="text-amber-900">{{ !empty($profile?->missing_profile_fields) ? implode(', ', $profile->missing_profile_fields) : 'Basic details' }}</strong>. Complete your profile details to unlock direct applications for school jobs and home tuitions.
+                                Missing fields: <strong class="text-amber-900">{{ !empty($profile?->missing_profile_fields) ? implode(', ', $profile->missing_profile_fields) : 'Basic preferences' }}</strong>. 
+                                @if($profile?->appliesForHomeTuition())
+                                    <span class="text-amber-800 font-bold block mt-0.5"><i class="fas fa-lock text-[10px] mr-1"></i> Home Tuition leads remain hidden until your profile reaches at least 80%.</span>
+                                @endif
                             </p>
                         </div>
                     </div>
@@ -61,10 +79,10 @@
                         <div class="bg-white px-4 py-2.5 rounded-2xl border border-amber-200 shadow-2xs">
                             <div class="flex justify-between text-[11px] font-bold text-slate-700 mb-1">
                                 <span>Progress</span>
-                                <span class="text-amber-600 font-black">{{ $profile?->completion_percentage ?? 0 }}%</span>
+                                <span class="text-amber-600 font-black">{{ $completionPct }}%</span>
                             </div>
                             <div class="w-full sm:w-36 bg-amber-100 rounded-full h-2.5 overflow-hidden">
-                                <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500" style="width: {{ $profile?->completion_percentage ?? 0 }}%"></div>
+                                <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500" style="width: {{ $completionPct }}%"></div>
                             </div>
                         </div>
 
@@ -82,15 +100,16 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div>
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-extrabold text-[#031b4e] text-sm sm:text-base">100% Profile Completed</h3>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h3 class="font-extrabold text-[#031b4e] text-sm sm:text-base">{{ $completionPct }}% Profile Completed</h3>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black border {{ $catBadgeColor }}">{{ $catLabel }}</span>
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">Verified & Active</span>
                         </div>
-                        <p class="text-xs text-slate-600">Your profile is complete, verified, and actively visible to top schools & tuition inquiries.</p>
+                        <p class="text-xs text-slate-600">Your profile is eligible and active. Tuition leads and school job applications are fully unlocked!</p>
                     </div>
                 </div>
                 <a href="{{ route('candidate.profile.edit') }}" class="px-4 py-2 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 flex items-center gap-1.5">
-                    <i class="fas fa-edit text-xs"></i> Update Details
+                    <i class="fas fa-edit text-xs"></i> Update Profile
                 </a>
             </div>
         @endif
@@ -199,16 +218,44 @@
                         @endif
                     </h1>
                     @if(($profile?->completion_percentage ?? 0) >= 100)
-                        <p class="text-white/80 text-lg">Your profile is complete and actively visible to top schools.</p>
+                        <p class="text-white/80 text-lg">
+                            @if($profile?->candidate_category === 'home_tutor')
+                                Your Home Tutor profile is 100% verified and active for home tuition matching.
+                            @elseif($profile?->candidate_category === 'school_job')
+                                Your school teaching profile is 100% complete and visible to hiring schools.
+                            @else
+                                Your profile is 100% complete and visible to schools and parents.
+                            @endif
+                        </p>
                     @else
-                        <p class="text-amber-200/90 text-sm font-medium mt-1">Complete your remaining profile details to increase interview calls from top schools.</p>
+                        <p class="text-amber-200/90 text-sm font-medium mt-1">
+                            @if($profile?->candidate_category === 'home_tutor')
+                                Complete missing details to unlock instant student matching for home tuitions in your area.
+                            @elseif($profile?->candidate_category === 'school_job')
+                                Complete remaining profile details to increase direct interview calls from top schools.
+                            @else
+                                Complete remaining profile details to unlock tuition leads and school teaching jobs.
+                            @endif
+                        </p>
                     @endif
                 </div>
                 <div class="mt-4 md:mt-0 flex gap-3">
-                    <a href="{{ route('jobs') }}"
-                        class="px-6 py-3 bg-white text-[#0ea5e9] font-bold rounded-xl hover:bg-gray-50 transition-all shadow-md flex items-center gap-2">
-                        <i class="fas fa-search"></i> Find Jobs
-                    </a>
+                    @if($profile?->candidate_category === 'home_tutor')
+                        <a href="{{ route('candidate.tuitions.index') }}"
+                            class="px-6 py-3 bg-white text-[#031b4e] hover:bg-slate-50 font-black rounded-xl transition-all shadow-md flex items-center gap-2 text-sm">
+                            <i class="fas fa-book-reader text-amber-500"></i> Explore Home Tuitions
+                        </a>
+                    @elseif($profile?->candidate_category === 'school_job')
+                        <a href="{{ route('candidate.applications.available') }}"
+                            class="px-6 py-3 bg-white text-[#0ea5e9] hover:bg-slate-50 font-black rounded-xl transition-all shadow-md flex items-center gap-2 text-sm">
+                            <i class="fas fa-briefcase"></i> Explore School Jobs
+                        </a>
+                    @else
+                        <a href="{{ route('jobs') }}"
+                            class="px-6 py-3 bg-white text-[#0ea5e9] hover:bg-slate-50 font-black rounded-xl transition-all shadow-md flex items-center gap-2 text-sm">
+                            <i class="fas fa-search"></i> Find Jobs & Tuitions
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -217,91 +264,195 @@
             {{-- Left Column: Stats & Plan --}}
             <div class="lg:col-span-2 space-y-8">
 
-                {{-- Quick Stats: Jobs & Tuitions --}}
+                {{-- Quick Stats --}}
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 reveal reveal-delay-1">
-                    {{-- Card 1: School Jobs Applied --}}
-                    <a href="{{ route('candidate.applications.index') }}"
-                        class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-[#0ea5e9]/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
-                        <div class="w-11 h-11 rounded-xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-lg mb-2">
-                            <i class="fas fa-briefcase"></i>
-                        </div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
-                            {{ auth()->user()->applications()->count() }}
-                        </h3>
-                        <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Jobs Applied</p>
-                    </a>
+                    @if($profile?->candidate_category === 'home_tutor')
+                        {{-- Home Tutor Stat 1: Tuitions Applied --}}
+                        <a href="{{ route('candidate.tuitions.index') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-amber-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-book-reader"></i>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
+                                {{ \App\Models\TuitionApplication::where('candidate_id', auth()->id())->count() }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Tuitions Applied</p>
+                        </a>
 
-                    {{-- Card 2: Tuitions Applied --}}
-                    <a href="{{ route('candidate.tuitions.index') }}"
-                        class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-purple-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
-                        <div class="w-11 h-11 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-lg mb-2">
-                            <i class="fas fa-book-reader"></i>
-                        </div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
-                            {{ \App\Models\TuitionApplication::where('candidate_id', auth()->id())->count() }}
-                        </h3>
-                        <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Tuitions Applied</p>
-                    </a>
-                    
-                    {{-- Card 3: Shortlisted / Interview --}}
-                    <a href="{{ route('candidate.applications.index') }}"
-                        class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-amber-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
-                        <div class="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg mb-2">
-                            <i class="fas fa-user-check"></i>
-                        </div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
-                            {{ auth()->user()->applications()->whereIn('status', ['shortlisted', 'interview'])->count() }}
-                        </h3>
-                        <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Shortlisted</p>
-                    </a>
+                        {{-- Home Tutor Stat 2: Assigned Tuitions --}}
+                        <a href="{{ route('candidate.tuitions.index') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-emerald-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
+                                {{ \App\Models\TuitionApplication::where('candidate_id', auth()->id())->where('status', 'Assigned')->count() }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Assigned Tutors</p>
+                        </a>
 
-                    {{-- Card 4: Assigned Tuitions --}}
-                    <a href="{{ route('candidate.tuitions.index') }}"
-                        class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-green-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
-                        <div class="w-11 h-11 rounded-xl bg-green-500/10 text-green-600 flex items-center justify-center text-lg mb-2">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
-                            {{ \App\Models\TuitionApplication::where('candidate_id', auth()->id())->where('status', 'Assigned')->count() }}
-                        </h3>
-                        <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Assigned Tutors</p>
-                    </a>
+                        {{-- Home Tutor Stat 3: Teaching Subjects --}}
+                        <a href="{{ route('candidate.profile.edit') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-blue-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
+                                {{ !empty($profile->tuition_subjects) ? count($profile->tuition_subjects) : 0 }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Subjects Taught</p>
+                        </a>
+
+                        {{-- Home Tutor Stat 4: Agreement Status --}}
+                        <a href="{{ route('candidate.agreement.show') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-purple-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-file-signature"></i>
+                            </div>
+                            <h3 class="text-base font-extrabold text-[#031b4e] mt-1">
+                                {{ $profile->is_agreement_signed ? 'Signed' : 'Pending' }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Tuition Agreement</p>
+                        </a>
+                    @elseif($profile?->candidate_category === 'school_job')
+                        {{-- School Job Stat 1: Jobs Applied --}}
+                        <a href="{{ route('candidate.applications.index') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-[#0ea5e9]/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
+                                {{ auth()->user()->applications()->count() }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Jobs Applied</p>
+                        </a>
+
+                        {{-- School Job Stat 2: Shortlisted --}}
+                        <a href="{{ route('candidate.applications.index') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-amber-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
+                                {{ auth()->user()->applications()->whereIn('status', ['shortlisted', 'interview'])->count() }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Shortlisted</p>
+                        </a>
+
+                        {{-- School Job Stat 3: Selected / Hired --}}
+                        <a href="{{ route('candidate.applications.index') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-emerald-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
+                                {{ auth()->user()->applications()->where('status', 'hired')->count() }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Selected</p>
+                        </a>
+
+                        {{-- School Job Stat 4: Agreement --}}
+                        <a href="{{ route('candidate.agreement.show') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-purple-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-file-signature"></i>
+                            </div>
+                            <h3 class="text-base font-extrabold text-[#031b4e] mt-1">
+                                {{ $profile->is_agreement_signed ? 'Signed' : 'Pending' }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Candidate Agreement</p>
+                        </a>
+                    @else
+                        {{-- Both Category --}}
+                        <a href="{{ route('candidate.applications.index') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-[#0ea5e9]/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
+                                {{ auth()->user()->applications()->count() }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Jobs Applied</p>
+                        </a>
+
+                        <a href="{{ route('candidate.tuitions.index') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-purple-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-book-reader"></i>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
+                                {{ \App\Models\TuitionApplication::where('candidate_id', auth()->id())->count() }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Tuitions Applied</p>
+                        </a>
+                        
+                        <a href="{{ route('candidate.applications.index') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-amber-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
+                                {{ auth()->user()->applications()->whereIn('status', ['shortlisted', 'interview'])->count() }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Shortlisted</p>
+                        </a>
+
+                        <a href="{{ route('candidate.tuitions.index') }}"
+                            class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-green-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-green-500/10 text-green-600 flex items-center justify-center text-lg mb-2">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">
+                                {{ \App\Models\TuitionApplication::where('candidate_id', auth()->id())->where('status', 'Assigned')->count() }}
+                            </h3>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Assigned Tutors</p>
+                        </a>
+                    @endif
                 </div>
 
                 {{-- Quick Opportunities Banner --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <a href="{{ route('candidate.applications.available') }}" class="p-5 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all group flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] uppercase font-bold tracking-widest text-blue-200">Verified Vacancies</span>
-                            <h4 class="text-lg font-black mt-0.5">Explore School Jobs</h4>
-                            <p class="text-xs text-blue-100 mt-1">Apply for latest school teacher openings</p>
-                        </div>
-                        <div class="w-10 h-10 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors shrink-0 ml-3">
-                            <i class="fas fa-arrow-right text-sm"></i>
-                        </div>
-                    </a>
+                <div class="grid grid-cols-1 {{ $profile?->candidate_category === 'both' ? 'sm:grid-cols-2' : '' }} gap-4">
+                    @if(in_array($profile?->candidate_category, ['school_job', 'both']))
+                        <a href="{{ route('candidate.applications.available') }}" class="p-5 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all group flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold tracking-widest text-blue-200">Verified Vacancies</span>
+                                <h4 class="text-lg font-black mt-0.5">Explore School Jobs</h4>
+                                <p class="text-xs text-blue-100 mt-1">Apply for latest school teacher openings</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors shrink-0 ml-3">
+                                <i class="fas fa-arrow-right text-sm"></i>
+                            </div>
+                        </a>
+                    @endif
 
-                    <a href="{{ route('candidate.tuitions.index') }}" class="p-5 rounded-2xl bg-gradient-to-br from-[#031b4e] to-sky-700 text-white shadow-lg hover:shadow-xl transition-all group flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] uppercase font-bold tracking-widest text-sky-300">Home Tuitions</span>
-                            <h4 class="text-lg font-black mt-0.5">Browse Tuitions</h4>
-                            <p class="text-xs text-sky-100 mt-1">Find home tuition requirements near you</p>
-                        </div>
-                        <div class="w-10 h-10 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors shrink-0 ml-3">
-                            <i class="fas fa-arrow-right text-sm"></i>
-                        </div>
-                    </a>
+                    @if(in_array($profile?->candidate_category, ['home_tutor', 'both']))
+                        <a href="{{ route('candidate.tuitions.index') }}" class="p-5 rounded-2xl bg-gradient-to-br from-[#031b4e] to-sky-700 text-white shadow-lg hover:shadow-xl transition-all group flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold tracking-widest text-sky-300">Verified Leads</span>
+                                <h4 class="text-lg font-black mt-0.5">Explore Home Tuitions</h4>
+                                <p class="text-xs text-sky-100 mt-1">Browse active student requirements near you</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors shrink-0 ml-3">
+                                <i class="fas fa-arrow-right text-sm"></i>
+                            </div>
+                        </a>
+                    @endif
                 </div>
 
                 {{-- ================= ACTIVE PLACEMENTS, INTERVIEWS & ASSIGNED TUITIONS ================= --}}
-                @if((isset($activeJobInterviews) && $activeJobInterviews->isNotEmpty()) || (isset($activeTuitionAssignments) && $activeTuitionAssignments->isNotEmpty()))
+                @php
+                    $dashCat = $profile?->candidate_category ?: 'both';
+                    $showTuitions = in_array($dashCat, ['home_tutor', 'both']) && isset($activeTuitionAssignments) && $activeTuitionAssignments->isNotEmpty();
+                    $showJobs = in_array($dashCat, ['school_job', 'both']) && isset($activeJobInterviews) && $activeJobInterviews->isNotEmpty();
+                @endphp
+                @if($showTuitions || $showJobs)
                     <div class="space-y-4 reveal">
                         <div class="flex items-center justify-between">
                             <h3 class="text-base sm:text-lg font-black text-[#031b4e] flex items-center gap-2">
                                 <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-sm shadow-xs">
                                     <i class="fas fa-bullhorn"></i>
                                 </span>
-                                Active Placements, Interviews & Assignments
+                                {{ $dashCat === 'home_tutor' ? 'Active Tuition Assignments' : ($dashCat === 'school_job' ? 'Active Interviews & Selections' : 'Active Placements, Interviews & Assignments') }}
                             </h3>
                             <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full animate-pulse">
                                 Action Required / Active
@@ -309,7 +460,7 @@
                         </div>
 
                         {{-- 1. Assigned Tuitions Cards --}}
-                        @if(isset($activeTuitionAssignments) && $activeTuitionAssignments->isNotEmpty())
+                        @if($showTuitions)
                             <div class="space-y-3">
                                 @foreach($activeTuitionAssignments as $tAssigned)
                                     @php $lead = $tAssigned->tuitionLead; @endphp
@@ -322,7 +473,7 @@
                                                 <div>
                                                     <div class="flex items-center gap-2">
                                                         <span class="font-mono text-[10px] font-extrabold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-lg border border-emerald-200">
-                                                            {{ $lead?->tuition_id ?: 'TUI-' . str_pad($lead?->id ?? 0, 4, '0', STR_PAD_LEFT) }}
+                                                             {{ $lead?->tuition_id ?: 'TUI-' . str_pad($lead?->id ?? 0, 4, '0', STR_PAD_LEFT) }}
                                                         </span>
                                                         <h4 class="font-black text-[#031b4e] text-base">Class {{ $lead?->class ?? 'N/A' }} ({{ $lead?->subjects }})</h4>
                                                     </div>
@@ -374,7 +525,7 @@
                         @endif
 
                         {{-- 2. Job Interviews & Selections Cards --}}
-                        @if(isset($activeJobInterviews) && $activeJobInterviews->isNotEmpty())
+                        @if($showJobs)
                             <div class="space-y-3">
                                 @foreach($activeJobInterviews as $jApp)
                                     <div class="bg-gradient-to-r from-amber-50/90 via-orange-50/50 to-white border-2 border-amber-300 rounded-3xl p-5 shadow-sm relative overflow-hidden">
@@ -496,35 +647,130 @@
             {{-- Right Column: Profile & Verification --}}
             <div class="space-y-6">
                 {{-- Profile Card --}}
-                <div class="light-metallic-blue-card rounded-2xl p-6 shadow-sm reveal reveal-delay-2 bg-white">
-                    <div class="flex justify-between items-center mb-5">
-                        <h3 class="font-bold text-[#031b4e] flex items-center gap-2">
-                            <i class="fas fa-id-card text-accent-blue"></i> Profile Overview
-                        </h3>
+                <div class="light-metallic-blue-card rounded-2xl p-6 shadow-sm reveal reveal-delay-2 bg-white space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-[#031b4e] flex items-center gap-2">
+                                <i class="fas fa-id-card text-accent-blue"></i> Profile Overview
+                            </h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black border {{ $catBadgeColor }}">
+                                {{ $catLabel }}
+                            </span>
+                        </div>
                         <a href="{{ route('candidate.profile.edit') }}" class="text-xs text-accent-blue hover:underline font-bold">Edit Profile</a>
                     </div>
 
-                    <div class="space-y-3.5 text-xs sm:text-sm">
-                        <div class="flex justify-between items-center py-2 border-b border-slate-100">
-                            <span class="text-slate-500"><i class="fas fa-phone mr-2 w-4"></i> Phone</span>
+                    <div class="space-y-3 text-xs sm:text-sm">
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-100">
+                            <span class="text-slate-500"><i class="fas fa-phone mr-2 w-4 text-slate-400"></i> Mobile</span>
                             <span class="font-semibold text-[#031b4e]">{{ auth()->user()->phone }}</span>
                         </div>
-                        <div class="flex justify-between items-center py-2 border-b border-slate-100">
-                            <span class="text-slate-500"><i class="fas fa-graduation-cap mr-2 w-4"></i> Education</span>
-                            <span class="font-semibold text-[#031b4e]">{{ $profile?->highestQualification?->name ?? 'Not Provided' }}</span>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-100">
+                            <span class="text-slate-500"><i class="fab fa-whatsapp mr-2 w-4 text-emerald-500"></i> WhatsApp</span>
+                            <span class="font-semibold text-emerald-700 font-mono">{{ auth()->user()->whatsapp_no ?: ($profile?->whatsapp_no ?? 'Same as mobile') }}</span>
                         </div>
-                        <div class="flex justify-between items-center py-2 border-b border-slate-100">
-                            <span class="text-slate-500"><i class="fas fa-briefcase mr-2 w-4"></i> Experience</span>
-                            <span class="font-semibold text-[#031b4e]">{{ $profile?->experience_years ?? 0 }} Years</span>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-100">
+                            <span class="text-slate-500"><i class="fas fa-graduation-cap mr-2 w-4 text-indigo-500"></i> Qualification</span>
+                            <span class="font-semibold text-[#031b4e] text-right">{{ $profile?->highest_qualification_name ?: ($profile?->highestQualification?->name ?? 'Not Provided') }}</span>
                         </div>
-                        <div class="flex justify-between items-center py-2">
-                            <span class="text-slate-500"><i class="fas fa-map-marker-alt mr-2 w-4"></i> Location</span>
-                            <span class="font-semibold text-[#031b4e]">{{ $profile?->preferredCity?->name ? ($profile->preferredCity->name . ', ' . ($profile->preferredState?->name ?? '')) : 'Not Selected' }}</span>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-100">
+                            <span class="text-slate-500"><i class="fas fa-briefcase mr-2 w-4 text-amber-500"></i> Experience</span>
+                            <span class="font-semibold text-[#031b4e]">{{ $profile?->experience_range ?: ($profile?->experience_years ? $profile->experience_years . ' Years' : 'Fresher') }}</span>
                         </div>
+
+                        {{-- Home Tutor Specific Details --}}
+                        @if($profile?->appliesForHomeTuition())
+                            <div class="pt-2 border-t border-slate-100 space-y-2">
+                                <span class="text-[10px] font-black uppercase tracking-wider text-amber-800 block">Home Tuition Preferences</span>
+                                
+                                @if(!empty($profile->tuition_subjects) && is_array($profile->tuition_subjects))
+                                    <div>
+                                        <span class="text-[11px] text-slate-400 block mb-1">Tuition Subjects:</span>
+                                        <div class="flex flex-wrap gap-1">
+                                            @foreach(array_slice($profile->tuition_subjects, 0, 5) as $sub)
+                                                <span class="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-bold">{{ $sub }}</span>
+                                            @endforeach
+                                            @if(count($profile->tuition_subjects) > 5)
+                                                <span class="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold">+{{ count($profile->tuition_subjects) - 5 }} more</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if(!empty($profile->classes_interested) && is_array($profile->classes_interested))
+                                    <div>
+                                        <span class="text-[11px] text-slate-400 block mb-1">Target Classes:</span>
+                                        <div class="flex flex-wrap gap-1">
+                                            @foreach(array_slice($profile->classes_interested, 0, 4) as $cls)
+                                                <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 border border-blue-200 text-[10px] font-bold">{{ $cls }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="text-slate-500">Teaching Mode</span>
+                                    <span class="font-bold text-[#031b4e]">{{ $profile?->teaching_mode ?? 'Offline' }}</span>
+                                </div>
+
+                                @if(!empty($profile->preferred_areas))
+                                    <div class="py-1">
+                                        <span class="text-slate-500 block mb-0.5">Preferred Areas:</span>
+                                        <p class="font-medium text-[#031b4e] text-xs bg-slate-50 p-2 rounded-lg border border-slate-100">{{ $profile->preferred_areas }}</p>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
+                        {{-- School Job Specific Details --}}
+                        @if($profile?->appliesForSchoolJob())
+                            <div class="pt-2 border-t border-slate-100 space-y-2">
+                                <span class="text-[10px] font-black uppercase tracking-wider text-blue-800 block">School Job Preferences</span>
+                                
+                                @if(!empty($profile->position_applying_for))
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-slate-500">Position</span>
+                                        <span class="font-black text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">{{ $profile->position_applying_for }}</span>
+                                    </div>
+                                @endif
+
+                                @if(!empty($profile->subject_specialization))
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-slate-500">Specialization</span>
+                                        <span class="font-bold text-[#031b4e]">{{ $profile->subject_specialization }}</span>
+                                    </div>
+                                @endif
+
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="text-slate-500">B.Ed / D.El.Ed</span>
+                                    <span class="font-semibold text-slate-700 text-xs">
+                                        B.Ed: {{ $profile?->b_ed_status ?? 'No' }} • D.El.Ed: {{ $profile?->d_el_ed_status ?? 'No' }}
+                                    </span>
+                                </div>
+
+                                @if(!empty($profile->expected_salary))
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-slate-500">Expected Salary</span>
+                                        <span class="font-black text-emerald-700">₹{{ number_format((float)$profile->expected_salary) }} /mo</span>
+                                    </div>
+                                @endif
+
+                                @if(!empty($profile->preferred_locations) && is_array($profile->preferred_locations))
+                                    <div>
+                                        <span class="text-[11px] text-slate-400 block mb-1">Preferred Locations:</span>
+                                        <div class="flex flex-wrap gap-1">
+                                            @foreach($profile->preferred_locations as $ploc)
+                                                <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-900 border border-indigo-200 text-[10px] font-bold">{{ $ploc }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                     </div>
 
-                    <div class="mt-5 pt-4 border-t border-slate-100">
-                        @if(($profile?->completion_percentage ?? 0) >= 100)
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        @if($completionPct >= 100)
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-xs font-bold text-[#031b4e] flex items-center gap-1.5">
                                     <i class="fas fa-check-circle text-emerald-500"></i> Profile Status
@@ -539,10 +785,10 @@
                                 <span class="text-xs font-bold text-[#031b4e] flex items-center gap-1.5">
                                     <i class="fas fa-clock text-amber-500"></i> Profile Status
                                 </span>
-                                <span class="text-xs font-extrabold text-amber-600">{{ $profile?->completion_percentage ?? 0 }}% (Pending)</span>
+                                <span class="text-xs font-extrabold text-amber-600">{{ $completionPct }}% (Pending)</span>
                             </div>
                             <div class="w-full bg-amber-100 rounded-full h-2 overflow-hidden">
-                                <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all" style="width: {{ $profile?->completion_percentage ?? 0 }}%"></div>
+                                <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all" style="width: {{ $completionPct }}%"></div>
                             </div>
                             <a href="{{ route('candidate.profile.edit') }}" class="block text-center mt-3 text-[11px] font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 py-1.5 rounded-lg border border-amber-200 transition-colors">
                                 Complete Missing Details →

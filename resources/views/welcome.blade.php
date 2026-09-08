@@ -40,7 +40,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
          
-        <div class="bg-white rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] p-5 sm:p-7 md:p-8 max-w-4xl w-full relative border border-slate-100 my-auto overflow-hidden flex flex-col justify-between" 
+        <div class="bg-white rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] p-5 sm:p-7 md:p-8 max-w-5xl w-full relative border border-slate-100 my-auto overflow-hidden flex flex-col justify-between" 
              @click.away="showWelcomeModal = false"
              x-show="showWelcomeModal"
              x-transition:enter="transition ease-out duration-400"
@@ -69,8 +69,8 @@
                 <p class="text-slate-500 text-xs sm:text-sm max-w-md mx-auto font-medium">Please select what you are looking for to get instant matching.</p>
             </div>
             
-            <!-- 3 Interactive Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 relative z-10">
+            <!-- 4 Interactive Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative z-10">
                 
                 <!-- Card 1: Hire a Home Tutor -->
                 <button type="button" 
@@ -118,7 +118,7 @@
                 
                 <!-- Card 3: Join as Teacher / Tutor -->
                 @guest
-                <button type="button" onclick="openTeacherModal()" 
+                <button type="button" @click="showWelcomeModal = false; openRequirementModal('teacher')" 
                    class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-amber-50/60 via-white to-orange-50/30 hover:from-amber-50/90 hover:to-white border-2 border-amber-100 hover:border-amber-500 shadow-xs hover:shadow-xl hover:shadow-amber-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
@@ -158,6 +158,28 @@
                     </div>
                 </a>
                 @endguest
+                
+                <!-- Card 4: Both -->
+                <button type="button" 
+                        @click="showWelcomeModal = false; openRequirementModal('both')" 
+                        class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-emerald-50/60 via-white to-teal-50/30 hover:from-emerald-50/90 hover:to-white border-2 border-emerald-100 hover:border-emerald-500 shadow-xs hover:shadow-xl hover:shadow-emerald-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
+                    <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-emerald-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="flex-grow text-left md:text-center">
+                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100/90 text-emerald-900 group-hover:bg-emerald-500 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Tutors & Parents</span>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-emerald-800 mb-0.5 md:mb-1 transition-colors">Both</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Mix of Join as a Teacher & Join as a Home Tutor.</p>
+                        </div>
+                    </div>
+                    <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 w-auto md:w-full flex items-center justify-end md:justify-center gap-2 text-xs font-extrabold text-emerald-800 group-hover:text-emerald-700 transition-colors shrink-0">
+                        <span class="hidden md:inline">Explore Both</span>
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-100 group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center text-emerald-800 transition-all shadow-xs group-hover:shadow-md group-hover:shadow-emerald-500/30">
+                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
+                        </div>
+                    </div>
+                </button>
 
             </div>
             

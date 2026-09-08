@@ -23,6 +23,9 @@ class CandidateProfile extends Model
         'plan_started_at' => 'datetime',
         'agreement_status' => 'string',
         'tuition_agreement_status' => 'string',
+        'tuition_subjects' => 'array',
+        'classes_interested' => 'array',
+        'preferred_locations' => 'array',
     ];
 
     public function user()
@@ -60,28 +63,90 @@ class CandidateProfile extends Model
         return $this->belongsTo(City::class, 'preferred_city_id');
     }
 
+    public function isHomeTutor(): bool
+    {
+        return $this->candidate_category === 'home_tutor';
+    }
+
+    public function isSchoolJob(): bool
+    {
+        return $this->candidate_category === 'school_job';
+    }
+
+    public function isBoth(): bool
+    {
+        return $this->candidate_category === 'both' || empty($this->candidate_category);
+    }
+
+    public function appliesForHomeTuition(): bool
+    {
+        return in_array($this->candidate_category, ['home_tutor', 'both']) || empty($this->candidate_category);
+    }
+
+    public function appliesForSchoolJob(): bool
+    {
+        return in_array($this->candidate_category, ['school_job', 'both']) || empty($this->candidate_category);
+    }
+
     /**
-     * Calculate live profile completion percentage
+     * Calculate live profile completion percentage (25%, 50%, 75%, 100%)
      */
     public function getCompletionPercentageAttribute(): int
     {
-        $score = 0;
-        $total = 6;
+        $category = $this->candidate_category ?: 'both';
+        $stepsPassed = 0;
 
-        // 1. Basic Info (DOB & Gender)
-        if (!empty($this->date_of_birth) && !empty($this->gender)) $score++;
-        // 2. Address
-        if (!empty($this->address)) $score++;
-        // 3. Location (State & City)
-        if (!empty($this->preferred_state_id) && !empty($this->preferred_city_id)) $score++;
-        // 4. Qualification
-        if (!empty($this->highest_qualification_id)) $score++;
-        // 5. School Job Info / Category
-        if (!empty($this->category_id)) $score++;
-        // 6. Resume Uploaded
-        if (!empty($this->resume_path)) $score++;
+        // Step 1: Basic Personal Details (Common) - 25%
+        // Gender, DOB, and User's name & contact
+        $hasBasic = !empty($this->gender) 
+            && !empty($this->date_of_birth) 
+            && ($this->user && !empty($this->user->name) && (!empty($this->user->phone) || !empty($this->user->email) || !empty($this->whatsapp_no)));
+        if ($hasBasic) $stepsPassed++;
 
-        return (int) round(($score / $total) * 100);
+        // Step 2: Education & Experience (Common) - 25%
+        $hasEducationExp = (!empty($this->highest_qualification_id) || !empty($this->highest_qualification_name)) 
+            && (!empty($this->experience_range) || isset($this->experience_years));
+        if ($hasEducationExp) $stepsPassed++;
+
+        // Step 3: Domain Preferences - 25%
+        if ($category === 'home_tutor') {
+            // Needs tuition subjects, classes interested, and teaching mode or area
+            $hasPreferences = (!empty($this->tuition_subjects) && count($this->tuition_subjects) > 0)
+                && (!empty($this->classes_interested) && count($this->classes_interested) > 0)
+                && (!empty($this->teaching_mode) || !empty($this->preferred_areas));
+        } elseif ($category === 'school_job') {
+            // Needs position applying for, specialization or category, and expected salary
+            $hasPreferences = !empty($this->position_applying_for) 
+                && (!empty($this->subject_specialization) || !empty($this->category_id))
+                && (!empty($this->expected_salary) || !empty($this->current_salary));
+        } else {
+            // Both: At least tuition subjects and school position
+            $hasPreferences = (!empty($this->tuition_subjects) && count($this->tuition_subjects) > 0)
+                && !empty($this->position_applying_for);
+        }
+        if ($hasPreferences) $stepsPassed++;
+
+        // Step 4: Documents & Location Details - 25%
+        if ($category === 'home_tutor') {
+            // Resume or preferred areas / time slots
+            $hasDocsLoc = !empty($this->resume_path) || (!empty($this->preferred_areas) && !empty($this->available_time_slot));
+        } elseif ($category === 'school_job') {
+            // Resume is mandatory, and preferred locations selected
+            $hasDocsLoc = !empty($this->resume_path) && (!empty($this->preferred_locations) && count($this->preferred_locations) > 0);
+        } else {
+            // Both: Resume and preferred locations/areas
+            $hasDocsLoc = !empty($this->resume_path) && (!empty($this->preferred_locations) || !empty($this->preferred_areas));
+        }
+        if ($hasDocsLoc) $stepsPassed++;
+
+        // Return exact quartile percentage (0, 25, 50, 75, 100)
+        return match($stepsPassed) {
+            4 => 100,
+            3 => 75,
+            2 => 50,
+            1 => 25,
+            default => 0,
+        };
     }
 
     /**
@@ -90,12 +155,41 @@ class CandidateProfile extends Model
     public function getMissingProfileFieldsAttribute(): array
     {
         $missing = [];
-        if (empty($this->date_of_birth) || empty($this->gender)) $missing[] = 'Basic Details (DOB & Gender)';
-        if (empty($this->address)) $missing[] = 'Full Residential Address';
-        if (empty($this->preferred_state_id) || empty($this->preferred_city_id)) $missing[] = 'Preferred Location (State & City)';
-        if (empty($this->highest_qualification_id)) $missing[] = 'Highest Qualification';
-        if (empty($this->category_id)) $missing[] = 'Teaching Category';
-        if (empty($this->resume_path)) $missing[] = 'Resume / CV';
+        $category = $this->candidate_category ?: 'both';
+
+        if (empty($this->gender) || empty($this->date_of_birth)) {
+            $missing[] = 'Gender & Date of Birth';
+        }
+        if (empty($this->highest_qualification_id) && empty($this->highest_qualification_name)) {
+            $missing[] = 'Highest Qualification';
+        }
+        if (empty($this->experience_range) && !isset($this->experience_years)) {
+            $missing[] = 'Teaching Experience';
+        }
+
+        if ($category === 'home_tutor' || $category === 'both') {
+            if (empty($this->tuition_subjects) || count($this->tuition_subjects) === 0) {
+                $missing[] = 'Tuition Subjects';
+            }
+            if (empty($this->classes_interested) || count($this->classes_interested) === 0) {
+                $missing[] = 'Interested Classes';
+            }
+            if (empty($this->preferred_areas)) {
+                $missing[] = 'Preferred Home Tuition Areas';
+            }
+        }
+
+        if ($category === 'school_job' || $category === 'both') {
+            if (empty($this->position_applying_for)) {
+                $missing[] = 'Position Applying For';
+            }
+            if (empty($this->resume_path)) {
+                $missing[] = 'Resume / CV';
+            }
+            if (empty($this->preferred_locations) || count($this->preferred_locations) === 0) {
+                $missing[] = 'Preferred Locations';
+            }
+        }
 
         return $missing;
     }
