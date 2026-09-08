@@ -50,9 +50,10 @@
 
       gtag('config', '{{ $googleTagId }}');
       gtag('config', '{{ $googleAdsId }}');
-      @if($ga4Id)
-      gtag('config', '{{ $ga4Id }}');
-      @endif
+      const ga4Id = '{{ $ga4Id }}';
+      if (ga4Id) {
+          gtag('config', ga4Id);
+      }
 
       // Unified Lead Conversion Tracking helper (DataLayer, Google Ads, Meta Pixel)
       window.trackLeadConversion = function(leadType, extraData) {
@@ -613,7 +614,7 @@
         </div>
     </div>
 
-    <main class="min-h-screen" style="{{ !request()->routeIs('home') ? 'padding-top: 140px;' : '' }}">
+    <main class="min-h-screen" @style(['padding-top: 140px;' => !request()->routeIs('home')])>
         @yield('content')
     </main>
 
