@@ -127,7 +127,7 @@
                 </div>
                 
                 <h3 class="text-lg font-bold text-slate-900 mb-1 group-hover:text-accent-blue transition-colors line-clamp-1">
-                    {{ $tuition->subjects ?? 'Tuition Requirement' }}
+                    <a href="{{ route('tuitions.show', $tuition->id) }}">{{ $tuition->subjects ?? 'Tuition Requirement' }}</a>
                 </h3>
                 <p class="text-sm text-slate-500 font-medium mb-3 flex items-center gap-1.5">
                     <i class="fas fa-map-marker-alt text-red-400 text-xs"></i> 
@@ -167,10 +167,24 @@
                     <div class="flex flex-col">
                         <span class="text-[10px] text-slate-400 font-medium mt-1">Posted {{ $tuition->created_at->diffForHumans() }}</span>
                     </div>
-                    <form action="{{ route('candidate.tuitions.apply', $tuition->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="text-white bg-accent-blue px-4 py-2 rounded-lg font-bold text-xs hover:bg-blue-600 transition-colors shadow-glow-blue flex items-center gap-2">Apply</button>
-                    </form>
+                    <div class="flex items-center gap-2">
+                        <button type="button" 
+                                data-share-url="{{ route('tuitions.show', $tuition->id) }}"
+                                onclick="copyJobUrl(this.dataset.shareUrl, this)" 
+                                title="Copy Tuition Link to Share" 
+                                class="p-2 w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center justify-center shadow-2xs">
+                            <i class="fas fa-link text-[#0ea5e9]"></i>
+                        </button>
+                        <a href="{{ route('tuitions.show', $tuition->id) }}" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#031b4e] font-bold text-xs transition-colors flex items-center gap-1">
+                            <span>Details</span>
+                        </a>
+                        <form action="{{ route('candidate.tuitions.apply', $tuition->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="text-white bg-accent-blue px-4 py-2 rounded-xl font-bold text-xs hover:bg-blue-600 transition-colors shadow-glow-blue flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                                <span>Apply</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

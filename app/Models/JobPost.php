@@ -32,12 +32,20 @@ class JobPost extends Model
      */
     public function resolveRouteBinding($value, $field = null)
     {
-        return $this->where(function ($query) use ($value) {
+        $idFromCode = null;
+        if (preg_match('/^(?:job-?)0*(\d+)$/i', (string) $value, $m)) {
+            $idFromCode = (int) $m[1];
+        }
+
+        return $this->where(function ($query) use ($value, $idFromCode) {
             if (is_numeric($value)) {
                 $query->where('id', (int) $value)->orWhere('job_id', $value);
             } else {
                 $query->where('job_id', $value)
                       ->orWhere('job_id', strtoupper($value));
+                if ($idFromCode) {
+                    $query->orWhere('id', $idFromCode);
+                }
             }
         })->first() ?? abort(404);
     }

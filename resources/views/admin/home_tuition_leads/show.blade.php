@@ -59,6 +59,17 @@
                         </form>
                     @endif
 
+                    <button type="button" 
+                            data-share-url="{{ route('tuitions.show', $lead->id) }}" 
+                            onclick="copyJobUrl(this.dataset.shareUrl, this)" 
+                            class="px-3.5 py-1.5 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-link text-xs"></i> Copy Public Link
+                    </button>
+
+                    <a href="{{ route('tuitions.show', $lead->id) }}" target="_blank" class="px-3.5 py-1.5 bg-sky-500/10 text-sky-600 hover:bg-sky-500 hover:text-white border border-sky-500/20 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
+                        <i class="fas fa-external-link-alt text-xs"></i> View Page
+                    </a>
+
                     <a href="{{ route('admin.tuition-leads.edit', $lead->id) }}" class="px-3.5 py-1.5 bg-secondary-bg hover:bg-card-border/50 text-text-main border border-card-border rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
                         <i class="fas fa-edit"></i> Edit Details
                     </a>
@@ -327,6 +338,39 @@
     <!-- Right Column: Status & Follow-ups -->
     <div class="space-y-6">
         
+        <!-- Public Tuition Share Link Card -->
+        <div class="bg-card-bg rounded-2xl border border-emerald-500/20 shadow-sm p-6">
+            <h3 class="text-sm font-bold text-text-main mb-1.5 flex items-center gap-2">
+                <i class="fas fa-share-nodes text-emerald-500"></i> Share Tuition With Tutors
+            </h3>
+            <p class="text-xs text-text-dark/60 mb-3 leading-relaxed">Copy this public link to share directly with teachers on WhatsApp groups, Telegram, or SMS. Anyone clicking will open this exact tuition requirement.</p>
+            
+            <div class="flex items-center gap-2 bg-secondary-bg border border-card-border rounded-xl p-1.5 pl-3 mb-3">
+                <input type="text" readonly value="{{ route('tuitions.show', $lead->id) }}" class="w-full bg-transparent text-xs text-text-main font-mono outline-none select-all font-medium" onclick="this.select()" />
+                <button type="button" 
+                        data-share-url="{{ route('tuitions.show', $lead->id) }}"
+                        onclick="copyJobUrl(this.dataset.shareUrl, this)"
+                        class="px-3 py-1.5 bg-[#031b4e] hover:bg-blue-900 text-white rounded-lg text-xs font-bold transition-all shrink-0 flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm">
+                    <i class="fas fa-copy text-xs"></i> <span>Copy</span>
+                </button>
+            </div>
+
+            @php
+                $adminTuitionUrl = route('tuitions.show', $lead->id);
+                $adminTuitionId = $lead->tuition_id ?: ('TUI-' . str_pad($lead->id, 4, '0', STR_PAD_LEFT));
+                $adminTuitionText = "🎯 *Home Tuition Requirement Alert - Warriors Educare*\n\n"
+                    . "📌 *Tuition ID:* " . $adminTuitionId . "\n"
+                    . "📚 *Class & Board:* Class " . ($lead->class ?? 'N/A') . " (" . ($lead->board ?: 'General') . ")\n"
+                    . "📖 *Subjects:* " . ($lead->subjects ?? 'All Subjects') . "\n"
+                    . "📍 *Location:* " . $lead->location . "\n"
+                    . "💰 *Fee:* " . ($lead->fee ? '₹' . $lead->fee . '/mo' : 'Negotiable') . "\n\n"
+                    . "👉 *Check Details & Apply Online:* \n" . $adminTuitionUrl;
+            @endphp
+            <a href="https://api.whatsapp.com/send?text={{ urlencode($adminTuitionText) }}" target="_blank" class="w-full py-2.5 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                <i class="fab fa-whatsapp text-base text-emerald-500"></i> Share on WhatsApp
+            </a>
+        </div>
+
         <!-- Update Status Card -->
         <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-card-border bg-secondary-bg/50">

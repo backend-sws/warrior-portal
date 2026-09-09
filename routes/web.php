@@ -15,6 +15,7 @@ Route::get('/school-hiring-success', function () {
 })->name('school.requirement.success');
 Route::get('/jobs', [\App\Http\Controllers\HomeController::class, 'jobs'])->name('jobs');
 Route::get('/tuitions', [\App\Http\Controllers\HomeController::class, 'tuitions'])->name('tuitions');
+Route::get('/tuitions/{tuition}', [\App\Http\Controllers\HomeController::class, 'showTuition'])->name('tuitions.show');
 Route::get('/tutors/search', [\App\Http\Controllers\TutorSearchController::class, 'search'])->name('tutors.search');
 Route::post('/tutors/request-demo', [\App\Http\Controllers\TutorSearchController::class, 'requestDemo'])->name('tutors.requestDemo');
 Route::get('/jobs/{job}', [\App\Http\Controllers\JobController::class, 'show'])->name('jobs.show');

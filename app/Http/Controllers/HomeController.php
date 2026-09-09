@@ -278,6 +278,40 @@ class HomeController extends Controller
         return view('tuitions', compact('tuitions'));
     }
 
+    public function showTuition(\App\Models\HomeTuitionLead $tuition)
+    {
+        if (in_array(strtolower((string)$tuition->status), ['cancelled', 'spam', 'rejected'])) {
+            $user = \Illuminate\Support\Facades\Auth::user();
+            $canPreview = $user && (
+                $user->role === 'admin' ||
+                $user->id === $tuition->user_id
+            );
+
+            if (!$canPreview) {
+                abort(404);
+            }
+        }
+
+        $similarTuitions = \App\Models\HomeTuitionLead::where('status', 'Approved')
+            ->where('id', '!=', $tuition->id)
+            ->where(function ($q) use ($tuition) {
+                $q->where('class', $tuition->class)
+                  ->orWhere('location', 'like', '%' . substr($tuition->location, 0, 8) . '%');
+            })
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $hasApplied = false;
+        if (auth()->check() && auth()->user()->role === 'candidate') {
+            $hasApplied = \App\Models\TuitionApplication::where('candidate_id', auth()->id())
+                ->where('home_tuition_lead_id', $tuition->id)
+                ->exists();
+        }
+
+        return view('tuitions.show', compact('tuition', 'similarTuitions', 'hasApplied'));
+    }
+
     public function storeContact(\Illuminate\Http\Request $request)
     {
         $request->validate([

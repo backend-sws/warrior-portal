@@ -227,6 +227,22 @@
                             </a>
                         @endif
 
+                        <button type="button" 
+                                data-share-url="{{ route('tuitions.show', $lead->id) }}"
+                                onclick="copyJobUrl(this.dataset.shareUrl, this)" 
+                                class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors tooltip cursor-pointer" 
+                                title="Copy Public Link for Tutors">
+                            <i class="fas fa-link text-xs"></i>
+                        </button>
+
+                        <a href="{{ route('tuitions.show', $lead->id) }}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-sky-500/10 text-sky-600 hover:bg-sky-500 hover:text-white transition-colors tooltip" title="Open Public Tuition Page">
+                            <i class="fas fa-external-link-alt text-xs"></i>
+                        </a>
+
+                        <a href="{{ route('admin.tuition-leads.show', $lead->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-accent-blue/10 text-accent-blue hover:bg-accent-blue hover:text-white transition-colors tooltip" title="Review Lead Details">
+                            <i class="fas fa-eye text-xs"></i>
+                        </a>
+
                         <a href="{{ route('admin.tuition-leads.edit', $lead->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue rounded-lg text-xs font-bold transition-colors" title="Edit Tuition Requirement">
                             <i class="fas fa-edit text-xs"></i> Edit
                         </a>

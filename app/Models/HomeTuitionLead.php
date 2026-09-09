@@ -34,6 +34,37 @@ class HomeTuitionLead extends Model
         return $value ?: ('TUI-' . str_pad($this->id, 4, '0', STR_PAD_LEFT));
     }
 
+    /**
+     * Retrieve the model for a bound value (supports numeric id or tuition_id string like TUI-0001).
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        $idFromCode = null;
+        if (preg_match('/^(?:tui-?)0*(\d+)$/i', (string) $value, $m)) {
+            $idFromCode = (int) $m[1];
+        }
+
+        return $this->where(function ($query) use ($value, $idFromCode) {
+            if (is_numeric($value)) {
+                $query->where('id', (int) $value)->orWhere('tuition_id', $value);
+            } else {
+                $query->where('tuition_id', $value)
+                      ->orWhere('tuition_id', strtoupper($value));
+                if ($idFromCode) {
+                    $query->orWhere('id', $idFromCode);
+                }
+            }
+        })->first() ?? abort(404);
+    }
+
+    /**
+     * Get direct canonical public URL for this tuition post.
+     */
+    public function getPublicUrlAttribute(): string
+    {
+        return route('tuitions.show', $this->id);
+    }
+
     public function followUps()
     {
         return $this->hasMany(HomeTuitionLeadFollowUp::class)->latest();
