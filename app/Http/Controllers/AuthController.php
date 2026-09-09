@@ -30,15 +30,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
 
-            if ($user->role === 'admin') {
-                return redirect()->intended('/admin/dashboard');
-            } elseif ($user->role === 'employer') {
-                return redirect()->intended('/employer/dashboard');
-            } elseif ($user->role === 'parent') {
-                return redirect()->intended('/parent/dashboard');
-            } else {
-                return redirect()->intended('/candidate/dashboard');
-            }
+            return $this->redirectToDashboard($user);
         }
 
         return back()->withErrors([
@@ -116,17 +108,40 @@ class AuthController extends Controller
             Auth::login($user, true); // login and remember
             $request->session()->regenerate();
 
-            if ($user->role === 'admin') {
-                return redirect()->intended('/admin/dashboard');
-            } elseif ($user->role === 'employer') {
-                return redirect()->intended('/employer/dashboard');
-            } elseif ($user->role === 'parent') {
-                return redirect()->intended('/parent/dashboard');
-            } else {
-                return redirect()->intended('/candidate/dashboard');
-            }
+            return $this->redirectToDashboard($user);
         }
 
         return back()->withErrors(['otp' => 'Invalid or expired OTP.']);
+    }
+
+    /**
+     * Redirect user to their respective dashboard, preventing redirection back to guest/auth routes.
+     */
+    protected function redirectToDashboard($user)
+    {
+        $intended = session()->get('url.intended');
+        session()->forget('url.intended');
+
+        $guestPaths = ['/', '/login', '/login/otp', '/register', '/register/verify-otp'];
+        $path = $intended ? parse_url($intended, PHP_URL_PATH) : null;
+
+        // If intended URL is missing or points to a public/guest page, redirect directly to role dashboard
+        if (!$intended || in_array($path, $guestPaths)) {
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->role === 'employer') {
+                return \Illuminate\Support\Facades\Route::has('employer.dashboard')
+                    ? redirect()->route('employer.dashboard')
+                    : redirect()->route('candidate.dashboard');
+            } elseif ($user->role === 'parent') {
+                return \Illuminate\Support\Facades\Route::has('parent.dashboard')
+                    ? redirect()->route('parent.dashboard')
+                    : redirect()->route('candidate.dashboard');
+            } else {
+                return redirect()->route('candidate.dashboard');
+            }
+        }
+
+        return redirect()->to($intended);
     }
 }
