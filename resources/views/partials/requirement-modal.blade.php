@@ -1,4 +1,4 @@
-﻿@php
+@php
     $modalCategories = $categories ?? \App\Models\Category::where('is_active', true)->orderBy('name')->get();
     $modalStates = $states ?? \App\Models\State::where('is_active', true)->orderBy('name')->get();
     $modalQualifications = $qualifications ?? \App\Models\Qualification::where('is_active', true)->orderBy('name')->get();
@@ -449,10 +449,14 @@ function globalRequirementModal() {
                     } else {
                         this.errorMessage = 'Registration could not be completed. Please check your inputs.';
                     }
+                    const modalScroll = document.getElementById('requirement-modal')?.querySelector('.overflow-y-auto') || window;
+                    modalScroll.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             } catch (err) {
                 console.error('Candidate modal registration error:', err);
                 this.errorMessage = 'Unable to complete registration. Please verify your connection or refresh the page.';
+                const modalScroll = document.getElementById('requirement-modal')?.querySelector('.overflow-y-auto') || window;
+                modalScroll.scrollTo({ top: 0, behavior: 'smooth' });
             } finally {
                 this.submitting = false;
             }
@@ -558,8 +562,21 @@ function globalRequirementModal() {
                         <template x-if="Object.keys(fieldErrors).length === 0 && errorMessage">
                             <p class="text-xs text-rose-700 mt-1" x-text="errorMessage"></p>
                         </template>
+
+                        <template x-if="Object.values(fieldErrors).some(err => (Array.isArray(err) ? err.join(' ') : String(err)).toLowerCase().includes('already registered')) || (errorMessage && errorMessage.toLowerCase().includes('already registered'))">
+                            <div class="mt-3 pt-2.5 border-t border-rose-200 flex flex-wrap items-center gap-2">
+                                <span class="text-xs text-rose-700 font-medium">Already have an account?</span>
+                                <a href="{{ route('login.otp') }}" class="text-xs font-bold text-blue-700 hover:text-blue-900 underline flex items-center gap-1">
+                                    <i class="fas fa-key text-[10px]"></i> Quick Login with OTP &rarr;
+                                </a>
+                                <span class="text-xs text-slate-400">|</span>
+                                <a href="{{ route('login') }}" class="text-xs font-bold text-[#031b4e] hover:underline">
+                                    Sign In with Password
+                                </a>
+                            </div>
+                        </template>
                     </div>
-                    <button type="button" @click="errorMessage = ''; fieldErrors = {};" class="text-rose-400 hover:text-rose-600"><i class="fas fa-times"></i></button>
+                    <button type="button" @click="errorMessage = ''; fieldErrors = {};" class="text-rose-400 hover:text-rose-600 cursor-pointer"><i class="fas fa-times"></i></button>
                 </div>
 
                 {{-- TAB 1: HOME TUITION TAB (Default: Home Tutor Candidate Form, Toggle: Parent Requirement Form) --}}

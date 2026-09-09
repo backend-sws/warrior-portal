@@ -23,14 +23,21 @@ class CandidateAuthController extends Controller
      */
     public function register(Request $request)
     {
-        // Remove unverified user with same email or phone so they can re-register cleanly
-        $unverifiedUser = User::where(function($query) use ($request) {
-            if ($request->email) $query->orWhere('email', $request->email);
-            if ($request->phone) $query->orWhere('phone', $request->phone);
-        })->whereNull('email_verified_at')->first();
+        // Prevent registering an administrator account as candidate
+        $existingAdmin = User::where(function($query) use ($request) {
+            if ($request->filled('email')) $query->orWhere('email', $request->email);
+            if ($request->filled('phone')) $query->orWhere('phone', $request->phone);
+        })->where('role', 'admin')->first();
 
-        if ($unverifiedUser) {
-            $unverifiedUser->delete();
+        if ($existingAdmin) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This email or phone is reserved for portal administration. Please log in using the Admin login page.',
+                    'errors' => ['email' => ['This account is reserved for administration.']]
+                ], 422);
+            }
+            return back()->withErrors(['email' => 'This email or phone is reserved for portal administration.'])->withInput();
         }
 
         $isFullRegistration = $request->filled('candidate_category') || $request->filled('gender');
@@ -39,8 +46,8 @@ class CandidateAuthController extends Controller
             $rules = [
                 'candidate_category'        => ['required', 'in:home_tutor,school_job,both'],
                 'name'                      => ['required', 'string', 'min:3', 'max:80', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
-                'email'                     => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users,email'],
-                'phone'                     => ['required', 'regex:/^[6-9]\d{9}$/', 'unique:users,phone'],
+                'email'                     => ['required', 'string', 'email:rfc', 'max:255'],
+                'phone'                     => ['required', 'regex:/^[6-9]\d{9}$/'],
                 'whatsapp_no'               => ['nullable', 'regex:/^[6-9]\d{9}$/'],
                 'password'                  => ['required', 'string', 'min:8', 'confirmed'],
                 'gender'                    => ['required', 'in:Male,Female,Other'],
@@ -80,8 +87,8 @@ class CandidateAuthController extends Controller
         } else {
             $rules = [
                 'name'     => ['required', 'string', 'min:3', 'max:80', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
-                'email'    => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users,email'],
-                'phone'    => ['required', 'regex:/^[6-9]\d{9}$/', 'unique:users,phone'],
+                'email'    => ['required', 'string', 'email:rfc', 'max:255'],
+                'phone'    => ['required', 'regex:/^[6-9]\d{9}$/'],
                 'password' => ['required', 'string', 'min:8', 'confirmed'],
             ];
             $category = 'both';
@@ -93,10 +100,8 @@ class CandidateAuthController extends Controller
             'name.regex'                     => 'Name should only contain letters and spaces.',
             'email.required'                 => 'Please enter your email address.',
             'email.email'                    => 'Please provide a valid authentic email address.',
-            'email.unique'                   => 'This email address is already registered with us. Please log in.',
             'phone.required'                 => 'Please enter your 10-digit mobile number.',
             'phone.regex'                    => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
-            'phone.unique'                   => 'This mobile number is already registered with us.',
             'whatsapp_no.regex'              => 'Please enter a valid 10-digit WhatsApp number starting with 6, 7, 8, or 9.',
             'password.min'                   => 'Password must be at least 8 characters long.',
             'password.confirmed'             => 'Password confirmation does not match.',
@@ -138,10 +143,16 @@ class CandidateAuthController extends Controller
         elseif ($range === '10–15 Years') $expYears = 12;
         elseif ($range === '15+ Years') $expYears = 15;
 
+        // Determine actual qualification (support custom input if '__other__')
+        $qualificationName = $request->highest_qualification;
+        if ($qualificationName === '__other__' && $request->filled('highest_qualification_custom')) {
+            $qualificationName = trim($request->highest_qualification_custom);
+        }
+
         // Generate 6-digit secure numeric OTP
         $otp = sprintf('%06d', mt_rand(100000, 999999));
 
-        // Store complete registration payload in session
+        // Store complete registration payload in session (leave password plain so model cast handles single hash)
         session([
             'register_data' => [
                 'role'                       => 'candidate',
@@ -150,10 +161,10 @@ class CandidateAuthController extends Controller
                 'email'                      => $request->email,
                 'phone'                      => $request->phone,
                 'whatsapp_no'                => $request->whatsapp_no ?: $request->phone,
-                'password'                   => Hash::make($request->password),
+                'password'                   => $request->password,
                 'gender'                     => $request->gender,
                 'date_of_birth'              => $request->date_of_birth,
-                'highest_qualification_name' => $request->highest_qualification,
+                'highest_qualification_name' => $qualificationName,
                 'experience_range'           => $request->experience_range,
                 'experience_years'           => $expYears,
 
@@ -239,128 +250,100 @@ class CandidateAuthController extends Controller
             return back()->withErrors(['otp' => 'Invalid verification code. Please check your email and enter the correct 6-digit code.']);
         }
 
-        // Clean up any stale unverified collision
+        // Clean up any other stale unverified records with same contact details
         User::where(function($query) use ($data) {
             if (!empty($data['email'])) $query->orWhere('email', $data['email']);
             if (!empty($data['phone'])) $query->orWhere('phone', $data['phone']);
-        })->whereNull('email_verified_at')->delete();
+        })->where('email', '!=', $data['email'])
+          ->whereNull('email_verified_at')
+          ->delete();
 
-        // Double check uniqueness for verified users
-        if (User::where('email', $data['email'])->exists()) {
-            return redirect()->route('login')->withErrors(['email' => 'An account with this email already exists. Please log in.']);
+        // Check if user already exists
+        $user = User::where('email', $data['email'])
+            ->orWhere('phone', $data['phone'])
+            ->first();
+
+        if (!$user) {
+            // Create brand new authentic candidate
+            $user = User::create([
+                'name'        => $data['name'],
+                'email'       => $data['email'],
+                'phone'       => $data['phone'],
+                'whatsapp_no' => $data['whatsapp_no'] ?? $data['phone'],
+                'role'        => 'candidate',
+                'password'    => $data['password'],
+                'is_active'   => true,
+            ]);
+        } else {
+            // Existing user: update name, whatsapp, password if supplied and guarantee active
+            $user->name = $data['name'] ?: $user->name;
+            $user->whatsapp_no = $data['whatsapp_no'] ?? $user->whatsapp_no ?? $data['phone'];
+            if (!empty($data['password'])) {
+                $user->password = $data['password'];
+            }
+            $user->is_active = true;
         }
-
-        // Create verified authentic User
-        $user = User::create([
-            'name'        => $data['name'],
-            'email'       => $data['email'],
-            'phone'       => $data['phone'],
-            'whatsapp_no' => $data['whatsapp_no'] ?? $data['phone'],
-            'role'        => $data['role'] ?? 'candidate',
-            'password'    => $data['password'],
-        ]);
 
         $user->email_verified_at = now();
         $user->save();
 
-        // Initialize role-based profile
-        if ($user->role === 'employer') {
-            $user->employerProfile()->create([
-                'school_name'    => $data['school_name'] ?? null,
-                'contact_person' => $data['name'],
-                'phone'          => $data['phone'],
-            ]);
-        } elseif ($user->role === 'parent') {
-            $user->parentProfile()->create([]);
+        // Candidate Profile creation or update
+        $profileData = [
+            'candidate_category'         => $data['candidate_category'] ?? 'both',
+            'whatsapp_no'                => $data['whatsapp_no'] ?? $data['phone'],
+            'gender'                     => $data['gender'] ?? null,
+            'date_of_birth'              => $data['date_of_birth'] ?? null,
+            'highest_qualification_name' => $data['highest_qualification_name'] ?? null,
+            'experience_range'           => $data['experience_range'] ?? null,
+            'experience_years'           => $data['experience_years'] ?? 0,
+            'address'                    => $data['preferred_areas'] ?? null,
+
+            // Home Tutor fields
+            'tuition_subjects'           => $data['tuition_subjects'] ?? null,
+            'classes_interested'         => $data['classes_interested'] ?? null,
+            'teaching_mode'              => $data['teaching_mode'] ?? null,
+            'preferred_areas'            => $data['preferred_areas'] ?? null,
+            'available_time_slot'        => $data['available_time_slot'] ?? null,
+
+            // School Job fields
+            'b_ed_status'                => $data['b_ed_status'] ?? null,
+            'd_el_ed_status'              => $data['d_el_ed_status'] ?? null,
+            'subject_specialization'     => $data['subject_specialization'] ?? null,
+            'position_applying_for'      => $data['position_applying_for'] ?? null,
+            'current_salary'             => $data['current_salary'] ?? null,
+            'expected_salary'            => $data['expected_salary'] ?? null,
+            'last_school_name'           => $data['last_school_name'] ?? null,
+            'last_designation'           => $data['last_designation'] ?? null,
+            'last_drawn_salary'          => $data['last_drawn_salary'] ?? null,
+            'preferred_locations'        => $data['preferred_locations'] ?? null,
+
+            // Documents
+            'resume_path'                => $data['resume_path'] ?? null,
+            'salary_slip_path'           => $data['salary_slip_path'] ?? null,
+
+            'is_profile_complete'        => true,
+            'registration_completed_at'  => now(),
+        ];
+
+        if ($user->profile) {
+            $user->profile->update(array_filter($profileData, fn($v) => !is_null($v)));
+            $profile = $user->profile;
         } else {
-            // Comprehensive Candidate Profile creation with all roadmap fields
-            $profile = $user->profile()->create([
-                'candidate_category'         => $data['candidate_category'] ?? 'both',
-                'whatsapp_no'                => $data['whatsapp_no'] ?? $data['phone'],
-                'gender'                     => $data['gender'] ?? null,
-                'date_of_birth'              => $data['date_of_birth'] ?? null,
-                'highest_qualification_name' => $data['highest_qualification_name'] ?? null,
-                'experience_range'           => $data['experience_range'] ?? null,
-                'experience_years'           => $data['experience_years'] ?? 0,
-                'address'                    => $data['preferred_areas'] ?? null,
-
-                // Home Tutor fields
-                'tuition_subjects'           => $data['tuition_subjects'] ?? null,
-                'classes_interested'         => $data['classes_interested'] ?? null,
-                'teaching_mode'              => $data['teaching_mode'] ?? null,
-                'preferred_areas'            => $data['preferred_areas'] ?? null,
-                'available_time_slot'        => $data['available_time_slot'] ?? null,
-
-                // School Job fields
-                'b_ed_status'                => $data['b_ed_status'] ?? null,
-                'd_el_ed_status'              => $data['d_el_ed_status'] ?? null,
-                'subject_specialization'     => $data['subject_specialization'] ?? null,
-                'position_applying_for'      => $data['position_applying_for'] ?? null,
-                'current_salary'             => $data['current_salary'] ?? null,
-                'expected_salary'            => $data['expected_salary'] ?? null,
-                'last_school_name'           => $data['last_school_name'] ?? null,
-                'last_designation'           => $data['last_designation'] ?? null,
-                'last_drawn_salary'          => $data['last_drawn_salary'] ?? null,
-                'preferred_locations'        => $data['preferred_locations'] ?? null,
-
-                // Documents
-                'resume_path'                => $data['resume_path'] ?? null,
-                'salary_slip_path'           => $data['salary_slip_path'] ?? null,
-
-                'is_profile_complete'        => true,
-                'registration_completed_at'  => now(),
-            ]);
-
-            // Save calculated profile completion percentage
-            $profile->profile_completion_percentage = $profile->completion_percentage;
-            $profile->save();
+            $profile = $user->profile()->create($profileData);
         }
 
-        // Clear registration session
-        session()->forget(['register_data', 'register_otp', 'register_otp_expires_at']);
+        // Save calculated profile completion percentage
+        $profile->profile_completion_percentage = $profile->completion_percentage;
+        $profile->save();
 
-        event(new Registered($user));
-        Auth::login($user);
+        // Clear registration session & any stale intended URLs
+        session()->forget(['register_data', 'register_otp', 'register_otp_expires_at', 'url.intended']);
+
+        Auth::login($user, true);
         $request->session()->regenerate();
 
-        // Notifications
-        if ($user->role === 'employer') {
-            \App\Helpers\NotificationHelper::notifyAdmin(
-                'New Verified Employer Registered',
-                ($data['school_name'] ?? 'Employer') . ' (' . $user->name . ') has verified email and registered.',
-                route('admin.users.index'),
-                'fas fa-building'
-            );
-
-            \App\Helpers\NotificationHelper::notifyUser(
-                $user->id,
-                'Welcome to Warriors Educare',
-                'Your verified employer account has been activated. Complete your institution profile to post requirements.',
-                route('employer.dashboard'),
-                'fas fa-building',
-                true
-            );
-
-            return redirect()->route('employer.dashboard');
-        } elseif ($user->role === 'parent') {
-            \App\Helpers\NotificationHelper::notifyAdmin(
-                'New Verified Parent Registered',
-                $user->name . ' has verified email and registered as a parent/tuition seeker.',
-                route('admin.users.index'),
-                'fas fa-user-friends'
-            );
-
-            \App\Helpers\NotificationHelper::notifyUser(
-                $user->id,
-                'Welcome to Warriors Educare',
-                'Your verified parent account is now active. Find top home tutors and educators.',
-                route('parent.dashboard'),
-                'fas fa-user',
-                true
-            );
-
-            return redirect()->route('parent.dashboard');
-        } else {
+        // Notifications (safely caught so notification issues never block redirect)
+        try {
             \App\Helpers\NotificationHelper::notifyAdmin(
                 'New Verified Candidate Registered',
                 $user->name . ' has verified email and registered as a candidate.',
@@ -371,14 +354,16 @@ class CandidateAuthController extends Controller
             \App\Helpers\NotificationHelper::notifyUser(
                 $user->id,
                 'Welcome to Warriors Educare',
-                'Thank you for verifying your email. Please complete your profile to start applying for jobs and tuition inquiries.',
+                'Thank you for verifying your email. Your candidate dashboard is ready.',
                 route('candidate.dashboard'),
                 'fas fa-handshake',
-                true
+                false
             );
-
-            return redirect()->route('candidate.dashboard');
+        } catch (\Throwable $e) {
+            Log::warning('Registration notification failed: ' . $e->getMessage());
         }
+
+        return redirect()->route('candidate.dashboard')->with('success', 'Email verified successfully! Welcome to your dashboard.');
     }
 
     /**
