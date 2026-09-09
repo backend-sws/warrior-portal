@@ -11,17 +11,21 @@
         content="@yield('meta_keywords', 'education recruitment agency, home tutors in India, hire school teachers, private home tuition, teaching jobs India, PGT TGT PRT teachers, Warriors Educare')">
     <meta name="robots" content="index, follow">
     
+    <link rel="canonical" href="@yield('canonical_url', url()->current())">
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
+    <meta property="og:url" content="@yield('og_url', url()->current())">
     <meta property="og:title" content="@yield('title', 'Warriors Educare — #1 Education Recruitment Agency & Verified Home Tutors in India')">
     <meta property="og:description" content="@yield('meta_description', 'India’s trusted education network. Hire verified home tutors for all subjects, recruit top school & college faculty, or apply for high-paying teaching jobs.')">
-    <meta property="og:image" content="{{ asset('adobe.png') }}">
+    <meta property="og:image" content="@yield('og_image', asset('adobe.png'))">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="@yield('og_url', url()->current())">
     <meta name="twitter:title" content="@yield('title', 'Warriors Educare — #1 Education Recruitment Agency & Verified Home Tutors in India')">
     <meta name="twitter:description" content="@yield('meta_description', 'India’s trusted education network. Hire verified home tutors for all subjects, recruit top school & college faculty, or apply for high-paying teaching jobs.')">
-    <meta name="twitter:image" content="{{ asset('adobe.png') }}">
+    <meta name="twitter:image" content="@yield('og_image', asset('adobe.png'))">
 
     @php
         $gtmId = env('GTM_CONTAINER_ID') ?: env('GTM_ID');
@@ -1075,6 +1079,7 @@
     </script>
     @include('partials.requirement-modal')
     @include('partials.job-registration-popup')
+    @include('partials.copy-job-link')
 </body>
 
 </html>

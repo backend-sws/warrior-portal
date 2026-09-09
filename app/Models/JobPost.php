@@ -27,6 +27,29 @@ class JobPost extends Model
         return $value ?: ('JOB-' . str_pad($this->id, 4, '0', STR_PAD_LEFT));
     }
 
+    /**
+     * Retrieve the model for a bound value (supports both numeric id and job_id string like JOB-0001).
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where(function ($query) use ($value) {
+            if (is_numeric($value)) {
+                $query->where('id', (int) $value)->orWhere('job_id', $value);
+            } else {
+                $query->where('job_id', $value)
+                      ->orWhere('job_id', strtoupper($value));
+            }
+        })->first() ?? abort(404);
+    }
+
+    /**
+     * Get direct canonical public URL for this job post.
+     */
+    public function getPublicUrlAttribute(): string
+    {
+        return route('jobs.show', $this->id);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -1,7 +1,24 @@
 @extends('layouts.app')
 
-@section('title', ($job->title ?? 'Teacher Vacancy') . ' in ' . ($job->city?->name ?? 'Bihar') . ' | Warriors Educare')
-@section('meta_description', 'Apply for ' . ($job->title ?? 'Teacher') . ' vacancy in ' . ($job->city?->name ?? 'Bihar') . '. Verified educational placement by Warriors Educare Consultancy.')
+@php
+    $jobTitle = $job->title ?? 'Teacher Vacancy';
+    $jobLocation = ($job->city?->name ?? 'Bihar') . ($job->state ? ', ' . $job->state->name : '');
+    $jobId = $job->job_id ?: ('JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT));
+    $shareJobUrl = route('jobs.show', $job->id);
+    $shareWhatsappText = "🎯 *Teaching Vacancy Alert - Warriors Educare*\n\n"
+        . "📌 *Position:* {$jobTitle}\n"
+        . "🆔 *Job ID:* {$jobId}\n"
+        . "📚 *Subject:* " . ($job->subject?->name ?? 'General') . "\n"
+        . "🎓 *Eligibility:* " . ($job->qualification_display ?? 'Any Graduate') . "\n"
+        . "📍 *Location:* {$jobLocation}\n"
+        . "💰 *Salary:* " . ($job->salary_range ?? 'Best in Industry') . "\n\n"
+        . "👉 *Check Full Details & Apply Online:* \n{$shareJobUrl}";
+@endphp
+
+@section('title', "{$jobTitle} ({$jobId}) in {$jobLocation} | Warriors Educare")
+@section('meta_description', "Apply for {$jobTitle} ({$jobId}) in {$jobLocation}. Subject: " . ($job->subject?->name ?? 'General') . ", Eligibility: " . ($job->qualification_display ?? 'Any Graduate') . ", Salary: " . ($job->salary_range ?? 'Best in Industry') . ". Verified educational vacancy by Warriors Educare.")
+@section('canonical_url', $shareJobUrl)
+@section('og_url', $shareJobUrl)
 
 @section('content')
 <x-page-header title="{{ $job->title ?? 'Teaching Opportunity' }}" :breadcrumbs="['Home' => route('home'), 'Jobs' => route('jobs'), ($job->job_id ?: 'Job Details') => null]" />
@@ -73,9 +90,23 @@
                             </span>
                         </div>
 
-                        <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
-                            <i class="far fa-clock"></i> Posted {{ $job->created_at->diffForHumans() }}
-                        </span>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button type="button" 
+                                    onclick="copyJobUrl('{{ $shareJobUrl }}', this)" 
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#031b4e] text-xs font-bold border border-slate-200/80 transition-all active:scale-95 cursor-pointer shadow-2xs">
+                                <i class="fas fa-link text-[#0ea5e9] text-xs"></i>
+                                <span>Copy Link</span>
+                            </button>
+                            <a href="https://api.whatsapp.com/send?text={{ urlencode($shareWhatsappText) }}" 
+                               target="_blank" 
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 transition-all active:scale-95 shadow-2xs">
+                                <i class="fab fa-whatsapp text-emerald-600 text-xs"></i>
+                                <span>Share</span>
+                            </a>
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5 ml-1">
+                                <i class="far fa-clock"></i> {{ $job->created_at->diffForHumans() }}
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Role Icon & Title Header -->
@@ -368,23 +399,36 @@
 
                 <!-- 2. Share This Job Card -->
                 <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm">
-                    <h4 class="text-xs font-black uppercase tracking-wider text-[#031b4e] mb-3 flex items-center gap-2">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-[#031b4e] mb-2 flex items-center gap-2">
                         <i class="fas fa-share-alt text-[#0ea5e9]"></i> Share This Vacancy
                     </h4>
-                    <p class="text-xs text-slate-500 mb-4">Know a teacher looking for a job? Share this requirement.</p>
+                    <p class="text-xs text-slate-500 mb-4">Copy this job's direct link to send to candidates or share on social media.</p>
 
-                    <div class="flex items-center gap-2">
-                        <a href="https://api.whatsapp.com/send?text={{ urlencode('Teacher Vacancy: ' . ($job->title ?? 'Teacher') . ' (Job ID: ' . ($job->job_id ?: 'JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT)) . '). Location: ' . ($job->city?->name ?? 'Bihar') . '. Check details and apply: ' . url()->current()) }}" 
+                    <!-- Direct Copyable Link Box -->
+                    <div class="mb-3 flex items-center bg-slate-50 border border-slate-200/90 rounded-2xl p-1.5 pl-3 focus-within:border-[#0ea5e9] focus-within:ring-2 focus-within:ring-[#0ea5e9]/20 transition-all">
+                        <input type="text" readonly value="{{ $shareJobUrl }}" id="shareJobUrlInput" 
+                               class="w-full bg-transparent text-xs text-slate-700 font-mono outline-none select-all cursor-pointer font-medium" 
+                               onclick="this.select()" />
+                        <button type="button" 
+                                onclick="copyJobUrl('{{ $shareJobUrl }}', this)" 
+                                class="shrink-0 py-2 px-3.5 bg-[#031b4e] hover:bg-[#0a2f7c] text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer">
+                            <i class="fas fa-copy text-xs"></i>
+                            <span>Copy Link</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="https://api.whatsapp.com/send?text={{ urlencode($shareWhatsappText) }}" 
                            target="_blank" 
-                           class="flex-1 py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-2xs">
-                            <i class="fab fa-whatsapp text-sm"></i> WhatsApp
+                           class="py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-2xs">
+                            <i class="fab fa-whatsapp text-sm text-emerald-600"></i> WhatsApp
                         </a>
 
-                        <button type="button" 
-                                onclick="navigator.clipboard.writeText(window.location.href); alert('Job link copied to clipboard!');" 
-                                class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5">
-                            <i class="fas fa-copy text-xs"></i> Copy
-                        </button>
+                        <a href="https://t.me/share/url?url={{ urlencode($shareJobUrl) }}&text={{ urlencode('🎯 Teaching Vacancy: ' . $jobTitle . ' (' . $jobId . ') in ' . $jobLocation) }}" 
+                           target="_blank" 
+                           class="py-2.5 px-3 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-2xs">
+                            <i class="fab fa-telegram-plane text-sm text-sky-500"></i> Telegram
+                        </a>
                     </div>
                 </div>
 

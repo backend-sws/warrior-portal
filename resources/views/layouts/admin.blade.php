@@ -712,6 +712,7 @@
             });
         }
     </script>
+    @include('partials.copy-job-link')
 </body>
 
 </html>

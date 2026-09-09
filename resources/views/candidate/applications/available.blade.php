@@ -283,6 +283,13 @@
 
                         {{-- Card Footer CTA Actions --}}
                         <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
+                            <button type="button" 
+                                    data-share-url="{{ route('jobs.show', $job->id) }}"
+                                    onclick="copyJobUrl(this.dataset.shareUrl, this)" 
+                                    title="Copy Job Link to Share"
+                                    class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all active:scale-95 flex items-center justify-center shrink-0 cursor-pointer shadow-2xs">
+                                <i class="fas fa-link text-[#0ea5e9]"></i>
+                            </button>
                             <a href="{{ route('jobs.show', $job->id) }}" target="_blank"
                                class="flex-1 py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-[#031b4e] text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center gap-1.5">
                                 <i class="fas fa-eye text-slate-400"></i>

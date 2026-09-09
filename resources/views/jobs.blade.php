@@ -127,7 +127,19 @@
                                 @endif
                                 <span class="text-[10px] text-slate-400 font-medium mt-0.5">Posted {{ $job->created_at->diffForHumans() }}</span>
                             </div>
-                            <a href="{{ route('jobs.show', $job->id) }}" class="text-white bg-accent-blue hover:bg-blue-600 px-4 py-2 rounded-xl font-bold text-xs transition-colors shadow-sm flex items-center gap-2 active:scale-95">Apply</a>
+                            <div class="flex items-center gap-2">
+                                <button type="button" 
+                                        data-share-url="{{ route('jobs.show', $job->id) }}"
+                                        onclick="copyJobUrl(this.dataset.shareUrl, this)" 
+                                        title="Copy Job Link to Share" 
+                                        class="p-2 w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center justify-center shadow-2xs">
+                                    <i class="fas fa-link text-[#0ea5e9]"></i>
+                                </button>
+                                <a href="{{ route('jobs.show', $job->id) }}" class="text-white bg-accent-blue hover:bg-blue-600 px-4 py-2 rounded-xl font-bold text-xs transition-colors shadow-sm flex items-center gap-1.5 active:scale-95">
+                                    <span>Apply</span>
+                                    <i class="fas fa-arrow-right text-[10px]"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

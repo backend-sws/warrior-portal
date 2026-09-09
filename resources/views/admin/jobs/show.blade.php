@@ -14,7 +14,16 @@
         </span>
     </div>
     
-    <div class="flex items-center space-x-3">
+    <div class="flex items-center space-x-2.5">
+        <button type="button" 
+                data-share-url="{{ route('jobs.show', $job->id) }}" 
+                onclick="copyJobUrl(this.dataset.shareUrl, this)" 
+                class="px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-sm font-semibold transition-colors border border-emerald-200 flex items-center gap-1.5 cursor-pointer">
+            <i class="fas fa-link text-xs"></i> Copy Public Link
+        </button>
+        <a href="{{ route('jobs.show', $job->id) }}" target="_blank" class="px-3 py-1.5 bg-sky-50 text-sky-700 hover:bg-sky-100 rounded-lg text-sm font-semibold transition-colors border border-sky-200 flex items-center gap-1.5">
+            <i class="fas fa-external-link-alt text-xs"></i> View Page
+        </a>
         <a href="{{ route('admin.jobs.edit', $job->id) }}" class="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-sm font-semibold transition-colors border border-blue-200">
             <i class="fas fa-edit mr-1"></i> Edit Job
         </a>
@@ -222,6 +231,39 @@
     <!-- Right Column: Employer & Actions -->
     <div class="space-y-6">
         
+        <!-- Public Candidate Share Link Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-emerald-100 p-6">
+            <h3 class="text-sm font-bold text-gray-800 mb-1.5 flex items-center gap-2">
+                <i class="fas fa-share-nodes text-emerald-600"></i> Share Vacancy With Candidates
+            </h3>
+            <p class="text-xs text-gray-500 mb-3 leading-relaxed">Copy this public link to share directly with teachers on WhatsApp groups, Telegram, or SMS. Anyone clicking will open this exact vacancy.</p>
+            
+            <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl p-1.5 pl-3 mb-3">
+                <input type="text" readonly value="{{ route('jobs.show', $job->id) }}" class="w-full bg-transparent text-xs text-gray-700 font-mono outline-none select-all font-medium" onclick="this.select()" />
+                <button type="button" 
+                        data-share-url="{{ route('jobs.show', $job->id) }}"
+                        onclick="copyJobUrl(this.dataset.shareUrl, this)"
+                        class="px-3 py-1.5 bg-[#031b4e] hover:bg-[#0a2970] text-white rounded-lg text-xs font-bold transition-all shrink-0 flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm">
+                    <i class="fas fa-copy text-xs"></i> <span>Copy</span>
+                </button>
+            </div>
+
+            @php
+                $adminJobUrl = route('jobs.show', $job->id);
+                $adminJobId = $job->job_id ?: ('JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT));
+                $adminJobText = "🎯 *Teaching Vacancy Alert - Warriors Educare*\n\n"
+                    . "📌 *Position:* " . ($job->title ?? 'Teacher Required') . "\n"
+                    . "🆔 *Job ID:* " . $adminJobId . "\n"
+                    . "📚 *Subject:* " . ($job->subject?->name ?? 'General') . "\n"
+                    . "📍 *Location:* " . ($job->city?->name ?? 'Bihar') . "\n"
+                    . "💰 *Salary:* " . ($job->salary_range ?? 'Best in Industry') . "\n\n"
+                    . "👉 *Check Details & Apply Online:* \n" . $adminJobUrl;
+            @endphp
+            <a href="https://api.whatsapp.com/send?text={{ urlencode($adminJobText) }}" target="_blank" class="w-full py-2.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                <i class="fab fa-whatsapp text-base text-emerald-600"></i> Share on WhatsApp
+            </a>
+        </div>
+
         <!-- Employer Info -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">Employer Information</h3>

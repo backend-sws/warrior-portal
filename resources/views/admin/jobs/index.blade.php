@@ -170,6 +170,16 @@
                 </td>
                 <td>
                     <div class="flex items-center justify-end gap-2">
+                        <button type="button" 
+                                data-share-url="{{ route('jobs.show', $job->id) }}"
+                                onclick="copyJobUrl(this.dataset.shareUrl, this)" 
+                                class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors tooltip" 
+                                title="Copy Public Link for Candidates">
+                            <i class="fas fa-link text-xs"></i>
+                        </button>
+                        <a href="{{ route('jobs.show', $job->id) }}" target="_blank" class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-600 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-colors tooltip" title="Open Public Page">
+                            <i class="fas fa-external-link-alt text-xs"></i>
+                        </a>
                         <a href="{{ route('admin.jobs.show', $job) }}" class="w-8 h-8 rounded-lg bg-accent-blue/10 text-accent-blue flex items-center justify-center hover:bg-accent-blue hover:text-white transition-colors tooltip" title="Review Job">
                             <i class="fas fa-eye text-xs"></i>
                         </a>
