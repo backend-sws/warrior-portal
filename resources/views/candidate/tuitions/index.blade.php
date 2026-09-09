@@ -1061,7 +1061,11 @@ function printTuitionAgreement() {
                     </div>
                 </div>
 
-                <h3 class="text-base sm:text-lg md:text-xl font-bold text-[#031b4e] mb-2 leading-snug">{{ $tuition->subjects }}</h3>
+                <h3 class="text-base sm:text-lg md:text-xl font-bold text-[#031b4e] mb-2 leading-snug">
+                    <a href="{{ route('tuitions.show', $tuition->id) }}" target="_blank" class="hover:underline hover:text-[#0ea5e9] transition-colors">
+                        {{ $tuition->subjects }}
+                    </a>
+                </h3>
                 
                 <div class="space-y-2 sm:space-y-2.5 mb-4 sm:mb-6 flex-grow text-xs sm:text-sm">
                     <div class="flex items-center text-gray-600">
@@ -1084,23 +1088,38 @@ function printTuitionAgreement() {
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between mt-auto pt-3 sm:pt-4 border-t border-[#031b4e]/10 gap-2">
+                <div class="flex items-center justify-between mt-auto pt-3 sm:pt-4 border-t border-[#031b4e]/10 gap-2 flex-wrap">
                     <span class="text-[11px] sm:text-xs text-[#031b4e]/60 whitespace-nowrap">
                         <i class="far fa-clock mr-1"></i> {{ $tuition->created_at->diffForHumans() }}
                     </span>
 
-                    @if(in_array($tuition->id, $appliedTuitionIds))
-                        <button disabled class="bg-gray-100 text-[#031b4e]/80 font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm cursor-not-allowed">
-                            Applied <i class="fas fa-check ml-1 text-green-600"></i>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" 
+                                data-share-url="{{ route('tuitions.show', $tuition->id) }}"
+                                onclick="copyJobUrl(this.dataset.shareUrl, this)" 
+                                title="Copy Tuition Link to Share"
+                                class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all active:scale-95 flex items-center justify-center shrink-0 cursor-pointer shadow-2xs">
+                            <i class="fas fa-link text-[#0ea5e9]"></i>
                         </button>
-                    @else
-                        <form action="{{ route('candidate.tuitions.apply', $tuition->id) }}" method="POST" class="shrink-0">
-                            @csrf
-                            <button type="submit" class="bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95">
-                                Apply Now
+                        <a href="{{ route('tuitions.show', $tuition->id) }}" target="_blank"
+                           class="py-1.5 px-2.5 bg-slate-100 hover:bg-slate-200 text-[#031b4e] text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center gap-1">
+                            <i class="fas fa-eye text-slate-400"></i>
+                            <span>Details</span>
+                        </a>
+
+                        @if(in_array($tuition->id, $appliedTuitionIds))
+                            <button disabled class="bg-gray-100 text-[#031b4e]/80 font-bold py-1.5 px-3 rounded-xl text-xs cursor-not-allowed">
+                                Applied <i class="fas fa-check ml-1 text-green-600"></i>
                             </button>
-                        </form>
-                    @endif
+                        @else
+                            <form action="{{ route('candidate.tuitions.apply', $tuition->id) }}" method="POST" class="shrink-0">
+                                @csrf
+                                <button type="submit" class="bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-bold py-1.5 px-3.5 rounded-xl text-xs transition-all shadow-sm active:scale-95 cursor-pointer">
+                                    Apply
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
             </div>
         @empty
