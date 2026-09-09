@@ -281,6 +281,7 @@
     min-height: 48px !important;
     padding: 0.65rem 0.875rem !important;
     background-color: #ffffff !important;
+    background-image: none !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 0.75rem !important; /* rounded-xl */
     font-family: inherit !important;
@@ -351,11 +352,60 @@
 [data-theme="dark"] .ss-main .ss-values .ss-single {
     color: #ffffff !important;
 }
+[data-theme="dark"] .ss-main .ss-values .ss-placeholder {
+    color: rgba(255, 255, 255, 0.65) !important;
+}
+[data-theme="dark"] .ss-main .ss-arrow {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
 [data-theme="dark"] .ss-main:focus,
 [data-theme="dark"] .ss-main.ss-open-below,
 [data-theme="dark"] .ss-main.ss-open-above {
     background-color: #002152 !important;
     border-color: #3b82f6 !important;
+}
+
+/* Light container overrides: When .ss-main is inside a white card, modal, or light container */
+.bg-white .ss-main,
+.bg-slate-50 .ss-main,
+.bg-slate-100 .ss-main,
+[data-theme="dark"] .bg-white .ss-main,
+[data-theme="dark"] .bg-slate-50 .ss-main,
+[data-theme="dark"] .bg-slate-100 .ss-main,
+[data-theme] .bg-white .ss-main,
+[data-theme] .bg-slate-50 .ss-main,
+[data-theme] .bg-slate-100 .ss-main {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #031b4e !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+}
+
+.bg-white .ss-main .ss-values .ss-placeholder,
+[data-theme] .bg-white .ss-main .ss-values .ss-placeholder {
+    color: #94a3b8 !important;
+}
+
+.bg-white .ss-main .ss-values .ss-single,
+[data-theme] .bg-white .ss-main .ss-values .ss-single {
+    color: #031b4e !important;
+}
+
+.bg-white .ss-main .ss-arrow,
+[data-theme] .bg-white .ss-main .ss-arrow {
+    color: #64748b !important;
+}
+
+.bg-white .ss-main:focus,
+.bg-white .ss-main.ss-open-below,
+.bg-white .ss-main.ss-open-above,
+[data-theme] .bg-white .ss-main:focus,
+[data-theme] .bg-white .ss-main.ss-open-below,
+[data-theme] .bg-white .ss-main.ss-open-above {
+    border-color: #0062f5 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(0, 98, 245, 0.15) !important;
 }
 
 .ss-main .ss-values .ss-value {
@@ -383,7 +433,7 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    margin-left: 8px !important;
+    margin-left: 6px !important;
     width: 16px !important;
     height: 16px !important;
     color: #64748b !important;
@@ -403,6 +453,13 @@
     stroke: currentColor !important;
 }
 
+/* Hide deselect/clear button when empty or has ss-hide class */
+.ss-main .ss-deselect.ss-hide,
+.ss-deselect.ss-hide,
+.ss-hide {
+    display: none !important;
+}
+
 .ss-main .ss-deselect {
     margin-left: 6px !important;
     color: #94a3b8 !important;
@@ -414,6 +471,7 @@
     justify-content: center !important;
     cursor: pointer !important;
     transition: color 0.15s ease !important;
+    flex-shrink: 0 !important;
 }
 
 .ss-main .ss-deselect:hover {
