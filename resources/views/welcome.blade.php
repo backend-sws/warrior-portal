@@ -840,10 +840,19 @@
                                 @endif
                             </div>
 
-                            <a href="{{ route('jobs.show', $job->id) }}" class="w-full py-2.5 px-4 rounded-xl bg-slate-50 group-hover:bg-[#031b4e] text-[#031b4e] group-hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition-all duration-200 border border-slate-200 group-hover:border-[#031b4e] shadow-xs">
-                                <span>View Details & Apply</span>
-                                <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-                            </a>
+                            <div class="flex items-center gap-2">
+                                <button type="button" 
+                                        data-share-url="{{ route('jobs.show', $job->id) }}"
+                                        onclick="copyJobUrl(this.dataset.shareUrl, this)" 
+                                        title="Copy Job Link to Share" 
+                                        class="p-2.5 w-9 h-9 rounded-xl bg-slate-50 group-hover:bg-slate-100 text-slate-600 hover:text-[#0ea5e9] text-xs font-bold transition-all border border-slate-200 shadow-xs flex items-center justify-center shrink-0 active:scale-95 cursor-pointer">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                                <a href="{{ route('jobs.show', $job->id) }}" class="flex-1 py-2.5 px-4 rounded-xl bg-slate-50 group-hover:bg-[#031b4e] text-[#031b4e] group-hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition-all duration-200 border border-slate-200 group-hover:border-[#031b4e] shadow-xs">
+                                    <span>View Details & Apply</span>
+                                    <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                     @empty

@@ -9,6 +9,7 @@ use App\Models\City;
 use App\Models\Qualification;
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JobController extends Controller
 {
@@ -25,7 +26,15 @@ class JobController extends Controller
     public function show(JobPost $job)
     {
         if ($job->status !== 'approved') {
-            abort(404);
+            $user = Auth::user();
+            $canPreview = $user && (
+                $user->role === 'admin' ||
+                $user->id === $job->user_id
+            );
+
+            if (!$canPreview) {
+                abort(404);
+            }
         }
         
         $job->load(['category', 'subject', 'qualification', 'specialization', 'state', 'city']);
