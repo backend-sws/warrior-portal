@@ -109,6 +109,29 @@
                         </div>
                         @error('subjects') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Gender Preference</label>
+                        <div class="relative">
+                            <select name="tutor_preference" class="w-full px-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all cursor-pointer">
+                                <option value="" disabled {{ old('tutor_preference', $lead->tutor_preference) ? '' : 'selected' }}>Select preference</option>
+                                <option value="Any" {{ old('tutor_preference', $lead->tutor_preference) == 'Any' ? 'selected' : '' }}>Any (No Preference)</option>
+                                <option value="Male" {{ old('tutor_preference', $lead->tutor_preference) == 'Male' ? 'selected' : '' }}>Male</option>
+                                <option value="Female" {{ old('tutor_preference', $lead->tutor_preference) == 'Female' ? 'selected' : '' }}>Female</option>
+                            </select>
+                        </div>
+                        @error('tutor_preference') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Tuition Fees</label>
+                        <div class="relative">
+                            <i class="fas fa-rupee-sign absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                            <input type="text" name="fee" value="{{ old('fee', $lead->fee) }}" placeholder="e.g. 5000/month or Negotiable"
+                                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
+                        </div>
+                        @error('fee') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
                 </div>
             </div>
 

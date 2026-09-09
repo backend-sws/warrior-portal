@@ -74,7 +74,7 @@
                 
                 <!-- Card 1: Hire a Home Tutor -->
                 <button type="button" 
-                        @click="openTuitionRequirement()" 
+                        @click="window.location.href='{{ route('login') }}'" 
                         class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-blue-50/60 via-white to-blue-50/30 hover:from-blue-50/90 hover:to-white border-2 border-blue-100 hover:border-blue-500 shadow-xs hover:shadow-xl hover:shadow-blue-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-blue-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
@@ -118,7 +118,7 @@
                 
                 <!-- Card 3: Join as Teacher / Tutor -->
                 @guest
-                <button type="button" @click="showWelcomeModal = false; openRequirementModal('teacher')" 
+                <button type="button" @click="window.location.href='{{ route('login') }}'" 
                    class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-amber-50/60 via-white to-orange-50/30 hover:from-amber-50/90 hover:to-white border-2 border-amber-100 hover:border-amber-500 shadow-xs hover:shadow-xl hover:shadow-amber-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
@@ -161,7 +161,7 @@
                 
                 <!-- Card 4: Both -->
                 <button type="button" 
-                        @click="showWelcomeModal = false; openRequirementModal('both')" 
+                        @click="window.location.href='{{ route('login') }}'" 
                         class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-emerald-50/60 via-white to-teal-50/30 hover:from-emerald-50/90 hover:to-white border-2 border-emerald-100 hover:border-emerald-500 shadow-xs hover:shadow-xl hover:shadow-emerald-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-emerald-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">

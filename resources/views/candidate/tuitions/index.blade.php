@@ -359,15 +359,29 @@
                             Candidate Signature (Pending Signature)
                         </div>
                     </div>
+                @elseif($tuitionAgreementStatus === 'request_pending')
+                    <div class="text-left bg-blue-50 p-4 rounded-xl border border-blue-200 min-w-[260px]" style="font-size: 12px; color: #1e3a8a;">
+                        <div class="flex items-center gap-1.5 mb-1.5 font-bold text-blue-800 text-xs">
+                            <i class="fas fa-hourglass-half text-blue-600 animate-pulse"></i> REQUEST PENDING
+                        </div>
+                        <p class="text-[11px] text-blue-700 mb-2 leading-relaxed">You have requested to sign the agreement. Please wait for the admin to approve and unlock the signature.</p>
+                        <div class="h-10 border-2 border-dashed border-blue-300 rounded-lg flex items-center justify-center text-[11px] text-blue-500 font-medium bg-white">
+                            Awaiting Admin Approval...
+                        </div>
+                    </div>
                 @else
                     <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200 min-w-[260px]" style="font-size: 12px; color: #475569;">
                         <div class="flex items-center gap-1.5 mb-1.5 font-bold text-slate-700 text-xs">
                             <i class="fas fa-lock text-slate-500"></i> DIGITAL SIGNING LOCKED
                         </div>
-                        <p class="text-[11px] text-slate-500 mb-2 leading-relaxed">Signing is currently locked. Warriors Educare admin will unlock and activate signing once you are shortlisted.</p>
-                        <div class="h-10 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center text-[11px] text-slate-400 font-medium bg-white">
-                            Signature Locked (Read-Only Terms)
-                        </div>
+                        <p class="text-[11px] text-slate-500 mb-2 leading-relaxed">Signing is currently locked. Request the admin to unlock and activate signing for you.</p>
+                        
+                        <form action="{{ route('candidate.tuitions.request-agreement') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center justify-center text-[11px] font-bold transition-all shadow-sm gap-2">
+                                <i class="fas fa-hand-paper"></i> Request to Sign
+                            </button>
+                        </form>
                     </div>
                 @endif
             </div>
@@ -398,7 +412,7 @@
                 <div class="p-3.5 sm:p-4 border-t border-[#031b4e]/10 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
                     <div class="flex items-center gap-2 text-xs text-slate-500">
                         <i class="fas fa-shield-alt text-blue-600"></i>
-                        <span>Digital signing is activated by admin when you are shortlisted / assigned.</span>
+                        <span>Digital signing must be unlocked by the admin.</span>
                     </div>
                     <button type="button" onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="w-full sm:w-auto px-6 py-2.5 bg-[#031b4e] text-white rounded-xl font-bold hover:bg-[#021338] transition-colors text-xs sm:text-sm">
                         Close
@@ -1060,6 +1074,14 @@ function printTuitionAgreement() {
                         <span class="font-mono">Pincode: {{ $tuition->pincode }}</span>
                     </div>
                     @endif
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-venus-mars w-5 text-purple-500 shrink-0"></i>
+                        <span class="line-clamp-1">Gender Pref: <span class="font-bold">{{ $tuition->tutor_preference ?: 'Any' }}</span></span>
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-rupee-sign w-5 text-emerald-500 shrink-0"></i>
+                        <span class="line-clamp-1">Fee: <span class="font-bold text-emerald-600">{{ $tuition->fee ? '₹'.$tuition->fee : 'Negotiable' }}</span></span>
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-between mt-auto pt-3 sm:pt-4 border-t border-[#031b4e]/10 gap-2">

@@ -52,6 +52,32 @@ class TuitionController extends Controller
         return view('candidate.tuitions.index', compact('tuitions', 'appliedTuitionIds', 'profile', 'isAgreementSigned', 'isAgreementActive', 'tuitionAgreementStatus', 'isProfileUnder80', 'completionPercentage'));
     }
 
+    public function requestAgreement(Request $request)
+    {
+        $profile = auth()->user()->profile;
+
+        if (!$profile) {
+            return back()->with('error', 'Candidate profile not found.');
+        }
+
+        if ($profile->tuition_agreement_status === 'not_required' || empty($profile->tuition_agreement_status)) {
+            $profile->update([
+                'tuition_agreement_status' => 'request_pending'
+            ]);
+
+            \App\Helpers\NotificationHelper::notifyAdmin(
+                'Tuition Agreement Unlock Requested',
+                auth()->user()->name . ' has requested to unlock their Home Tuition Agreement.',
+                route('admin.crm.show', auth()->id()),
+                'fas fa-unlock'
+            );
+
+            return back()->with('success', 'Your request has been sent to the admin. You will be able to sign once they approve.');
+        }
+
+        return back()->with('info', 'Your agreement is already requested or active.');
+    }
+
     public function signAgreement(Request $request)
     {
         $request->validate([

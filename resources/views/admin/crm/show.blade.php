@@ -519,6 +519,10 @@
                                 <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
                                     <i class="fas fa-hourglass-half mr-0.5"></i> Active on Candidate Panel
                                 </span>
+                            @elseif($profile?->tuition_agreement_status === 'request_pending')
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 animate-pulse">
+                                    <i class="fas fa-hand-paper mr-0.5"></i> Request Pending
+                                </span>
                             @else
                                 <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-card-border/50 text-text-dark/60 border border-card-border">
                                     <i class="fas fa-ban mr-0.5"></i> Inactive / Not Sent
@@ -527,7 +531,18 @@
                         </div>
 
                         {{-- 1-Click Action Buttons for Tuition Agreement --}}
-                        @if(!$profile?->is_tuition_agreement_signed && $profile?->tuition_agreement_status !== 'pending_signature')
+                        @if($profile?->tuition_agreement_status === 'request_pending')
+                            <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-2">
+                                <p class="text-xs text-blue-800 font-bold flex items-center gap-1.5"><i class="fas fa-info-circle"></i> Candidate requested to sign the agreement</p>
+                                <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="tuition_agreement_status" value="pending_signature">
+                                    <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2">
+                                        <i class="fas fa-check"></i> <span>Approve & Unlock Signature</span>
+                                    </button>
+                                </form>
+                            </div>
+                        @elseif(!$profile?->is_tuition_agreement_signed && $profile?->tuition_agreement_status !== 'pending_signature')
                             <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="tuition_agreement_status" value="pending_signature">
@@ -573,6 +588,7 @@
                             <div class="flex items-center gap-1.5">
                                 <select name="tuition_agreement_status" class="text-xs bg-card-bg border border-card-border rounded-lg py-1 px-2 text-text-main font-semibold focus:ring-1 focus:ring-accent-blue">
                                     <option value="not_required" {{ ($profile?->tuition_agreement_status === 'not_required' || (!$profile?->tuition_agreement_status && !$profile?->is_tuition_agreement_signed)) ? 'selected' : '' }}>Not Required / Inactive</option>
+                                    <option value="request_pending" {{ $profile?->tuition_agreement_status === 'request_pending' ? 'selected' : '' }}>Request Pending</option>
                                     <option value="pending_signature" {{ $profile?->tuition_agreement_status === 'pending_signature' ? 'selected' : '' }}>Pending Signature (Active)</option>
                                     <option value="signed" {{ ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed) ? 'selected' : '' }}>Signed & Approved</option>
                                 </select>
