@@ -19,7 +19,8 @@ class ApplicationController extends Controller
     {
         if ($redirect = $this->ensureRegistrationComplete()) return $redirect;
 
-        $activeTab = $request->input('tab', 'jobs');
+        $userCat = auth()->user()->profile?->candidate_category ?: 'both';
+        $activeTab = $request->input('tab') ?: ($userCat === 'home_tutor' ? 'tuitions' : 'jobs');
 
         $applications = JobApplication::with(['jobPost.category', 'jobPost.city', 'jobPost.state'])
             ->where('candidate_id', auth()->id())

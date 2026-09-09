@@ -94,7 +94,7 @@
 @endif
 
 <!-- Modal for Tuition Agreement -->
-<div id="tuitionAgreementModal" x-data="{ step: 1, isSigned: {{ $isAgreementSigned ? 'true' : 'false' }}, isActive: {{ $isAgreementActive ? 'true' : 'false' }} }" class="fixed inset-0 z-[9999] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+<div id="tuitionAgreementModal" x-data="{ step: 1, isSigned: {{ $isAgreementSigned ? 'true' : 'false' }}, isActive: {{ $isAgreementActive ? 'true' : 'false' }} }" class="fixed inset-0 z-[9999] {{ (session('open_agreement') || request('open_agreement')) ? '' : 'hidden' }} bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
     <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden relative border border-slate-200">
         
         <!-- Modal Header with Step Navigation -->
@@ -311,45 +311,79 @@
                     <p class="font-bold mb-4 sm:mb-8 text-xs sm:text-sm">For Warriors Educare</p>
                     <p class="text-xs text-slate-500">(Authorized Signatory)</p>
                 </div>
-                <div class="text-left sm:text-left bg-slate-50 p-3.5 rounded-xl border border-slate-200" style="font-family: 'Times New Roman', Times, serif; font-size: 12px; color: #000; line-height: 1.35;">
-                    @php
-                        $tuitionSigData = null;
-                        if (!empty($sigMeta['signature_data'])) {
-                            $tuitionSigData = $sigMeta['signature_data'];
-                        } elseif (!empty($profile?->signature_data)) {
-                            $tuitionSigData = $profile->signature_data;
-                        }
-                        $tuitionSigType = $sigMeta['signature_type'] ?? $profile?->signature_type ?? 'draw';
-                    @endphp
+                @if($isAgreementSigned)
+                    <div class="text-left sm:text-left bg-slate-50 p-3.5 rounded-xl border border-slate-200" style="font-family: 'Times New Roman', Times, serif; font-size: 12px; color: #000; line-height: 1.35;">
+                        @php
+                            $tuitionSigData = $sigMeta['signature_data'] ?? $profile?->tuition_signature_data ?? null;
+                            if (empty($tuitionSigData) && !empty($profile?->signature_data) && $profile?->is_tuition_agreement_signed) {
+                                $tuitionSigData = $profile->signature_data;
+                            }
+                            $tuitionSigType = $sigMeta['signature_type'] ?? $profile?->signature_type ?? 'draw';
+                        @endphp
 
-                    @if(!empty($tuitionSigData))
-                        <div class="mb-2 p-2 bg-white rounded-xl border border-slate-200 inline-block">
-                            @if(str_starts_with($tuitionSigData, 'data:image'))
-                                <img src="{{ $tuitionSigData }}" alt="Digital Signature" class="max-h-12 w-auto object-contain">
-                            @elseif(Storage::disk('public')->exists($tuitionSigData))
-                                <img src="{{ asset('storage/' . $tuitionSigData) }}" alt="Digital Signature" class="max-h-12 w-auto object-contain">
-                            @elseif($tuitionSigType === 'type')
-                                <span class="font-serif italic text-xl text-blue-900 font-bold tracking-wide" style="font-family: 'Brush Script MT', 'Dancing Script', cursive, Georgia, serif;">
-                                    {{ $tuitionSigData }}
-                                </span>
-                            @endif
+                        @if(!empty($tuitionSigData))
+                            <div class="mb-2 p-2 bg-white rounded-xl border border-slate-200 inline-block">
+                                @if(str_starts_with($tuitionSigData, 'data:image'))
+                                    <img src="{{ $tuitionSigData }}" alt="Digital Signature" class="max-h-12 w-auto object-contain">
+                                @elseif(Storage::disk('public')->exists($tuitionSigData))
+                                    <img src="{{ asset('storage/' . $tuitionSigData) }}" alt="Digital Signature" class="max-h-12 w-auto object-contain">
+                                @elseif($tuitionSigType === 'type')
+                                    <span class="font-serif italic text-xl text-blue-900 font-bold tracking-wide" style="font-family: 'Brush Script MT', 'Dancing Script', cursive, Georgia, serif;">
+                                        {{ $tuitionSigData }}
+                                    </span>
+                                @endif
+                            </div>
+                        @endif
+
+                        <div class="flex items-center gap-1.5 mb-1 text-[11px] font-sans font-bold text-emerald-700">
+                            <i class="fas fa-certificate text-emerald-600"></i> DIGITALLY SIGNED & VERIFIED
                         </div>
-                    @endif
-
-                    <div class="flex items-center gap-1.5 mb-1 text-[11px] font-sans font-bold text-emerald-700">
-                        <i class="fas fa-certificate text-emerald-600"></i> DIGITALLY SIGNED & VERIFIED
+                        <i>Digitally Signed by: <strong>{{ auth()->user()->name }}</strong></i><br>
+                        <i>Phone No : ******{{ substr(auth()->user()->phone ?? '0000', -4) }}</i><br>
+                        @if(!empty($profile?->tuition_location_name) || !empty($sigMeta['location']))
+                            <i>GPS Location : 📍 {{ $profile?->tuition_location_name ?? $sigMeta['location'] }}</i><br>
+                        @elseif($profile?->tuition_latitude && $profile?->tuition_longitude)
+                            <i>GPS Coordinates : 📍 {{ number_format($profile->tuition_latitude, 4) }}° N, {{ number_format($profile->tuition_longitude, 4) }}° E</i><br>
+                        @endif
+                        <i>IP Address : 💻 {{ $sigMeta['ip'] ?? request()->ip() }}</i><br>
+                        <i>Execution Timestamp : 📅 {{ \Carbon\Carbon::parse($profile?->tuition_agreement_signed_at ?? now())->format('D M d H:i:s T Y') }}</i><br>
+                        <i>Identity Verification : {{ ($profile?->tuition_live_photo_path || $profile?->live_photo_path) ? 'Live Camera Snapshot Verified ✅' : 'Verified Digital Signature ✅' }}</i>
                     </div>
-                    <i>Digitally Signed by: <strong>{{ auth()->user()->name }}</strong></i><br>
-                    <i>Phone No : ******{{ substr(auth()->user()->phone ?? '0000', -4) }}</i><br>
-                    @if(!empty($profile?->tuition_location_name) || !empty($sigMeta['location']))
-                        <i>GPS Location : 📍 {{ $profile?->tuition_location_name ?? $sigMeta['location'] }}</i><br>
-                    @elseif($profile?->tuition_latitude && $profile?->tuition_longitude)
-                        <i>GPS Coordinates : 📍 {{ number_format($profile->tuition_latitude, 4) }}° N, {{ number_format($profile->tuition_longitude, 4) }}° E</i><br>
-                    @endif
-                    <i>IP Address : 💻 {{ $sigMeta['ip'] ?? request()->ip() }}</i><br>
-                    <i>Execution Timestamp : 📅 {{ \Carbon\Carbon::parse($profile?->tuition_agreement_signed_at ?? now())->format('D M d H:i:s T Y') }}</i><br>
-                    <i>Identity Verification : {{ ($profile?->tuition_live_photo_path || $profile?->live_photo_path) ? 'Live Camera Snapshot Verified ✅' : 'Verified Digital Signature ✅' }}</i>
-                </div>
+                @elseif($isAgreementActive)
+                    <div class="text-left bg-amber-50/90 p-4 rounded-xl border border-amber-200 min-w-[260px]" style="font-size: 12px; color: #78350f;">
+                        <div class="flex items-center gap-1.5 mb-1.5 font-bold text-amber-900 text-xs">
+                            <i class="fas fa-pen-nib text-amber-600"></i> SIGNATURE REQUIRED (UNLOCKED)
+                        </div>
+                        <p class="text-[11px] text-amber-800 mb-2 leading-relaxed">Admin has unlocked this agreement for your digital signing. Please click <strong>"Proceed to Sign"</strong> below.</p>
+                        <div class="h-10 border-2 border-dashed border-amber-300 rounded-lg flex items-center justify-center text-[11px] text-amber-700 font-bold bg-white/80">
+                            Candidate Signature (Pending Signature)
+                        </div>
+                    </div>
+                @elseif($tuitionAgreementStatus === 'request_pending')
+                    <div class="text-left bg-blue-50 p-4 rounded-xl border border-blue-200 min-w-[260px]" style="font-size: 12px; color: #1e3a8a;">
+                        <div class="flex items-center gap-1.5 mb-1.5 font-bold text-blue-800 text-xs">
+                            <i class="fas fa-hourglass-half text-blue-600 animate-pulse"></i> REQUEST PENDING
+                        </div>
+                        <p class="text-[11px] text-blue-700 mb-2 leading-relaxed">You have requested to sign the agreement. Please wait for the admin to approve and unlock the signature.</p>
+                        <div class="h-10 border-2 border-dashed border-blue-300 rounded-lg flex items-center justify-center text-[11px] text-blue-500 font-medium bg-white">
+                            Awaiting Admin Approval...
+                        </div>
+                    </div>
+                @else
+                    <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200 min-w-[260px]" style="font-size: 12px; color: #475569;">
+                        <div class="flex items-center gap-1.5 mb-1.5 font-bold text-slate-700 text-xs">
+                            <i class="fas fa-lock text-slate-500"></i> DIGITAL SIGNING LOCKED
+                        </div>
+                        <p class="text-[11px] text-slate-500 mb-2 leading-relaxed">Signing is currently locked. Request the admin to unlock and activate signing for you.</p>
+                        
+                        <form action="{{ route('candidate.tuitions.request-agreement') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center justify-center text-[11px] font-bold transition-all shadow-sm gap-2">
+                                <i class="fas fa-hand-paper"></i> Request to Sign
+                            </button>
+                        </form>
+                    </div>
+                @endif
             </div>
             </div> <!-- End relative z-10 -->
         </div> <!-- End #printableTuitionAgreement -->
@@ -378,7 +412,7 @@
                 <div class="p-3.5 sm:p-4 border-t border-[#031b4e]/10 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
                     <div class="flex items-center gap-2 text-xs text-slate-500">
                         <i class="fas fa-shield-alt text-blue-600"></i>
-                        <span>Digital signing is activated by admin when you are shortlisted / assigned.</span>
+                        <span>Digital signing must be unlocked by the admin.</span>
                     </div>
                     <button type="button" onclick="document.getElementById('tuitionAgreementModal').classList.add('hidden')" class="w-full sm:w-auto px-6 py-2.5 bg-[#031b4e] text-white rounded-xl font-bold hover:bg-[#021338] transition-colors text-xs sm:text-sm">
                         Close
@@ -934,94 +968,157 @@ function printTuitionAgreement() {
 }
 </script>
 
-<!-- Search / Filter Bar -->
-<div class="bg-white rounded-2xl border border-[#031b4e]/10 p-4 mb-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-    <div class="text-xs sm:text-sm font-bold text-[#031b4e]">
-        Found {{ $tuitions->total() }} Tuition Requirements
-    </div>
-    <form action="{{ route('candidate.tuitions.index') }}" method="GET" class="w-full sm:w-auto flex items-center gap-2">
-        <div class="relative w-full sm:w-72">
-            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Tuition ID (e.g. TUI-0001), subject, area..." 
-                   class="w-full pl-8 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-blue-500">
-            @if(request('search'))
-                <a href="{{ route('candidate.tuitions.index') }}" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
-                    <i class="fas fa-times text-xs"></i>
-                </a>
+@if($isProfileUnder80)
+    {{-- ================= REGISTRATION PENDING (UNDER 80%) LOCK SCREEN ================= --}}
+    <div class="bg-gradient-to-r from-amber-50 via-orange-50/60 to-amber-50 border-2 border-amber-300 rounded-3xl p-6 sm:p-10 mb-8 text-center shadow-md">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-3xl sm:text-4xl mx-auto shadow-xl shadow-amber-500/30 mb-4 animate-pulse">
+            <i class="fas fa-user-lock"></i>
+        </div>
+
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-200/80 text-amber-950 text-xs font-black uppercase tracking-wider mb-3">
+            <span><i class="fas fa-hourglass-half mr-1"></i> Registration Pending</span>
+            <span>&bull;</span>
+            <span>{{ $completionPercentage }}% Completed</span>
+        </div>
+
+        <h3 class="text-xl sm:text-3xl font-black text-[#031b4e] max-w-xl mx-auto">
+            Home Tuition Leads Are Locked
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-600 mt-2 max-w-lg mx-auto leading-relaxed">
+            As per Warriors Educare rules, your profile must be at least <strong>80% complete</strong> to view student contact leads and submit tuition applications.
+        </p>
+
+        {{-- Progress Bar Card --}}
+        <div class="max-w-md mx-auto my-6 bg-white p-5 rounded-2xl border border-amber-200 shadow-xs text-left">
+            <div class="flex justify-between items-center text-xs font-bold text-slate-700 mb-2">
+                <span>Profile Completion Progress</span>
+                <span class="text-amber-700 font-black">{{ $completionPercentage }}% / 80% Required</span>
+            </div>
+            <div class="w-full bg-amber-100 rounded-full h-3.5 overflow-hidden p-0.5">
+                <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500" style="width: {{ $completionPercentage }}%"></div>
+            </div>
+
+            @if(!empty($profile?->missing_profile_fields))
+                <div class="mt-4 pt-3 border-t border-slate-100">
+                    <p class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-2">Complete these items to unlock leads:</p>
+                    <div class="flex flex-wrap gap-1.5">
+                        @foreach($profile->missing_profile_fields as $missingField)
+                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-amber-100/80 text-amber-900 border border-amber-300 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle text-amber-600 text-[9px]"></i> {{ $missingField }}
+                            </span>
+                        @endforeach
+                    </div>
+                </div>
             @endif
         </div>
-        <button type="submit" class="px-4 py-2 bg-[#031b4e] text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-blue-900 transition-colors">
-            Search
-        </button>
-    </form>
-</div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-    @forelse($tuitions as $tuition)
-        <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 shadow-sm p-4 sm:p-6 flex flex-col hover:shadow-md transition-shadow bg-white">
-            <div class="flex justify-between items-start gap-2 mb-3 sm:mb-4">
-                <span class="inline-flex items-center gap-1 font-mono text-xs font-bold text-accent-blue bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
-                    <i class="fas fa-hashtag text-[9px] opacity-70"></i>{{ $tuition->tuition_id ?: 'TUI-' . str_pad($tuition->id, 4, '0', STR_PAD_LEFT) }}
-                </span>
-                <div class="flex items-center gap-1.5">
-                    <span class="bg-[#0ea5e9]/10 text-[#0ea5e9] text-xs font-bold px-2.5 py-1 rounded-full">
-                        Class {{ $tuition->{'class'} }}
-                    </span>
-                    <span class="bg-blue-50 text-[#031b4e] text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-100">
-                        {{ $tuition->board ?: 'General Board' }}
-                    </span>
-                </div>
-            </div>
-
-            <h3 class="text-base sm:text-lg md:text-xl font-bold text-[#031b4e] mb-2 leading-snug">{{ $tuition->subjects }}</h3>
-            
-            <div class="space-y-2 sm:space-y-2.5 mb-4 sm:mb-6 flex-grow text-xs sm:text-sm">
-                <div class="flex items-center text-gray-600">
-                    <i class="fas fa-map-marker-alt w-5 text-red-500 shrink-0"></i>
-                    <span class="line-clamp-1" title="{{ $tuition->location }}">{{ $tuition->location }}</span>
-                </div>
-                @if($tuition->pincode)
-                <div class="flex items-center text-gray-600">
-                    <i class="fas fa-mail-bulk w-5 text-[#031b4e]/50 shrink-0"></i>
-                    <span class="font-mono">Pincode: {{ $tuition->pincode }}</span>
-                </div>
-                @endif
-            </div>
-
-            <div class="flex items-center justify-between mt-auto pt-3 sm:pt-4 border-t border-[#031b4e]/10 gap-2">
-                <span class="text-[11px] sm:text-xs text-[#031b4e]/60 whitespace-nowrap">
-                    <i class="far fa-clock mr-1"></i> {{ $tuition->created_at->diffForHumans() }}
-                </span>
-
-                @if(in_array($tuition->id, $appliedTuitionIds))
-                    <button disabled class="bg-gray-100 text-[#031b4e]/80 font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm cursor-not-allowed">
-                        Applied <i class="fas fa-check ml-1 text-green-600"></i>
-                    </button>
-                @else
-                    <form action="{{ route('candidate.tuitions.apply', $tuition->id) }}" method="POST" class="shrink-0">
-                        @csrf
-                        <button type="submit" class="bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95">
-                            Apply Now
-                        </button>
-                    </form>
-                @endif
-            </div>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+            <a href="{{ route('candidate.profile.edit') }}" class="px-6 py-3.5 bg-[#031b4e] hover:bg-blue-900 text-white rounded-xl text-xs sm:text-sm font-black shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+                <i class="fas fa-edit"></i> Complete Profile Now (Unlock Leads)
+            </a>
+            <a href="{{ route('candidate.dashboard') }}" class="px-5 py-3.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs sm:text-sm font-bold shadow-xs transition-colors">
+                Back to Dashboard
+            </a>
         </div>
-    @empty
-        <div class="col-span-full bg-white p-8 sm:p-12 text-center rounded-2xl border border-[#031b4e]/5">
-            <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <i class="fas fa-book-reader text-[#031b4e]/50 text-xl sm:text-2xl"></i>
-            </div>
-            <h3 class="text-base sm:text-lg font-bold text-[#031b4e] mb-1">No Tuitions Available</h3>
-            <p class="text-xs sm:text-sm text-[#031b4e]/80">There are currently no active tuitions to apply for. Please check back later.</p>
-        </div>
-    @endforelse
-</div>
-
-@if($tuitions->hasPages())
-    <div class="mt-8">
-        {{ $tuitions->links() }}
     </div>
+@else
+    <!-- Search / Filter Bar -->
+    <div class="bg-white rounded-2xl border border-[#031b4e]/10 p-4 mb-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-xs sm:text-sm font-bold text-[#031b4e]">
+            Found {{ $tuitions->total() }} Tuition Requirements
+        </div>
+        <form action="{{ route('candidate.tuitions.index') }}" method="GET" class="w-full sm:w-auto flex items-center gap-2">
+            <div class="relative w-full sm:w-72">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Tuition ID (e.g. TUI-0001), subject, area..." 
+                       class="w-full pl-8 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @if(request('search'))
+                    <a href="{{ route('candidate.tuitions.index') }}" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                        <i class="fas fa-times text-xs"></i>
+                    </a>
+                @endif
+            </div>
+            <button type="submit" class="px-4 py-2 bg-[#031b4e] text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-blue-900 transition-colors">
+                Search
+            </button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        @forelse($tuitions as $tuition)
+            <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 shadow-sm p-4 sm:p-6 flex flex-col hover:shadow-md transition-shadow bg-white">
+                <div class="flex justify-between items-start gap-2 mb-3 sm:mb-4">
+                    <span class="inline-flex items-center gap-1 font-mono text-xs font-bold text-accent-blue bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                        <i class="fas fa-hashtag text-[9px] opacity-70"></i>{{ $tuition->tuition_id ?: 'TUI-' . str_pad($tuition->id, 4, '0', STR_PAD_LEFT) }}
+                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="bg-[#0ea5e9]/10 text-[#0ea5e9] text-xs font-bold px-2.5 py-1 rounded-full">
+                            Class {{ $tuition->{'class'} }}
+                        </span>
+                        <span class="bg-blue-50 text-[#031b4e] text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-100">
+                            {{ $tuition->board ?: 'General Board' }}
+                        </span>
+                    </div>
+                </div>
+
+                <h3 class="text-base sm:text-lg md:text-xl font-bold text-[#031b4e] mb-2 leading-snug">{{ $tuition->subjects }}</h3>
+                
+                <div class="space-y-2 sm:space-y-2.5 mb-4 sm:mb-6 flex-grow text-xs sm:text-sm">
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-map-marker-alt w-5 text-red-500 shrink-0"></i>
+                        <span class="line-clamp-1" title="{{ $tuition->location }}">{{ $tuition->location }}</span>
+                    </div>
+                    @if($tuition->pincode)
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-mail-bulk w-5 text-[#031b4e]/50 shrink-0"></i>
+                        <span class="font-mono">Pincode: {{ $tuition->pincode }}</span>
+                    </div>
+                    @endif
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-venus-mars w-5 text-purple-500 shrink-0"></i>
+                        <span class="line-clamp-1">Gender Pref: <span class="font-bold">{{ $tuition->tutor_preference ?: 'Any' }}</span></span>
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-rupee-sign w-5 text-emerald-500 shrink-0"></i>
+                        <span class="line-clamp-1">Fee: <span class="font-bold text-emerald-600">{{ $tuition->fee ? '₹'.$tuition->fee : 'Negotiable' }}</span></span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mt-auto pt-3 sm:pt-4 border-t border-[#031b4e]/10 gap-2">
+                    <span class="text-[11px] sm:text-xs text-[#031b4e]/60 whitespace-nowrap">
+                        <i class="far fa-clock mr-1"></i> {{ $tuition->created_at->diffForHumans() }}
+                    </span>
+
+                    @if(in_array($tuition->id, $appliedTuitionIds))
+                        <button disabled class="bg-gray-100 text-[#031b4e]/80 font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm cursor-not-allowed">
+                            Applied <i class="fas fa-check ml-1 text-green-600"></i>
+                        </button>
+                    @else
+                        <form action="{{ route('candidate.tuitions.apply', $tuition->id) }}" method="POST" class="shrink-0">
+                            @csrf
+                            <button type="submit" class="bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95">
+                                Apply Now
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        @empty
+            <div class="col-span-full bg-white p-8 sm:p-12 text-center rounded-2xl border border-[#031b4e]/5">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                    <i class="fas fa-book-reader text-[#031b4e]/50 text-xl sm:text-2xl"></i>
+                </div>
+                <h3 class="text-base sm:text-lg font-bold text-[#031b4e] mb-1">No Tuitions Available</h3>
+                <p class="text-xs sm:text-sm text-[#031b4e]/80">There are currently no active tuitions to apply for. Please check back later.</p>
+            </div>
+        @endforelse
+    </div>
+
+    @if($tuitions->hasPages())
+        <div class="mt-8">
+            {{ $tuitions->links() }}
+        </div>
+    @endif
 @endif
 
     </div>

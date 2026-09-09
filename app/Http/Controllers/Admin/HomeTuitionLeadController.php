@@ -116,6 +116,8 @@ class HomeTuitionLeadController extends Controller
             'subjects'      => 'required|string|max:255',
             'location'      => 'required|string|max:255',
             'pincode'       => 'nullable|string|max:20',
+            'tutor_preference' => 'nullable|in:Male,Female,Any',
+            'fee'           => 'nullable|string|max:255',
             'status'        => 'required|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
             'is_featured'   => 'nullable|boolean',
         ]);
@@ -172,6 +174,8 @@ class HomeTuitionLeadController extends Controller
             'subjects' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'pincode' => 'nullable|string|max:20',
+            'tutor_preference' => 'nullable|in:Male,Female,Any',
+            'fee' => 'nullable|string|max:255',
             'status' => 'nullable|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
             'is_featured' => 'nullable|boolean',
         ]);

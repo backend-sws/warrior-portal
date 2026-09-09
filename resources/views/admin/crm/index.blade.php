@@ -49,80 +49,139 @@
 
 {{-- Filter/Search Bar --}}
 <div class="bg-card-bg rounded-t-2xl border-x border-t border-card-border p-4">
-        <div class="flex justify-between items-center gap-4">
-            <div class="text-sm text-text-dark/70 font-semibold">
-                Showing {{ $candidates->firstItem() ?? 0 }} to {{ $candidates->lastItem() ?? 0 }} of {{ $candidates->total() }} candidates
-            </div>
-            
-            <button type="button" onclick="document.getElementById('advanced-filters').classList.toggle('hidden')" class="text-sm font-semibold text-accent-blue flex items-center gap-2 hover:text-accent-blue-hover transition-colors">
-                <i class="fas fa-filter"></i> Advanced Filters
-            </button>
+    <div class="flex justify-between items-center gap-4">
+        <div class="text-sm text-text-dark/70 font-semibold flex items-center gap-2">
+            <span>Showing {{ $candidates->firstItem() ?? 0 }} to {{ $candidates->lastItem() ?? 0 }} of {{ $candidates->total() }} candidates</span>
+            @if(request()->anyFilled(['search', 'candidate_category', 'position', 'subject', 'qualification', 'experience', 'location', 'profile_completion', 'salary_range', 'state_id', 'city_id', 'gender']))
+                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent-blue/10 text-accent-blue border border-accent-blue/20">
+                    <i class="fas fa-filter text-[9px]"></i> Filtered Results
+                </span>
+            @endif
         </div>
+        
+        <button type="button" onclick="document.getElementById('advanced-filters').classList.toggle('hidden')" class="text-sm font-semibold text-accent-blue flex items-center gap-2 hover:text-accent-blue-hover transition-colors">
+            <i class="fas fa-sliders-h"></i> 
+            <span>Advanced Filters</span>
+            <i class="fas fa-chevron-down text-xs"></i>
+        </button>
+    </div>
 
     <form action="{{ route('admin.crm.index') }}" method="GET" class="space-y-4 mt-3">
         <div class="flex items-center relative">
             <i class="fas fa-search absolute left-3 text-text-dark/40 text-sm"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, email, phone..." 
-                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-            @if(request()->anyFilled(['search', 'subject_id', 'experience', 'qualification_id', 'state_id', 'city_id', 'gender', 'english_fluency', 'availability', 'plan_amount']))
-                <a href="{{ route('admin.crm.index') }}" class="absolute right-3 text-text-dark/40 hover:text-red-400 transition-colors text-sm font-bold flex items-center gap-1">
-                    <i class="fas fa-times"></i> Clear Filters
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, email, phone, whatsapp number..." 
+                   class="w-full pl-9 pr-24 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
+            @if(request()->anyFilled(['search', 'candidate_category', 'position', 'subject', 'qualification', 'experience', 'location', 'profile_completion', 'salary_range', 'subject_id', 'qualification_id', 'state_id', 'city_id', 'gender']))
+                <a href="{{ route('admin.crm.index') }}" class="absolute right-3 text-red-500 hover:text-red-700 transition-colors text-xs font-bold flex items-center gap-1 bg-red-50 px-2 py-1 rounded-lg border border-red-200">
+                    <i class="fas fa-times"></i> Clear All
                 </a>
             @endif
         </div>
 
-        <div id="advanced-filters" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 {{ request()->anyFilled(['subject_id', 'experience', 'qualification_id', 'state_id', 'city_id', 'gender', 'english_fluency', 'availability', 'plan_amount']) ? '' : 'hidden' }}">
-            <select name="subject_id" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-sm text-text-main focus:border-accent-blue focus:outline-none">
-                <option value="">All Subjects</option>
-                @foreach($subjects as $subject)
-                    <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
-                @endforeach
-            </select>
+        <div id="advanced-filters" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-card-border {{ request()->anyFilled(['candidate_category', 'position', 'subject', 'qualification', 'experience', 'location', 'profile_completion', 'salary_range', 'state_id', 'city_id', 'gender']) ? '' : 'hidden' }}">
+            {{-- 1. Candidate Category --}}
+            <div>
+                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Apply Category</label>
+                <select name="candidate_category" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-xs text-text-main focus:border-accent-blue focus:outline-none">
+                    <option value="">All Categories</option>
+                    <option value="home_tutor" {{ request('candidate_category') === 'home_tutor' ? 'selected' : '' }}>🏡 Home Tutor</option>
+                    <option value="school_job" {{ request('candidate_category') === 'school_job' ? 'selected' : '' }}>🏫 School Job</option>
+                    <option value="both" {{ request('candidate_category') === 'both' ? 'selected' : '' }}>✨ Both (Tutor + School)</option>
+                </select>
+            </div>
 
-            <select name="qualification_id" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-sm text-text-main focus:border-accent-blue focus:outline-none">
-                <option value="">All Qualifications</option>
-                @foreach($qualifications as $qualification)
-                    <option value="{{ $qualification->id }}" {{ request('qualification_id') == $qualification->id ? 'selected' : '' }}>{{ $qualification->name }}</option>
-                @endforeach
-            </select>
+            {{-- 2. Position Applying For --}}
+            <div>
+                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">School Position</label>
+                <select name="position" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-xs text-text-main focus:border-accent-blue focus:outline-none">
+                    <option value="">All Positions</option>
+                    <option value="PRT" {{ request('position') === 'PRT' ? 'selected' : '' }}>PRT (Primary Teacher)</option>
+                    <option value="TGT" {{ request('position') === 'TGT' ? 'selected' : '' }}>TGT (Trained Graduate)</option>
+                    <option value="PGT" {{ request('position') === 'PGT' ? 'selected' : '' }}>PGT (Post Graduate)</option>
+                    <option value="Mother Teacher" {{ request('position') === 'Mother Teacher' ? 'selected' : '' }}>Mother Teacher</option>
+                    <option value="NTT" {{ request('position') === 'NTT' ? 'selected' : '' }}>NTT / Pre-Primary</option>
+                    <option value="Coordinator" {{ request('position') === 'Coordinator' ? 'selected' : '' }}>Academic Coordinator</option>
+                    <option value="Principal" {{ request('position') === 'Principal' ? 'selected' : '' }}>Principal / Vice Principal</option>
+                    <option value="Computer Teacher" {{ request('position') === 'Computer Teacher' ? 'selected' : '' }}>Computer / IT Teacher</option>
+                    <option value="Sports" {{ request('position') === 'Sports' ? 'selected' : '' }}>Sports / PET</option>
+                    <option value="Special Educator" {{ request('position') === 'Special Educator' ? 'selected' : '' }}>Special Educator</option>
+                    <option value="Accountant" {{ request('position') === 'Accountant' ? 'selected' : '' }}>Admin / Accountant</option>
+                    <option value="Counselor" {{ request('position') === 'Counselor' ? 'selected' : '' }}>Counselor / Front Desk</option>
+                </select>
+            </div>
 
-            <select name="state_id" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-sm text-text-main focus:border-accent-blue focus:outline-none">
-                <option value="">All States</option>
-                @foreach($states as $state)
-                    <option value="{{ $state->id }}" {{ request('state_id') == $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
-                @endforeach
-            </select>
-            <select name="city_id" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-sm text-text-main focus:border-accent-blue focus:outline-none">
-                <option value="">All Cities</option>
-                @foreach($cities as $city)
-                    <option value="{{ $city->id }}" {{ request('city_id') == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
-                @endforeach
-            </select>
+            {{-- 3. Subject Filter --}}
+            <div>
+                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Subject / Specialization</label>
+                <select name="subject" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-xs text-text-main focus:border-accent-blue focus:outline-none">
+                    <option value="">All Subjects</option>
+                    @foreach($subjects as $subj)
+                        <option value="{{ $subj->name }}" {{ request('subject') == $subj->name ? 'selected' : '' }}>{{ $subj->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-            <select name="experience" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-sm text-text-main focus:border-accent-blue focus:outline-none">
-                <option value="">Min Experience</option>
-                <option value="1" {{ request('experience') == '1' ? 'selected' : '' }}>1+ Years</option>
-                <option value="3" {{ request('experience') == '3' ? 'selected' : '' }}>3+ Years</option>
-                <option value="5" {{ request('experience') == '5' ? 'selected' : '' }}>5+ Years</option>
-                <option value="10" {{ request('experience') == '10' ? 'selected' : '' }}>10+ Years</option>
-            </select>
+            {{-- 4. Qualification Filter --}}
+            <div>
+                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Highest Qualification</label>
+                <select name="qualification" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-xs text-text-main focus:border-accent-blue focus:outline-none">
+                    <option value="">All Qualifications</option>
+                    @foreach($qualifications as $qualification)
+                        <option value="{{ $qualification->name }}" {{ request('qualification') == $qualification->name ? 'selected' : '' }}>{{ $qualification->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-            <select name="gender" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-sm text-text-main focus:border-accent-blue focus:outline-none">
-                <option value="">All Genders</option>
-                <option value="Male" {{ request('gender') == 'Male' ? 'selected' : '' }}>Male</option>
-                <option value="Female" {{ request('gender') == 'Female' ? 'selected' : '' }}>Female</option>
-            </select>
+            {{-- 5. Experience Filter --}}
+            <div>
+                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Teaching Experience</label>
+                <select name="experience" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-xs text-text-main focus:border-accent-blue focus:outline-none">
+                    <option value="">All Experience Levels</option>
+                    <option value="Fresher" {{ request('experience') === 'Fresher' ? 'selected' : '' }}>Fresher</option>
+                    <option value="1-3" {{ request('experience') === '1-3' ? 'selected' : '' }}>1 - 3 Years</option>
+                    <option value="3-5" {{ request('experience') === '3-5' ? 'selected' : '' }}>3 - 5 Years</option>
+                    <option value="5-10" {{ request('experience') === '5-10' ? 'selected' : '' }}>5 - 10 Years</option>
+                    <option value="10+" {{ request('experience') === '10+' ? 'selected' : '' }}>10+ Years</option>
+                </select>
+            </div>
 
-            <select name="english_fluency" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-sm text-text-main focus:border-accent-blue focus:outline-none">
-                <option value="">English Fluency</option>
-                <option value="beginner" {{ request('english_fluency') == 'beginner' ? 'selected' : '' }}>Beginner</option>
-                <option value="intermediate" {{ request('english_fluency') == 'intermediate' ? 'selected' : '' }}>Intermediate</option>
-                <option value="fluent" {{ request('english_fluency') == 'fluent' ? 'selected' : '' }}>Fluent</option>
-            </select>
+            {{-- 6. Preferred Location Filter --}}
+            <div>
+                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Preferred Location / Area</label>
+                <input type="text" name="location" value="{{ request('location') }}" placeholder="e.g. Kankarbagh, Patna, Ranchi..."
+                       class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-xs text-text-main focus:border-accent-blue focus:outline-none">
+            </div>
 
-            <button type="submit" class="w-full bg-accent-blue text-white rounded-lg px-4 py-2 text-sm font-bold shadow hover:bg-accent-blue-hover transition-colors">
-                Apply Filters
-            </button>
+            {{-- 7. Profile Completion Filter --}}
+            <div>
+                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Profile Completion</label>
+                <select name="profile_completion" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-xs text-text-main focus:border-accent-blue focus:outline-none">
+                    <option value="">All Completion Levels</option>
+                    <option value="<50" {{ request('profile_completion') === '<50' ? 'selected' : '' }}>&lt; 50% (Incomplete)</option>
+                    <option value="50-80" {{ request('profile_completion') === '50-80' ? 'selected' : '' }}>50% – 80% (Leads Locked)</option>
+                    <option value=">80" {{ request('profile_completion') === '>80' ? 'selected' : '' }}>&gt; 80% (Leads Unlocked)</option>
+                    <option value="100" {{ request('profile_completion') === '100' ? 'selected' : '' }}>100% (Fully Complete)</option>
+                </select>
+            </div>
+
+            {{-- 8. Salary Expectation Filter --}}
+            <div>
+                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Salary Expectation</label>
+                <select name="salary_range" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-xs text-text-main focus:border-accent-blue focus:outline-none">
+                    <option value="">All Salary Ranges</option>
+                    <option value="<15k" {{ request('salary_range') === '<15k' ? 'selected' : '' }}>Under ₹15,000</option>
+                    <option value="15k-25k" {{ request('salary_range') === '15k-25k' ? 'selected' : '' }}>₹15,000 – ₹25,000</option>
+                    <option value="25k-40k" {{ request('salary_range') === '25k-40k' ? 'selected' : '' }}>₹25,000 – ₹40,000</option>
+                    <option value="40k-60k" {{ request('salary_range') === '40k-60k' ? 'selected' : '' }}>₹40,000 – ₹60,000</option>
+                    <option value=">60k" {{ request('salary_range') === '>60k' ? 'selected' : '' }}>Above ₹60,000</option>
+                </select>
+            </div>
+
+            <div class="sm:col-span-2 md:col-span-4 flex justify-end gap-2 pt-2">
+                <button type="submit" class="px-5 py-2 bg-accent-blue text-white rounded-xl text-xs font-bold shadow hover:bg-accent-blue-hover transition-colors flex items-center gap-1.5">
+                    <i class="fas fa-check"></i> Apply Filters
+                </button>
+            </div>
         </div>
     </form>
 </div>
@@ -138,7 +197,7 @@
                 @endphp
                 <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">
                     <a href="{{ route($route, array_merge(request()->query(), ['sort_by' => 'name', 'order' => $order])) }}" class="flex items-center gap-2 hover:text-accent-blue transition-colors">
-                        Candidate
+                        Candidate & Contact
                         @if(request('sort_by') === 'name')
                             <i class="fas fa-sort-{{ request('order') === 'asc' ? 'up' : 'down' }} text-accent-blue"></i>
                         @else
@@ -146,9 +205,9 @@
                         @endif
                     </a>
                 </th>
-                <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">Teaching Profile</th>
+                <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">Applied Category & Preference</th>
+                <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">Profile Completion</th>
                 <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">Service Readiness</th>
-                <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">Agreement Status</th>
                 <th class="py-3.5 px-4 text-xs font-bold text-text-dark/70 uppercase">
                     <a href="{{ route($route, array_merge(request()->query(), ['sort_by' => 'created_at', 'order' => $order])) }}" class="flex items-center gap-2 hover:text-accent-blue transition-colors">
                         Registered
@@ -166,10 +225,13 @@
             @forelse($candidates as $candidate)
             @php
                 $prof = $candidate->profile;
+                $pct = $prof?->completion_percentage ?? 0;
+                $category = $prof?->candidate_category ?: 'both';
                 $isTuitionReady = ($prof && $prof->date_of_birth && $prof->gender && $prof->address && $prof->preferred_state_id && $prof->preferred_city_id && $prof->highest_qualification_id && $prof->subject_id);
                 $isJobReady = ($isTuitionReady && $prof->category_id && $prof->resume_path);
             @endphp
             <tr class="group hover:bg-secondary-bg/50 transition-colors">
+                {{-- Candidate & Contact --}}
                 <td class="py-3.5 px-4">
                     <div class="font-bold text-sm text-text-main group-hover:text-accent-blue transition-colors flex items-center gap-1.5">
                         <span>{{ $candidate->name }}</span>
@@ -177,51 +239,144 @@
                             <i class="fas fa-check-circle text-accent-blue text-xs" title="Verified Candidate"></i>
                         @endif
                     </div>
-                    <div class="text-xs text-text-dark/50 flex flex-col gap-0.5 mt-0.5">
-                        <span><i class="fas fa-phone-alt text-[10px] w-3.5"></i> {{ $candidate->phone }}</span>
-                        <span><i class="fas fa-envelope text-[10px] w-3.5"></i> {{ $candidate->email }}</span>
+
+                    <div class="text-xs text-text-dark/60 flex flex-col gap-1 mt-1">
+                        {{-- Phone & WhatsApp --}}
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="inline-flex items-center gap-1 text-[11px] font-medium text-text-main">
+                                <i class="fas fa-phone-alt text-[9px] text-text-dark/40"></i> {{ $candidate->phone }}
+                            </span>
+                            @if($candidate->whatsapp_no || $prof?->whatsapp_no)
+                                @php $wNo = preg_replace('/[^0-9]/', '', $candidate->whatsapp_no ?: $prof?->whatsapp_no); @endphp
+                                <a href="https://wa.me/{{ str_starts_with($wNo, '91') ? $wNo : '91'.$wNo }}" target="_blank" 
+                                   class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                                   title="Open WhatsApp Chat">
+                                    <i class="fab fa-whatsapp text-[10px] text-emerald-600"></i>
+                                    <span>{{ $candidate->whatsapp_no ?: $prof?->whatsapp_no }}</span>
+                                </a>
+                            @endif
+                        </div>
+                        <span class="text-[11px] text-text-dark/50 flex items-center gap-1 truncate">
+                            <i class="fas fa-envelope text-[9px]"></i> {{ $candidate->email }}
+                        </span>
                     </div>
                 </td>
 
+                {{-- Applied Category & Preference --}}
                 <td class="py-3.5 px-4">
+                    <div class="mb-1.5">
+                        @if($category === 'home_tutor')
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <i class="fas fa-chalkboard-teacher text-[9px]"></i> Home Tutor
+                            </span>
+                        @elseif($category === 'school_job')
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                <i class="fas fa-school text-[9px]"></i> School Job
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200">
+                                <i class="fas fa-layer-group text-[9px]"></i> Both (Tutor + School)
+                            </span>
+                        @endif
+                    </div>
+
                     <div class="text-xs font-bold text-text-main">
-                        {{ $prof?->subject?->name ?? 'Subject N/A' }}
+                        @if($prof?->position_applying_for)
+                            <span>{{ $prof->position_applying_for }}</span>
+                        @elseif($prof?->subject?->name)
+                            <span>{{ $prof->subject->name }}</span>
+                        @elseif($prof?->subject_specialization)
+                            <span>{{ $prof->subject_specialization }}</span>
+                        @else
+                            <span class="text-text-dark/40">Not Specified</span>
+                        @endif
                     </div>
+
                     <div class="text-[11px] text-text-dark/60 mt-0.5">
-                        {{ $prof?->highestQualification?->name ?? 'N/A' }} • {{ $prof?->experience_years ?? 0 }} Yrs Exp
+                        {{ $prof?->highest_qualification_name ?: ($prof?->highestQualification?->name ?? 'Qualification N/A') }} • 
+                        {{ $prof?->experience_range ?: (($prof?->experience_years ?? 0) . ' Yrs Exp') }}
                     </div>
-                    <div class="text-[10px] text-text-dark/40">
-                        📍 {{ $prof?->preferredCity?->name ?? 'City N/A' }}
+
+                    {{-- Tuition Subjects or Preferred Locations --}}
+                    <div class="mt-1 flex flex-wrap gap-1">
+                        @if(!empty($prof?->tuition_subjects) && is_array($prof->tuition_subjects))
+                            @foreach(array_slice($prof->tuition_subjects, 0, 3) as $subjItem)
+                                <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-secondary-bg text-text-dark/70 border border-card-border">
+                                    {{ $subjItem }}
+                                </span>
+                            @endforeach
+                            @if(count($prof->tuition_subjects) > 3)
+                                <span class="text-[9px] text-text-dark/40">+{{ count($prof->tuition_subjects) - 3 }}</span>
+                            @endif
+                        @elseif($prof?->preferred_areas)
+                            <span class="text-[10px] text-text-dark/50">📍 {{ Str::limit($prof->preferred_areas, 24) }}</span>
+                        @elseif($prof?->preferredCity)
+                            <span class="text-[10px] text-text-dark/50">📍 {{ $prof->preferredCity->name }}</span>
+                        @endif
                     </div>
                 </td>
 
+                {{-- Profile Completion Percentage --}}
+                <td class="py-3.5 px-4">
+                    <div class="w-32 space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px] font-bold">
+                            <span class="{{ $pct >= 80 ? 'text-emerald-600' : ($pct >= 50 ? 'text-amber-600' : 'text-red-500') }}">
+                                {{ $pct }}%
+                            </span>
+                            <span class="text-[9px] font-semibold text-text-dark/50">
+                                @if($pct >= 100)
+                                    Complete
+                                @elseif($pct >= 75)
+                                    Step 3/4
+                                @elseif($pct >= 50)
+                                    Step 2/4
+                                @else
+                                    Step 1/4
+                                @endif
+                            </span>
+                        </div>
+                        <div class="w-full h-2 bg-secondary-bg rounded-full overflow-hidden border border-card-border">
+                            <div class="h-full rounded-full transition-all duration-500 {{ $pct >= 80 ? 'bg-emerald-500' : ($pct >= 50 ? 'bg-amber-500' : 'bg-red-500') }}"
+                                 style="width: {{ $pct }}%"></div>
+                        </div>
+                        @if($pct < 80 && ($category === 'home_tutor' || $category === 'both'))
+                            <span class="inline-flex items-center gap-1 text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                                <i class="fas fa-lock text-[8px]"></i> Leads Locked (&lt;80%)
+                            </span>
+                        @endif
+                    </div>
+                </td>
+
+                {{-- Service Readiness & Agreements --}}
                 <td class="py-3.5 px-4">
                     <div class="flex flex-col gap-1 w-max">
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold {{ $isJobReady ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-secondary-bg text-text-dark/50 border border-card-border' }}">
-                            <i class="fas fa-school text-[9px]"></i> {{ $isJobReady ? 'School Ready' : 'School Incomplete' }}
-                        </span>
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold {{ $isTuitionReady ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-secondary-bg text-text-dark/50 border border-card-border' }}">
-                            <i class="fas fa-chalkboard-teacher text-[9px]"></i> {{ $isTuitionReady ? 'Tuition Ready' : 'Tuition Incomplete' }}
-                        </span>
+                        @if($category === 'school_job' || $category === 'both')
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold {{ $isJobReady ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-secondary-bg text-text-dark/50 border border-card-border' }}">
+                                <i class="fas fa-school text-[9px]"></i> {{ $isJobReady ? 'School Ready' : 'School Pending' }}
+                            </span>
+                        @endif
+
+                        @if($category === 'home_tutor' || $category === 'both')
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold {{ ($pct >= 80) ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                                <i class="fas fa-chalkboard-teacher text-[9px]"></i> {{ ($pct >= 80) ? 'Tuition Unlocked' : 'Tuition Pending' }}
+                            </span>
+                        @endif
+
+                        @if($prof && ($prof->is_agreement_signed || $prof->agreement_pdf_path))
+                            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-blue-600">
+                                <i class="fas fa-check-circle text-[9px]"></i> Agreement Signed
+                            </span>
+                        @endif
                     </div>
                 </td>
 
-                <td class="py-3.5 px-4">
-                    @if($prof && ($prof->is_agreement_signed || $prof->agreement_pdf_path))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-blue-50 text-accent-blue border border-accent-blue/20">
-                            <i class="fas fa-file-signature text-[9px]"></i> Signed
-                        </span>
-                    @else
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                            <i class="fas fa-clock text-[9px]"></i> Pending
-                        </span>
-                    @endif
-                </td>
-
+                {{-- Registered Date --}}
                 <td class="py-3.5 px-4 text-text-dark/60 text-xs">
                     {{ $candidate->created_at->format('d M, Y') }}
+                    <span class="block text-[10px] text-text-dark/40">{{ $candidate->created_at->diffForHumans() }}</span>
                 </td>
 
+                {{-- Actions --}}
                 <td class="py-3.5 px-4 text-right">
                     <div class="flex items-center justify-end gap-2">
                         <a href="{{ route('admin.crm.show', $candidate->id) }}" class="px-3.5 py-1.5 rounded-xl bg-accent-blue hover:bg-blue-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">

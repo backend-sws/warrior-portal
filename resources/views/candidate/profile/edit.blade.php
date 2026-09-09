@@ -3,13 +3,47 @@
 @section('content')
 @include('candidate.partials.nav')
 
-<div class="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+@php
+    $activeCategory = $profile->candidate_category ?: 'both';
+    $curQual = $profile->highest_qualification_name ?: ($profile->highestQualification?->name ?? '');
+    $hasSavedSubjects = !empty($profile->tuition_subjects) && count($profile->tuition_subjects) > 0;
+    $hasSavedClasses = !empty($profile->classes_interested) && count($profile->classes_interested) > 0;
+    $hasSavedLocations = !empty($profile->preferred_locations) && count($profile->preferred_locations) > 0;
+@endphp
+
+<div class="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8" x-data="{
+    teachingMode: '{{ old('teaching_mode', $profile->teaching_mode ?? 'Offline') }}',
+    selectedTuitionSubjects: {{ json_encode(old('tuition_subjects', $profile->tuition_subjects ?? [])) }},
+    selectedClasses: {{ json_encode(old('classes_interested', $profile->classes_interested ?? [])) }},
+    selectedLocations: {{ json_encode(old('preferred_locations', $profile->preferred_locations ?? [])) }},
+    toggleTuitionSubject(subj) {
+        if (this.selectedTuitionSubjects.includes(subj)) {
+            this.selectedTuitionSubjects = this.selectedTuitionSubjects.filter(s => s !== subj);
+        } else {
+            this.selectedTuitionSubjects.push(subj);
+        }
+    },
+    toggleSelectedClass(cls) {
+        if (this.selectedClasses.includes(cls)) {
+            this.selectedClasses = this.selectedClasses.filter(c => c !== cls);
+        } else {
+            this.selectedClasses.push(cls);
+        }
+    },
+    toggleLocation(loc) {
+        if (this.selectedLocations.includes(loc)) {
+            this.selectedLocations = this.selectedLocations.filter(l => l !== loc);
+        } else {
+            this.selectedLocations.push(loc);
+        }
+    }
+}">
 
     {{-- Page Header --}}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8 reveal">
         <div class="flex items-center gap-4">
             @if($profile->profile_photo_path)
-                <img src="{{ asset('storage/' . $profile->profile_photo_path) }}" alt="Profile Photo" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-[#0ea5e9] shadow-lg shrink-0">
+                <img src="{{ asset('storage/' . $profile->profile_photo_path) }}" alt="{{ $user->name }}" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-[#0ea5e9] shadow-lg shrink-0" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0ea5e9&color=fff';">
             @else
                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-2xl sm:text-3xl shadow-inner shrink-0">
                     <i class="fas fa-user"></i>
@@ -17,82 +51,49 @@
             @endif
             <div>
                 <h1 class="text-xl sm:text-2xl font-black text-[#031b4e] flex items-center gap-2">
-                    My Profile
+                    My Educator Profile
                     @if($profile->is_verified)
                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-extrabold uppercase tracking-wider rounded-full">
-                            <i class="fas fa-check-circle text-blue-600"></i> Verified Educator
+                            <i class="fas fa-check-circle text-blue-600"></i> Verified
                         </span>
                     @endif
                 </h1>
-                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Manage your personal, tuition, and school teaching credentials.</p>
+                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                    @if($activeCategory === 'home_tutor')
+                        Manage your home tuition preferences, subjects, and verified details.
+                    @elseif($activeCategory === 'school_job')
+                        Manage your school teaching credentials, experience, and verified details.
+                    @else
+                        Manage your home tuition and school teaching preferences.
+                    @endif
+                </p>
             </div>
         </div>
-    </div>
 
-    {{-- Profile Readiness Cards (Tuition vs School Jobs) --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        {{-- Card 1: Home Tuition Status --}}
-        <div class="p-5 rounded-2xl border transition-all {{ $isTuitionProfileReady ? 'bg-emerald-50/80 border-emerald-200' : 'bg-amber-50/80 border-amber-200' }}">
-            <div class="flex items-center justify-between mb-2">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-home {{ $isTuitionProfileReady ? 'text-emerald-600' : 'text-amber-600' }}"></i>
-                    <h3 class="text-sm font-bold text-[#031b4e]">Home Tuition Eligibility</h3>
-                </div>
-                @if($isTuitionProfileReady)
-                    <span class="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">
-                        <i class="fas fa-check-circle"></i> Ready to Apply
-                    </span>
-                @else
-                    <span class="text-[10px] font-extrabold bg-amber-200/70 text-amber-900 px-2.5 py-0.5 rounded-full">
-                        <i class="fas fa-exclamation-triangle"></i> Incomplete
-                    </span>
-                @endif
-            </div>
-            <p class="text-xs text-slate-600 leading-relaxed">
-                Requires: <strong>DOB, Gender, City, Address, Qualification & Subject</strong>. 
-                <br><span class="text-[11px] text-slate-500 font-medium">(11th/12th students & undergraduates can also complete this and teach tuitions!)</span>
-            </p>
-        </div>
-
-        {{-- Card 2: School Jobs Status --}}
-        <div class="p-5 rounded-2xl border transition-all {{ $isJobProfileReady ? 'bg-emerald-50/80 border-emerald-200' : 'bg-purple-50/80 border-purple-200' }}">
-            <div class="flex items-center justify-between mb-2">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-school {{ $isJobProfileReady ? 'text-emerald-600' : 'text-purple-600' }}"></i>
-                    <h3 class="text-sm font-bold text-[#031b4e]">School Teaching Jobs Eligibility</h3>
-                </div>
-                @if($isJobProfileReady)
-                    <span class="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">
-                        <i class="fas fa-check-circle"></i> Ready to Apply
-                    </span>
-                @else
-                    <span class="text-[10px] font-extrabold bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-full">
-                        <i class="fas fa-exclamation-triangle"></i> Requires Resume & Category
-                    </span>
-                @endif
-            </div>
-            <p class="text-xs text-slate-600 leading-relaxed">
-                Requires: <strong>Teaching Category (PRT/TGT/PGT), Experience & Resume Upload</strong> in addition to basic info.
-            </p>
+        <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-600">Profile Completion:</span>
+            <span class="px-3 py-1 rounded-full text-xs font-black {{ $profile->completion_percentage >= 80 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300' }}">
+                {{ $profile->completion_percentage }}%
+            </span>
         </div>
     </div>
 
     @if(session('success'))
-        <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl flex items-center gap-3 reveal">
+        <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl flex items-center gap-3 reveal shadow-xs">
             <i class="fas fa-check-circle text-emerald-600 text-lg"></i>
             <span class="text-sm font-bold">{{ session('success') }}</span>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="mb-6 bg-red-50 border border-red-200 text-red-800 p-4 rounded-2xl flex items-center gap-3 reveal">
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-800 p-4 rounded-2xl flex items-center gap-3 reveal shadow-xs">
             <i class="fas fa-exclamation-circle text-red-600 text-lg"></i>
             <span class="text-sm font-bold">{{ session('error') }}</span>
         </div>
     @endif
 
     @if($errors->any())
-        <div class="mb-6 bg-red-50 border border-red-200 text-red-800 p-4 rounded-2xl reveal">
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-800 p-4 rounded-2xl reveal shadow-xs">
             <div class="flex items-start gap-3">
                 <i class="fas fa-exclamation-circle text-red-600 mt-0.5"></i>
                 <div>
@@ -112,7 +113,42 @@
         <form action="{{ route('candidate.profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            {{-- Section 1: Basic & Personal Information --}}
+            {{-- Category Header (Locked to registered category) --}}
+            <div class="p-6 md:p-8 border-b border-slate-100 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <span class="block text-[11px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+                        Registered Teaching Category
+                    </span>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        @if($activeCategory === 'home_tutor')
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-white font-black text-sm shadow-xs">
+                                <i class="fas fa-chalkboard-teacher text-base"></i> Home Tutor
+                            </span>
+                        @elseif($activeCategory === 'school_job')
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-black text-sm shadow-xs">
+                                <i class="fas fa-school text-base"></i> School Job Candidate
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white font-black text-sm shadow-xs">
+                                <i class="fas fa-layer-group text-base"></i> Both (Home Tutor + School Job)
+                            </span>
+                        @endif
+
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-200/80 text-slate-700 text-xs font-bold border border-slate-300/60">
+                            <i class="fas fa-lock text-[11px] text-slate-500"></i> Locked
+                        </span>
+                    </div>
+                </div>
+                <input type="hidden" name="candidate_category" value="{{ $activeCategory }}">
+                <div class="text-left sm:text-right">
+                    <p class="text-xs text-slate-500 font-medium">
+                        <i class="fas fa-shield-alt text-emerald-500 mr-1"></i>
+                        Details once saved are permanently locked for profile integrity.
+                    </p>
+                </div>
+            </div>
+
+            {{-- Section 1: Basic & Personal Information (Common) --}}
             <div class="p-6 md:p-8 border-b border-slate-100">
                 <div class="flex items-center justify-between gap-3 mb-6">
                     <div class="flex items-center gap-3">
@@ -120,14 +156,15 @@
                         <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">Personal Information</h3>
                     </div>
                     <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
-                        Required for Tuitions & Jobs
+                        Common Details
                     </span>
                 </div>
 
+                {{-- Profile Photo --}}
                 <div class="mb-8 flex flex-col sm:flex-row items-center gap-5">
                     <div class="relative group shrink-0">
                         @if($profile->profile_photo_path)
-                            <img src="{{ asset('storage/' . $profile->profile_photo_path) }}" alt="Profile Photo" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-200 shadow-md">
+                            <img src="{{ asset('storage/' . $profile->profile_photo_path) }}" alt="{{ $user->name }}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-200 shadow-md" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0ea5e9&color=fff';">
                         @else
                             <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-100 flex items-center justify-center text-3xl text-slate-400 border border-slate-200 shadow-inner">
                                 <i class="fas fa-user"></i>
@@ -136,239 +173,627 @@
                     </div>
                     <div class="flex-1 w-full">
                         <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Profile Photo</label>
-                        <input type="file" name="profile_photo" accept="image/jpeg,image/png,image/jpg,image/webp"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-accent-blue/40 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
-                        <p class="text-[11px] text-slate-400 mt-1"><i class="fas fa-info-circle mr-1"></i> JPG, PNG, WEBP (Max 3MB).</p>
+                        @if($profile->profile_photo_path)
+                            <div class="flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200 w-fit">
+                                <i class="fas fa-check-circle text-emerald-600"></i> Profile photo uploaded & saved
+                            </div>
+                        @else
+                            <input type="file" name="profile_photo" accept="image/jpeg,image/png,image/jpg,image/webp"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-accent-blue/40 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                            <p class="text-[11px] text-slate-400 mt-1"><i class="fas fa-info-circle mr-1"></i> JPG, PNG, WEBP (Max 3MB).</p>
+                        @endif
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                    {{-- Full Name (Locked) --}}
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Full Name</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-user text-sm"></i></span>
-                            <input type="text" value="{{ $user->name }}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-500 cursor-not-allowed font-medium">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Full Name</label>
+                            <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
                         </div>
+                        <input type="text" value="{{ $user->name }}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 cursor-not-allowed font-medium">
                     </div>
 
+                    {{-- Email (Locked) --}}
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Email Address</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-envelope text-sm"></i></span>
-                            <input type="email" value="{{ $user->email }}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-500 cursor-not-allowed font-medium">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Email Address</label>
+                            <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
                         </div>
+                        <input type="email" value="{{ $user->email }}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 cursor-not-allowed font-medium">
                     </div>
 
+                    {{-- Mobile Number (Locked) --}}
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Phone Number</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-phone-alt text-sm"></i></span>
-                            <input type="text" value="{{ $user->phone }}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-500 cursor-not-allowed font-medium">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Mobile Number</label>
+                            <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
                         </div>
+                        <input type="text" value="{{ $user->phone }}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 cursor-not-allowed font-medium">
                     </div>
 
+                    {{-- WhatsApp Number --}}
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Date of Birth <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-calendar-alt text-sm"></i></span>
-                            <input type="date" name="date_of_birth" required value="{{ old('date_of_birth', $profile->date_of_birth?->format('Y-m-d')) }}"
-                                class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">WhatsApp Number</label>
+                            @if(!empty($profile->whatsapp_no) || !empty($user->whatsapp_no))
+                                <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                            @endif
                         </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Gender <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-venus-mars text-sm"></i></span>
-                            <select name="gender" required class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
-                                <option value="">Select Gender</option>
-                                <option value="Male" {{ old('gender', $profile->gender) == 'Male' ? 'selected' : '' }}>Male</option>
-                                <option value="Female" {{ old('gender', $profile->gender) == 'Female' ? 'selected' : '' }}>Female</option>
-                                <option value="Other" {{ old('gender', $profile->gender) == 'Other' ? 'selected' : '' }}>Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Preferred State <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-map text-sm"></i></span>
-                            <select name="preferred_state_id" id="preferred_state_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
-                                <option value="">Select State</option>
-                                @foreach($states as $state)
-                                    <option value="{{ $state->id }}" {{ old('preferred_state_id', $profile->preferred_state_id) == $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Preferred City <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-city text-sm"></i></span>
-                            <select name="preferred_city_id" id="preferred_city_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
-                                <option value="">Select City</option>
-                                @foreach($cities as $city)
-                                    <option value="{{ $city->id }}" {{ old('preferred_city_id', $profile->preferred_city_id) == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="sm:col-span-2">
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Full Address <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-3.5 text-slate-400"><i class="fas fa-map-marker-alt text-sm"></i></span>
-                            <textarea name="address" required rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 resize-none" placeholder="Enter complete residential address with area/locality">{{ old('address', $profile->address) }}</textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Section 2: Educational & Teaching Subject --}}
-            <div class="p-6 md:p-8 border-b border-slate-100">
-                <div class="flex items-center justify-between gap-3 mb-6">
-                    <div class="flex items-center gap-3">
-                        <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-black border border-amber-200">2</span>
-                        <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">Academic & Subject Expertise</h3>
-                    </div>
-                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
-                        Required for Tuitions & Jobs
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-                            Current Qualification / Education <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-graduation-cap text-sm"></i></span>
-                            <select name="highest_qualification_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
-                                <option value="">Select Qualification (e.g. 12th, B.Sc, B.Ed)</option>
-                                @foreach($qualifications as $qualification)
-                                    <option value="{{ $qualification->id }}" {{ old('highest_qualification_id', $profile->highest_qualification_id) == $qualification->id ? 'selected' : '' }}>{{ $qualification->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mt-1">11th/12th students can select <em>Class 12th / Intermediate</em>.</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-                            Primary Subject You Teach <span class="text-xs font-normal text-slate-400 normal-case">(Optional)</span>
-                        </label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-book text-sm"></i></span>
-                            <select name="subject_id" id="subject_id" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
-                                <option value="">Select Primary Subject (Optional)</option>
-                                @foreach($subjects as $subject)
-                                    <option value="{{ $subject->id }}" {{ old('subject_id', $profile->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Section 3: School Jobs & Professional Teaching Details --}}
-            <div class="p-6 md:p-8 bg-slate-50/40">
-                <div class="flex items-center justify-between gap-3 mb-6">
-                    <div class="flex items-center gap-3">
-                        <span class="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-xs font-black border border-purple-200">3</span>
-                        <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">School Teaching Details</h3>
-                    </div>
-                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-purple-100 text-purple-800 border border-purple-200">
-                        Required for School Jobs
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Job Category</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-layer-group text-sm"></i></span>
-                            <select name="category_id" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
-                                <option value="">Select Category (e.g. PRT, TGT, PGT)</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id', $profile->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Teaching Experience (Years)</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-briefcase text-sm"></i></span>
-                            <input type="number" name="experience_years" min="0" value="{{ old('experience_years', $profile->experience_years ?? 0) }}"
-                                class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-accent-blue/40"
-                                placeholder="0 for freshers">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Upload Resume / CV <span class="text-[10px] text-slate-400">(PDF, DOC)</span></label>
-                        <div class="relative">
-                            <input type="file" name="resume" accept=".pdf,.doc,.docx"
-                                class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-accent-blue/40 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-700 cursor-pointer">
-                        </div>
-                        @if($profile->resume_path)
-                            <p class="text-[11px] text-emerald-600 mt-1.5 flex items-center gap-1 font-bold"><i class="fas fa-check-circle"></i> Resume uploaded. Upload new to replace.</p>
+                        @if(!empty($profile->whatsapp_no) || !empty($user->whatsapp_no))
+                            <input type="text" value="{{ $profile->whatsapp_no ?: $user->whatsapp_no }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 font-medium cursor-not-allowed">
+                        @else
+                            <input type="tel" name="whatsapp_no" value="{{ old('whatsapp_no') }}" minlength="10" maxlength="10"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 font-medium"
+                                placeholder="10-digit WhatsApp number">
                         @endif
                     </div>
 
+                    {{-- Date of Birth --}}
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Expected Salary</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-rupee-sign text-sm"></i></span>
-                            <input type="text" name="expected_salary" value="{{ old('expected_salary', $profile->expected_salary) }}" placeholder="e.g. ₹25,000 - ₹35,000 / month"
-                                class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-accent-blue/40">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Date of Birth</label>
+                            @if(!empty($profile->date_of_birth))
+                                <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                            @endif
                         </div>
+                        @if(!empty($profile->date_of_birth))
+                            <input type="text" value="{{ $profile->date_of_birth->format('d M, Y') }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 font-medium cursor-not-allowed">
+                        @else
+                            <input type="date" name="date_of_birth" required value="{{ old('date_of_birth') }}"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 font-medium">
+                        @endif
                     </div>
 
+                    {{-- Gender --}}
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Current / Previous School <span class="text-[10px] text-slate-400">(Optional)</span></label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-school text-sm"></i></span>
-                            <input type="text" name="current_school" value="{{ old('current_school', $profile->current_school) }}" placeholder="e.g. DAV Public School"
-                                class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-accent-blue/40">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Gender</label>
+                            @if(!empty($profile->gender))
+                                <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                            @endif
                         </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">English Fluency</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-language text-sm"></i></span>
-                            <select name="english_fluency" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
-                                <option value="">Select Fluency</option>
-                                <option value="beginner" {{ old('english_fluency', $profile->english_fluency) == 'beginner' ? 'selected' : '' }}>Beginner</option>
-                                <option value="intermediate" {{ old('english_fluency', $profile->english_fluency) == 'intermediate' ? 'selected' : '' }}>Intermediate</option>
-                                <option value="fluent" {{ old('english_fluency', $profile->english_fluency) == 'fluent' ? 'selected' : '' }}>Fluent / Native</option>
+                        @if(!empty($profile->gender))
+                            <input type="text" value="{{ $profile->gender }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 font-medium cursor-not-allowed">
+                        @else
+                            <select name="gender" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 font-medium">
+                                <option value="">Select Gender</option>
+                                <option value="Male" {{ old('gender') === 'Male' ? 'selected' : '' }}>Male</option>
+                                <option value="Female" {{ old('gender') === 'Female' ? 'selected' : '' }}>Female</option>
+                                <option value="Other" {{ old('gender') === 'Other' ? 'selected' : '' }}>Other</option>
                             </select>
+                        @endif
+                    </div>
+
+                    {{-- Highest Qualification --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Highest Qualification</label>
+                            @if(!empty($curQual))
+                                <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                            @endif
                         </div>
+                        @if(!empty($curQual))
+                            <input type="text" value="{{ $curQual }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 font-medium cursor-not-allowed">
+                        @else
+                            <select name="highest_qualification" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 font-medium">
+                                <option value="">Select Qualification</option>
+                                @php
+                                    $quals = ['Graduate (B.A/B.Sc/B.Com/B.Tech)', 'Post Graduate (M.A/M.Sc/M.Com/M.Tech)', 'B.Ed', 'M.Ed', 'D.El.Ed', 'Ph.D. / Doctorate', 'CTET / STET Qualified', '12th Pass / Undergraduate', 'Other'];
+                                @endphp
+                                @foreach($quals as $q)
+                                    <option value="{{ $q }}" {{ old('highest_qualification') === $q ? 'selected' : '' }}>{{ $q }}</option>
+                                @endforeach
+                            </select>
+                        @endif
+                    </div>
+
+                    {{-- Teaching Experience --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Teaching Experience</label>
+                            @if(!empty($profile->experience_range))
+                                <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                            @endif
+                        </div>
+                        @if(!empty($profile->experience_range))
+                            <input type="text" value="{{ $profile->experience_range }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 font-medium cursor-not-allowed">
+                        @else
+                            <select name="experience_range" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 font-medium">
+                                <option value="">Select Experience</option>
+                                @php
+                                    $experiences = ['Fresher', '0–1 Year', '1–3 Years', '3–5 Years', '5–10 Years', '10–15 Years', '15+ Years'];
+                                @endphp
+                                @foreach($experiences as $exp)
+                                    <option value="{{ $exp }}" {{ old('experience_range') === $exp ? 'selected' : '' }}>{{ $exp }}</option>
+                                @endforeach
+                            </select>
+                        @endif
+                    </div>
+
+                    {{-- Address / Locality --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Address / Locality</label>
+                            @if(!empty($profile->address))
+                                <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                            @endif
+                        </div>
+                        @if(!empty($profile->address))
+                            <input type="text" value="{{ $profile->address }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 font-medium cursor-not-allowed">
+                        @else
+                            <input type="text" name="address" value="{{ old('address') }}"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 font-medium"
+                                placeholder="Residential area">
+                        @endif
                     </div>
                 </div>
             </div>
 
-            {{-- Submit Button --}}
+            {{-- Section 2: Home Tuition Preferences (Only if home_tutor or both) --}}
+            @if(in_array($activeCategory, ['home_tutor', 'both']))
+                <div class="p-6 md:p-8 border-b border-slate-100 bg-amber-50/20 space-y-6">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs font-black">2</span>
+                            <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">Home Tuition Preferences</h3>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 border border-amber-300">
+                            Home Tutor Details
+                        </span>
+                    </div>
+
+                    {{-- Subjects Multi-select --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                Subjects You Teach
+                            </label>
+                            @if($hasSavedSubjects)
+                                <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                            @endif
+                        </div>
+
+                        @if($hasSavedSubjects)
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($profile->tuition_subjects as $subj)
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 text-white text-xs font-bold shadow-2xs">
+                                        <i class="fas fa-check text-[9px]"></i> {{ $subj }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @else
+                            @php
+                                $tuitionSubjectsList = [
+                                    'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 
+                                    'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 
+                                    'Economics', 'Business Studies', 'Others'
+                                ];
+                            @endphp
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($tuitionSubjectsList as $subj)
+                                    <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all select-none"
+                                           :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-amber-400'">
+                                        <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}"
+                                               :checked="selectedTuitionSubjects.includes('{{ $subj }}')"
+                                               @change="toggleTuitionSubject('{{ $subj }}')"
+                                               class="sr-only">
+                                        <i class="fas fa-check text-[9px]" x-show="selectedTuitionSubjects.includes('{{ $subj }}')"></i>
+                                        <span>{{ $subj }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Classes Interested --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                Classes Interested To Teach
+                            </label>
+                            @if($hasSavedClasses)
+                                <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                            @endif
+                        </div>
+
+                        @if($hasSavedClasses)
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($profile->classes_interested as $cls)
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold shadow-2xs">
+                                        <i class="fas fa-check text-[9px]"></i> {{ $cls }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @else
+                            @php
+                                $classList = [
+                                    'Nursery – UKG', 'Class nur – 5', 'Class 5 – 8', 'Class 6-10', 
+                                    'Class 9 – 10', 'Class 11 – 12', 'IIT JEE', 'NEET', 'Graduation Level'
+                                ];
+                            @endphp
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($classList as $cls)
+                                    <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all select-none"
+                                           :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400'">
+                                        <input type="checkbox" name="classes_interested[]" value="{{ $cls }}"
+                                               :checked="selectedClasses.includes('{{ $cls }}')"
+                                               @change="toggleSelectedClass('{{ $cls }}')"
+                                               class="sr-only">
+                                        <i class="fas fa-check text-[9px]" x-show="selectedClasses.includes('{{ $cls }}')"></i>
+                                        <span>{{ $cls }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                        {{-- Teaching Mode --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Teaching Mode</label>
+                                @if(!empty($profile->teaching_mode))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->teaching_mode))
+                                <div class="px-4 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-2">
+                                    <i class="fas fa-chalkboard text-amber-600"></i> {{ $profile->teaching_mode }}
+                                </div>
+                            @else
+                                <div class="grid grid-cols-3 gap-2">
+                                    @foreach(['Offline', 'Online', 'Both'] as $mode)
+                                        <label class="p-2.5 rounded-xl border text-center cursor-pointer transition-all"
+                                               :class="teachingMode === '{{ $mode }}' ? 'bg-amber-500 text-white border-amber-500 font-bold' : 'bg-white text-slate-700 border-slate-200'">
+                                            <input type="radio" name="teaching_mode" value="{{ $mode }}" x-model="teachingMode" class="sr-only">
+                                            <span class="text-xs">{{ $mode }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Available Time Slot --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Available Time Slot</label>
+                                @if(!empty($profile->available_time_slot))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->available_time_slot))
+                                <input type="text" value="{{ $profile->available_time_slot }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-medium cursor-not-allowed">
+                            @else
+                                <input type="text" name="available_time_slot" value="{{ old('available_time_slot') }}"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                    placeholder="e.g. Morning 6 AM – 9 AM">
+                            @endif
+                        </div>
+
+                        {{-- Preferred Areas --}}
+                        <div class="sm:col-span-2">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Preferred Areas For Home Tuition</label>
+                                @if(!empty($profile->preferred_areas))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->preferred_areas))
+                                <div class="p-3.5 bg-slate-100 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-600 font-medium">
+                                    {{ $profile->preferred_areas }}
+                                </div>
+                            @else
+                                <textarea name="preferred_areas" rows="2"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                    placeholder="e.g. Kankarbagh, Boring Road, Danapur">{{ old('preferred_areas') }}</textarea>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Section 3: School Job Details (Only if school_job or both) --}}
+            @if(in_array($activeCategory, ['school_job', 'both']))
+                <div class="p-6 md:p-8 border-b border-slate-100 bg-blue-50/20 space-y-6">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-black">
+                                {{ $activeCategory === 'school_job' ? '2' : '3' }}
+                            </span>
+                            <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">School Teaching & Employment Details</h3>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-blue-100 text-blue-900 border border-blue-300">
+                            School Job Credentials
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+                        {{-- B.Ed Status --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">B.Ed Status</label>
+                                @if(!empty($profile->b_ed_status))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->b_ed_status))
+                                <input type="text" value="{{ $profile->b_ed_status }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-medium cursor-not-allowed">
+                            @else
+                                <select name="b_ed_status" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/40 font-medium">
+                                    <option value="">Select Status</option>
+                                    <option value="Yes" {{ old('b_ed_status') === 'Yes' ? 'selected' : '' }}>Yes</option>
+                                    <option value="No" {{ old('b_ed_status') === 'No' ? 'selected' : '' }}>No</option>
+                                    <option value="Pursuing" {{ old('b_ed_status') === 'Pursuing' ? 'selected' : '' }}>Pursuing</option>
+                                </select>
+                            @endif
+                        </div>
+
+                        {{-- D.El.Ed Status --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">D.El.Ed Status</label>
+                                @if(!empty($profile->d_el_ed_status))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->d_el_ed_status))
+                                <input type="text" value="{{ $profile->d_el_ed_status }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-medium cursor-not-allowed">
+                            @else
+                                <select name="d_el_ed_status" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/40 font-medium">
+                                    <option value="">Select Status</option>
+                                    <option value="Yes" {{ old('d_el_ed_status') === 'Yes' ? 'selected' : '' }}>Yes</option>
+                                    <option value="No" {{ old('d_el_ed_status') === 'No' ? 'selected' : '' }}>No</option>
+                                    <option value="Pursuing" {{ old('d_el_ed_status') === 'Pursuing' ? 'selected' : '' }}>Pursuing</option>
+                                </select>
+                            @endif
+                        </div>
+
+                        {{-- Subject Specialization --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Subject Specialization</label>
+                                @if(!empty($profile->subject_specialization))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->subject_specialization))
+                                <input type="text" value="{{ $profile->subject_specialization }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-medium cursor-not-allowed">
+                            @else
+                                <select name="subject_specialization" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/40 font-medium">
+                                    <option value="">Select Specialization</option>
+                                    @php
+                                        $specs = ['Mathematics', 'English', 'Science', 'Physics', 'Chemistry', 'Biology', 'Hindi', 'SST', 'Computer', 'Commerce', 'Others'];
+                                    @endphp
+                                    @foreach($specs as $spec)
+                                        <option value="{{ $spec }}" {{ old('subject_specialization') === $spec ? 'selected' : '' }}>{{ $spec }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+                        {{-- Position Applying For --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Position Applying For</label>
+                                @if(!empty($profile->position_applying_for))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->position_applying_for))
+                                <input type="text" value="{{ $profile->position_applying_for }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-medium cursor-not-allowed">
+                            @else
+                                <select name="position_applying_for" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/40 font-medium">
+                                    <option value="">Select Position</option>
+                                    <optgroup label="Teaching">
+                                        @foreach(['Mother Teacher', 'PRT', 'TGT', 'PGT', 'Academic Coordinator', 'Vice Principal', 'Principal'] as $p)
+                                            <option value="{{ $p }}" {{ old('position_applying_for') === $p ? 'selected' : '' }}>{{ $p }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                    <optgroup label="Non-Teaching">
+                                        @foreach(['Receptionist', 'Accountant', 'Librarian', 'Counselor', 'Lab Assistant', 'Computer Operator', 'Hostel Warden', 'Office Executive', 'Administrative Staff', 'Other'] as $p)
+                                            <option value="{{ $p }}" {{ old('position_applying_for') === $p ? 'selected' : '' }}>{{ $p }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                </select>
+                            @endif
+                        </div>
+
+                        {{-- Current Salary --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Current Salary (₹)</label>
+                                @if(!empty($profile->current_salary))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->current_salary))
+                                <input type="text" value="{{ $profile->current_salary }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-medium cursor-not-allowed">
+                            @else
+                                <input type="text" name="current_salary" value="{{ old('current_salary') }}"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/40" placeholder="e.g. 25000">
+                            @endif
+                        </div>
+
+                        {{-- Expected Salary --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Expected Salary (₹)</label>
+                                @if(!empty($profile->expected_salary))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->expected_salary))
+                                <input type="text" value="{{ $profile->expected_salary }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-medium cursor-not-allowed">
+                            @else
+                                <input type="text" name="expected_salary" value="{{ old('expected_salary') }}"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/40" placeholder="e.g. 35000">
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Previous School Details --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+                        {{-- Last School Name --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Last School Name</label>
+                                @if(!empty($profile->last_school_name))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->last_school_name))
+                                <input type="text" value="{{ $profile->last_school_name }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-medium cursor-not-allowed">
+                            @else
+                                <input type="text" name="last_school_name" value="{{ old('last_school_name') }}"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/40" placeholder="e.g. DPS Patna">
+                            @endif
+                        </div>
+
+                        {{-- Last Designation --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Last Designation</label>
+                                @if(!empty($profile->last_designation))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->last_designation))
+                                <input type="text" value="{{ $profile->last_designation }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-medium cursor-not-allowed">
+                            @else
+                                <input type="text" name="last_designation" value="{{ old('last_designation') }}"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/40" placeholder="e.g. TGT Mathematics">
+                            @endif
+                        </div>
+
+                        {{-- Last Drawn Salary --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Last Drawn Salary (₹)</label>
+                                @if(!empty($profile->last_drawn_salary))
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                                @endif
+                            </div>
+                            @if(!empty($profile->last_drawn_salary))
+                                <input type="text" value="{{ $profile->last_drawn_salary }}" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-medium cursor-not-allowed">
+                            @else
+                                <input type="text" name="last_drawn_salary" value="{{ old('last_drawn_salary') }}"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/40" placeholder="e.g. 28000">
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Preferred School Locations --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                Preferred School Locations
+                            </label>
+                            @if($hasSavedLocations)
+                                <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Locked</span>
+                            @endif
+                        </div>
+                        @if($hasSavedLocations)
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($profile->preferred_locations as $loc)
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-2xs">
+                                        <i class="fas fa-check text-[9px]"></i> {{ $loc }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @else
+                            @php
+                                $locList = ['Patna', 'Hajipur', 'Muzaffarpur', 'Bhagalpur', 'Supaul', 'Darbhanga', 'Gaya', 'Begusarai', 'Other'];
+                            @endphp
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($locList as $loc)
+                                    <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all select-none"
+                                           :class="selectedLocations.includes('{{ $loc }}') ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-400'">
+                                        <input type="checkbox" name="preferred_locations[]" value="{{ $loc }}"
+                                               :checked="selectedLocations.includes('{{ $loc }}')"
+                                               @change="toggleLocation('{{ $loc }}')"
+                                               class="sr-only">
+                                        <i class="fas fa-check text-[9px]" x-show="selectedLocations.includes('{{ $loc }}')"></i>
+                                        <span>{{ $loc }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Document Uploads --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 pt-2">
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Resume (PDF / DOC)</label>
+                                @if($profile->resume_path)
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Uploaded</span>
+                                @endif
+                            </div>
+                            @if($profile->resume_path)
+                                <div class="p-3 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between gap-3">
+                                    <span class="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                                        <i class="fas fa-file-pdf text-red-500"></i> Resume Uploaded & Saved
+                                    </span>
+                                    <a href="{{ asset('storage/' . $profile->resume_path) }}" target="_blank" class="text-xs text-blue-600 font-black hover:underline">
+                                        View File
+                                    </a>
+                                </div>
+                            @else
+                                <input type="file" name="resume" accept=".pdf,.doc,.docx"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                            @endif
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Salary Slip (Optional)</label>
+                                @if($profile->salary_slip_path)
+                                    <span class="text-[10px] font-bold text-slate-400"><i class="fas fa-lock text-[9px] mr-0.5"></i>Uploaded</span>
+                                @endif
+                            </div>
+                            @if($profile->salary_slip_path)
+                                <div class="p-3 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between gap-3">
+                                    <span class="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                                        <i class="fas fa-file-invoice text-blue-500"></i> Slip Uploaded
+                                    </span>
+                                    <a href="{{ asset('storage/' . $profile->salary_slip_path) }}" target="_blank" class="text-xs text-blue-600 font-black hover:underline">
+                                        View File
+                                    </a>
+                                </div>
+                            @else
+                                <input type="file" name="salary_slip" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-700 file:text-white hover:file:bg-slate-800 cursor-pointer">
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Save Button --}}
             <div class="p-6 md:p-8 bg-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <p class="text-xs text-slate-500 font-medium"><i class="fas fa-info-circle mr-1"></i> Make sure to save changes after updating details.</p>
-                <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-[#031b4e] hover:bg-[#021338] text-white font-extrabold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
+                <p class="text-xs text-slate-500 font-medium">
+                    <i class="fas fa-info-circle mr-1"></i> 
+                    Unsaved fields will be saved permanently upon submission.
+                </p>
+                <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-[#031b4e] hover:bg-[#021338] text-white font-extrabold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm cursor-pointer">
                     <i class="fas fa-save"></i> Save Profile Details
                 </button>
             </div>
         </form>
     </div>
 
-    {{-- Change Password Section --}}
+    {{-- Change Password Card --}}
     <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xl mt-8 reveal">
         <form action="{{ route('candidate.password.update') }}" method="POST">
             @csrf
             <div class="p-6 md:p-8">
                 <div class="flex items-center gap-3 mb-6">
                     <span class="w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center text-xs font-black border border-red-100"><i class="fas fa-lock"></i></span>
-                    <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">Change Password</h3>
+                    <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">Security & Password</h3>
                 </div>
 
                 @if(session('password_success'))
@@ -392,114 +817,21 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">New Password</label>
-                        <input type="password" name="new_password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40" placeholder="••••••••">
+                        <input type="password" name="new_password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40" placeholder="Min. 8 characters">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Confirm New Password</label>
-                        <input type="password" name="new_password_confirmation" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40" placeholder="••••••••">
+                        <input type="password" name="new_password_confirmation" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40" placeholder="Re-enter password">
                     </div>
                 </div>
-            </div>
-            <div class="p-6 md:p-8 pt-0 flex justify-end">
-                <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-red-500/10 text-red-600 border border-red-500/20 font-bold rounded-xl hover:bg-red-500/20 transition-all text-xs flex items-center justify-center gap-2">
-                    <i class="fas fa-key text-xs"></i> Update Password
-                </button>
+
+                <div class="mt-6 flex justify-end">
+                    <button type="submit" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer">
+                        Update Password
+                    </button>
+                </div>
             </div>
         </form>
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    function updateDynamicSelect(selectEl, options, placeholder = 'Select City', selectedId = null) {
-        if (!selectEl) return;
-        let html = `<option value="">${placeholder}</option>`;
-        options.forEach(item => {
-            const isSelected = selectedId && String(selectedId) === String(item.id) ? 'selected' : '';
-            html += `<option value="${item.id}" ${isSelected}>${item.name}</option>`;
-        });
-        selectEl.innerHTML = html;
-        selectEl.disabled = false;
-
-        if (selectEl._slimSelect) {
-            try {
-                const ssData = [
-                    { text: placeholder, value: '', placeholder: true },
-                    ...options.map(item => ({ 
-                        text: item.name, 
-                        value: String(item.id),
-                        selected: selectedId && String(selectedId) === String(item.id)
-                    }))
-                ];
-                selectEl._slimSelect.setData(ssData);
-                selectEl._slimSelect.enable();
-            } catch (e) {
-                if (typeof window.refreshSearchableSelect === 'function') {
-                    window.refreshSearchableSelect(selectEl);
-                }
-            }
-        }
-    }
-
-    function setSelectLoading(selectEl, placeholder = 'Loading...') {
-        if (!selectEl) return;
-        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
-        selectEl.disabled = true;
-        if (selectEl._slimSelect) {
-            try {
-                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
-                selectEl._slimSelect.disable();
-            } catch (e) {}
-        }
-    }
-
-    function resetDynamicSelect(selectEl, placeholder = 'Select City') {
-        if (!selectEl) return;
-        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
-        selectEl.disabled = false;
-        if (selectEl._slimSelect) {
-            try {
-                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
-                selectEl._slimSelect.enable();
-            } catch (e) {}
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const stateSelect = document.getElementById('preferred_state_id');
-        const citySelect = document.getElementById('preferred_city_id');
-        const defaultStateId = "{{ old('preferred_state_id', $profile->preferred_state_id) }}";
-        const defaultCityId = "{{ old('preferred_city_id', $profile->preferred_city_id) }}";
-
-        function loadCities(stateId, selectedCityId = null) {
-            if (!citySelect) return;
-            if (stateId) {
-                setSelectLoading(citySelect, 'Loading cities...');
-                fetch(`/api/states/${stateId}/cities`)
-                    .then(response => response.json())
-                    .then(data => {
-                        updateDynamicSelect(citySelect, data, 'Select City', selectedCityId);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching cities:', error);
-                        resetDynamicSelect(citySelect, 'Select City');
-                    });
-            } else {
-                resetDynamicSelect(citySelect, 'Select City');
-            }
-        }
-
-        if (stateSelect && citySelect) {
-            stateSelect.addEventListener('change', function() {
-                loadCities(this.value);
-            });
-
-            // Initial load if state already selected
-            if (defaultStateId) {
-                loadCities(defaultStateId, defaultCityId);
-            }
-        }
-    });
-</script>
-@endpush

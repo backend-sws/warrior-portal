@@ -14,17 +14,22 @@
         <!-- Scrollable Navigation Container -->
         <div id="candidateNavScroll" class="flex items-center justify-between gap-3 py-2.5 overflow-x-auto hide-scrollbar scroll-smooth w-full px-1">
             @php
+                $userProfile = auth()->user()->profile;
+                $userCat = $userProfile?->candidate_category ?: 'both';
                 $appCount = auth()->user()->applications()->count();
                 $tuitionCount = \App\Models\TuitionApplication::where('candidate_id', auth()->id())->count();
-                $navItems = [
-                    ['route' => 'candidate.dashboard', 'routeIs' => 'candidate.dashboard', 'icon' => 'fa-th-large', 'label' => 'Dashboard'],
-                    ['route' => 'candidate.applications.available', 'routeIs' => 'candidate.applications.available', 'icon' => 'fa-briefcase', 'label' => 'School Jobs'],
-                    ['route' => 'candidate.tuitions.index', 'routeIs' => 'candidate.tuitions.*', 'icon' => 'fa-book-reader', 'label' => 'Home Tuitions'],
-                    ['route' => 'candidate.applications.index', 'routeIs' => 'candidate.applications.index', 'icon' => 'fa-paper-plane', 'label' => 'My Applications', 'badge' => ($appCount + $tuitionCount)],
-                    ['route' => 'candidate.profile.edit', 'routeIs' => 'candidate.profile.*', 'icon' => 'fa-user-circle', 'label' => 'My Profile'],
-                    ['route' => 'candidate.agreement.show', 'routeIs' => 'candidate.agreement.*', 'icon' => 'fa-file-signature', 'label' => 'My Agreement'],
-                    ['route' => 'candidate.serviceCharge.show', 'routeIs' => 'candidate.servicecharge.*', 'icon' => 'fa-file-invoice-dollar', 'label' => 'Service Charge'],
+
+                $allNavItems = [
+                    ['route' => 'candidate.dashboard', 'routeIs' => 'candidate.dashboard', 'icon' => 'fa-th-large', 'label' => 'Dashboard', 'show' => true],
+                    ['route' => 'candidate.applications.available', 'routeIs' => 'candidate.applications.available', 'icon' => 'fa-briefcase', 'label' => 'School Jobs', 'show' => in_array($userCat, ['school_job', 'both'])],
+                    ['route' => 'candidate.tuitions.index', 'routeIs' => 'candidate.tuitions.*', 'icon' => 'fa-book-reader', 'label' => 'Home Tuitions', 'show' => in_array($userCat, ['home_tutor', 'both'])],
+                    ['route' => 'candidate.applications.index', 'routeIs' => 'candidate.applications.index', 'icon' => 'fa-paper-plane', 'label' => 'My Applications', 'badge' => ($userCat === 'home_tutor' ? $tuitionCount : ($userCat === 'school_job' ? $appCount : ($appCount + $tuitionCount))), 'show' => true],
+                    ['route' => 'candidate.profile.edit', 'routeIs' => 'candidate.profile.*', 'icon' => 'fa-user-circle', 'label' => 'My Profile', 'show' => true],
+                    ['route' => 'candidate.agreement.show', 'routeIs' => 'candidate.agreement.*', 'icon' => 'fa-file-signature', 'label' => 'My Agreement', 'show' => true],
+                    ['route' => 'candidate.serviceCharge.show', 'routeIs' => 'candidate.servicecharge.*', 'icon' => 'fa-file-invoice-dollar', 'label' => 'Service Charge', 'show' => true],
                 ];
+
+                $navItems = array_filter($allNavItems, fn($item) => $item['show'] ?? true);
             @endphp
 
             <div class="flex items-center gap-1.5 sm:gap-2 flex-nowrap shrink-0">
@@ -35,7 +40,8 @@
                         
                         @if($item['route'] === 'candidate.profile.edit' && auth()->user()->profile?->profile_photo_path)
                             <img src="{{ asset('storage/' . auth()->user()->profile->profile_photo_path) }}" alt="Profile"
-                                class="w-4 h-4 rounded-full object-cover border {{ $isActive ? 'border-white' : 'border-slate-300' }}">
+                                class="w-4 h-4 rounded-full object-cover border {{ $isActive ? 'border-white' : 'border-slate-300' }}"
+                                onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=0ea5e9&color=fff';">
                         @else
                             <i class="fas {{ $item['icon'] }} text-xs {{ $isActive ? 'text-[#fbc043]' : 'text-slate-400 group-hover:text-[#031b4e]' }} transition-colors"></i>
                         @endif

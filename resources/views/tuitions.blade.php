@@ -147,6 +147,18 @@
                         <span class="text-slate-500 font-medium">Subjects:</span>
                         <span class="font-bold text-slate-800">{{ $tuition->subjects }}</span>
                     </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 font-medium">Gender Pref:</span>
+                        <span class="font-bold text-slate-800">{{ $tuition->tutor_preference ?: 'Any' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 font-medium">Tuition Fee:</span>
+                        @auth
+                            <span class="font-bold text-emerald-600">{{ $tuition->fee ? '₹'.$tuition->fee : 'Negotiable' }}</span>
+                        @else
+                            <span class="font-bold text-emerald-600 blur-sm select-none" title="Login to view fees">₹XXXX</span>
+                        @endauth
+                    </div>
                 </div>
             </div>
             

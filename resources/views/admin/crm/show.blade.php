@@ -56,6 +56,12 @@
     </div>
 @endif
 
+@php
+    $catSlug = $profile?->candidate_category ?: 'both';
+    $pct = $profile?->completion_percentage ?? 0;
+    $missingFields = $profile?->missing_profile_fields ?? [];
+@endphp
+
 {{-- Top Readiness & Agreement Status Strip --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     {{-- School Jobs Readiness --}}
@@ -66,51 +72,73 @@
         <div>
             <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider">School Hiring Readiness</p>
             <h4 class="text-sm font-black {{ $isJobReady ? 'text-indigo-600' : 'text-amber-600' }}">
-                {{ $isJobReady ? 'Ready for Schools' : 'Incomplete Profile' }}
+                @if(!$profile?->appliesForSchoolJob())
+                    <span class="text-text-dark/50">Not Applied</span>
+                @elseif($isJobReady)
+                    Ready for Schools
+                @else
+                    Incomplete Profile
+                @endif
             </h4>
         </div>
     </div>
 
     {{-- Home Tuitions Readiness --}}
-    <div class="bg-card-bg border {{ $isTuitionReady ? 'border-emerald-500/40 bg-emerald-50/10' : 'border-amber-500/40 bg-amber-50/10' }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl {{ $isTuitionReady ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600' }} flex items-center justify-center font-bold text-lg shrink-0">
+    <div class="bg-card-bg border {{ ($pct >= 80 && $isTuitionReady) ? 'border-emerald-500/40 bg-emerald-50/10' : 'border-amber-500/40 bg-amber-50/10' }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl {{ ($pct >= 80 && $isTuitionReady) ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600' }} flex items-center justify-center font-bold text-lg shrink-0">
             <i class="fas fa-chalkboard-teacher"></i>
         </div>
         <div>
             <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider">Home Tuition Readiness</p>
-            <h4 class="text-sm font-black {{ $isTuitionReady ? 'text-emerald-600' : 'text-amber-600' }}">
-                {{ $isTuitionReady ? 'Ready for Tuitions' : 'Missing Basic Details' }}
+            <h4 class="text-sm font-black {{ ($pct >= 80 && $isTuitionReady) ? 'text-emerald-600' : 'text-amber-600' }}">
+                @if(!$profile?->appliesForHomeTuition())
+                    <span class="text-text-dark/50">Not Applied</span>
+                @elseif($pct < 80)
+                    Leads Locked (&lt;80%)
+                @elseif($isTuitionReady)
+                    Ready & Unlocked
+                @else
+                    Missing Details
+                @endif
             </h4>
         </div>
     </div>
 
     {{-- School Job Agreement --}}
-    <div class="bg-card-bg border {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'border-blue-500/40 bg-blue-50/10' : 'border-red-500/40 bg-red-50/10' }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'bg-blue-500/10 text-blue-600' : 'bg-red-500/10 text-red-500' }} flex items-center justify-center font-bold text-lg shrink-0">
+    <div class="bg-card-bg border {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'border-blue-500/40 bg-blue-50/10' : ($catSlug === 'home_tutor' ? 'border-card-border bg-card-bg opacity-70' : 'border-red-500/40 bg-red-50/10') }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'bg-blue-500/10 text-blue-600' : ($catSlug === 'home_tutor' ? 'bg-slate-100 text-slate-400' : 'bg-red-500/10 text-red-500') }} flex items-center justify-center font-bold text-lg shrink-0">
             <i class="fas fa-file-contract"></i>
         </div>
         <div>
             <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider">Job Service Agreement</p>
-            <h4 class="text-sm font-black {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'text-blue-600' : 'text-red-500' }}">
-                {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'Agreement Signed' : 'Pending Signature' }}
+            <h4 class="text-sm font-black {{ ($profile?->is_agreement_signed || $profile?->agreement_pdf_path) ? 'text-blue-600' : ($catSlug === 'home_tutor' ? 'text-slate-400' : 'text-red-500') }}">
+                @if($catSlug === 'home_tutor')
+                    <span class="text-slate-400 font-semibold">Not Applicable</span>
+                @elseif($profile?->is_agreement_signed || $profile?->agreement_pdf_path)
+                    Agreement Signed
+                @else
+                    Pending Signature
+                @endif
             </h4>
         </div>
     </div>
 
     {{-- Tuition Agreement --}}
-    <div class="bg-card-bg border {{ ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed) ? 'border-teal-500/40 bg-teal-50/10' : ($profile?->tuition_agreement_status === 'pending_signature' ? 'border-amber-500/40 bg-amber-50/10' : 'border-slate-300/40 bg-slate-50/20') }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
+    <div class="bg-card-bg border {{ ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed) ? 'border-teal-500/40 bg-teal-50/10' : ($profile?->tuition_agreement_status === 'pending_signature' ? 'border-amber-500/40 bg-amber-50/10' : ($catSlug === 'school_job' ? 'border-card-border bg-card-bg opacity-70' : 'border-slate-300/40 bg-slate-50/20')) }} rounded-2xl p-4 shadow-sm flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl {{ ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed) ? 'bg-teal-500/10 text-teal-600' : ($profile?->tuition_agreement_status === 'pending_signature' ? 'bg-amber-500/10 text-amber-600' : 'bg-slate-200 text-slate-500') }} flex items-center justify-center font-bold text-lg shrink-0">
             <i class="fas fa-file-signature"></i>
         </div>
         <div>
             <p class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider">Tuition Agreement</p>
             <h4 class="text-sm font-black {{ ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed) ? 'text-teal-600' : ($profile?->tuition_agreement_status === 'pending_signature' ? 'text-amber-600' : 'text-slate-500') }}">
-                @if($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed)
-                    Tuition Signed
+                @if($catSlug === 'school_job')
+                    <span class="text-slate-400 font-semibold">Not Applicable</span>
+                @elseif($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed)
+                    Tuition Signed ✅
                 @elseif($profile?->tuition_agreement_status === 'pending_signature')
-                    Active / Pending Sign
+                    Unlocked (Pending Sign)
                 @else
-                    Inactive
+                    Locked / Inactive
                 @endif
             </h4>
         </div>
@@ -123,7 +151,7 @@
     <div class="lg:col-span-1 space-y-6">
         <!-- Candidate Profile Card -->
         <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden">
-            <!-- Header Header with Photo -->
+            <!-- Header Header with Photo & Category -->
             <div class="p-6 border-b border-card-border bg-secondary-bg flex items-center gap-4">
                 @if($profile && $profile->profile_photo_path)
                     <img src="{{ Storage::url($profile->profile_photo_path) }}" alt="{{ $candidate->name }}" class="w-16 h-16 rounded-2xl object-cover border-2 border-accent-blue/30 shadow-sm shrink-0">
@@ -135,16 +163,89 @@
                     </div>
                 @endif
                 <div class="min-w-0">
-                    <h3 class="text-lg font-black text-text-main truncate">{{ $candidate->name }}</h3>
-                    <p class="text-xs text-text-dark/60 mt-0.5 flex items-center gap-1.5"><i class="fas fa-phone-alt text-[10px]"></i> {{ $candidate->phone }}</p>
-                    <p class="text-xs text-text-dark/60 mt-0.5 flex items-center gap-1.5 truncate"><i class="fas fa-envelope text-[10px]"></i> {{ $candidate->email }}</p>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h3 class="text-lg font-black text-text-main truncate">{{ $candidate->name }}</h3>
+                    </div>
+
+                    {{-- Category Badge --}}
+                    <div class="mt-1">
+                        @if($catSlug === 'home_tutor')
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <i class="fas fa-chalkboard-teacher text-[9px]"></i> Home Tutor
+                            </span>
+                        @elseif($catSlug === 'school_job')
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                <i class="fas fa-school text-[9px]"></i> School Job
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200">
+                                <i class="fas fa-layer-group text-[9px]"></i> Both (Tutor + School)
+                            </span>
+                        @endif
+                    </div>
+
+                    {{-- Contact --}}
+                    <div class="mt-2 space-y-0.5 text-xs text-text-dark/70">
+                        <p class="flex items-center gap-1.5">
+                            <i class="fas fa-phone-alt text-[10px] text-text-dark/40"></i>
+                            <a href="tel:{{ $candidate->phone }}" class="hover:text-accent-blue font-semibold">{{ $candidate->phone }}</a>
+                        </p>
+                        @if($candidate->whatsapp_no || $profile?->whatsapp_no)
+                            @php $wNo = preg_replace('/[^0-9]/', '', $candidate->whatsapp_no ?: $profile?->whatsapp_no); @endphp
+                            <p class="flex items-center gap-1.5">
+                                <i class="fab fa-whatsapp text-[11px] text-emerald-600"></i>
+                                <a href="https://wa.me/{{ str_starts_with($wNo, '91') ? $wNo : '91'.$wNo }}" target="_blank" class="text-emerald-700 font-bold hover:underline">
+                                    {{ $candidate->whatsapp_no ?: $profile?->whatsapp_no }}
+                                </a>
+                            </p>
+                        @endif
+                        <p class="flex items-center gap-1.5 truncate">
+                            <i class="fas fa-envelope text-[10px] text-text-dark/40"></i>
+                            <a href="mailto:{{ $candidate->email }}" class="hover:text-accent-blue truncate">{{ $candidate->email }}</a>
+                        </p>
+                    </div>
                 </div>
             </div>
 
             <div class="p-6 space-y-5">
+                {{-- Profile Completion Progress Card --}}
+                <div class="bg-secondary-bg/70 p-4 rounded-2xl border border-card-border space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-black uppercase tracking-wider text-text-dark/60">Profile Completion</span>
+                        <span class="text-xs font-black {{ $pct >= 80 ? 'text-emerald-600' : ($pct >= 50 ? 'text-amber-600' : 'text-red-500') }}">
+                            {{ $pct }}% Complete
+                        </span>
+                    </div>
+
+                    <div class="w-full h-2.5 bg-card-bg rounded-full overflow-hidden border border-card-border">
+                        <div class="h-full rounded-full transition-all duration-500 {{ $pct >= 80 ? 'bg-emerald-500' : ($pct >= 50 ? 'bg-amber-500' : 'bg-red-500') }}"
+                             style="width: {{ (int)$pct }}%;"></div>
+                    </div>
+
+                    @if($pct < 80 && ($catSlug === 'home_tutor' || $catSlug === 'both'))
+                        <div class="p-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold flex items-center gap-2">
+                            <i class="fas fa-lock text-amber-600 shrink-0"></i>
+                            <span>Tuition leads are locked for this teacher because completion is &lt; 80%.</span>
+                        </div>
+                    @endif
+
+                    @if(!empty($missingFields))
+                        <div class="pt-1">
+                            <span class="text-[10px] font-bold text-text-dark/50 uppercase block mb-1">Missing Details:</span>
+                            <div class="flex flex-wrap gap-1">
+                                @foreach($missingFields as $field)
+                                    <span class="text-[9px] font-semibold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">
+                                        • {{ $field }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
                 <!-- Personal Info -->
                 <div>
-                    <h4 class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-2.5">Personal Info</h4>
+                    <h4 class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-2.5">Common Personal Details</h4>
                     <div class="grid grid-cols-2 gap-2 text-xs">
                         <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
                             <span class="text-[10px] text-text-dark/50 block">Gender</span>
@@ -154,55 +255,156 @@
                             <span class="text-[10px] text-text-dark/50 block">Date of Birth</span>
                             <span class="font-bold text-text-main">{{ $profile?->date_of_birth ? $profile->date_of_birth->format('d M Y') : 'N/A' }}</span>
                         </div>
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block">Highest Qualification</span>
+                            <span class="font-bold text-text-main">{{ $profile?->highest_qualification_name ?: ($profile?->highestQualification?->name ?? 'N/A') }}</span>
+                        </div>
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block">Teaching Experience</span>
+                            <span class="font-bold text-text-main">{{ $profile?->experience_range ?: (($profile?->experience_years ?? 0) . ' Years') }}</span>
+                        </div>
                         <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border col-span-2">
-                            <span class="text-[10px] text-text-dark/50 block">Address</span>
+                            <span class="text-[10px] text-text-dark/50 block">Full Residential Address</span>
                             <span class="font-medium text-text-main">{{ $profile?->address ?? 'N/A' }}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Professional Info -->
-                <div>
-                    <h4 class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-2.5">Education & Teaching Profile</h4>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
+                {{-- Home Tutor Flow Details --}}
+                @if($profile?->appliesForHomeTuition())
+                <div class="pt-2 border-t border-card-border">
+                    <h4 class="text-xs font-black text-emerald-700 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                        <i class="fas fa-chalkboard-teacher"></i> Home Tutor Preferences
+                    </h4>
+                    <div class="space-y-2 text-xs">
+                        {{-- Tuition Subjects --}}
                         <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
-                            <span class="text-[10px] text-text-dark/50 block">Qualification</span>
-                            <span class="font-bold text-text-main">{{ $profile?->highestQualification?->name ?? 'N/A' }}</span>
+                            <span class="text-[10px] text-text-dark/50 block mb-1">Subjects Interested in Teaching:</span>
+                            @if(!empty($profile?->tuition_subjects) && is_array($profile->tuition_subjects))
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($profile->tuition_subjects as $subj)
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                            {{ $subj }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @else
+                                <span class="text-text-dark/40 italic">None selected</span>
+                            @endif
                         </div>
+
+                        {{-- Classes Interested --}}
                         <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
-                            <span class="text-[10px] text-text-dark/50 block">Subject</span>
-                            <span class="font-bold text-accent-blue">{{ $profile?->subject?->name ?? 'N/A' }}</span>
+                            <span class="text-[10px] text-text-dark/50 block mb-1">Classes / Levels:</span>
+                            @if(!empty($profile?->classes_interested) && is_array($profile->classes_interested))
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($profile->classes_interested as $cls)
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-accent-blue border border-blue-200">
+                                            {{ $cls }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @else
+                                <span class="text-text-dark/40 italic">None selected</span>
+                            @endif
                         </div>
+
+                        {{-- Mode & Time Slot --}}
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                                <span class="text-[10px] text-text-dark/50 block">Teaching Mode</span>
+                                <span class="font-bold text-text-main">{{ ucfirst($profile?->teaching_mode ?? 'Offline') }}</span>
+                            </div>
+                            <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                                <span class="text-[10px] text-text-dark/50 block">Time Slot</span>
+                                <span class="font-bold text-text-main">{{ $profile?->available_time_slot ?? 'Any Time' }}</span>
+                            </div>
+                        </div>
+
+                        {{-- Preferred Areas --}}
                         <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
-                            <span class="text-[10px] text-text-dark/50 block">School Category</span>
-                            <span class="font-bold text-text-main">{{ $profile?->category?->name ?? 'None' }}</span>
-                        </div>
-                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
-                            <span class="text-[10px] text-text-dark/50 block">Experience</span>
-                            <span class="font-bold text-text-main">{{ $profile?->experience_years ?? 0 }} Years</span>
-                        </div>
-                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
-                            <span class="text-[10px] text-text-dark/50 block">Current Salary</span>
-                            <span class="font-bold text-text-main">{{ $profile?->current_salary ? '₹'.$profile->current_salary : 'N/A' }}</span>
-                        </div>
-                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
-                            <span class="text-[10px] text-text-dark/50 block">Expected Salary</span>
-                            <span class="font-bold text-emerald-600">{{ $profile?->expected_salary ? '₹'.$profile->expected_salary : 'N/A' }}</span>
-                        </div>
-                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border col-span-2">
-                            <span class="text-[10px] text-text-dark/50 block">Preferred Location</span>
-                            <span class="font-bold text-text-main">{{ $profile?->preferredCity?->name ?? 'N/A' }}, {{ $profile?->preferredState?->name ?? '' }}</span>
+                            <span class="text-[10px] text-text-dark/50 block">Preferred Home Tuition Areas</span>
+                            <span class="font-bold text-emerald-800">{{ $profile?->preferred_areas ?? 'Not Specified' }}</span>
                         </div>
                     </div>
                 </div>
+                @endif
+
+                {{-- School Job Flow Details --}}
+                @if($profile?->appliesForSchoolJob())
+                <div class="pt-2 border-t border-card-border">
+                    <h4 class="text-xs font-black text-indigo-700 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                        <i class="fas fa-school"></i> School Job Application Details
+                    </h4>
+                    <div class="space-y-2 text-xs">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                                <span class="text-[10px] text-text-dark/50 block">Position Applying For</span>
+                                <span class="font-black text-indigo-700">{{ $profile?->position_applying_for ?? 'N/A' }}</span>
+                            </div>
+                            <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                                <span class="text-[10px] text-text-dark/50 block">Subject / Specialization</span>
+                                <span class="font-bold text-text-main">{{ $profile?->subject_specialization ?: ($profile?->subject?->name ?? 'N/A') }}</span>
+                            </div>
+                            <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                                <span class="text-[10px] text-text-dark/50 block">B.Ed Status</span>
+                                <span class="font-bold text-text-main">{{ $profile?->b_ed_status ?? 'No' }}</span>
+                            </div>
+                            <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                                <span class="text-[10px] text-text-dark/50 block">D.El.Ed Status</span>
+                                <span class="font-bold text-text-main">{{ $profile?->d_el_ed_status ?? 'No' }}</span>
+                            </div>
+                            <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                                <span class="text-[10px] text-text-dark/50 block">Current / Last Drawn Salary</span>
+                                <span class="font-bold text-text-main">{{ $profile?->last_drawn_salary ?: ($profile?->current_salary ? '₹'.$profile->current_salary : 'N/A') }}</span>
+                            </div>
+                            <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                                <span class="text-[10px] text-text-dark/50 block">Expected Salary</span>
+                                <span class="font-black text-emerald-600">{{ $profile?->expected_salary ? '₹'.$profile->expected_salary : 'N/A' }}</span>
+                            </div>
+                            <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                                <span class="text-[10px] text-text-dark/50 block">Previous School</span>
+                                <span class="font-bold text-text-main">{{ $profile?->last_school_name ?: ($profile?->current_school ?? 'N/A') }}</span>
+                            </div>
+                            <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                                <span class="text-[10px] text-text-dark/50 block">Last Designation</span>
+                                <span class="font-bold text-text-main">{{ $profile?->last_designation ?? 'N/A' }}</span>
+                            </div>
+                        </div>
+
+                        {{-- Preferred Locations --}}
+                        <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border">
+                            <span class="text-[10px] text-text-dark/50 block mb-1">Preferred Locations for School:</span>
+                            @if(!empty($profile?->preferred_locations) && is_array($profile->preferred_locations))
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($profile->preferred_locations as $locItem)
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-800 border border-indigo-200">
+                                            📍 {{ $locItem }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @elseif($profile?->preferredCity)
+                                <span class="font-bold text-text-main">📍 {{ $profile->preferredCity->name }}, {{ $profile->preferredState?->name }}</span>
+                            @else
+                                <span class="text-text-dark/40 italic">None selected</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Documents -->
-                <div>
+                <div class="pt-2 border-t border-card-border">
                     <h4 class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-2.5">Uploaded Documents</h4>
                     <div class="grid grid-cols-2 gap-2">
                         @if($profile?->resume_path)
                             <a href="{{ Storage::url($profile->resume_path) }}" target="_blank" class="p-2.5 bg-blue-50/50 hover:bg-blue-100/60 border border-blue-200 text-accent-blue rounded-xl text-xs font-bold transition-all flex items-center gap-2">
-                                <i class="fas fa-file-pdf text-sm"></i> <span>Resume</span>
+                                <i class="fas fa-file-pdf text-sm"></i> <span>Resume / CV</span>
+                            </a>
+                        @endif
+                        @if($profile?->salary_slip_path)
+                            <a href="{{ Storage::url($profile->salary_slip_path) }}" target="_blank" class="p-2.5 bg-amber-50/50 hover:bg-amber-100/60 border border-amber-200 text-amber-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                                <i class="fas fa-file-invoice text-sm"></i> <span>Salary Slip</span>
                             </a>
                         @endif
                         @if($profile?->profile_photo_path)
@@ -213,11 +415,6 @@
                         @if($profile?->live_photo_path)
                             <a href="{{ Storage::url($profile->live_photo_path) }}" target="_blank" class="p-2.5 bg-emerald-50/50 hover:bg-emerald-100/60 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
                                 <i class="fas fa-id-card text-sm"></i> <span>ID Card</span>
-                            </a>
-                        @endif
-                        @if($profile?->salary_slip_path)
-                            <a href="{{ Storage::url($profile->salary_slip_path) }}" target="_blank" class="p-2.5 bg-amber-50/50 hover:bg-amber-100/60 border border-amber-200 text-amber-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
-                                <i class="fas fa-file-invoice text-sm"></i> <span>Salary Slip</span>
                             </a>
                         @endif
                         @if($profile?->offer_letter_path)
@@ -322,6 +519,10 @@
                                 <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
                                     <i class="fas fa-hourglass-half mr-0.5"></i> Active on Candidate Panel
                                 </span>
+                            @elseif($profile?->tuition_agreement_status === 'request_pending')
+                                <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 animate-pulse">
+                                    <i class="fas fa-hand-paper mr-0.5"></i> Request Pending
+                                </span>
                             @else
                                 <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-card-border/50 text-text-dark/60 border border-card-border">
                                     <i class="fas fa-ban mr-0.5"></i> Inactive / Not Sent
@@ -330,18 +531,29 @@
                         </div>
 
                         {{-- 1-Click Action Buttons for Tuition Agreement --}}
-                        @if(!$profile?->is_tuition_agreement_signed && $profile?->tuition_agreement_status !== 'pending_signature')
+                        @if($profile?->tuition_agreement_status === 'request_pending')
+                            <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-2">
+                                <p class="text-xs text-blue-800 font-bold flex items-center gap-1.5"><i class="fas fa-info-circle"></i> Candidate requested to sign the agreement</p>
+                                <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="tuition_agreement_status" value="pending_signature">
+                                    <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2">
+                                        <i class="fas fa-check"></i> <span>Approve & Unlock Signature</span>
+                                    </button>
+                                </form>
+                            </div>
+                        @elseif(!$profile?->is_tuition_agreement_signed && $profile?->tuition_agreement_status !== 'pending_signature')
                             <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="tuition_agreement_status" value="pending_signature">
-                                <button type="submit" class="w-full py-2.5 px-3 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
-                                    <i class="fas fa-paper-plane"></i> <span>Activate Tuition Agreement on Candidate Panel</span>
+                                <button type="submit" class="w-full py-2.5 px-3 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-2 cursor-pointer">
+                                    <i class="fas fa-lock-open"></i> <span>Unlock Tuition Agreement for Candidate</span>
                                 </button>
-                                <p class="text-[10px] text-text-dark/50 mt-1.5 leading-tight">Enables digital signing wizard for candidate on home tuitions page.</p>
+                                <p class="text-[10px] text-text-dark/50 mt-1.5 leading-tight">Unlocks the digital signing form (Live Photo & Signature) for the candidate on their panel.</p>
                             </form>
                         @elseif($profile?->tuition_agreement_status === 'pending_signature')
                             <div class="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-800 space-y-2">
-                                <p class="font-bold flex items-center gap-1.5"><i class="fas fa-bell"></i> Tuition Agreement is LIVE on candidate portal</p>
+                                <p class="font-bold flex items-center gap-1.5"><i class="fas fa-lock-open text-amber-600"></i> Tuition Agreement is UNLOCKED on candidate portal</p>
                                 <div class="flex items-center gap-2">
                                     <form action="{{ route('admin.crm.candidate.update-agreement-status', $candidate->id) }}" method="POST" class="flex-1">
                                         @csrf
@@ -354,7 +566,7 @@
                                         @csrf
                                         <input type="hidden" name="tuition_agreement_status" value="not_required">
                                         <button type="submit" class="w-full py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-all">
-                                            <i class="fas fa-times mr-1"></i> Deactivate
+                                            <i class="fas fa-lock mr-1"></i> Lock Again
                                         </button>
                                     </form>
                                 </div>
@@ -376,6 +588,7 @@
                             <div class="flex items-center gap-1.5">
                                 <select name="tuition_agreement_status" class="text-xs bg-card-bg border border-card-border rounded-lg py-1 px-2 text-text-main font-semibold focus:ring-1 focus:ring-accent-blue">
                                     <option value="not_required" {{ ($profile?->tuition_agreement_status === 'not_required' || (!$profile?->tuition_agreement_status && !$profile?->is_tuition_agreement_signed)) ? 'selected' : '' }}>Not Required / Inactive</option>
+                                    <option value="request_pending" {{ $profile?->tuition_agreement_status === 'request_pending' ? 'selected' : '' }}>Request Pending</option>
                                     <option value="pending_signature" {{ $profile?->tuition_agreement_status === 'pending_signature' ? 'selected' : '' }}>Pending Signature (Active)</option>
                                     <option value="signed" {{ ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed) ? 'selected' : '' }}>Signed & Approved</option>
                                 </select>
@@ -416,11 +629,19 @@
                         </div>
 
                         @php
-                            $adminSig = $profile?->signature_data ?? ($tuitionMeta['signature_data'] ?? null);
-                            $adminSigType = $profile?->signature_type ?? ($tuitionMeta['signature_type'] ?? 'draw');
+                            $isActuallySigned = false;
+                            if ($catSlug === 'home_tutor') {
+                                $isActuallySigned = ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed);
+                                $adminSig = $isActuallySigned ? ($tuitionMeta['signature_data'] ?? $profile?->tuition_signature_data ?? $profile?->signature_data) : null;
+                                $adminSigType = $tuitionMeta['signature_type'] ?? $profile?->signature_type ?? 'draw';
+                            } else {
+                                $isActuallySigned = ($profile?->is_agreement_signed || $profile?->agreement_status === 'signed');
+                                $adminSig = $isActuallySigned ? ($profile?->signature_data ?? ($tuitionMeta['signature_data'] ?? null)) : null;
+                                $adminSigType = $profile?->signature_type ?? ($tuitionMeta['signature_type'] ?? 'draw');
+                            }
                         @endphp
 
-                        @if($adminSig)
+                        @if($isActuallySigned && $adminSig)
                             <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-blue-100">
                                 <div class="shrink-0 p-1.5 bg-slate-50 rounded-lg border border-slate-200">
                                     @if(str_starts_with($adminSig, 'data:image'))
@@ -439,6 +660,11 @@
                                     </p>
                                     <p class="text-[10px] text-text-dark/60 mt-0.5">Verified candidate signature attached to agreement.</p>
                                 </div>
+                            </div>
+                        @else
+                            <div class="p-3 bg-slate-100/90 rounded-xl text-xs text-slate-500 flex items-center gap-2">
+                                <i class="fas fa-lock text-slate-400"></i>
+                                <span>No signature submitted yet. {{ ($profile?->tuition_agreement_status === 'pending_signature' || $profile?->agreement_status === 'pending_signature') ? '(Agreement is Unlocked for candidate to sign)' : '(Agreement is Locked - Unlock above to allow candidate signing)' }}</span>
                             </div>
                         @endif
 

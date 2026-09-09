@@ -10,7 +10,8 @@
 @endsection
 
 @section('content')
-<div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden">
+<div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden" 
+     x-data="{ category: '{{ old('candidate_category', $profile?->candidate_category ?: 'both') }}' }">
     <form action="{{ route('admin.crm.update', $user->id) }}" method="POST" enctype="multipart/form-data" class="p-6 sm:p-8 space-y-8">
         @csrf
         @method('PUT')
@@ -29,17 +30,74 @@
             </div>
         @endif
 
+        {{-- Section 0: Candidate Category Selection --}}
+        <div>
+            <div class="flex items-center gap-3 border-b border-card-border pb-3 mb-4">
+                <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center font-black text-sm">
+                    <i class="fas fa-layer-group text-xs"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-text-main">Applied Category</h3>
+                    <p class="text-xs text-text-dark/50">Determine whether candidate applies for Home Tuitions, School Teaching Jobs, or Both.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {{-- Home Tutor Card --}}
+                <label @click="category = 'home_tutor'" 
+                       :class="category === 'home_tutor' ? 'border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-500/30' : 'border-card-border hover:border-emerald-300'"
+                       class="relative flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all">
+                    <input type="radio" name="candidate_category" value="home_tutor" x-model="category" class="sr-only">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-lg shrink-0">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-black text-text-main">Home Tutor</span>
+                        <span class="text-[11px] text-text-dark/50">Only Home Tuitions</span>
+                    </div>
+                </label>
+
+                {{-- School Job Card --}}
+                <label @click="category = 'school_job'" 
+                       :class="category === 'school_job' ? 'border-indigo-500 bg-indigo-50/20 ring-2 ring-indigo-500/30' : 'border-card-border hover:border-indigo-300'"
+                       class="relative flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all">
+                    <input type="radio" name="candidate_category" value="school_job" x-model="category" class="sr-only">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center text-lg shrink-0">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-black text-text-main">School Job</span>
+                        <span class="text-[11px] text-text-dark/50">Only School Teaching</span>
+                    </div>
+                </label>
+
+                {{-- Both Card --}}
+                <label @click="category = 'both'" 
+                       :class="category === 'both' ? 'border-purple-500 bg-purple-50/20 ring-2 ring-purple-500/30' : 'border-card-border hover:border-purple-300'"
+                       class="relative flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all">
+                    <input type="radio" name="candidate_category" value="both" x-model="category" class="sr-only">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-lg shrink-0">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-black text-text-main">Both Categories</span>
+                        <span class="text-[11px] text-text-dark/50">Tutor + School Job</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
         <!-- Section 1: Account Setup -->
         <div>
             <div class="flex items-center gap-3 border-b border-card-border pb-3 mb-5">
                 <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-accent-blue flex items-center justify-center font-black text-sm">1</div>
                 <div>
                     <h3 class="text-base font-black text-text-main">Account & Contact Information</h3>
-                    <p class="text-xs text-text-dark/50">Basic login credentials and contact details.</p>
+                    <p class="text-xs text-text-dark/50">Candidate login credentials and communications.</p>
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 sm:gap-6">
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Full Name <span class="text-red-500">*</span></label>
                     <input type="text" name="name" value="{{ old('name', $user->name) }}" required
@@ -56,8 +114,13 @@
                            class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-all">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Password</label>
-                    <input type="password" name="password" placeholder="Leave blank to keep unchanged"
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">WhatsApp Number</label>
+                    <input type="text" name="whatsapp_no" value="{{ old('whatsapp_no', $user->whatsapp_no ?: ($profile?->whatsapp_no ?? $user->phone)) }}"
+                           class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">New Password</label>
+                    <input type="password" name="password" placeholder="Leave blank to keep current"
                            class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-all">
                 </div>
             </div>
@@ -101,16 +164,16 @@
             <div class="flex items-center gap-3 border-b border-card-border pb-3 mb-5">
                 <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center font-black text-sm">3</div>
                 <div>
-                    <h3 class="text-base font-black text-text-main">Qualification & Teaching Preferences</h3>
-                    <p class="text-xs text-text-dark/50">For school placements and tuition matching.</p>
+                    <h3 class="text-base font-black text-text-main">Highest Qualification & Experience</h3>
+                    <p class="text-xs text-text-dark/50">Core education background and teaching experience.</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Highest Qualification <span class="text-red-500">*</span></label>
-                    <select name="highest_qualification_id" required class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                        <option value="">Select Qualification</option>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Highest Qualification</label>
+                    <select name="highest_qualification_id" class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                        <option value="">Select from list</option>
                         @foreach($qualifications as $qual)
                             <option value="{{ $qual->id }}" {{ old('highest_qualification_id', $profile?->highest_qualification_id) == $qual->id ? 'selected' : '' }}>{{ $qual->name }}</option>
                         @endforeach
@@ -118,34 +181,179 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Primary Subject <span class="text-red-500">*</span></label>
-                    <select name="subject_id" required class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                        <option value="">Select Subject</option>
-                        @foreach($subjects as $subject)
-                            <option value="{{ $subject->id }}" {{ old('subject_id', $profile?->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">School Teaching Category</label>
-                    <select name="category_id" class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                        <option value="">Select Category (Optional)</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id', $profile?->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Experience (Years)</label>
-                    <input type="number" name="experience_years" value="{{ old('experience_years', $profile?->experience_years ?? 0) }}" min="0"
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Qualification Name / Degree</label>
+                    <input type="text" name="highest_qualification_name" value="{{ old('highest_qualification_name', $profile?->highest_qualification_name ?: ($profile?->highestQualification?->name ?? '')) }}" placeholder="e.g. M.Sc Physics / B.Tech / M.A"
                            class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Preferred State <span class="text-red-500">*</span></label>
-                    <select name="preferred_state_id" required class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Experience Range</label>
+                    <select name="experience_range" class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                        <option value="">Select Range</option>
+                        @foreach(['Fresher', '1-3 Years', '3-5 Years', '5-10 Years', '10+ Years'] as $expR)
+                            <option value="{{ $expR }}" {{ old('experience_range', $profile?->experience_range) == $expR ? 'selected' : '' }}>{{ $expR }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Experience (Years Numeric)</label>
+                    <input type="number" name="experience_years" value="{{ old('experience_years', $profile?->experience_years ?? 0) }}" min="0"
+                           class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                </div>
+            </div>
+        </div>
+
+        {{-- Section 4: Home Tutor Preferences --}}
+        <div x-show="category === 'home_tutor' || category === 'both'" class="border border-emerald-500/30 bg-emerald-50/10 rounded-2xl p-5 sm:p-6 space-y-6">
+            <div class="flex items-center gap-3 border-b border-emerald-500/20 pb-3">
+                <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-700 flex items-center justify-center font-black text-sm">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-emerald-900">Home Tutor Preferences</h3>
+                    <p class="text-xs text-text-dark/60">Subjects, classes, tutoring modes, and preferred areas.</p>
+                </div>
+            </div>
+
+            @php
+                $savedTuitionSubjs = $profile?->tuition_subjects ?? [];
+                if (!is_array($savedTuitionSubjs)) $savedTuitionSubjs = [];
+                $popularTuitionSubjs = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Science (1-10)', 'Social Science', 'Hindi', 'Computer Science / Coding', 'Commerce / Accounts', 'Economics'];
+
+                $savedClasses = $profile?->classes_interested ?? [];
+                if (!is_array($savedClasses)) $savedClasses = [];
+                $classOptions = ['Pre-Primary / Nursery', 'Class 1 to 5', 'Class 6 to 8', 'Class 9 to 10', 'Class 11 to 12', 'IIT-JEE / NEET Foundation'];
+            @endphp
+
+            {{-- Tuition Subjects Multi-Select --}}
+            <div>
+                <label class="block text-xs font-bold text-text-dark/70 uppercase mb-2">Tuition Subjects Interested</label>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    @foreach($popularTuitionSubjs as $tSubj)
+                        <label class="flex items-center gap-2 p-2 bg-card-bg border border-card-border rounded-xl text-xs text-text-main font-semibold cursor-pointer hover:bg-emerald-50/40">
+                            <input type="checkbox" name="tuition_subjects[]" value="{{ $tSubj }}" 
+                                   {{ in_array($tSubj, old('tuition_subjects', $savedTuitionSubjs)) ? 'checked' : '' }}
+                                   class="rounded text-emerald-600 focus:ring-emerald-500">
+                            <span>{{ $tSubj }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Classes Interested Multi-Select --}}
+            <div>
+                <label class="block text-xs font-bold text-text-dark/70 uppercase mb-2">Classes / Levels Interested</label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    @foreach($classOptions as $cOpt)
+                        <label class="flex items-center gap-2 p-2 bg-card-bg border border-card-border rounded-xl text-xs text-text-main font-semibold cursor-pointer hover:bg-emerald-50/40">
+                            <input type="checkbox" name="classes_interested[]" value="{{ $cOpt }}" 
+                                   {{ in_array($cOpt, old('classes_interested', $savedClasses)) ? 'checked' : '' }}
+                                   class="rounded text-emerald-600 focus:ring-emerald-500">
+                            <span>{{ $cOpt }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Teaching Mode</label>
+                    <select name="teaching_mode" class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500">
+                        <option value="offline" {{ old('teaching_mode', $profile?->teaching_mode) === 'offline' ? 'selected' : '' }}>Offline (At Student's Home)</option>
+                        <option value="online" {{ old('teaching_mode', $profile?->teaching_mode) === 'online' ? 'selected' : '' }}>Online</option>
+                        <option value="both" {{ old('teaching_mode', $profile?->teaching_mode) === 'both' ? 'selected' : '' }}>Both (Offline & Online)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Available Time Slot</label>
+                    <select name="available_time_slot" class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500">
+                        <option value="Morning" {{ old('available_time_slot', $profile?->available_time_slot) === 'Morning' ? 'selected' : '' }}>Morning (6 AM - 10 AM)</option>
+                        <option value="Afternoon" {{ old('available_time_slot', $profile?->available_time_slot) === 'Afternoon' ? 'selected' : '' }}>Afternoon (12 PM - 4 PM)</option>
+                        <option value="Evening" {{ old('available_time_slot', $profile?->available_time_slot) === 'Evening' ? 'selected' : '' }}>Evening (4 PM - 8 PM)</option>
+                        <option value="Flexible" {{ old('available_time_slot', $profile?->available_time_slot) === 'Flexible' ? 'selected' : '' }}>Flexible / Any Time</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Preferred Home Tuition Areas</label>
+                    <input type="text" name="preferred_areas" value="{{ old('preferred_areas', $profile?->preferred_areas) }}" placeholder="e.g. Kankarbagh, Boring Road, Bailey Road"
+                           class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500">
+                </div>
+            </div>
+        </div>
+
+        {{-- Section 5: School Job Application Details --}}
+        <div x-show="category === 'school_job' || category === 'both'" class="border border-indigo-500/30 bg-indigo-50/10 rounded-2xl p-5 sm:p-6 space-y-6">
+            <div class="flex items-center gap-3 border-b border-indigo-500/20 pb-3">
+                <div class="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-700 flex items-center justify-center font-black text-sm">
+                    <i class="fas fa-school"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-indigo-900">School Job Application Details</h3>
+                    <p class="text-xs text-text-dark/60">Position, B.Ed / D.El.Ed credentials, previous school history, and salary.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Position Applying For</label>
+                    <input type="text" name="position_applying_for" value="{{ old('position_applying_for', $profile?->position_applying_for) }}" placeholder="e.g. PRT, TGT, PGT Physics"
+                           class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Subject / Specialization</label>
+                    <input type="text" name="subject_specialization" value="{{ old('subject_specialization', $profile?->subject_specialization ?: ($profile?->subject?->name ?? '')) }}" placeholder="e.g. Mathematics, English"
+                           class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">B.Ed Status</label>
+                    <select name="b_ed_status" class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
+                        <option value="No" {{ old('b_ed_status', $profile?->b_ed_status) === 'No' ? 'selected' : '' }}>Not Applicable / No</option>
+                        <option value="Completed" {{ old('b_ed_status', $profile?->b_ed_status) === 'Completed' ? 'selected' : '' }}>Completed</option>
+                        <option value="Pursuing" {{ old('b_ed_status', $profile?->b_ed_status) === 'Pursuing' ? 'selected' : '' }}>Pursuing / Appearing</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">D.El.Ed Status</label>
+                    <select name="d_el_ed_status" class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
+                        <option value="No" {{ old('d_el_ed_status', $profile?->d_el_ed_status) === 'No' ? 'selected' : '' }}>Not Applicable / No</option>
+                        <option value="Completed" {{ old('d_el_ed_status', $profile?->d_el_ed_status) === 'Completed' ? 'selected' : '' }}>Completed</option>
+                        <option value="Pursuing" {{ old('d_el_ed_status', $profile?->d_el_ed_status) === 'Pursuing' ? 'selected' : '' }}>Pursuing</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Last / Current School</label>
+                    <input type="text" name="last_school_name" value="{{ old('last_school_name', $profile?->last_school_name ?: ($profile?->current_school ?? '')) }}" placeholder="e.g. DPS Patna"
+                           class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Last Designation</label>
+                    <input type="text" name="last_designation" value="{{ old('last_designation', $profile?->last_designation) }}" placeholder="e.g. Senior Teacher"
+                           class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Last Drawn Salary (₹/mo)</label>
+                    <input type="text" name="last_drawn_salary" value="{{ old('last_drawn_salary', $profile?->last_drawn_salary ?: ($profile?->current_salary ?? '')) }}" placeholder="e.g. 25,000"
+                           class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Expected Salary (₹/mo)</label>
+                    <input type="text" name="expected_salary" value="{{ old('expected_salary', $profile?->expected_salary) }}" placeholder="e.g. 35,000"
+                           class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Preferred State</label>
+                    <select name="preferred_state_id" class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
                         <option value="">Select State</option>
                         @foreach($states as $state)
                             <option value="{{ $state->id }}" {{ old('preferred_state_id', $profile?->preferred_state_id) == $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
@@ -154,8 +362,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Preferred City <span class="text-red-500">*</span></label>
-                    <select name="preferred_city_id" required class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Preferred City</label>
+                    <select name="preferred_city_id" class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
                         <option value="">Select City</option>
                         @foreach($cities as $city)
                             <option value="{{ $city->id }}" {{ old('preferred_city_id', $profile?->preferred_city_id) == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
@@ -164,31 +372,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Current Salary (₹/Month)</label>
-                    <input type="text" name="current_salary" value="{{ old('current_salary', $profile?->current_salary) }}" placeholder="e.g. 25,000"
-                           class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Expected Salary (₹/Month)</label>
-                    <input type="text" name="expected_salary" value="{{ old('expected_salary', $profile?->expected_salary) }}" placeholder="e.g. 35,000"
-                           class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">English Fluency</label>
-                    <select name="english_fluency" class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                        <option value="">Select Fluency</option>
-                        <option value="beginner" {{ old('english_fluency', $profile?->english_fluency) == 'beginner' ? 'selected' : '' }}>Beginner</option>
-                        <option value="intermediate" {{ old('english_fluency', $profile?->english_fluency) == 'intermediate' ? 'selected' : '' }}>Intermediate</option>
-                        <option value="fluent" {{ old('english_fluency', $profile?->english_fluency) == 'fluent' ? 'selected' : '' }}>Fluent</option>
-                    </select>
-                </div>
-
-                <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">School Preference</label>
-                    <select name="residential_preference" class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                        <option value="">Select Option</option>
+                    <select name="residential_preference" class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
                         <option value="day" {{ old('residential_preference', $profile?->residential_preference) == 'day' ? 'selected' : '' }}>Day School</option>
                         <option value="residential" {{ old('residential_preference', $profile?->residential_preference) == 'residential' ? 'selected' : '' }}>Residential / Boarding</option>
                         <option value="both" {{ old('residential_preference', $profile?->residential_preference) == 'both' ? 'selected' : '' }}>Both</option>
@@ -198,21 +383,37 @@
                 <div>
                     <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Availability to Join</label>
                     <input type="text" name="availability_to_join" value="{{ old('availability_to_join', $profile?->availability_to_join) }}" placeholder="e.g. Immediate / 15 Days"
-                           class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                           class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
                 </div>
+            </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Current School / Coaching</label>
-                    <input type="text" name="current_school" value="{{ old('current_school', $profile?->current_school) }}" placeholder="e.g. DPS / Self-employed"
-                           class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+            {{-- Preferred Locations Multi-Select --}}
+            <div>
+                <label class="block text-xs font-bold text-text-dark/70 uppercase mb-2">Preferred School Job Locations</label>
+                @php
+                    $savedLocs = $profile?->preferred_locations ?? [];
+                    if (!is_array($savedLocs)) $savedLocs = [];
+                    $commonLocs = ['Patna', 'Ranchi', 'Gaya', 'Muzaffarpur', 'Bhagalpur', 'Darbhanga', 'Dhanbad', 'Jamshedpur', 'Bokaro', 'Delhi-NCR', 'Pan-India'];
+                @endphp
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    @foreach($commonLocs as $locItem)
+                        <label class="flex items-center gap-2 p-2 bg-card-bg border border-card-border rounded-xl text-xs text-text-main font-semibold cursor-pointer hover:bg-indigo-50/40">
+                            <input type="checkbox" name="preferred_locations[]" value="{{ $locItem }}"
+                                   {{ in_array($locItem, old('preferred_locations', $savedLocs)) ? 'checked' : '' }}
+                                   class="rounded text-indigo-600 focus:ring-indigo-500">
+                            <span>{{ $locItem }}</span>
+                        </label>
+                    @endforeach
                 </div>
             </div>
         </div>
 
-        <!-- Section 4: Document Uploads -->
+        <!-- Section 6: Document Uploads -->
         <div>
             <div class="flex items-center gap-3 border-b border-card-border pb-3 mb-5">
-                <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-black text-sm">4</div>
+                <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-black text-sm">
+                    <i class="fas fa-file-upload"></i>
+                </div>
                 <div>
                     <h3 class="text-base font-black text-text-main">Document Management</h3>
                     <p class="text-xs text-text-dark/50">Upload or replace candidate files.</p>
