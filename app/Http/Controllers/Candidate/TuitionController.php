@@ -14,7 +14,9 @@ class TuitionController extends Controller
 {
     public function index(Request $request)
     {
-        $profile = auth()->user()->profile;
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+        $profile = $user->profile;
         $tuitionAgreementStatus = $profile?->tuition_agreement_status ?? 'not_required';
         $isAgreementSigned = ($tuitionAgreementStatus === 'signed' || (bool) $profile?->is_tuition_agreement_signed);
         $isAgreementActive = ($tuitionAgreementStatus === 'pending_signature');
@@ -44,7 +46,7 @@ class TuitionController extends Controller
                 ->paginate(12)
                 ->withQueryString();
 
-            $appliedTuitionIds = TuitionApplication::where('candidate_id', auth()->id())
+            $appliedTuitionIds = TuitionApplication::where('candidate_id', $user->id)
                 ->pluck('home_tuition_lead_id')
                 ->toArray();
         }
@@ -54,7 +56,9 @@ class TuitionController extends Controller
 
     public function requestAgreement(Request $request)
     {
-        $profile = auth()->user()->profile;
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+        $profile = $user->profile;
 
         if (!$profile) {
             return back()->with('error', 'Candidate profile not found.');
@@ -67,8 +71,8 @@ class TuitionController extends Controller
 
             \App\Helpers\NotificationHelper::notifyAdmin(
                 'Tuition Agreement Unlock Requested',
-                auth()->user()->name . ' has requested to unlock their Home Tuition Agreement.',
-                route('admin.crm.show', auth()->id()),
+                $user->name . ' has requested to unlock their Home Tuition Agreement.',
+                route('admin.crm.show', $user->id),
                 'fas fa-unlock'
             );
 
@@ -87,7 +91,9 @@ class TuitionController extends Controller
             'location_name' => 'nullable|string|max:500',
         ]);
 
-        $profile = auth()->user()->profile;
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+        $profile = $user->profile;
         if (!$profile) {
             return back()->with('error', 'Candidate profile not found.');
         }
@@ -108,7 +114,7 @@ class TuitionController extends Controller
                     $ext = strtolower($type[1]);
                     if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
                         $decoded = base64_decode($data);
-                        $filename = 'candidate_live_photos/tuition_agreement_user_' . auth()->id() . '_' . time() . '.' . ($ext === 'jpeg' ? 'jpg' : $ext);
+                        $filename = 'candidate_live_photos/tuition_agreement_user_' . $user->id . '_' . time() . '.' . ($ext === 'jpeg' ? 'jpg' : $ext);
                         Storage::disk('public')->put($filename, $decoded);
                         $photoPath = $filename;
                     }
@@ -139,9 +145,9 @@ class TuitionController extends Controller
             }
 
             $signatureMeta = [
-                'name' => auth()->user()->name,
-                'phone' => auth()->user()->phone,
-                'email' => auth()->user()->email,
+                'name' => $user->name,
+                'phone' => $user->phone,
+                'email' => $user->email,
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
                 'latitude' => $request->input('latitude'),
@@ -181,7 +187,7 @@ class TuitionController extends Controller
         }
 
         NotificationHelper::notifyUser(
-            auth()->id(),
+            $user->id,
             'Tuition Agreement Signed & Verified ✅',
             'You have successfully signed the Home Tuition Tutor Service Agreement with live verification.',
             route('candidate.tuitions.index'),
@@ -191,9 +197,11 @@ class TuitionController extends Controller
         return back()->with('success', 'Home Tuition Tutor Service Agreement signed and digitally verified!');
     }
 
-    public function apply(Request $request, $id)
+    public function apply(Request $request, int $id)
     {
-        $profile = auth()->user()->profile;
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+        $profile = $user->profile;
 
         if (($profile?->completion_percentage ?? 0) < 80) {
             return redirect()->route('candidate.profile.edit')->with('error', 'Registration Pending: Your profile must be at least 80% complete to apply for home tuitions.');
@@ -209,7 +217,7 @@ class TuitionController extends Controller
             return back()->with('error', 'This tuition requirement is no longer active or accepting applications.');
         }
 
-        $existingApplication = TuitionApplication::where('candidate_id', auth()->id())
+        $existingApplication = TuitionApplication::where('candidate_id', $user->id)
             ->where('home_tuition_lead_id', $id)
             ->first();
 
@@ -218,13 +226,13 @@ class TuitionController extends Controller
         }
 
         TuitionApplication::create([
-            'candidate_id' => auth()->id(),
+            'candidate_id' => $user->id,
             'home_tuition_lead_id' => $id,
             'status' => 'Applied'
         ]);
 
         NotificationHelper::notifyUser(
-            auth()->id(),
+            $user->id,
             'Tuition Application Submitted ✅',
             "You have applied for {$tuition->class} ({$tuition->subjects}) in {$tuition->location}.",
             route('candidate.tuitions.index'),
