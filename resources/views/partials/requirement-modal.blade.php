@@ -689,25 +689,40 @@ function globalRequirementModal() {
                                     <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 ml-auto">Home Tutor Details</span>
                                 </div>
 
-                                {{-- Tuition Subjects --}}
-                                <div>
-                                    <div class="flex items-center justify-between mb-2">
-                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Tuition Subjects Interested <span class="text-red-500">*</span></label>
-                                        <button type="button" @click="toggleAllTuitionSubjects()" class="text-[11px] font-bold text-blue-600 hover:underline cursor-pointer">
-                                            <span x-text="selectedTuitionSubjects.includes('All Subjects') ? 'Deselect All' : 'Select All Subjects'"></span>
+                                {{-- Teaching Mode + Time Slot --}}
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Teaching Mode <span class="text-red-500">*</span></label>
+                                        <select data-no-search="true" name="teaching_mode" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                            <option value="Offline">Offline (Student's Home)</option>
+                                            <option value="Online">Online (Zoom / Google Meet)</option>
+                                            <option value="Both">Both (Offline &amp; Online)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Available Time Slot</label>
+                                        <select data-no-search="true" name="available_time_slot" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                            <option value="Flexible / Any Time">Flexible / Any Time</option>
+                                            <option value="Morning (6 AM - 10 AM)">Morning (6 AM - 10 AM)</option>
+                                            <option value="Afternoon (12 PM - 4 PM)">Afternoon (12 PM - 4 PM)</option>
+                                            <option value="Evening (4 PM - 8 PM)">Evening (4 PM - 8 PM)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- Subjects Card --}}
+                                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-xs font-black text-amber-800 uppercase tracking-wide flex items-center gap-1.5"><i class="fas fa-book-open text-amber-500"></i> Tuition Subjects Interested <span class="text-red-500">*</span></span>
+                                        <button type="button" @click="toggleAllTuitionSubjects()" class="text-[11px] font-bold text-amber-700 bg-white border border-amber-300 px-2.5 py-1 rounded-lg cursor-pointer hover:bg-amber-100">
+                                            <span x-text="selectedTuitionSubjects.includes('All Subjects') ? 'Deselect All' : 'Select All'"></span>
                                         </button>
                                     </div>
-                                    @php
-                                        $modalTuitionSubs = ['All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'];
-                                    @endphp
+                                    @php $modalTuitionSubs = ['All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies']; @endphp
                                     <div class="flex flex-wrap gap-1.5">
                                         @foreach($modalTuitionSubs as $subj)
-                                            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all select-none"
-                                                   :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-amber-300'">
-                                                <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}"
-                                                       :checked="selectedTuitionSubjects.includes('{{ $subj }}')"
-                                                       @change="toggleTuitionSubject('{{ $subj }}')"
-                                                       class="sr-only">
+                                            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-amber-400'">
+                                                <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}" :checked="selectedTuitionSubjects.includes('{{ $subj }}')" @change="toggleTuitionSubject('{{ $subj }}')" class="sr-only">
                                                 <i class="fas fa-check text-[9px]" x-show="selectedTuitionSubjects.includes('{{ $subj }}')"></i>
                                                 <span>{{ $subj }}</span>
                                             </label>
@@ -715,20 +730,14 @@ function globalRequirementModal() {
                                     </div>
                                 </div>
 
-                                {{-- Classes --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Classes You Can Teach <span class="text-red-500">*</span></label>
-                                    @php
-                                        $modalClassList = ['Class 1–5', 'Class 6–8', 'Class 9–10', 'Class 11–12', 'Competitive / Olympiad', 'Languages / Hobby'];
-                                    @endphp
-                                    <div class="flex flex-wrap gap-1.5">
+                                {{-- Classes Card --}}
+                                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+                                    <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span></span>
+                                    @php $modalClassList = ['Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'Competitive / Olympiad', 'Languages / Hobby']; @endphp
+                                    <div class="flex flex-wrap gap-2">
                                         @foreach($modalClassList as $cls)
-                                            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all select-none"
-                                                   :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-blue-300'">
-                                                <input type="checkbox" name="classes_interested[]" value="{{ $cls }}"
-                                                       :checked="selectedClasses.includes('{{ $cls }}')"
-                                                       @change="toggleSelectedClass('{{ $cls }}')"
-                                                       class="sr-only">
+                                            <label class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-400'">
+                                                <input type="checkbox" name="classes_interested[]" value="{{ $cls }}" :checked="selectedClasses.includes('{{ $cls }}')" @change="toggleSelectedClass('{{ $cls }}')" class="sr-only">
                                                 <i class="fas fa-check text-[9px]" x-show="selectedClasses.includes('{{ $cls }}')"></i>
                                                 <span>{{ $cls }}</span>
                                             </label>
@@ -736,44 +745,24 @@ function globalRequirementModal() {
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Teaching Mode <span class="text-red-500">*</span></label>
-                                        <select data-no-search="true" name="teaching_mode" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                                            <option value="Offline">Offline (Student's Home)</option>
-                                            <option value="Online">Online (Zoom / Google Meet)</option>
-                                            <option value="Both">Both (Offline & Online)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Available Time Slot</label>
-                                        <select data-no-search="true" name="available_time_slot" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                                            <option value="Flexible / Any Time">Flexible / Any Time</option>
-                                            <option value="Morning (6 AM – 10 AM)">Morning (6 AM – 10 AM)</option>
-                                            <option value="Afternoon (12 PM – 4 PM)">Afternoon (12 PM – 4 PM)</option>
-                                            <option value="Evening (4 PM – 8 PM)">Evening (4 PM – 8 PM)</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Preferred Localities / Areas <span class="text-red-500">*</span></label>
-                                    <textarea name="preferred_areas" id="modal_ht_areas" rows="2" placeholder="e.g. Kankarbagh, Boring Road, Bailey Road, Rajendra Nagar..."
-                                              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]"></textarea>
-                                    <div class="flex flex-wrap gap-1 mt-1.5">
+                                {{-- Preferred Areas Card --}}
+                                <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
+                                    <span class="text-xs font-black text-emerald-800 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-map-marker-alt text-emerald-500"></i> Preferred Localities / Areas <span class="text-red-500">*</span></span>
+                                    <textarea name="preferred_areas" id="modal_ht_areas" rows="2" placeholder="e.g. Kankarbagh, Boring Road, Bailey Road, Rajendra Nagar..." class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-400"></textarea>
+                                    <div class="flex flex-wrap gap-1.5 mt-2">
                                         @foreach(['Patna', 'Kankarbagh', 'Boring Road', 'Bailey Road', 'Danapur', 'Rajendra Nagar', 'Anisabad'] as $quickArea)
-                                            <button type="button" @click="appendModalArea('{{ $quickArea }}', 'modal_ht_areas')" class="text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full cursor-pointer transition-colors">
+                                            <button type="button" @click="appendModalArea('{{ $quickArea }}', 'modal_ht_areas')" class="text-[11px] font-bold bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-300 px-2.5 py-1 rounded-lg cursor-pointer transition-colors">
                                                 + {{ $quickArea }}
                                             </button>
                                         @endforeach
                                     </div>
                                 </div>
 
-                                {{-- Optional Resume for Home Tutor --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Resume / CV (Optional)</label>
-                                    <input type="file" name="tutor_resume" accept=".pdf,.doc,.docx"
-                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-white hover:file:bg-amber-600 cursor-pointer">
+                                {{-- Optional Resume --}}
+                                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                                    <span class="text-xs font-black text-slate-700 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-file-alt text-slate-500"></i> Resume / CV <span class="text-slate-400 font-normal normal-case text-[11px]">(Optional)</span></span>
+                                    <input type="file" name="tutor_resume" accept=".pdf,.doc,.docx" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-white hover:file:bg-amber-600 cursor-pointer">
+                                    <p class="text-[11px] text-slate-400 mt-1.5">PDF, DOC, DOCX format. Max 2MB.</p>
                                 </div>
                             </div>
 
