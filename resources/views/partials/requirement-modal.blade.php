@@ -1,4 +1,4 @@
-@php
+﻿@php
     $modalCategories = $categories ?? \App\Models\Category::where('is_active', true)->orderBy('name')->get();
     $modalStates = $states ?? \App\Models\State::where('is_active', true)->orderBy('name')->get();
     $modalQualifications = $qualifications ?? \App\Models\Qualification::where('is_active', true)->orderBy('name')->get();
@@ -647,17 +647,24 @@ function globalRequirementModal() {
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Highest Qualification <span class="text-red-500">*</span></label>
-                                        <select data-no-search="true" name="highest_qualification" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                                            <option value="">Select Qualification</option>
-                                            <option value="B.Tech / BE">B.Tech / BE</option>
-                                            <option value="BCA / MCA">BCA / MCA</option>
-                                            <option value="B.Sc / M.Sc">B.Sc / M.Sc</option>
-                                            <option value="B.A / M.A">B.A / M.A</option>
-                                            <option value="B.Com / M.Com">B.Com / M.Com</option>
-                                            <option value="B.Ed / M.Ed">B.Ed / M.Ed</option>
-                                            <option value="PhD / Doctorate">PhD / Doctorate</option>
-                                            <option value="Other">Other</option>
-                                        </select>
+                                        <div x-data="{ qual: '' }">
+                                            <select data-no-search="true" x-model="qual" name="highest_qualification" required
+                                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                                <option value="">Select Qualification</option>
+                                                <option value="B.Tech / BE">B.Tech / BE</option>
+                                                <option value="BCA / MCA">BCA / MCA</option>
+                                                <option value="B.Sc / M.Sc">B.Sc / M.Sc</option>
+                                                <option value="B.A / M.A">B.A / M.A</option>
+                                                <option value="B.Com / M.Com">B.Com / M.Com</option>
+                                                <option value="B.Ed / M.Ed">B.Ed / M.Ed</option>
+                                                <option value="PhD / Doctorate">PhD / Doctorate</option>
+                                                <option value="__other__">Other (Type manually)</option>
+                                            </select>
+                                            <input x-show="qual === '__other__'" type="text" name="highest_qualification_custom"
+                                                   placeholder="Type your qualification here..."
+                                                   style="display:none;"
+                                                   class="mt-2 w-full bg-white border-2 border-[#0ea5e9] rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40">
+                                        </div>
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Total Teaching Experience <span class="text-red-500">*</span></label>
@@ -915,17 +922,24 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Highest Qualification <span class="text-red-500">*</span></label>
-                                    <select data-no-search="true" name="highest_qualification" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                                        <option value="">Select Qualification</option>
-                                        <option value="B.Tech / BE">B.Tech / BE</option>
-                                        <option value="BCA / MCA">BCA / MCA</option>
-                                        <option value="B.Sc / M.Sc">B.Sc / M.Sc</option>
-                                        <option value="B.A / M.A">B.A / M.A</option>
-                                        <option value="B.Com / M.Com">B.Com / M.Com</option>
-                                        <option value="B.Ed / M.Ed">B.Ed / M.Ed</option>
-                                        <option value="PhD / Doctorate">PhD / Doctorate</option>
-                                        <option value="Other">Other</option>
-                                    </select>
+                                    <div x-data="{ qual: '' }">
+                                        <select data-no-search="true" x-model="qual" name="highest_qualification" required
+                                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                            <option value="">Select Qualification</option>
+                                            <option value="B.Tech / BE">B.Tech / BE</option>
+                                            <option value="BCA / MCA">BCA / MCA</option>
+                                            <option value="B.Sc / M.Sc">B.Sc / M.Sc</option>
+                                            <option value="B.A / M.A">B.A / M.A</option>
+                                            <option value="B.Com / M.Com">B.Com / M.Com</option>
+                                            <option value="B.Ed / M.Ed">B.Ed / M.Ed</option>
+                                            <option value="PhD / Doctorate">PhD / Doctorate</option>
+                                            <option value="__other__">Other (Type manually)</option>
+                                        </select>
+                                        <input x-show="qual === '__other__'" type="text" name="highest_qualification_custom"
+                                               placeholder="Type your qualification here..."
+                                               style="display:none;"
+                                               class="mt-2 w-full bg-white border-2 border-[#0ea5e9] rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40">
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Total Teaching Experience <span class="text-red-500">*</span></label>
@@ -942,6 +956,7 @@ function globalRequirementModal() {
                             </div>
                         </div>
 
+
                         {{-- Section 2: School Job Profile Details --}}
                         <div class="pt-4 border-t border-slate-100 space-y-4">
                             <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
@@ -949,9 +964,8 @@ function globalRequirementModal() {
                                 <h4 class="text-sm font-black text-[#031b4e]">School Teaching Profile</h4>
                                 <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 ml-auto">School Candidate Details</span>
                             </div>
-
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                                <div>
+                                <div class="sm:col-span-2">
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Teaching Post Applying For <span class="text-red-500">*</span></label>
                                     <select data-no-search="true" name="position_applying_for" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                         <option value="">Select Teaching Post</option>
@@ -963,49 +977,6 @@ function globalRequirementModal() {
                                         <option value="Principal / Vice Principal">Principal / Vice Principal</option>
                                         <option value="Admin / Non-Teaching Staff">Admin / Non-Teaching Staff</option>
                                     </select>
-                                </div>
-                                <div class="col-span-1 sm:col-span-2">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Subjects You Can Teach <span class="text-red-500">*</span></label>
-                                        <button type="button" @click="toggleAllTuitionSubjects()" class="text-[11px] font-bold text-blue-600 hover:underline cursor-pointer">
-                                            <span x-text="selectedTuitionSubjects.includes('All Subjects') ? 'Deselect All' : 'Select All Subjects'"></span>
-                                        </button>
-                                    </div>
-                                    @php
-                                        $modalSchoolSubs = ['All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'];
-                                    @endphp
-                                    <div class="flex flex-wrap gap-1.5">
-                                        @foreach($modalSchoolSubs as $subj)
-                                            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all select-none"
-                                                   :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-amber-300'">
-                                                <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}"
-                                                       :checked="selectedTuitionSubjects.includes('{{ $subj }}')"
-                                                       @change="toggleTuitionSubject('{{ $subj }}')"
-                                                       class="sr-only">
-                                                <i class="fas fa-check text-[9px]" x-show="selectedTuitionSubjects.includes('{{ $subj }}')"></i>
-                                                <span>{{ $subj }}</span>
-                                            </label>
-                                        @endforeach
-                                    </div>
-                                </div>
-                                <div class="col-span-1 sm:col-span-2">
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Classes You Can Teach <span class="text-red-500">*</span></label>
-                                    @php
-                                        $modalSchoolClassList = ['Class 1–5', 'Class 6–8', 'Class 9–10', 'Class 11–12', 'Pre-Primary', 'Languages / Hobby'];
-                                    @endphp
-                                    <div class="flex flex-wrap gap-1.5">
-                                        @foreach($modalSchoolClassList as $cls)
-                                            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all select-none"
-                                                   :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-blue-300'">
-                                                <input type="checkbox" name="classes_interested[]" value="{{ $cls }}"
-                                                       :checked="selectedClasses.includes('{{ $cls }}')"
-                                                       @change="toggleSelectedClass('{{ $cls }}')"
-                                                       class="sr-only">
-                                                <i class="fas fa-check text-[9px]" x-show="selectedClasses.includes('{{ $cls }}')"></i>
-                                                <span>{{ $cls }}</span>
-                                            </label>
-                                        @endforeach
-                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">B.Ed Status <span class="text-red-500">*</span></label>
@@ -1024,38 +995,58 @@ function globalRequirementModal() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Current / Last School (Optional)</label>
-                                    <input type="text" name="last_school_name" placeholder="e.g. DPS / DAV / St. Michael's"
-                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Current / Last School <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
+                                    <input type="text" name="last_school_name" placeholder="e.g. DPS / DAV / St. Michael's" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Expected Monthly Salary (₹)</label>
-                                    <input type="number" name="expected_salary" placeholder="e.g. 30000"
-                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Expected Monthly Salary (&#8377;) <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
+                                    <input type="number" name="expected_salary" placeholder="e.g. 30000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                             </div>
-
-                            {{-- Preferred School Locations --}}
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Preferred School Locations <span class="text-red-500">*</span></label>
-                                @php
-                                    $modalLocs = ['Patna', 'Hajipur', 'Muzaffarpur', 'Bhagalpur', 'Gaya', 'Darbhanga', 'Begusarai', 'Supaul', 'Other'];
-                                @endphp
+                            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-xs font-black text-amber-800 uppercase tracking-wide flex items-center gap-1.5"><i class="fas fa-book-open text-amber-500"></i> Subjects You Can Teach <span class="text-red-500">*</span></span>
+                                    <button type="button" @click="toggleAllTuitionSubjects()" class="text-[11px] font-bold text-amber-700 bg-white border border-amber-300 px-2.5 py-1 rounded-lg cursor-pointer hover:bg-amber-100">
+                                        <span x-text="selectedTuitionSubjects.includes('All Subjects') ? 'Deselect All' : 'Select All'"></span>
+                                    </button>
+                                </div>
+                                @php $modalSchoolSubs = ['All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies']; @endphp
                                 <div class="flex flex-wrap gap-1.5">
+                                    @foreach($modalSchoolSubs as $subj)
+                                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-amber-400'">
+                                            <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}" :checked="selectedTuitionSubjects.includes('{{ $subj }}')" @change="toggleTuitionSubject('{{ $subj }}')" class="sr-only">
+                                            <i class="fas fa-check text-[9px]" x-show="selectedTuitionSubjects.includes('{{ $subj }}')"></i>
+                                            <span>{{ $subj }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+                                <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span></span>
+                                @php $modalSchoolClassList = ['Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'Pre-Primary', 'Languages / Hobby']; @endphp
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($modalSchoolClassList as $cls)
+                                        <label class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-400'">
+                                            <input type="checkbox" name="classes_interested[]" value="{{ $cls }}" :checked="selectedClasses.includes('{{ $cls }}')" @change="toggleSelectedClass('{{ $cls }}')" class="sr-only">
+                                            <i class="fas fa-check text-[9px]" x-show="selectedClasses.includes('{{ $cls }}')"></i>
+                                            <span>{{ $cls }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4">
+                                <span class="text-xs font-black text-indigo-800 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-map-marker-alt text-indigo-500"></i> Preferred School Locations <span class="text-red-500">*</span></span>
+                                @php $modalLocs = ['Patna', 'Hajipur', 'Muzaffarpur', 'Bhagalpur', 'Gaya', 'Darbhanga', 'Begusarai', 'Supaul', 'Other']; @endphp
+                                <div class="flex flex-wrap gap-2">
                                     @foreach($modalLocs as $loc)
-                                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all select-none"
-                                               :class="selectedLocations.includes('{{ $loc }}') ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-indigo-300'">
-                                            <input type="checkbox" name="preferred_locations[]" value="{{ $loc }}"
-                                                   :checked="selectedLocations.includes('{{ $loc }}')"
-                                                   @change="toggleLocation('{{ $loc }}')"
-                                                   class="sr-only">
+                                        <label class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedLocations.includes('{{ $loc }}') ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-400'">
+                                            <input type="checkbox" name="preferred_locations[]" value="{{ $loc }}" :checked="selectedLocations.includes('{{ $loc }}')" @change="toggleLocation('{{ $loc }}')" class="sr-only">
                                             <i class="fas fa-check text-[9px]" x-show="selectedLocations.includes('{{ $loc }}')"></i>
                                             <span>{{ $loc }}</span>
                                         </label>
                                     @endforeach
                                 </div>
                             </div>
-
                             {{-- Resume Upload (Mandatory for School Job) --}}
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
@@ -1149,17 +1140,24 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Highest Qualification <span class="text-red-500">*</span></label>
-                                    <select data-no-search="true" name="highest_qualification" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                                        <option value="">Select Qualification</option>
-                                        <option value="B.Tech / BE">B.Tech / BE</option>
-                                        <option value="BCA / MCA">BCA / MCA</option>
-                                        <option value="B.Sc / M.Sc">B.Sc / M.Sc</option>
-                                        <option value="B.A / M.A">B.A / M.A</option>
-                                        <option value="B.Com / M.Com">B.Com / M.Com</option>
-                                        <option value="B.Ed / M.Ed">B.Ed / M.Ed</option>
-                                        <option value="PhD / Doctorate">PhD / Doctorate</option>
-                                        <option value="Other">Other</option>
-                                    </select>
+                                    <div x-data="{ qual: '' }">
+                                        <select data-no-search="true" x-model="qual" name="highest_qualification" required
+                                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                            <option value="">Select Qualification</option>
+                                            <option value="B.Tech / BE">B.Tech / BE</option>
+                                            <option value="BCA / MCA">BCA / MCA</option>
+                                            <option value="B.Sc / M.Sc">B.Sc / M.Sc</option>
+                                            <option value="B.A / M.A">B.A / M.A</option>
+                                            <option value="B.Com / M.Com">B.Com / M.Com</option>
+                                            <option value="B.Ed / M.Ed">B.Ed / M.Ed</option>
+                                            <option value="PhD / Doctorate">PhD / Doctorate</option>
+                                            <option value="__other__">Other (Type manually)</option>
+                                        </select>
+                                        <input x-show="qual === '__other__'" type="text" name="highest_qualification_custom"
+                                               placeholder="Type your qualification here..."
+                                               style="display:none;"
+                                               class="mt-2 w-full bg-white border-2 border-[#0ea5e9] rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40">
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Total Teaching Experience <span class="text-red-500">*</span></label>
