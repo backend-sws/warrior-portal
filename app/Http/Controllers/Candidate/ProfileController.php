@@ -54,12 +54,17 @@ class ProfileController extends Controller
         $profile = $user->profile ?? $user->profile()->create([]);
 
         $request->validate([
+            // User details
+            'name'                      => 'required|string|max:255',
+            'email'                     => 'required|email|max:255|unique:users,email,' . $user->id,
+            'phone'                     => 'required|string|max:20|unique:users,phone,' . $user->id,
+            'whatsapp_no'               => 'nullable|string|max:20',
+
             // Common Personal Details
             'candidate_category'        => 'nullable|in:home_tutor,school_job,both',
-            'date_of_birth'             => $profile->date_of_birth ? 'nullable|date' : 'required|date',
-            'gender'                    => $profile->gender ? 'nullable|in:Male,Female,Other' : 'required|in:Male,Female,Other',
-            'whatsapp_no'               => 'nullable|regex:/^[6-9]\d{9}$/',
-            'highest_qualification'     => 'nullable|string|max:100',
+            'date_of_birth'             => 'nullable|date',
+            'gender'                    => 'nullable|in:Male,Female,Other',
+            'highest_qualification'     => 'nullable|string|max:150',
             'experience_range'          => 'nullable|string|max:50',
             'experience_years'          => 'nullable|integer|min:0',
             'address'                   => 'nullable|string',
@@ -72,16 +77,17 @@ class ProfileController extends Controller
             'available_time_slot'       => 'nullable|string|max:150',
 
             // School Job Preferences
-            'b_ed_status'               => 'nullable|in:Yes,No,Pursuing',
-            'd_el_ed_status'            => 'nullable|in:Yes,No,Pursuing',
-            'subject_specialization'    => 'nullable|string|max:100',
-            'position_applying_for'     => 'nullable|string|max:100',
-            'current_salary'            => 'nullable|string',
-            'expected_salary'           => 'nullable|string',
+            'b_ed_status'               => 'nullable|string|max:100',
+            'd_el_ed_status'            => 'nullable|string|max:100',
+            'subject_specialization'    => 'nullable|string|max:150',
+            'position_applying_for'     => 'nullable|string|max:150',
+            'current_salary'            => 'nullable|string|max:100',
+            'expected_salary'           => 'nullable|string|max:100',
             'last_school_name'          => 'nullable|string|max:200',
             'last_designation'          => 'nullable|string|max:100',
-            'last_drawn_salary'         => 'nullable|string|max:50',
-            'preferred_locations'       => 'nullable|array',
+            'last_drawn_salary'         => 'nullable|string|max:100',
+            'preferred_locations'       => 'nullable',
+            'preferred_locations_manual'=> 'nullable|string|max:1000',
 
             // Files
             'resume'                    => 'nullable|mimes:pdf,doc,docx|max:5120',
@@ -89,100 +95,86 @@ class ProfileController extends Controller
             'profile_photo'             => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
         ]);
 
-        // Category is permanent once chosen
-        if (empty($profile->candidate_category) && $request->filled('candidate_category')) {
+        // 1. Update User info
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+        if ($request->filled('whatsapp_no')) {
+            $user->whatsapp_no = $request->whatsapp_no;
+        }
+        $user->save();
+
+        // 2. Update Profile info
+        if ($request->filled('candidate_category')) {
             $profile->candidate_category = $request->candidate_category;
         }
 
-        // WhatsApp: lock once saved
-        if (empty($profile->whatsapp_no) && empty($user->whatsapp_no)) {
-            if ($request->filled('whatsapp_no')) {
-                $user->whatsapp_no = $request->whatsapp_no;
-                $user->save();
-                $profile->whatsapp_no = $request->whatsapp_no;
-            }
+        if ($request->filled('whatsapp_no')) {
+            $profile->whatsapp_no = $request->whatsapp_no;
         }
 
-        // Only update fields that are NOT already saved (locked once saved)
-        if (empty($profile->date_of_birth) && $request->filled('date_of_birth')) {
+        if ($request->has('date_of_birth')) {
             $profile->date_of_birth = $request->date_of_birth;
         }
-        if (empty($profile->gender) && $request->filled('gender')) {
+        if ($request->has('gender')) {
             $profile->gender = $request->gender;
         }
-        if (empty($profile->highest_qualification_name) && empty($profile->highest_qualification_id) && $request->filled('highest_qualification')) {
+        if ($request->has('highest_qualification')) {
             $profile->highest_qualification_name = $request->highest_qualification;
         }
-        if (empty($profile->experience_range) && $request->filled('experience_range')) {
+        if ($request->has('experience_range')) {
             $profile->experience_range = $request->experience_range;
         }
-        if (empty($profile->address) && $request->filled('address')) {
+        if ($request->has('address')) {
             $profile->address = $request->address;
         }
 
-        if ($request->hasFile('profile_photo') && empty($profile->profile_photo_path)) {
+        if ($request->hasFile('profile_photo')) {
             $path = $request->file('profile_photo')->store('profile_photos', 'public');
             $profile->profile_photo_path = $path;
         }
 
         $activeCategory = $profile->candidate_category ?: 'both';
 
-        // Home Tutor fields (only if category applies and field not yet saved)
+        // Home Tutor fields
         if (in_array($activeCategory, ['home_tutor', 'both'])) {
-            if ((empty($profile->tuition_subjects) || count($profile->tuition_subjects) === 0) && $request->filled('tuition_subjects')) {
-                $profile->tuition_subjects = $request->tuition_subjects;
-            }
-            if ((empty($profile->classes_interested) || count($profile->classes_interested) === 0) && $request->filled('classes_interested')) {
-                $profile->classes_interested = $request->classes_interested;
-            }
-            if (empty($profile->teaching_mode) && $request->filled('teaching_mode')) {
-                $profile->teaching_mode = $request->teaching_mode;
-            }
-            if (empty($profile->preferred_areas) && $request->filled('preferred_areas')) {
-                $profile->preferred_areas = $request->preferred_areas;
-            }
-            if (empty($profile->available_time_slot) && $request->filled('available_time_slot')) {
-                $profile->available_time_slot = $request->available_time_slot;
-            }
+            $profile->tuition_subjects = $request->input('tuition_subjects', []);
+            $profile->classes_interested = $request->input('classes_interested', []);
+            $profile->teaching_mode = $request->input('teaching_mode');
+            $profile->preferred_areas = $request->input('preferred_areas');
+            $profile->available_time_slot = $request->input('available_time_slot');
         }
 
-        // School Job fields (only if category applies and field not yet saved)
+        // School Job fields
         if (in_array($activeCategory, ['school_job', 'both'])) {
-            if (empty($profile->b_ed_status) && $request->filled('b_ed_status')) {
-                $profile->b_ed_status = $request->b_ed_status;
+            $profile->b_ed_status = $request->input('b_ed_status');
+            $profile->d_el_ed_status = $request->input('d_el_ed_status');
+            $profile->subject_specialization = $request->input('subject_specialization');
+            $profile->position_applying_for = $request->input('position_applying_for');
+            $profile->current_salary = $request->input('current_salary');
+            $profile->expected_salary = $request->input('expected_salary');
+            $profile->last_school_name = $request->input('last_school_name');
+            $profile->last_designation = $request->input('last_designation');
+            $profile->last_drawn_salary = $request->input('last_drawn_salary');
+
+            if ($request->filled('preferred_locations_manual')) {
+                $locParts = array_map('trim', explode(',', $request->input('preferred_locations_manual')));
+                $profile->preferred_locations = array_values(array_filter($locParts));
+            } elseif ($request->has('preferred_locations')) {
+                $rawLocs = $request->input('preferred_locations');
+                if (is_string($rawLocs)) {
+                    $locParts = array_map('trim', explode(',', $rawLocs));
+                    $profile->preferred_locations = array_values(array_filter($locParts));
+                } else {
+                    $profile->preferred_locations = (array) $rawLocs;
+                }
             }
-            if (empty($profile->d_el_ed_status) && $request->filled('d_el_ed_status')) {
-                $profile->d_el_ed_status = $request->d_el_ed_status;
-            }
-            if (empty($profile->subject_specialization) && $request->filled('subject_specialization')) {
-                $profile->subject_specialization = $request->subject_specialization;
-            }
-            if (empty($profile->position_applying_for) && $request->filled('position_applying_for')) {
-                $profile->position_applying_for = $request->position_applying_for;
-            }
-            if (empty($profile->current_salary) && $request->filled('current_salary')) {
-                $profile->current_salary = $request->current_salary;
-            }
-            if (empty($profile->expected_salary) && $request->filled('expected_salary')) {
-                $profile->expected_salary = $request->expected_salary;
-            }
-            if (empty($profile->last_school_name) && $request->filled('last_school_name')) {
-                $profile->last_school_name = $request->last_school_name;
-            }
-            if (empty($profile->last_designation) && $request->filled('last_designation')) {
-                $profile->last_designation = $request->last_designation;
-            }
-            if (empty($profile->last_drawn_salary) && $request->filled('last_drawn_salary')) {
-                $profile->last_drawn_salary = $request->last_drawn_salary;
-            }
-            if ((empty($profile->preferred_locations) || count($profile->preferred_locations) === 0) && $request->filled('preferred_locations')) {
-                $profile->preferred_locations = $request->preferred_locations;
-            }
-            if ($request->hasFile('resume') && empty($profile->resume_path)) {
+
+            if ($request->hasFile('resume')) {
                 $path = $request->file('resume')->store('resumes', 'public');
                 $profile->resume_path = $path;
             }
-            if ($request->hasFile('salary_slip') && empty($profile->salary_slip_path)) {
+            if ($request->hasFile('salary_slip')) {
                 $path = $request->file('salary_slip')->store('salary_slips', 'public');
                 $profile->salary_slip_path = $path;
             }
@@ -192,7 +184,7 @@ class ProfileController extends Controller
         $profile->profile_completion_percentage = $profile->completion_percentage;
         $profile->save();
 
-        return redirect()->route('candidate.profile.edit')->with('success', 'Profile details updated successfully.');
+        return redirect()->route('candidate.dashboard')->with('success', 'Profile details updated successfully! Welcome to your dashboard.');
     }
 
     public function updatePassword(Request $request)

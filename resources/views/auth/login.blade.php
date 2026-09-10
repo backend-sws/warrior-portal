@@ -143,7 +143,7 @@
         </div>
 
         {{-- Right Panel - Login Form --}}
-        <div class="p-6 sm:p-10 lg:p-12 flex flex-col justify-center">
+        <div class="p-6 sm:p-8 lg:p-10 flex flex-col justify-center">
             {{-- Mobile Logo --}}
             <div class="lg:hidden flex justify-center mb-6">
                 <a href="{{ route('home') }}">
@@ -156,7 +156,7 @@
                 <p class="mt-1 text-xs sm:text-sm text-gray-500">Enter your credentials to access your account</p>
             </div>
 
-            {{-- 4 Requirement & Registration Cards Above Login Form --}}
+            {{-- 3 Requirement & Registration Buttons Above Login Form --}}
             <div class="mb-6">
                 <div class="flex items-center justify-between mb-2.5">
                     <span class="text-[11px] font-black uppercase tracking-wider text-[#031b4e]">
@@ -165,52 +165,40 @@
                     <span class="text-[10px] font-bold text-slate-400">Choose your category</span>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2.5">
-                    {{-- Button 1: Home Tuition --}}
+                <div class="grid grid-cols-3 gap-2 sm:gap-2.5">
+                    {{-- Button 1: Tuition Post Requirement --}}
                     <button type="button" onclick="openRequirementModal('tuition')"
-                            class="flex items-center gap-2.5 p-3 rounded-2xl bg-sky-50/90 hover:bg-sky-100 border border-sky-200/80 hover:border-sky-400 hover:shadow-md hover:-translate-y-0.5 transition-all text-left group cursor-pointer">
-                        <div class="w-9 h-9 rounded-xl bg-[#0ea5e9] text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0 group-hover:scale-110 transition-transform">
-                            <i class="fas fa-home"></i>
+                            class="flex flex-col items-center justify-between text-center p-2.5 sm:p-3 rounded-2xl bg-sky-50/90 hover:bg-sky-100 border border-sky-200/80 hover:border-sky-400 hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-pointer h-full">
+                        <div class="w-9 h-9 rounded-xl bg-[#0ea5e9] text-white flex items-center justify-center text-sm font-bold shadow-xs mb-2 group-hover:scale-110 transition-transform shrink-0">
+                            <i class="fas fa-graduation-cap"></i>
                         </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="text-xs font-black text-[#031b4e] leading-tight truncate">Home Tuition</div>
-                            <div class="text-[10px] text-slate-500 font-medium truncate">Tutor / Parent</div>
+                        <div class="w-full flex-1 flex flex-col justify-center">
+                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">Tuition Post Requirement</div>
+                            <div class="text-[9px] sm:text-[10px] text-slate-500 font-semibold leading-tight mt-1">Parent / Student</div>
                         </div>
                     </button>
 
                     {{-- Button 2: School Hiring --}}
                     <button type="button" onclick="openRequirementModal('school')"
-                            class="flex items-center gap-2.5 p-3 rounded-2xl bg-purple-50/90 hover:bg-purple-100 border border-purple-200/80 hover:border-purple-400 hover:shadow-md hover:-translate-y-0.5 transition-all text-left group cursor-pointer">
-                        <div class="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0 group-hover:scale-110 transition-transform">
+                            class="flex flex-col items-center justify-between text-center p-2.5 sm:p-3 rounded-2xl bg-purple-50/90 hover:bg-purple-100 border border-purple-200/80 hover:border-purple-400 hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-pointer h-full">
+                        <div class="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-xs mb-2 group-hover:scale-110 transition-transform shrink-0">
                             <i class="fas fa-school"></i>
                         </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="text-xs font-black text-[#031b4e] leading-tight truncate">School Hiring</div>
-                            <div class="text-[10px] text-slate-500 font-medium truncate">Post Vacancy</div>
+                        <div class="w-full flex-1 flex flex-col justify-center">
+                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">School Hiring</div>
+                            <div class="text-[9px] sm:text-[10px] text-slate-500 font-semibold leading-tight mt-1">Post Vacancy</div>
                         </div>
                     </button>
 
-                    {{-- Button 3: Join as Teacher --}}
+                    {{-- Button 3: Join as a Teacher --}}
                     <button type="button" onclick="openRequirementModal('teacher')"
-                            class="flex items-center gap-2.5 p-3 rounded-2xl bg-amber-50/90 hover:bg-amber-100 border border-amber-200/80 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 transition-all text-left group cursor-pointer">
-                        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0 group-hover:scale-110 transition-transform">
+                            class="flex flex-col items-center justify-between text-center p-2.5 sm:p-3 rounded-2xl bg-amber-50/90 hover:bg-amber-100 border border-amber-200/80 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-pointer h-full">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-xs mb-2 group-hover:scale-110 transition-transform shrink-0">
                             <i class="fas fa-chalkboard-teacher"></i>
                         </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="text-xs font-black text-[#031b4e] leading-tight truncate">Join as Teacher</div>
-                            <div class="text-[10px] text-slate-500 font-medium truncate">School Job</div>
-                        </div>
-                    </button>
-
-                    {{-- Button 4: Both --}}
-                    <button type="button" onclick="openRequirementModal('both')"
-                            class="flex items-center gap-2.5 p-3 rounded-2xl bg-emerald-50/90 hover:bg-emerald-100 border border-emerald-200/80 hover:border-emerald-400 hover:shadow-md hover:-translate-y-0.5 transition-all text-left group cursor-pointer">
-                        <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0 group-hover:scale-110 transition-transform">
-                            <i class="fas fa-handshake"></i>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="text-xs font-black text-[#031b4e] leading-tight truncate">Both</div>
-                            <div class="text-[10px] text-slate-500 font-medium truncate">Dual Profile</div>
+                        <div class="w-full flex-1 flex flex-col justify-center">
+                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">Join as a Teacher</div>
+                            <div class="text-[9px] sm:text-[10px] text-slate-500 font-semibold leading-tight mt-1">Tutor, School & Both</div>
                         </div>
                     </button>
                 </div>
@@ -283,13 +271,11 @@
             <div class="mt-6 pt-5 border-t border-gray-100 text-center">
                 <p class="text-xs text-gray-500 mb-2 font-medium">New to Warriors Educare? Register or post requirement:</p>
                 <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-[#031b4e]">
-                    <button type="button" onclick="openRequirementModal('teacher')" class="hover:text-amber-600 transition-colors cursor-pointer">Teacher Registration</button>
-                    <span class="text-gray-300">•</span>
-                    <button type="button" onclick="openRequirementModal('tuition')" class="hover:text-blue-600 transition-colors cursor-pointer">Home Tutor</button>
+                    <button type="button" onclick="openRequirementModal('tuition')" class="hover:text-blue-600 transition-colors cursor-pointer">Tuition Post Requirement</button>
                     <span class="text-gray-300">•</span>
                     <button type="button" onclick="openRequirementModal('school')" class="hover:text-purple-600 transition-colors cursor-pointer">School Hiring</button>
                     <span class="text-gray-300">•</span>
-                    <button type="button" onclick="openRequirementModal('both')" class="hover:text-emerald-600 transition-colors cursor-pointer">Both</button>
+                    <button type="button" onclick="openRequirementModal('teacher')" class="hover:text-amber-600 transition-colors cursor-pointer">Join as a Teacher</button>
                 </div>
             </div>
         </div>
