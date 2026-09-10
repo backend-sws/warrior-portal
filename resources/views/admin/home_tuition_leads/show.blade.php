@@ -73,6 +73,14 @@
                     <a href="{{ route('admin.tuition-leads.edit', $lead->id) }}" class="px-3.5 py-1.5 bg-secondary-bg hover:bg-card-border/50 text-text-main border border-card-border rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
                         <i class="fas fa-edit"></i> Edit Details
                     </a>
+
+                    <form action="{{ route('admin.tuition-leads.destroy', $lead->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this tuition lead? All associated applications, follow-ups, and invoices will be removed.');" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="px-3.5 py-1.5 bg-red-500/10 text-red-600 hover:bg-red-600 hover:text-white border border-red-500/20 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer" title="Delete Tuition Requirement">
+                            <i class="fas fa-trash-alt text-xs"></i> Delete
+                        </button>
+                    </form>
                 </div>
                 
                 @if($lead->follow_up_date)
