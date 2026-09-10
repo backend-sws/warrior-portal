@@ -255,6 +255,14 @@
                                         <span class="px-3 py-1.5 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-200 flex items-center gap-1.5">
                                             <i class="fas fa-star text-amber-600"></i> Shortlisted for Demo
                                         </span>
+                                    @elseif($status === 'Parent Rejected')
+                                        <span class="px-3 py-1.5 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-200 flex items-center gap-1.5">
+                                            <i class="fas fa-user-times text-rose-600"></i> Demo Disapproved (Parent)
+                                        </span>
+                                    @elseif($status === 'Tutor Backed Out')
+                                        <span class="px-3 py-1.5 rounded-full text-xs font-black bg-slate-200 text-slate-700 border border-slate-300 flex items-center gap-1.5">
+                                            <i class="fas fa-undo text-slate-500"></i> Declined by Tutor
+                                        </span>
                                     @elseif($status === 'Rejected')
                                         <span class="px-3 py-1.5 rounded-full text-xs font-black bg-red-100 text-red-700 border border-red-200">
                                             <i class="fas fa-times"></i> Not Selected
@@ -314,7 +322,31 @@
                             @endif
 
                             {{-- Rejection Feedback or Admin Remarks --}}
-                            @if($status === 'Rejected')
+                            @if($status === 'Parent Rejected')
+                                <div class="mb-4 p-3.5 rounded-2xl bg-rose-50/90 border border-rose-200 text-xs text-rose-900">
+                                    <div class="flex items-center gap-2 font-bold mb-1 text-rose-700">
+                                        <i class="fas fa-user-times"></i>
+                                        <span>Parent Feedback / Reason:</span>
+                                    </div>
+                                    @if($tApp->remarks)
+                                        <p class="text-rose-800 leading-relaxed font-medium pl-5">{{ $tApp->remarks }}</p>
+                                    @else
+                                        <p class="text-rose-700/80 italic pl-5">The parent preferred another tutor or disapproved the demo. You can apply for other available home tuitions!</p>
+                                    @endif
+                                </div>
+                            @elseif($status === 'Tutor Backed Out')
+                                <div class="mb-4 p-3.5 rounded-2xl bg-slate-100 border border-slate-300 text-xs text-slate-800">
+                                    <div class="flex items-center gap-2 font-bold mb-1 text-slate-700">
+                                        <i class="fas fa-undo"></i>
+                                        <span>Tutor Declined / Backed Out Note:</span>
+                                    </div>
+                                    @if($tApp->remarks)
+                                        <p class="text-slate-700 leading-relaxed font-medium pl-5">{{ $tApp->remarks }}</p>
+                                    @else
+                                        <p class="text-slate-600/80 italic pl-5">This tuition was declined by tutor or marked unavailable for the location/timings.</p>
+                                    @endif
+                                </div>
+                            @elseif($status === 'Rejected')
                                 <div class="mb-4 p-3.5 rounded-2xl bg-red-50/80 border border-red-200 text-xs text-red-900">
                                     <div class="flex items-center gap-2 font-bold mb-1 text-red-700">
                                         <i class="fas fa-times-circle"></i>
@@ -376,19 +408,33 @@
                                         <span class="font-bold {{ ($tApp->demo_date || $status === 'Assigned') ? 'text-slate-800' : 'text-slate-400' }}">Demo Class</span>
                                     </div>
 
-                                    {{-- Step 4: Assigned --}}
+                                    {{-- Step 4: Assigned / Outcome --}}
                                     <div class="flex flex-col items-center">
-                                        <div class="w-7 h-7 rounded-full {{ $status === 'Assigned' ? 'bg-emerald-500 text-white' : ($status === 'Rejected' ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-500') }} flex items-center justify-center font-bold mb-1 shadow-sm">
+                                        <div class="w-7 h-7 rounded-full {{ $status === 'Assigned' ? 'bg-emerald-500 text-white' : ($status === 'Parent Rejected' ? 'bg-rose-500 text-white' : ($status === 'Tutor Backed Out' ? 'bg-slate-400 text-white' : ($status === 'Rejected' ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-500'))) }} flex items-center justify-center font-bold mb-1 shadow-sm">
                                             @if($status === 'Assigned')
                                                 <i class="fas fa-trophy text-[10px]"></i>
+                                            @elseif($status === 'Parent Rejected')
+                                                <i class="fas fa-user-times text-[10px]"></i>
+                                            @elseif($status === 'Tutor Backed Out')
+                                                <i class="fas fa-undo text-[10px]"></i>
                                             @elseif($status === 'Rejected')
                                                 <i class="fas fa-times text-[10px]"></i>
                                             @else
                                                 4
                                             @endif
                                         </div>
-                                        <span class="font-bold {{ $status === 'Assigned' ? 'text-emerald-700' : ($status === 'Rejected' ? 'text-red-600' : 'text-slate-400') }}">
-                                            {{ $status === 'Rejected' ? 'Not Selected' : 'Assigned' }}
+                                        <span class="font-bold {{ $status === 'Assigned' ? 'text-emerald-700' : ($status === 'Parent Rejected' ? 'text-rose-600' : ($status === 'Tutor Backed Out' ? 'text-slate-600' : ($status === 'Rejected' ? 'text-red-600' : 'text-slate-400'))) }}">
+                                            @if($status === 'Assigned')
+                                                Assigned
+                                            @elseif($status === 'Parent Rejected')
+                                                Parent Disapproved
+                                            @elseif($status === 'Tutor Backed Out')
+                                                Tutor Declined
+                                            @elseif($status === 'Rejected')
+                                                Not Selected
+                                            @else
+                                                Assigned
+                                            @endif
                                         </span>
                                     </div>
                                 </div>

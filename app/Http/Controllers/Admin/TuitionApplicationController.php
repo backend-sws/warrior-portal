@@ -64,11 +64,13 @@ class TuitionApplicationController extends Controller
         }
 
         $stats = [
-            'total'       => (clone $baseQuery)->count(),
-            'applied'     => (clone $baseQuery)->where('status', 'Applied')->count(),
-            'shortlisted' => (clone $baseQuery)->where('status', 'Shortlisted')->count(),
-            'assigned'    => (clone $baseQuery)->where('status', 'Assigned')->count(),
-            'rejected'    => (clone $baseQuery)->where('status', 'Rejected')->count(),
+            'total'           => (clone $baseQuery)->count(),
+            'applied'         => (clone $baseQuery)->where('status', 'Applied')->count(),
+            'shortlisted'     => (clone $baseQuery)->where('status', 'Shortlisted')->count(),
+            'assigned'        => (clone $baseQuery)->where('status', 'Assigned')->count(),
+            'parent_rejected' => (clone $baseQuery)->where('status', 'Parent Rejected')->count(),
+            'tutor_rejected'  => (clone $baseQuery)->where('status', 'Tutor Backed Out')->count(),
+            'rejected'        => (clone $baseQuery)->where('status', 'Rejected')->count(),
         ];
 
         return view('admin.tuition_applications.index', compact('applications', 'stats'));
@@ -77,7 +79,7 @@ class TuitionApplicationController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status'                     => 'required|in:Applied,Shortlisted,Assigned,Rejected',
+            'status'                     => 'required|in:Applied,Shortlisted,Assigned,Parent Rejected,Tutor Backed Out,Rejected',
             'remarks'                    => 'nullable|string|max:500',
             'demo_date'                  => 'nullable|date',
             'create_service_charge'      => 'nullable|boolean',
@@ -231,6 +233,70 @@ class TuitionApplicationController extends Controller
                 Mail::to($candidate->email)->send(new TuitionApplicationStatusMail($application));
             } catch (\Throwable $e) {
                 Log::error("Rejection email failed for {$candidate->email}: " . $e->getMessage());
+            }
+
+        // ─── 4. STATUS: PARENT REJECTED ──────────────────────────────
+        } elseif ($request->status === 'Parent Rejected') {
+            if ($lead && $lead->teacher_name === $candidate->name) {
+                $lead->update([
+                    'teacher_name'    => null,
+                    'teacher_contact' => null,
+                    'status'          => 'Open',
+                ]);
+            }
+            if ($lead) {
+                $lead->followUps()->create([
+                    'admin_id'       => auth()->id(),
+                    'note'           => "Parent rejected demo for {$candidate->name}. Reason: " . ($request->remarks ?: 'Demo not approved by parent'),
+                    'follow_up_date' => now()->addDay()->toDateString(),
+                ]);
+            }
+
+            $reasonNote = $request->remarks ? " Feedback: {$request->remarks}" : "";
+            NotificationHelper::notifyUser(
+                $candidate->id,
+                'Demo Not Approved by Parent ❌',
+                "Parent did not approve the demo session for Class {$lead?->class} ({$lead?->subjects}).{$reasonNote} You are eligible to apply for other open tuitions.",
+                route('candidate.applications.index', ['tab' => 'tuitions']),
+                'fas fa-user-times'
+            );
+
+            try {
+                Mail::to($candidate->email)->send(new TuitionApplicationStatusMail($application));
+            } catch (\Throwable $e) {
+                Log::error("Parent rejected email failed for {$candidate->email}: " . $e->getMessage());
+            }
+
+        // ─── 5. STATUS: TUTOR BACKED OUT ──────────────────────────────
+        } elseif ($request->status === 'Tutor Backed Out') {
+            if ($lead && $lead->teacher_name === $candidate->name) {
+                $lead->update([
+                    'teacher_name'    => null,
+                    'teacher_contact' => null,
+                    'status'          => 'Open',
+                ]);
+            }
+            if ($lead) {
+                $lead->followUps()->create([
+                    'admin_id'       => auth()->id(),
+                    'note'           => "Tutor {$candidate->name} backed out / declined. Reason: " . ($request->remarks ?: 'Declined by tutor'),
+                    'follow_up_date' => now()->addDay()->toDateString(),
+                ]);
+            }
+
+            $reasonNote = $request->remarks ? " Note: {$request->remarks}" : "";
+            NotificationHelper::notifyUser(
+                $candidate->id,
+                'Tuition Application Marked as Declined ✋',
+                "Your application for Class {$lead?->class} ({$lead?->subjects}) has been marked as declined/backed out.{$reasonNote}",
+                route('candidate.applications.index', ['tab' => 'tuitions']),
+                'fas fa-hand-paper'
+            );
+
+            try {
+                Mail::to($candidate->email)->send(new TuitionApplicationStatusMail($application));
+            } catch (\Throwable $e) {
+                Log::error("Tutor backed out email failed for {$candidate->email}: " . $e->getMessage());
             }
         }
 
