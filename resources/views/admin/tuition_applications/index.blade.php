@@ -6,45 +6,61 @@
 @section('content')
 
 {{-- Analytics Stats Cards (Clickable Filters) --}}
-<div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
     <a href="{{ route('admin.tuition-applications.index', ['status' => '', 'search' => request('search')]) }}" 
-       class="bg-card-bg border {{ !request('status') ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/10' : 'border-card-border hover:border-blue-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+       class="bg-card-bg border {{ !request('status') ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/10' : 'border-card-border hover:border-blue-300' }} rounded-2xl p-3.5 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
-        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Total Applications</p>
-        <h4 class="text-2xl font-black text-blue-600 relative z-10">{{ $stats['total'] }}</h4>
-        <span class="text-[10px] text-slate-400 mt-0.5">All Submissions</span>
+        <p class="text-[9px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10 text-center">Total</p>
+        <h4 class="text-xl font-black text-blue-600 relative z-10">{{ $stats['total'] }}</h4>
+        <span class="text-[9px] text-slate-400 mt-0.5">All Submissions</span>
     </a>
 
     <a href="{{ route('admin.tuition-applications.index', ['status' => 'Applied', 'search' => request('search')]) }}" 
-       class="bg-card-bg border {{ request('status') === 'Applied' ? 'border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/10' : 'border-card-border hover:border-sky-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+       class="bg-card-bg border {{ request('status') === 'Applied' ? 'border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/10' : 'border-card-border hover:border-sky-300' }} rounded-2xl p-3.5 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-sky-500/5 group-hover:bg-sky-500/10 transition-colors"></div>
-        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">New (Applied)</p>
-        <h4 class="text-2xl font-black text-sky-600 relative z-10">{{ $stats['applied'] }}</h4>
-        <span class="text-[10px] text-sky-600 font-bold mt-0.5">Under Review</span>
+        <p class="text-[9px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10 text-center">New Applied</p>
+        <h4 class="text-xl font-black text-sky-600 relative z-10">{{ $stats['applied'] }}</h4>
+        <span class="text-[9px] text-sky-600 font-bold mt-0.5">Under Review</span>
     </a>
 
     <a href="{{ route('admin.tuition-applications.index', ['status' => 'Shortlisted', 'search' => request('search')]) }}" 
-       class="bg-card-bg border {{ request('status') === 'Shortlisted' ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/10' : 'border-card-border hover:border-amber-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+       class="bg-card-bg border {{ request('status') === 'Shortlisted' ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/10' : 'border-card-border hover:border-amber-300' }} rounded-2xl p-3.5 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors"></div>
-        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Shortlisted</p>
-        <h4 class="text-2xl font-black text-amber-600 relative z-10">{{ $stats['shortlisted'] }}</h4>
-        <span class="text-[10px] text-amber-600 font-bold mt-0.5">Demo Scheduled</span>
+        <p class="text-[9px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10 text-center">Shortlisted</p>
+        <h4 class="text-xl font-black text-amber-600 relative z-10">{{ $stats['shortlisted'] }}</h4>
+        <span class="text-[9px] text-amber-600 font-bold mt-0.5">For Demo</span>
     </a>
 
     <a href="{{ route('admin.tuition-applications.index', ['status' => 'Assigned', 'search' => request('search')]) }}" 
-       class="bg-card-bg border {{ request('status') === 'Assigned' ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-card-border hover:border-emerald-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+       class="bg-card-bg border {{ request('status') === 'Assigned' ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-card-border hover:border-emerald-300' }} rounded-2xl p-3.5 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
-        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Assigned Tutors</p>
-        <h4 class="text-2xl font-black text-emerald-600 relative z-10">{{ $stats['assigned'] }}</h4>
-        <span class="text-[10px] text-emerald-600 font-bold mt-0.5">Confirmed & Placed</span>
+        <p class="text-[9px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10 text-center">Assigned</p>
+        <h4 class="text-xl font-black text-emerald-600 relative z-10">{{ $stats['assigned'] }}</h4>
+        <span class="text-[9px] text-emerald-600 font-bold mt-0.5">Confirmed Tutor</span>
+    </a>
+
+    <a href="{{ route('admin.tuition-applications.index', ['status' => 'Parent Rejected', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'Parent Rejected' ? 'border-rose-500 ring-2 ring-rose-500/20 bg-rose-50/10' : 'border-card-border hover:border-rose-300' }} rounded-2xl p-3.5 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-rose-500/5 group-hover:bg-rose-500/10 transition-colors"></div>
+        <p class="text-[9px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10 text-center">Parent Rejected</p>
+        <h4 class="text-xl font-black text-rose-600 relative z-10">{{ $stats['parent_rejected'] }}</h4>
+        <span class="text-[9px] text-rose-500 font-bold mt-0.5">Demo Disapproved</span>
+    </a>
+
+    <a href="{{ route('admin.tuition-applications.index', ['status' => 'Tutor Backed Out', 'search' => request('search')]) }}" 
+       class="bg-card-bg border {{ request('status') === 'Tutor Backed Out' ? 'border-slate-500 ring-2 ring-slate-500/20 bg-slate-50/10' : 'border-card-border hover:border-slate-300' }} rounded-2xl p-3.5 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+        <div class="absolute inset-0 bg-slate-500/5 group-hover:bg-slate-500/10 transition-colors"></div>
+        <p class="text-[9px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10 text-center">Tutor Declined</p>
+        <h4 class="text-xl font-black text-slate-700 relative z-10">{{ $stats['tutor_rejected'] }}</h4>
+        <span class="text-[9px] text-slate-500 font-bold mt-0.5">Backed Out</span>
     </a>
 
     <a href="{{ route('admin.tuition-applications.index', ['status' => 'Rejected', 'search' => request('search')]) }}" 
-       class="bg-card-bg border {{ request('status') === 'Rejected' ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50/10' : 'border-card-border hover:border-red-300' }} rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
+       class="bg-card-bg border {{ request('status') === 'Rejected' ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50/10' : 'border-card-border hover:border-red-300' }} rounded-2xl p-3.5 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group transition-all cursor-pointer">
         <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors"></div>
-        <p class="text-[10px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10">Rejected</p>
-        <h4 class="text-2xl font-black text-red-500 relative z-10">{{ $stats['rejected'] }}</h4>
-        <span class="text-[10px] text-red-400 font-bold mt-0.5">Not Selected</span>
+        <p class="text-[9px] text-text-dark/60 font-bold uppercase tracking-wider mb-1 relative z-10 text-center">Rejected</p>
+        <h4 class="text-xl font-black text-red-500 relative z-10">{{ $stats['rejected'] }}</h4>
+        <span class="text-[9px] text-red-400 font-bold mt-0.5">Admin Mismatch</span>
     </a>
 </div>
 
@@ -74,9 +90,11 @@
             <select name="status" class="w-full bg-secondary-bg border border-card-border rounded-xl px-3.5 py-2.5 text-sm text-text-main focus:border-accent-blue focus:outline-none cursor-pointer">
                 <option value="">All Statuses</option>
                 <option value="Applied" {{ request('status') === 'Applied' ? 'selected' : '' }}>New (Applied)</option>
-                <option value="Shortlisted" {{ request('status') === 'Shortlisted' ? 'selected' : '' }}>Shortlisted</option>
+                <option value="Shortlisted" {{ request('status') === 'Shortlisted' ? 'selected' : '' }}>Shortlisted (Demo)</option>
                 <option value="Assigned" {{ request('status') === 'Assigned' ? 'selected' : '' }}>Assigned Tutor</option>
-                <option value="Rejected" {{ request('status') === 'Rejected' ? 'selected' : '' }}>Rejected</option>
+                <option value="Parent Rejected" {{ request('status') === 'Parent Rejected' ? 'selected' : '' }}>Parent Rejected</option>
+                <option value="Tutor Backed Out" {{ request('status') === 'Tutor Backed Out' ? 'selected' : '' }}>Tutor Backed Out</option>
+                <option value="Rejected" {{ request('status') === 'Rejected' ? 'selected' : '' }}>Rejected (Admin)</option>
             </select>
         </div>
         <button type="submit" class="bg-[#031b4e] text-white rounded-xl px-6 py-2.5 text-sm font-bold shadow hover:bg-[#021338] transition-colors flex items-center justify-center gap-2">
@@ -170,9 +188,21 @@
                         <span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider flex items-center gap-1 w-max">
                             <i class="fas fa-check-circle"></i> Assigned
                         </span>
+                    @elseif($app->status === 'Parent Rejected')
+                        <span class="bg-rose-50 text-rose-800 border border-rose-200 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider flex items-center gap-1 w-max">
+                            <i class="fas fa-user-times"></i> Parent Rejected
+                        </span>
+                    @elseif($app->status === 'Tutor Backed Out')
+                        <span class="bg-slate-100 text-slate-700 border border-slate-300 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider flex items-center gap-1 w-max">
+                            <i class="fas fa-hand-paper"></i> Tutor Declined
+                        </span>
                     @elseif($app->status === 'Rejected')
                         <span class="bg-red-50 text-red-700 border border-red-200 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider">
                             Rejected
+                        </span>
+                    @else
+                        <span class="bg-slate-100 text-slate-700 border border-slate-200 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider">
+                            {{ $app->status }}
                         </span>
                     @endif
                 </td>
@@ -253,11 +283,13 @@
             @csrf
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Application Status <span class="text-red-500">*</span></label>
-                <select name="status" id="modalStatusSelect" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
+                <select name="status" id="modalStatusSelect" required onchange="updateModalFieldsForStatus(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 cursor-pointer">
                     <option value="Applied">Applied (Under Review)</option>
                     <option value="Shortlisted">Shortlisted (Selected for Demo)</option>
                     <option value="Assigned">Assigned (Confirmed as Tutor & Assigned to Parent)</option>
-                    <option value="Rejected">Rejected</option>
+                    <option value="Parent Rejected">Parent Rejected (Demo Disapproved by Parent)</option>
+                    <option value="Tutor Backed Out">Tutor Backed Out (Declined by Tutor)</option>
+                    <option value="Rejected">Rejected (By Admin / Profile Mismatch)</option>
                 </select>
             </div>
 
@@ -326,12 +358,35 @@ function updateModalFieldsForStatus(status) {
     const demoSessionContainer = document.getElementById('demoSessionContainer');
     const createChargeCheckbox = document.getElementById('createServiceChargeCheckbox');
 
-    if (status === 'Rejected') {
+    if (status === 'Parent Rejected') {
+        remarksLabel.innerHTML = '<span class="text-rose-600 font-black"><i class="fas fa-user-times mr-1"></i> Parent Rejection Reason / Demo Feedback *</span> <span class="text-[10px] text-rose-500 font-normal lowercase">(Sent to candidate via email & dashboard)</span>';
+        remarksInput.placeholder = 'e.g. Parent found teaching pace too fast, child preferred female teacher, fee negotiation issue...';
+        remarksInput.classList.remove('border-red-300', 'bg-red-50/30', 'border-slate-300', 'bg-slate-50/30');
+        remarksInput.classList.add('border-rose-300', 'bg-rose-50/30');
+        remarksHelper.innerText = 'Candidate will see this feedback on dashboard. Lead will reset to Open for other teachers.';
+        remarksHelper.className = 'text-[11px] text-rose-500 mt-1';
+
+        serviceChargeBox.classList.add('hidden');
+        demoSessionContainer.classList.add('hidden');
+        createChargeCheckbox.checked = false;
+    } else if (status === 'Tutor Backed Out') {
+        remarksLabel.innerHTML = '<span class="text-slate-700 font-black"><i class="fas fa-hand-paper mr-1"></i> Reason Tutor Declined / Backed Out *</span> <span class="text-[10px] text-slate-500 font-normal lowercase">(Recorded for admin history)</span>';
+        remarksInput.placeholder = 'e.g. Tutor location too far (15 km), timings clashing with coaching, personal emergency...';
+        remarksInput.classList.remove('border-red-300', 'bg-red-50/30', 'border-rose-300', 'bg-rose-50/30');
+        remarksInput.classList.add('border-slate-300', 'bg-slate-50/30');
+        remarksHelper.innerText = 'Application will be marked as declined. Lead remains open for other tutors.';
+        remarksHelper.className = 'text-[11px] text-slate-600 mt-1';
+
+        serviceChargeBox.classList.add('hidden');
+        demoSessionContainer.classList.add('hidden');
+        createChargeCheckbox.checked = false;
+    } else if (status === 'Rejected') {
         remarksLabel.innerHTML = '<span class="text-red-600 font-black"><i class="fas fa-times-circle mr-1"></i> Rejection Reason / Feedback *</span> <span class="text-[10px] text-red-500 font-normal lowercase">(Sent to candidate via email & dashboard)</span>';
         remarksInput.placeholder = 'e.g. Profile location mismatch, candidate requested higher fee than parent budget, etc.';
+        remarksInput.classList.remove('border-rose-300', 'bg-rose-50/30', 'border-slate-300', 'bg-slate-50/30');
         remarksInput.classList.add('border-red-300', 'bg-red-50/30');
         remarksHelper.innerText = 'Candidate will clearly see this reason on their dashboard and in their status email.';
-        remarksHelper.classList.add('text-red-500');
+        remarksHelper.className = 'text-[11px] text-red-500 mt-1';
 
         serviceChargeBox.classList.add('hidden');
         demoSessionContainer.classList.add('hidden');
@@ -339,9 +394,9 @@ function updateModalFieldsForStatus(status) {
     } else if (status === 'Assigned') {
         remarksLabel.innerHTML = '<span class="text-emerald-700 font-black"><i class="fas fa-check-circle mr-1"></i> Assignment Notes & Instructions</span>';
         remarksInput.placeholder = 'e.g. Parent prefers evening classes from 5 PM to 6:30 PM. Please carry intro notes.';
-        remarksInput.classList.remove('border-red-300', 'bg-red-50/30');
+        remarksInput.classList.remove('border-red-300', 'bg-red-50/30', 'border-rose-300', 'bg-rose-50/30', 'border-slate-300', 'bg-slate-50/30');
         remarksHelper.innerText = 'Candidate will receive these instructions with parent contact details.';
-        remarksHelper.classList.remove('text-red-500');
+        remarksHelper.className = 'text-[11px] text-slate-400 mt-1';
 
         serviceChargeBox.classList.remove('hidden');
         demoSessionContainer.classList.remove('hidden');
@@ -349,9 +404,9 @@ function updateModalFieldsForStatus(status) {
     } else if (status === 'Shortlisted') {
         remarksLabel.innerHTML = '<span class="text-amber-700 font-black"><i class="fas fa-star mr-1"></i> Shortlisting Notes / Demo Guidelines</span>';
         remarksInput.placeholder = 'e.g. Shortlisted for Class 10th Maths demo. Be prepared for chapter 1 & 2.';
-        remarksInput.classList.remove('border-red-300', 'bg-red-50/30');
+        remarksInput.classList.remove('border-red-300', 'bg-red-50/30', 'border-rose-300', 'bg-rose-50/30', 'border-slate-300', 'bg-slate-50/30');
         remarksHelper.innerText = 'Included in candidate shortlist notification & email.';
-        remarksHelper.classList.remove('text-red-500');
+        remarksHelper.className = 'text-[11px] text-slate-400 mt-1';
 
         serviceChargeBox.classList.add('hidden');
         demoSessionContainer.classList.remove('hidden');
@@ -359,9 +414,9 @@ function updateModalFieldsForStatus(status) {
     } else {
         remarksLabel.innerHTML = 'Admin Remarks / Notes';
         remarksInput.placeholder = 'Enter internal notes, interview feedback, or remarks...';
-        remarksInput.classList.remove('border-red-300', 'bg-red-50/30');
+        remarksInput.classList.remove('border-red-300', 'bg-red-50/30', 'border-rose-300', 'bg-rose-50/30', 'border-slate-300', 'bg-slate-50/30');
         remarksHelper.innerText = 'Remarks will be included in the candidate dashboard update.';
-        remarksHelper.classList.remove('text-red-500');
+        remarksHelper.className = 'text-[11px] text-slate-400 mt-1';
 
         serviceChargeBox.classList.add('hidden');
         demoSessionContainer.classList.remove('hidden');

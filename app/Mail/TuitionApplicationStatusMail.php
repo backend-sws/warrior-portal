@@ -34,13 +34,15 @@ class TuitionApplicationStatusMail extends Mailable implements ShouldQueue
         $classInfo = $lead ? "Class {$lead->class} ({$lead->subjects})" : "Home Tuition";
 
         $subjectMap = [
-            'Assigned'    => "🎉 Congratulations! You are Assigned as Tutor for {$classInfo}",
-            'Shortlisted' => "⭐ You are Shortlisted for {$classInfo} – Demo Class Update",
-            'Rejected'    => "Update on Your Home Tuition Application: {$classInfo}",
-            'Applied'     => "Home Tuition Application Received: {$classInfo}",
+            'Assigned'        => "🎉 Congratulations! You are Assigned as Tutor for {$classInfo}",
+            'Shortlisted'     => "⭐ You are Shortlisted for {$classInfo} – Demo Class Update",
+            'Parent Rejected' => "Update on Demo Session: {$classInfo}",
+            'Tutor Backed Out'=> "Application Marked as Declined: {$classInfo}",
+            'Rejected'        => "Update on Your Home Tuition Application: {$classInfo}",
+            'Applied'         => "Home Tuition Application Received: {$classInfo}",
         ];
 
-        $subject = $subjectMap[$status] ?? "Update on Your Home Tuition Application: {$classInfo}";
+        $subject = $subjectMap[$this->application->status] ?? "Update on Your Home Tuition Application: {$classInfo}";
 
         return new Envelope(
             subject: $subject . ' — Warriors Educare',

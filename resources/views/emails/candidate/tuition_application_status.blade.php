@@ -24,6 +24,23 @@ Please contact the parent promptly to introduce yourself and coordinate the teac
 @elseif($application->status === 'Shortlisted')
 ⭐ **Great news!** Your profile has been shortlisted for this home tuition assignment. The administration will contact you shortly to coordinate the trial demo session.
 
+@elseif($application->status === 'Parent Rejected')
+We want to let you know that after the trial demo session, the parent did not approve this assignment.
+
+@if($application->remarks)
+> **Parent / Demo Feedback:**  
+> {{ $application->remarks }}
+@endif
+
+Don't be discouraged! Teaching styles vary per student and your profile remains 100% active and recommended for other open home tuition leads.
+
+@elseif($application->status === 'Tutor Backed Out')
+Your application for this tuition requirement has been recorded as declined as per your request.
+
+@if($application->remarks)
+> **Note:** {{ $application->remarks }}
+@endif
+
 @elseif($application->status === 'Rejected')
 We regret to inform you that your application for this specific tuition requirement was not selected.
 
