@@ -72,15 +72,16 @@ class CandidateAuthController extends Controller
 
             // School Job Fields validation
             if (in_array($category, ['school_job', 'both'])) {
-                $rules['b_ed_status']            = ['required', 'in:Yes,No,Pursuing'];
-                $rules['d_el_ed_status']          = ['required', 'in:Yes,No,Pursuing'];
+                $rules['b_ed_status']            = ['required', 'string', 'max:100'];
+                $rules['d_el_ed_status']          = ['required', 'string', 'max:100'];
                 $rules['position_applying_for']  = ['required', 'string', 'max:100'];
                 $rules['current_salary']         = ['nullable', 'numeric', 'min:0'];
                 $rules['expected_salary']        = ['nullable', 'numeric', 'min:0'];
                 $rules['last_school_name']       = ['nullable', 'string', 'max:200'];
                 $rules['last_designation']       = ['nullable', 'string', 'max:100'];
                 $rules['last_drawn_salary']      = ['nullable', 'numeric', 'min:0'];
-                $rules['preferred_locations']    = ['required', 'array', 'min:1'];
+                $rules['preferred_locations']    = ['nullable'];
+                $rules['preferred_locations_manual'] = ['nullable', 'string', 'max:500'];
                 $rules['resume']                 = [$category === 'school_job' ? 'required' : 'nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'];
                 $rules['salary_slip']            = ['nullable', 'file', 'mimes:pdf,doc,docx,jpg,jpeg,png', 'max:5120'];
             }
@@ -133,20 +134,47 @@ class CandidateAuthController extends Controller
             $salarySlipPath = $request->file('salary_slip')->store('salary_slips', 'public');
         }
 
-        // Map experience range to numeric approximate years for backward compatibility
+        // Derive approximate experience years from selected range
         $expYears = 0;
         $range = $request->experience_range;
-        if ($range === '0–1 Year') $expYears = 1;
+        if ($range === '0–1 Year') $expYears = 0;
         elseif ($range === '1–3 Years') $expYears = 2;
         elseif ($range === '3–5 Years') $expYears = 4;
         elseif ($range === '5–10 Years') $expYears = 7;
         elseif ($range === '10–15 Years') $expYears = 12;
         elseif ($range === '15+ Years') $expYears = 15;
 
-        // Determine actual qualification (support custom input if '__other__')
-        $qualificationName = $request->highest_qualification;
+        // Determine actual qualification (support direct manual text input)
+        $qualificationName = trim($request->highest_qualification);
         if ($qualificationName === '__other__' && $request->filled('highest_qualification_custom')) {
             $qualificationName = trim($request->highest_qualification_custom);
+        }
+
+        // Try to associate with master qualifications table if matching
+        $qualObj = \App\Models\Qualification::where('name', $qualificationName)
+            ->orWhere('name', 'like', "%{$qualificationName}%")
+            ->first();
+
+        // Process preferred school locations from manual text and/or chips
+        $prefLocations = [];
+        if (is_array($request->preferred_locations)) {
+            $prefLocations = array_filter($request->preferred_locations, fn($l) => !empty($l) && $l !== 'Other');
+        } elseif (is_string($request->preferred_locations) && trim($request->preferred_locations) !== '') {
+            $prefLocations = array_map('trim', explode(',', $request->preferred_locations));
+        }
+
+        if ($request->filled('preferred_locations_manual')) {
+            $manualLocs = array_map('trim', explode(',', $request->preferred_locations_manual));
+            $prefLocations = array_unique(array_merge($prefLocations, array_filter($manualLocs)));
+        }
+
+        // Validate that at least one location or address was provided for school jobs
+        if (in_array($category, ['school_job', 'both']) && empty($prefLocations) && !$request->filled('preferred_areas')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please enter your preferred school locations or address.',
+                'errors' => ['preferred_locations' => ['Please enter your preferred school locations or address.']]
+            ], 422);
         }
 
         // Generate 6-digit secure numeric OTP
@@ -165,6 +193,7 @@ class CandidateAuthController extends Controller
                 'gender'                     => $request->gender,
                 'date_of_birth'              => $request->date_of_birth,
                 'highest_qualification_name' => $qualificationName,
+                'highest_qualification_id'   => $qualObj?->id,
                 'experience_range'           => $request->experience_range,
                 'experience_years'           => $expYears,
 
@@ -185,7 +214,8 @@ class CandidateAuthController extends Controller
                 'last_school_name'           => $request->last_school_name,
                 'last_designation'           => $request->last_designation,
                 'last_drawn_salary'          => $request->last_drawn_salary,
-                'preferred_locations'        => $request->preferred_locations ?? [],
+                'preferred_locations'        => array_values($prefLocations),
+                'preferred_locations_manual' => $request->preferred_locations_manual,
 
                 // Uploaded files
                 'resume_path'                => $resumePath,
@@ -294,9 +324,10 @@ class CandidateAuthController extends Controller
             'gender'                     => $data['gender'] ?? null,
             'date_of_birth'              => $data['date_of_birth'] ?? null,
             'highest_qualification_name' => $data['highest_qualification_name'] ?? null,
+            'highest_qualification_id'   => $data['highest_qualification_id'] ?? null,
             'experience_range'           => $data['experience_range'] ?? null,
             'experience_years'           => $data['experience_years'] ?? 0,
-            'address'                    => $data['preferred_areas'] ?? null,
+            'address'                    => $data['preferred_locations_manual'] ?? ($data['preferred_areas'] ?? (is_array($data['preferred_locations'] ?? null) ? implode(', ', $data['preferred_locations']) : null)),
 
             // Home Tutor fields
             'tuition_subjects'           => $data['tuition_subjects'] ?? null,

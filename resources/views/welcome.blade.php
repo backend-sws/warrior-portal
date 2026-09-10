@@ -68,21 +68,20 @@
                 <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-[#031b4e] mb-1 tracking-tight">Welcome to Warriors Educare</h2>
                 <p class="text-slate-500 text-xs sm:text-sm max-w-md mx-auto font-medium">Please select what you are looking for to get instant matching.</p>
             </div>
-            
-            <!-- 4 Interactive Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative z-10">
+                       <!-- 3 Interactive Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 relative z-10">
                 
-                <!-- Card 1: Hire a Home Tutor -->
+                <!-- Card 1: Tuition Post Requirement -->
                 <button type="button" 
-                        @click="window.location.href='{{ route('login') }}'" 
+                        @click="showWelcomeModal = false; openRequirementModal('tuition')" 
                         class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-blue-50/60 via-white to-blue-50/30 hover:from-blue-50/90 hover:to-white border-2 border-blue-100 hover:border-blue-500 shadow-xs hover:shadow-xl hover:shadow-blue-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-blue-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
-                            <i class="fas fa-user-graduate"></i>
+                            <i class="fas fa-graduation-cap"></i>
                         </div>
                         <div class="flex-grow text-left md:text-center">
                             <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-blue-100/90 text-blue-800 group-hover:bg-blue-600 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Parents & Students</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-blue-600 mb-0.5 md:mb-1 transition-colors">Hire a Home Tutor</h3>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-blue-600 mb-0.5 md:mb-1 transition-colors">Tuition Post Requirement</h3>
                             <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Find verified & experienced home tutors for all classes & subjects.</p>
                         </div>
                     </div>
@@ -94,9 +93,9 @@
                     </div>
                 </button>
                 
-                <!-- Card 2: Hire Teachers & Staff -->
+                <!-- Card 2: School Hiring -->
                 <button type="button" 
-                        @click="openSchoolRequirement()" 
+                        @click="showWelcomeModal = false; openRequirementModal('school')" 
                         class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-indigo-50/60 via-white to-purple-50/30 hover:from-indigo-50/90 hover:to-white border-2 border-indigo-100 hover:border-indigo-500 shadow-xs hover:shadow-xl hover:shadow-indigo-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-indigo-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
@@ -104,7 +103,7 @@
                         </div>
                         <div class="flex-grow text-left md:text-center">
                             <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-indigo-100/90 text-indigo-800 group-hover:bg-indigo-600 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Schools & Institutes</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-indigo-600 mb-0.5 md:mb-1 transition-colors">Hire School Faculty</h3>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-indigo-600 mb-0.5 md:mb-1 transition-colors">School Hiring</h3>
                             <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Access 10,000+ pre-verified PGT, TGT, PRT teachers & staff.</p>
                         </div>
                     </div>
@@ -116,66 +115,23 @@
                     </div>
                 </button>
                 
-                <!-- Card 3: Join as Teacher / Tutor -->
-                @guest
-                <button type="button" @click="window.location.href='{{ route('login') }}'" 
-                   class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-amber-50/60 via-white to-orange-50/30 hover:from-amber-50/90 hover:to-white border-2 border-amber-100 hover:border-amber-500 shadow-xs hover:shadow-xl hover:shadow-amber-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
+                <!-- Card 3: Join as a Teacher -->
+                <button type="button" 
+                        @click="showWelcomeModal = false; openRequirementModal('teacher')" 
+                        class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-amber-50/60 via-white to-orange-50/30 hover:from-amber-50/90 hover:to-white border-2 border-amber-100 hover:border-amber-500 shadow-xs hover:shadow-xl hover:shadow-amber-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
                             <i class="fas fa-chalkboard-teacher"></i>
                         </div>
                         <div class="flex-grow text-left md:text-center">
                             <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-amber-100/90 text-amber-900 group-hover:bg-amber-500 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Teachers & Tutors</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-amber-800 mb-0.5 md:mb-1 transition-colors">Join as Teacher / Tutor</h3>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-amber-800 mb-0.5 md:mb-1 transition-colors">Join as a Teacher</h3>
                             <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Find verified home tuitions & school teaching jobs in your city.</p>
                         </div>
                     </div>
                     <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 w-auto md:w-full flex items-center justify-end md:justify-center gap-2 text-xs font-extrabold text-amber-800 group-hover:text-amber-700 transition-colors shrink-0">
                         <span class="hidden md:inline">Register Free</span>
                         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-100 group-hover:bg-amber-500 group-hover:text-white flex items-center justify-center text-amber-800 transition-all shadow-xs group-hover:shadow-md group-hover:shadow-amber-500/30">
-                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
-                        </div>
-                    </div>
-                </button>
-                @else
-                <a href="{{ route('candidate.dashboard') }}" 
-                   class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-amber-50/60 via-white to-orange-50/30 hover:from-amber-50/90 hover:to-white border-2 border-amber-100 hover:border-amber-500 shadow-xs hover:shadow-xl hover:shadow-amber-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
-                    <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
-                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
-                        <div class="flex-grow text-left md:text-center">
-                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-amber-100/90 text-amber-900 group-hover:bg-amber-500 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Teachers & Tutors</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-amber-800 mb-0.5 md:mb-1 transition-colors">Join as Teacher / Tutor</h3>
-                            <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Find verified home tuitions & school teaching jobs in your city.</p>
-                        </div>
-                    </div>
-                    <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 w-auto md:w-full flex items-center justify-end md:justify-center gap-2 text-xs font-extrabold text-amber-800 group-hover:text-amber-700 transition-colors shrink-0">
-                        <span class="hidden md:inline">Go to Dashboard</span>
-                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-100 group-hover:bg-amber-500 group-hover:text-white flex items-center justify-center text-amber-800 transition-all shadow-xs group-hover:shadow-md group-hover:shadow-amber-500/30">
-                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
-                        </div>
-                    </div>
-                </a>
-                @endguest
-                
-                <!-- Card 4: Both -->
-                <button type="button" 
-                        @click="window.location.href='{{ route('login') }}'" 
-                        class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-emerald-50/60 via-white to-teal-50/30 hover:from-emerald-50/90 hover:to-white border-2 border-emerald-100 hover:border-emerald-500 shadow-xs hover:shadow-xl hover:shadow-emerald-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
-                    <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
-                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-emerald-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
-                            <i class="fas fa-handshake"></i>
-                        </div>
-                        <div class="flex-grow text-left md:text-center">
-                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100/90 text-emerald-900 group-hover:bg-emerald-500 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Tutors & Parents</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-emerald-800 mb-0.5 md:mb-1 transition-colors">Both</h3>
-                            <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Mix of Join as a Teacher & Join as a Home Tutor.</p>
-                        </div>
-                    </div>
-                    <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 w-auto md:w-full flex items-center justify-end md:justify-center gap-2 text-xs font-extrabold text-emerald-800 group-hover:text-emerald-700 transition-colors shrink-0">
-                        <span class="hidden md:inline">Explore Both</span>
-                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-100 group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center text-emerald-800 transition-all shadow-xs group-hover:shadow-md group-hover:shadow-emerald-500/30">
                             <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
                         </div>
                     </div>
