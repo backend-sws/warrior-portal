@@ -288,7 +288,7 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <button type="button" onclick="openRequirementModal('tuition')" id="btn-hire" class="bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] hover:scale-105 transition-all shadow-lg flex items-center justify-center cursor-pointer">Hire a Teacher / Tutor</button>
+                    <button type="button" onclick="openRequirementModal('tuition')" id="btn-hire" class="bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] hover:scale-105 transition-all shadow-lg flex items-center justify-center cursor-pointer">Need a Home Tutor (Parent)</button>
                     @guest
                         <button type="button" onclick="openTeacherModal()" id="btn-join" class="bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 hover:scale-105 transition-all border border-gray-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer">Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i></button>
                     @else
@@ -929,82 +929,216 @@
 
 
             <!-- Featured Tuition Cards Grid -->
+            <!-- Featured Tuition Cards Horizontal Carousel -->
             <div class="max-w-7xl mx-auto mb-20 relative z-10 reveal">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
                         <h3 class="text-2xl sm:text-3xl font-black text-[#031b4e] tracking-tight">Featured Tuition Requirements</h3>
                         <p class="text-slate-500 text-xs sm:text-sm mt-1">Verified home tuition requirements ready for qualified tutors.</p>
                     </div>
-                    <a href="{{ route('tuitions') }}" class="inline-flex items-center gap-2 bg-[#031b4e] hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md">
-                        <span>Explore All Tuitions</span>
-                        <i class="fas fa-arrow-right text-xs"></i>
-                    </a>
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <!-- Left & Right Arrow Buttons -->
+                        <div class="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl p-1 shadow-2xs">
+                            <button type="button" 
+                                    onclick="scrollTuitionCards('left')" 
+                                    class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-blue-600 active:scale-95 transition-all cursor-pointer" 
+                                    title="Scroll Left">
+                                <i class="fas fa-chevron-left text-xs"></i>
+                            </button>
+                            <button type="button" 
+                                    onclick="scrollTuitionCards('right')" 
+                                    class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-blue-600 active:scale-95 transition-all cursor-pointer" 
+                                    title="Scroll Right">
+                                <i class="fas fa-chevron-right text-xs"></i>
+                            </button>
+                        </div>
+                        <a href="{{ route('tuitions') }}" class="inline-flex items-center gap-2 bg-[#031b4e] hover:bg-blue-600 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md">
+                            <span>Explore All</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
                 </div>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Single Line Horizontal Scroll Track -->
+                <div id="tuition-cards-scroll-track" 
+                     class="flex items-stretch gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth tuition-scroll-container">
                     @forelse($employerTuitions as $tuition)
-                        <div class="bg-white rounded-2xl border border-slate-200/80 hover:border-blue-300 shadow-[0_6px_20px_rgba(3,27,78,0.06)] hover:shadow-[0_12px_30px_rgba(3,27,78,0.12)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden group h-full">
+                        <div style="width: 295px; min-width: 295px; max-width: 295px; flex: 0 0 295px;" class="snap-start bg-white border border-slate-200 rounded-2xl p-4 flex flex-col justify-between hover:border-blue-400 hover:shadow-lg transition-all duration-300 group shadow-xs overflow-hidden">
+                            <div class="w-full min-w-0">
+                                <div class="flex justify-between items-center mb-2.5">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <div class="w-8 h-8 bg-blue-50/80 border border-blue-100 rounded-xl flex items-center justify-center p-1 group-hover:scale-105 transition-transform shrink-0">
+                                            <i class="fas fa-chalkboard-teacher text-sm text-[#0ea5e9]"></i>
+                                        </div>
+                                        <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 shrink-0">
+                                            <i class="fas fa-hashtag text-[8px] opacity-70"></i>{{ $tuition->tuition_id ?: 'TUI-' . str_pad($tuition->id, 4, '0', STR_PAD_LEFT) }}
+                                        </span>
+                                    </div>
+                                    <span class="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap border border-blue-100/60 shrink-0">{{ $tuition->board ?? 'General' }}</span>
+                                </div>
+                                
+                                <h3 class="text-sm font-bold text-[#031b4e] mb-1 group-hover:text-blue-600 transition-colors truncate" title="{{ $tuition->subjects ?? 'Tuition Requirement' }}">
+                                    <a href="{{ route('tuitions.show', $tuition->id) }}">{{ $tuition->subjects ?? 'Tuition Requirement' }}</a>
+                                </h3>
+                                
+                                <!-- Address with smooth moving marquee for long locations -->
+                                <div class="flex items-center gap-1.5 mb-2.5 w-full overflow-hidden text-[11px] text-slate-500 font-medium">
+                                    <i class="fas fa-map-marker-alt text-red-500 text-[10px] shrink-0"></i>
+                                    <div class="location-marquee-wrapper overflow-hidden w-full relative whitespace-nowrap">
+                                        @php
+                                            $fullLocation = trim($tuition->location . ($tuition->pincode ? ' - (Pincode: ' . $tuition->pincode . ')' : ''));
+                                            $isLongAddress = mb_strlen($fullLocation) > 26;
+                                        @endphp
+                                        @if($isLongAddress)
+                                            <div class="address-marquee-track" title="{{ $fullLocation }}">
+                                                <span>{{ $fullLocation }}</span>
+                                                <span class="mx-3 text-slate-300">•</span>
+                                                <span>{{ $fullLocation }}</span>
+                                                <span class="mx-3 text-slate-300">•</span>
+                                            </div>
+                                        @else
+                                            <span class="truncate block" title="{{ $fullLocation }}">{{ $fullLocation }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-slate-50 rounded-xl p-2.5 text-[11px] text-slate-700 space-y-1.5 mb-3 border border-slate-100">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-500">Class:</span>
+                                        <span class="font-bold text-[#031b4e]">{{ $tuition->class ?? $tuition->student_class ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-500">Board:</span>
+                                        <span class="font-bold text-blue-600">{{ $tuition->board ?: 'General' }}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-500">Subjects:</span>
+                                        <span class="font-bold text-slate-800 truncate max-w-[60%] text-right" title="{{ $tuition->subjects }}">{{ $tuition->subjects }}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-500">Gender Pref:</span>
+                                        <span class="font-bold text-slate-800">{{ $tuition->tutor_preference ?: 'Any' }}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-500">Duration:</span>
+                                        <span class="font-bold text-slate-800 truncate max-w-[60%] text-right">{{ $tuition->duration_hours ?: 'Flexible' }}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-500">Days / Week:</span>
+                                        <span class="font-bold text-slate-800">{{ $tuition->days_per_week ?: 'Flexible' }}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                                        <span class="text-slate-500">Tuition Fee:</span>
+                                        @auth
+                                            <span class="font-bold text-emerald-600">{{ $tuition->fee ? '₹'.$tuition->fee : 'Negotiable' }}</span>
+                                        @else
+                                            <span class="font-bold text-emerald-600 blur-xs select-none" title="Login to view fees">₹XXXX</span>
+                                        @endauth
+                                    </div>
+                                </div>
+                            </div>
                             
-                            <!-- Top Accent Bar -->
-                            <div class="h-1.5 w-full bg-gradient-to-r from-[#031b4e] via-blue-600 to-sky-400"></div>
-
-                            <div class="p-5 sm:p-6 flex flex-col flex-grow">
-                                <!-- Top Row (Class Badge & Verified) -->
-                                <div class="flex items-center justify-between gap-2 mb-4">
-                                    <span class="inline-flex items-center gap-1.5 bg-[#031b4e] text-white px-3 py-1 rounded-full text-xs font-bold shadow-xs">
-                                        <i class="fas fa-graduation-cap text-sky-300 text-[11px]"></i>
-                                        {{ $tuition->class ?? $tuition->student_class ?? 'Class 10' }}
-                                    </span>
-                                    <span class="inline-flex items-center gap-1 bg-emerald-50 border border-emerald-200 text-emerald-700 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
-                                        <i class="fas fa-check-circle text-emerald-500 text-[10px]"></i> Verified
-                                    </span>
-                                </div>
-
-                                <!-- Subject -->
-                                <h4 class="text-lg font-extrabold text-[#031b4e] mb-3.5 group-hover:text-blue-600 transition-colors line-clamp-1" title="{{ $tuition->subjects ?? 'All Subjects' }}">
-                                    {{ $tuition->subjects ?? 'All Subjects' }}
-                                </h4>
-
-                                <!-- Info Box -->
-                                <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-100 space-y-2.5 mb-5 flex-grow">
-                                    <div class="flex items-start gap-2.5 text-xs text-slate-600">
-                                        <div class="w-6 h-6 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
-                                            <i class="fas fa-map-marker-alt text-[11px]"></i>
-                                        </div>
-                                        <span class="truncate font-medium pt-0.5" title="{{ $tuition->location ?? 'Location on Request' }}">
-                                            {{ $tuition->location ?? 'Location on Request' }}
-                                        </span>
+                            <div class="w-full min-w-0">
+                                <div class="flex justify-between items-center border-t border-slate-100 pt-2.5">
+                                    <span class="text-[10px] text-slate-400 font-medium shrink-0">Posted {{ $tuition->created_at ? $tuition->created_at->diffForHumans() : 'Recently' }}</span>
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <button type="button" 
+                                                data-share-url="{{ route('tuitions.show', $tuition->id) }}"
+                                                onclick="copyJobUrl(this.dataset.shareUrl, this)" 
+                                                title="Copy Tuition Link to Share" 
+                                                class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center justify-center shadow-2xs">
+                                            <i class="fas fa-link text-[#0ea5e9] text-[10px]"></i>
+                                        </button>
+                                        <a href="{{ route('tuitions.show', $tuition->id) }}" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#031b4e] font-bold text-xs transition-colors flex items-center">
+                                            <span>Details</span>
+                                        </a>
+                                        @auth
+                                            @if(auth()->user()->role === 'candidate')
+                                                <form action="{{ route('candidate.tuitions.apply', $tuition->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="text-white bg-[#031b4e] hover:bg-blue-600 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors shadow-xs flex items-center active:scale-95 cursor-pointer">
+                                                        <span>Apply</span>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <a href="{{ route('tuitions.show', $tuition->id) }}" class="text-white bg-[#031b4e] hover:bg-blue-600 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors shadow-xs flex items-center active:scale-95 cursor-pointer">
+                                                    <span>Apply</span>
+                                                </a>
+                                            @endif
+                                        @else
+                                            <button type="button" onclick="openRequirementModal('teacher')" class="text-white bg-[#031b4e] hover:bg-blue-600 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors shadow-xs flex items-center active:scale-95 cursor-pointer">
+                                                <span>Apply</span>
+                                            </button>
+                                        @endauth
                                     </div>
-                                    <div class="flex items-center gap-2.5 text-xs text-slate-600">
-                                        <div class="w-6 h-6 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 shadow-xs">
-                                            <i class="fas fa-book-open text-[10px]"></i>
-                                        </div>
-                                        <span class="truncate font-medium">
-                                            {{ $tuition->board ? $tuition->board : 'CBSE / All Boards' }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Footer Row -->
-                                <div class="flex items-center justify-between pt-3.5 border-t border-slate-100 mt-auto">
-                                    <span class="text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
-                                        <i class="far fa-clock text-slate-300"></i> {{ $tuition->created_at ? $tuition->created_at->diffForHumans() : 'Recently' }}
-                                    </span>
-                                    <a href="{{ auth()->check() ? route('candidate.tuitions.index') : route('contact') }}" class="inline-flex items-center gap-1.5 bg-[#031b4e] hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-xs transition-all shadow-md group-hover:shadow-blue-500/20">
-                                        <span>Apply Now</span>
-                                        <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
-                                    </a>
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <div class="col-span-full text-center py-12 bg-white rounded-2xl shadow-sm border border-slate-200/60">
+                        <div class="w-full text-center py-12 bg-white rounded-2xl shadow-sm border border-slate-200/60">
                             <i class="fas fa-chalkboard-teacher text-slate-300 text-3xl mb-3 block"></i>
                             <p class="text-slate-500 font-semibold text-sm">No featured tuition posts currently available.</p>
                         </div>
                     @endforelse
                 </div>
             </div>
+
+            <style>
+                .tuition-scroll-container {
+                    scrollbar-width: thin;
+                    scrollbar-color: #94a3b8 #f1f5f9;
+                    -webkit-overflow-scrolling: touch;
+                }
+                .tuition-scroll-container::-webkit-scrollbar {
+                    height: 8px;
+                }
+                .tuition-scroll-container::-webkit-scrollbar-track {
+                    background: #f1f5f9;
+                    border-radius: 9999px;
+                }
+                .tuition-scroll-container::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 9999px;
+                }
+                .tuition-scroll-container::-webkit-scrollbar-thumb:hover {
+                    background: #0ea5e9;
+                }
+
+                .location-marquee-wrapper {
+                    mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+                    -webkit-mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+                }
+                .address-marquee-track {
+                    display: inline-flex;
+                    white-space: nowrap;
+                    will-change: transform;
+                    animation: marqueeAddress 14s linear infinite;
+                }
+                .address-marquee-track:hover {
+                    animation-play-state: paused;
+                }
+                @keyframes marqueeAddress {
+                    0% {
+                        transform: translateX(0);
+                    }
+                    100% {
+                        transform: translateX(-50%);
+                    }
+                }
+            </style>
+
+            <script>
+                function scrollTuitionCards(direction) {
+                    const track = document.getElementById('tuition-cards-scroll-track');
+                    if (!track) return;
+                    const scrollAmount = 340;
+                    if (direction === 'left') {
+                        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                    } else {
+                        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                    }
+                }
+            </script>
 
 
             
@@ -1160,21 +1294,34 @@
                             
                             <!-- Board -->
                             <div>
-                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Education Board <span class="text-rose-500">*</span></label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider">Education Board <span class="text-rose-500">*</span></label>
+                                    <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Select or Type Manual</span>
+                                </div>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-book text-sm"></i></span>
-                                    <select name="board" required 
-                                        @change="if(fieldErrors.board) { delete fieldErrors.board; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
+                                    <select data-no-search="true" name="board" id="tuition_board_id" x-model="tuition_board" :required="!tuition_manual_board" 
+                                        @change="onSelectChange('board', $event)"
                                         :class="fieldErrors.board ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
                                         class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
-                                        <option value="">Select Education Board</option>
+                                        <option value="" x-show="!tuition_manual_board">Select Education Board</option>
+                                        <option value="__manual__" x-show="tuition_manual_board" x-text="tuition_manual_board ? '✍️ Custom: ' + tuition_manual_board : ''"></option>
                                         <option value="CBSE">CBSE Board</option>
                                         <option value="ICSE">ICSE / ISC Board</option>
                                         <option value="State Board">State Board</option>
                                         <option value="IB / IGCSE">IB / Cambridge / IGCSE</option>
                                         <option value="Other">Other / Competitive Prep</option>
                                     </select>
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#031b4e] focus-within:ring-2 focus-within:ring-[#031b4e]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_board" x-model="tuition_manual_board"
+                                        @input="syncManualToSelect('board')"
+                                        placeholder="e.g. CBSE, ICSE, BSEB, NIOS, Cambridge..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
                                 </div>
                                 <p x-show="fieldErrors.board" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
                                     <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.board ? fieldErrors.board[0] : ''"></span>
@@ -1198,13 +1345,26 @@
 
                             <!-- Location -->
                             <div>
-                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Complete Location / Area <span class="text-rose-500">*</span></label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider">Complete Location / Area <span class="text-rose-500">*</span></label>
+                                    <button type="button" @click="detectLocation()" class="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-0.5 rounded-full transition-all inline-flex items-center gap-1 shadow-2xs">
+                                        <i class="fas fa-crosshairs text-blue-600"></i>
+                                        <span>Use Live GPS</span>
+                                    </button>
+                                </div>
+                                <input type="hidden" name="latitude" :value="userLat">
+                                <input type="hidden" name="longitude" :value="userLng">
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-map-marker-alt text-sm"></i></span>
                                     <input type="text" name="location" required minlength="3" maxlength="200" 
+                                        @focus="detectLocation(true)"
                                         @input="if(fieldErrors.location) { delete fieldErrors.location; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
                                         :class="fieldErrors.location ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
                                         placeholder="e.g. Kankarbagh, Patna or Area name" class="w-full bg-white border rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                                <div x-show="userLat && userLng" x-cloak class="mt-1 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 animate-fade-in">
+                                    <i class="fas fa-map-pin text-emerald-600"></i>
+                                    <span>GPS Location Attached (<span x-text="Number(userLat).toFixed(4)"></span>, <span x-text="Number(userLng).toFixed(4)"></span>)</span>
                                 </div>
                                 <p x-show="fieldErrors.location" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
                                     <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.location ? fieldErrors.location[0] : ''"></span>
@@ -1224,6 +1384,43 @@
                                 </div>
                                 <p x-show="fieldErrors.pincode" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
                                     <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.pincode ? fieldErrors.pincode[0] : ''"></span>
+                                </p>
+                            </div>
+
+                            <!-- Duration (Hours/Day) -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Time Duration (Daily Hours)</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-hourglass-half text-sm"></i></span>
+                                    <input type="text" name="duration_hours" maxlength="50"
+                                        placeholder="e.g. 1.5 Hours / Day (Kitne ghante padhana hai)" class="w-full bg-white border border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e] rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Days per Week -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Days Per Week</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-calendar-week text-sm"></i></span>
+                                    <input type="text" name="days_per_week" maxlength="50"
+                                        placeholder="e.g. 5 Days / Week (Week me kitne din padhana hoga)" class="w-full bg-white border border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e] rounded-xl pl-11 pr-4 py-3.5 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Remark / Specific Requirements -->
+                            <div class="md:col-span-2">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider">Remark / Specific Requirements</label>
+                                    <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Optional</span>
+                                </div>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-3.5 text-slate-400"><i class="fas fa-comment-alt text-sm"></i></span>
+                                    <textarea name="remarks" id="tuition_remarks" rows="2" maxlength="1500" 
+                                        placeholder="e.g. Female tutor preferred / Evening 5 PM timing / Focus on weak math fundamentals / Board exam preparation etc." 
+                                        class="w-full bg-white border border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e] rounded-xl pl-11 pr-4 py-3 font-medium placeholder-slate-400 transition-colors outline-none shadow-sm text-sm resize-none"></textarea>
+                                </div>
+                                <p class="mt-1.5 text-[11px] text-slate-500 font-medium">
+                                    Specify any special timing preference, female/male tutor preference, or specific learning goals here.
                                 </p>
                             </div>
                         </div>
@@ -1325,62 +1522,118 @@
 
                             <!-- Job Category -->
                             <div>
-                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Job Category <span class="text-rose-500">*</span></label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider">Job Category <span class="text-rose-500">*</span></label>
+                                    <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Select or Type Manual</span>
+                                </div>
                                 <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-layer-group text-sm"></i></span>
-                                    <select name="category_id" x-model="school_category_id" @change="fetchSchoolSubjects(); if(fieldErrors.category_id) { delete fieldErrors.category_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }" required 
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-layer-group text-sm"></i></span>
+                                    <select data-no-search="true" name="category_id" id="school_category_id" x-model="school_category_id" 
+                                        @change="onSelectChange('category', $event)" :required="!school_manual_category" 
                                         :class="fieldErrors.category_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
                                         class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
-                                        <option value="">Select Category</option>
+                                        <option value="" x-show="!school_manual_category">Select Category</option>
+                                        <option value="__manual__" x-show="school_manual_category" x-text="school_manual_category ? '✍️ Custom: ' + school_manual_category : ''"></option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
                                     </select>
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#031b4e] focus-within:ring-2 focus-within:ring-[#031b4e]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_category" x-model="school_manual_category"
+                                        @input="syncManualToSelect('category')"
+                                        placeholder="e.g. Primary Teacher, PRT, TGT, Music, Sports..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
                                 </div>
                                 <p x-show="fieldErrors.category_id" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
                                     <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.category_id ? fieldErrors.category_id[0] : ''"></span>
                                 </p>
                             </div>
 
-                            <!-- Subject (Dynamic based on Category) -->
+                            <!-- Subject (Dynamic based on Category OR Manual) -->
                             <div>
-                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Subject <span class="text-rose-500">*</span></label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider">Subject <span class="text-rose-500">*</span></label>
+                                    <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Select or Type Manual</span>
+                                </div>
                                 <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-book text-sm"></i></span>
-                                    <select name="subject_id" id="school_subject_id" x-model="school_subject_id" 
-                                        @change="onSubjectChange($event); if(fieldErrors.subject_id) { delete fieldErrors.subject_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }" 
-                                        :disabled="!school_category_id || loadingSchoolSubjects" required 
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-book text-sm"></i></span>
+                                    <select data-no-search="true" name="subject_id" id="school_subject_id" x-model="school_subject_id" 
+                                        @change="onSelectChange('subject', $event)" 
+                                        :disabled="loadingSchoolSubjects" :required="!school_manual_subject" 
                                         :class="fieldErrors.subject_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
                                         class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
-                                        <option value="">— First Select Category —</option>
+                                        <option value="" x-show="!school_manual_subject">— Select Subject (or pick Category above) —</option>
+                                        <option value="__manual__" x-show="school_manual_subject" x-text="school_manual_subject ? '✍️ Custom: ' + school_manual_subject : ''"></option>
+                                        @if(isset($allSubjects))
+                                            @foreach($allSubjects as $sub)
+                                                <option value="{{ $sub->id }}">{{ $sub->name }}</option>
+                                            @endforeach
+                                        @endif
                                     </select>
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#031b4e] focus-within:ring-2 focus-within:ring-[#031b4e]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_subject" x-model="school_manual_subject"
+                                        @input="syncManualToSelect('subject')"
+                                        placeholder="e.g. Physics, Mathematics, English, Computer..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
                                 </div>
                                 <p x-show="fieldErrors.subject_id" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
                                     <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.subject_id ? fieldErrors.subject_id[0] : ''"></span>
                                 </p>
                             </div>
 
-                            <!-- Required Qualification -->
-                            <div>
-                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Required Qualification <span class="text-rose-500">*</span></label>
-                                <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-graduation-cap text-sm"></i></span>
-                                    <select name="qualification_id" id="school_qualification_id" x-model="school_qualification_id" required 
-                                        @change="if(fieldErrors.qualification_id) { delete fieldErrors.qualification_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }"
-                                        :class="fieldErrors.qualification_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
-                                        class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
-                                        <option value="">Select Qualification</option>
-                                        @foreach($qualifications as $qualification)
-                                            <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                            <!-- Required Qualification (Full-Width: Left 50% Select, Right 50% OR TYPE) -->
+                            <div class="md:col-span-2">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider">Required Qualification <span class="text-rose-500">*</span></label>
+                                    <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Select or Type Manual</span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-graduation-cap text-sm"></i></span>
+                                        <select data-no-search="true" name="qualification_id" id="school_qualification_id" x-model="school_qualification_id" :required="!school_manual_qualification" 
+                                            @change="onSelectChange('qualification', $event)"
+                                            :class="fieldErrors.qualification_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
+                                            class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
+                                            <option value="" x-show="!school_manual_qualification">Select Qualification</option>
+                                            <option value="__manual__" x-show="school_manual_qualification" x-text="school_manual_qualification ? '✍️ Custom: ' + school_manual_qualification : ''"></option>
+                                            @foreach($qualifications as $qualification)
+                                                <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-chevron-down text-xs"></i></span>
+                                    </div>
+                                    <div class="flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#031b4e] focus-within:ring-2 focus-within:ring-[#031b4e]/20 transition-all shadow-2xs">
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                            <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                        </span>
+                                        <input type="text" name="manual_qualification" x-model="school_manual_qualification"
+                                            @input="syncManualToSelect('qualification')"
+                                            placeholder="e.g. B.Ed, M.Sc, PhD, MCA, CTET, D.El.Ed..." 
+                                            class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
+                                    </div>
                                 </div>
                                 <p x-show="fieldErrors.qualification_id" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
                                     <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.qualification_id ? fieldErrors.qualification_id[0] : ''"></span>
                                 </p>
+                            </div>
+
+                            <!-- Salary Range / Budget -->
+                            <div>
+                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Salary Range / Budget (Monthly)</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-rupee-sign text-sm"></i></span>
+                                    <input type="text" name="salary_range" maxlength="80" placeholder="e.g. ₹25,000 - ₹40,000 / month (or Negotiable)" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                </div>
                             </div>
 
                             <!-- Other / Additional Qualification (Writable) -->
@@ -1390,61 +1643,90 @@
                                     <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Optional</span>
                                 </div>
                                 <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-pencil-alt text-sm"></i></span>
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-pencil-alt text-sm"></i></span>
                                     <input type="text" name="other_qualification" id="school_other_qualification" x-model="school_other_qualification" maxlength="150" 
-                                        placeholder="e.g. B.Ed, CTET qualified, NTT, 2+ Yrs Exp..." 
+                                        placeholder="e.g. CTET qualified, NTT, 2+ Yrs Exp, Fluent English..." 
                                         class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
                                 </div>
-                                <p class="mt-1.5 text-[11px] text-slate-500 font-medium">
-                                    Specify any additional degrees, certifications or experience requirements here.
-                                </p>
                             </div>
 
                             <!-- State -->
                             <div>
-                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">State <span class="text-rose-500">*</span></label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider">State <span class="text-rose-500">*</span></label>
+                                    <button type="button" @click="detectLocation()" class="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-0.5 rounded-full transition-all inline-flex items-center gap-1 shadow-2xs">
+                                        <i class="fas fa-crosshairs text-blue-600"></i>
+                                        <span>Use Live GPS</span>
+                                    </button>
+                                </div>
+                                <input type="hidden" name="latitude" :value="userLat">
+                                <input type="hidden" name="longitude" :value="userLng">
                                 <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-map text-sm"></i></span>
-                                    <select name="state_id" id="school_state_id" x-model="school_state_id" @change="fetchSchoolCities(); if(fieldErrors.state_id) { delete fieldErrors.state_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }" required 
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-map text-sm"></i></span>
+                                    <select data-no-search="true" name="state_id" id="school_state_id" x-model="school_state_id" 
+                                        @change="onSelectChange('state', $event)" :required="!school_manual_state" 
                                         :class="fieldErrors.state_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
                                         class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer">
-                                        <option value="">Select State</option>
+                                        <option value="" x-show="!school_manual_state">Select State</option>
+                                        <option value="__manual__" x-show="school_manual_state" x-text="school_manual_state ? '✍️ Custom: ' + school_manual_state : ''"></option>
                                         @foreach($states as $state)
                                             <option value="{{ $state->id }}">{{ $state->name }}</option>
                                         @endforeach
                                     </select>
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#031b4e] focus-within:ring-2 focus-within:ring-[#031b4e]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_state" x-model="school_manual_state"
+                                        @input="syncManualToSelect('state')"
+                                        placeholder="e.g. Bihar, Uttar Pradesh, Delhi NCR, Jharkhand..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
                                 </div>
                                 <p x-show="fieldErrors.state_id" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
                                     <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.state_id ? fieldErrors.state_id[0] : ''"></span>
                                 </p>
                             </div>
 
-                            <!-- City (Dynamic based on State) -->
+                            <!-- City (Dynamic based on State OR Manual) -->
                             <div>
-                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">City <span class="text-rose-500">*</span></label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider">City <span class="text-rose-500">*</span></label>
+                                    <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Select or Type Manual</span>
+                                </div>
                                 <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-city text-sm"></i></span>
-                                    <select name="city_id" id="school_city_id" x-model="school_city_id" 
-                                        @change="if(fieldErrors.city_id) { delete fieldErrors.city_id; if(Object.keys(fieldErrors).length===0) errorMessage=''; }" 
-                                        :disabled="!school_state_id || loadingSchoolCities" required 
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-city text-sm"></i></span>
+                                    <select data-no-search="true" name="city_id" id="school_city_id" x-model="school_city_id" 
+                                        @change="onSelectChange('city', $event)" 
+                                        :disabled="loadingSchoolCities" :required="!school_manual_city" 
                                         :class="fieldErrors.city_id ? 'border-rose-400 bg-rose-50/30 ring-2 ring-rose-200 text-rose-900' : 'border-blue-200 focus:border-[#031b4e] focus:ring-2 focus:ring-[#031b4e]/30 text-[#031b4e]'"
                                         class="w-full bg-white border rounded-xl pl-11 pr-10 py-3.5 font-medium transition-colors outline-none appearance-none shadow-sm text-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
-                                        <option value="">— First Select State —</option>
+                                        <option value="" x-show="!school_manual_city">— Select City (or select State above) —</option>
+                                        <option value="__manual__" x-show="school_manual_city" x-text="school_manual_city ? '✍️ Custom: ' + school_manual_city : ''"></option>
+                                        @if(isset($allCities))
+                                            @foreach($allCities as $ct)
+                                                <option value="{{ $ct->id }}">{{ $ct->name }}</option>
+                                            @endforeach
+                                        @endif
                                     </select>
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fas fa-chevron-down text-xs"></i></span>
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"><i class="fas fa-chevron-down text-xs"></i></span>
+                                </div>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#031b4e] focus-within:ring-2 focus-within:ring-[#031b4e]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_city" x-model="school_manual_city"
+                                        @input="syncManualToSelect('city')"
+                                        placeholder="e.g. Patna, Muzaffarpur, Gaya, Ranchi, Lucknow..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
                                 </div>
                                 <p x-show="fieldErrors.city_id" x-cloak class="mt-1.5 text-xs font-bold text-rose-600 flex items-center gap-1.5 animate-fade-in">
                                     <i class="fas fa-exclamation-circle text-xs"></i> <span x-text="fieldErrors.city_id ? fieldErrors.city_id[0] : ''"></span>
                                 </p>
-                            </div>
-
-                            <!-- Salary Range -->
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-[#031b4e] uppercase tracking-wider mb-2">Salary Range / Budget (Monthly)</label>
-                                <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-rupee-sign text-sm"></i></span>
-                                    <input type="text" name="salary_range" maxlength="80" placeholder="e.g. ₹35,000 - ₹50,000 / Negotiable" class="w-full bg-white border border-blue-200 rounded-xl pl-11 pr-4 py-3.5 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none shadow-sm text-sm">
+                                <div x-show="userLat && userLng" x-cloak class="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 animate-fade-in">
+                                    <i class="fas fa-map-pin text-emerald-600"></i>
+                                    <span>GPS Location Attached (<span x-text="Number(userLat).toFixed(4)"></span>, <span x-text="Number(userLng).toFixed(4)"></span>)</span>
                                 </div>
                             </div>
 
@@ -1481,13 +1763,34 @@
                     errorMessage: '',
                     fieldErrors: {},
 
+                    // Live Geolocation State
+                    userLat: '',
+                    userLng: '',
+                    detectLocation(silent = false) {
+                        if (typeof window.captureUserLiveLocation === 'function') {
+                            window.captureUserLiveLocation(silent, (coords) => {
+                                this.userLat = coords.lat;
+                                this.userLng = coords.lng;
+                            });
+                        }
+                    },
+
+                    // Tuition form board state
+                    tuition_board: '',
+                    tuition_manual_board: '',
+
                     // School form dynamic state
                     school_category_id: '',
+                    school_manual_category: '',
                     school_subject_id: '',
+                    school_manual_subject: '',
                     school_qualification_id: '',
+                    school_manual_qualification: '',
                     school_other_qualification: '',
                     school_state_id: '',
+                    school_manual_state: '',
                     school_city_id: '',
+                    school_manual_city: '',
                     school_subjects: [],
                     school_cities: [],
                     loadingSchoolSubjects: false,
@@ -1500,34 +1803,24 @@
                             }
                         });
 
+                        window.addEventListener('gps-detected', (e) => {
+                            if (e.detail && e.detail.lat && e.detail.lng) {
+                                this.userLat = e.detail.lat;
+                                this.userLng = e.detail.lng;
+                            }
+                        });
+
                         const urlParams = new URLSearchParams(window.location.search);
                         const tabParam = urlParams.get('tab') || urlParams.get('requirement');
                         if (tabParam === 'school' || tabParam === 'tuition') {
                             this.switchTab(tabParam);
                         }
-
-                        this.$nextTick(() => {
-                            const sub = document.getElementById('school_subject_id');
-                            if (sub && sub._slimSelect && !this.school_category_id) sub._slimSelect.disable();
-                            const city = document.getElementById('school_city_id');
-                            if (city && city._slimSelect && !this.school_state_id) city._slimSelect.disable();
-                        });
                     },
 
                     switchTab(newTab) {
                         this.tab = newTab;
                         this.errorMessage = '';
                         this.fieldErrors = {};
-                        this.$nextTick(() => {
-                            const formContainer = document.getElementById('quick-request-form');
-                            if (formContainer && typeof window.initSearchableSelects === 'function') {
-                                window.initSearchableSelects(formContainer);
-                            }
-                            const sub = document.getElementById('school_subject_id');
-                            if (sub && sub._slimSelect && !this.school_category_id) sub._slimSelect.disable();
-                            const city = document.getElementById('school_city_id');
-                            if (city && city._slimSelect && !this.school_state_id) city._slimSelect.disable();
-                        });
                     },
                     resetForm() {
                         this.submitted = false;
@@ -1544,80 +1837,121 @@
                             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
                     },
-                    setSelectLoading(selectEl, placeholder) {
-                        if (!selectEl) return;
-                        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
-                        selectEl.disabled = true;
-                        if (selectEl._slimSelect) {
-                            selectEl._isUpdatingFromSlim = true;
-                            try {
-                                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
-                                selectEl._slimSelect.disable();
-                            } catch (e) {
-                                console.warn(e);
-                            } finally {
-                                setTimeout(() => { selectEl._isUpdatingFromSlim = false; }, 30);
+
+                    syncManualToSelect(field) {
+                        let manualVal = '';
+                        let selectEl = null;
+
+                        if (field === 'board') {
+                            manualVal = (this.tuition_manual_board || '').trim();
+                            selectEl = document.getElementById('tuition_board_id') || document.querySelector('select[name="board"]');
+                            if (manualVal) {
+                                this.tuition_board = '__manual__';
+                            } else if (this.tuition_board === '__manual__') {
+                                this.tuition_board = '';
+                            }
+                        } else {
+                            const manualKey = 'school_manual_' + field;
+                            const selectKey = field === 'category' ? 'school_category_id' : (field === 'subject' ? 'school_subject_id' : (field === 'qualification' ? 'school_qualification_id' : (field === 'state' ? 'school_state_id' : 'school_city_id')));
+                            manualVal = (this[manualKey] || '').trim();
+                            selectEl = document.getElementById('school_' + field + '_id');
+                            
+                            if (manualVal) {
+                                this[selectKey] = '__manual__';
+                            } else if (this[selectKey] === '__manual__') {
+                                this[selectKey] = '';
+                            }
+                        }
+
+                        if (selectEl) {
+                            let opt = selectEl.querySelector('option[value="__manual__"]');
+                            if (!opt) {
+                                opt = document.createElement('option');
+                                opt.value = '__manual__';
+                                if (selectEl.options.length > 1) {
+                                    selectEl.insertBefore(opt, selectEl.options[1]);
+                                } else {
+                                    selectEl.appendChild(opt);
+                                }
+                            }
+                            if (manualVal) {
+                                opt.textContent = '✍️ Custom: ' + manualVal;
+                                opt.style.display = '';
+                                opt.selected = true;
+                                selectEl.value = '__manual__';
+                            } else {
+                                opt.textContent = '';
+                                opt.style.display = 'none';
+                                if (selectEl.value === '__manual__') {
+                                    selectEl.value = '';
+                                }
                             }
                         }
                     },
+
+                    onSelectChange(field, event) {
+                        const val = event && event.target ? event.target.value : '';
+                        if (val !== '__manual__') {
+                            if (field === 'board') {
+                                this.tuition_manual_board = '';
+                            } else {
+                                this['school_manual_' + field] = '';
+                            }
+                        }
+                        if (field === 'category') {
+                            this.fetchSchoolSubjects();
+                        } else if (field === 'state') {
+                            this.fetchSchoolCities();
+                        }
+                    },
+
+                    setSelectLoading(selectEl, placeholder) {
+                        if (!selectEl) return;
+                        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+                    },
                     updateSelectOptions(selectEl, items, placeholder, selectedValue = '') {
                         if (!selectEl) return;
-                        let html = `<option value="">${placeholder}</option>`;
+                        const isSubject = selectEl.id === 'school_subject_id';
+                        const isCity = selectEl.id === 'school_city_id';
+                        const manualVal = isSubject ? (this.school_manual_subject || '').trim() : (isCity ? (this.school_manual_city || '').trim() : '');
+
+                        let html = `<option value="" ${!manualVal ? '' : 'style="display:none"'}>${placeholder}</option>`;
+                        html += `<option value="__manual__" ${manualVal ? 'selected' : 'style="display:none"'}>${manualVal ? '✍️ Custom: ' + manualVal : ''}</option>`;
+
                         items.forEach(item => {
-                            const isSel = selectedValue && String(selectedValue) === String(item.id);
+                            const isSel = !manualVal && selectedValue && String(selectedValue) === String(item.id);
                             html += `<option value="${item.id}" ${isSel ? 'selected' : ''}>${item.name}</option>`;
                         });
+
                         selectEl.innerHTML = html;
                         selectEl.disabled = false;
-
-                        if (selectEl._slimSelect) {
-                            selectEl._isUpdatingFromSlim = true;
-                            try {
-                                const ssData = [
-                                    { text: placeholder, value: '', placeholder: true },
-                                    ...items.map(item => ({
-                                        text: item.name,
-                                        value: String(item.id),
-                                        selected: selectedValue && String(selectedValue) === String(item.id)
-                                    }))
-                                ];
-                                selectEl._slimSelect.setData(ssData);
-                                if (selectedValue) {
-                                    selectEl._slimSelect.setSelected(String(selectedValue), false);
-                                } else {
-                                    selectEl._slimSelect.setSelected('', false);
-                                }
-                                selectEl._slimSelect.enable();
-                            } catch (e) {
-                                console.warn(e);
-                            } finally {
-                                setTimeout(() => { selectEl._isUpdatingFromSlim = false; }, 30);
-                            }
+                        if (manualVal) {
+                            selectEl.value = '__manual__';
+                        } else if (selectedValue) {
+                            selectEl.value = String(selectedValue);
                         }
                     },
                     resetSelect(selectEl, placeholder) {
                         if (!selectEl) return;
-                        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
-                        selectEl.value = '';
-                        selectEl.disabled = true;
-                        if (selectEl._slimSelect) {
-                            selectEl._isUpdatingFromSlim = true;
-                            try {
-                                selectEl._slimSelect.setData([{ text: placeholder, value: '', placeholder: true }]);
-                                selectEl._slimSelect.setSelected('', false);
-                                selectEl._slimSelect.disable();
-                            } catch (e) {
-                                console.warn(e);
-                            } finally {
-                                setTimeout(() => { selectEl._isUpdatingFromSlim = false; }, 30);
-                            }
+                        const isSubject = selectEl.id === 'school_subject_id';
+                        const isCity = selectEl.id === 'school_city_id';
+                        const manualVal = isSubject ? (this.school_manual_subject || '').trim() : (isCity ? (this.school_manual_city || '').trim() : '');
+
+                        let html = `<option value="" ${!manualVal ? '' : 'style="display:none"'}>${placeholder}</option>`;
+                        html += `<option value="__manual__" ${manualVal ? 'selected' : 'style="display:none"'}>${manualVal ? '✍️ Custom: ' + manualVal : ''}</option>`;
+                        selectEl.innerHTML = html;
+                        selectEl.disabled = false;
+                        if (manualVal) {
+                            selectEl.value = '__manual__';
+                        } else {
+                            selectEl.value = '';
                         }
                     },
                     fetchSchoolSubjects() {
-                        this.school_subject_id = '';
                         const subjectSelect = document.getElementById('school_subject_id');
+                        if (!subjectSelect) return;
 
-                        if (this.school_category_id) {
+                        if (this.school_category_id && this.school_category_id !== '__manual__') {
                             this.loadingSchoolSubjects = true;
                             this.setSelectLoading(subjectSelect, 'Loading subjects...');
 
@@ -1635,19 +1969,16 @@
                                 .finally(() => {
                                     this.loadingSchoolSubjects = false;
                                 });
-                        } else {
-                            this.school_subjects = [];
-                            this.resetSelect(subjectSelect, '— First Select Category —');
                         }
                     },
                     onSubjectChange(event) {
                         this.school_subject_id = event && event.target ? event.target.value : '';
                     },
                     fetchSchoolCities() {
-                        this.school_city_id = '';
                         const citySelect = document.getElementById('school_city_id');
+                        if (!citySelect) return;
 
-                        if (this.school_state_id) {
+                        if (this.school_state_id && this.school_state_id !== '__manual__') {
                             this.loadingSchoolCities = true;
                             this.setSelectLoading(citySelect, 'Loading cities...');
 
@@ -1665,14 +1996,15 @@
                                 .finally(() => {
                                     this.loadingSchoolCities = false;
                                 });
-                        } else {
-                            this.school_cities = [];
-                            this.resetSelect(citySelect, '— First Select State —');
                         }
                     },
                     async submitTuitionForm(event) {
                         const form = event.target;
                         const formData = new FormData(form);
+                        if (this.userLat && this.userLng) {
+                            formData.set('latitude', this.userLat);
+                            formData.set('longitude', this.userLng);
+                        }
                         this.loading = true;
                         this.errorMessage = '';
                         this.fieldErrors = {};
@@ -1712,6 +2044,8 @@
                                 this.successMessage = data.message || 'Your tuition requirement has been posted successfully! Our team will contact you soon.';
                                 form.reset();
                                 this.fieldErrors = {};
+                                this.tuition_board = '';
+                                this.tuition_manual_board = '';
                                 this.scrollToSection();
                             } else {
                                 if (response.status === 419) {
@@ -1737,6 +2071,10 @@
                     async submitSchoolForm(event) {
                         const form = event.target;
                         const formData = new FormData(form);
+                        if (this.userLat && this.userLng) {
+                            formData.set('latitude', this.userLat);
+                            formData.set('longitude', this.userLng);
+                        }
                         this.loading = true;
                         this.errorMessage = '';
                         this.fieldErrors = {};
@@ -1779,11 +2117,16 @@
                                 this.school_subjects = [];
                                 this.school_cities = [];
                                 this.school_category_id = '';
+                                this.school_manual_category = '';
                                 this.school_subject_id = '';
+                                this.school_manual_subject = '';
                                 this.school_qualification_id = '';
+                                this.school_manual_qualification = '';
                                 this.school_other_qualification = '';
                                 this.school_state_id = '';
+                                this.school_manual_state = '';
                                 this.school_city_id = '';
+                                this.school_manual_city = '';
                                 const otherQual = document.getElementById('school_other_qualification');
                                 if (otherQual) otherQual.value = '';
                                 this.scrollToSection();

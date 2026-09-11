@@ -114,7 +114,21 @@
 
                 <!-- State -->
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">State *</label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide">State *</label>
+                        <div class="flex items-center gap-2">
+                            @if($job->google_maps_url)
+                                <a href="{{ $job->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-emerald-600 hover:text-white bg-emerald-500/10 hover:bg-emerald-600 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg transition-all inline-flex items-center gap-1 shadow-2xs">
+                                    <i class="fas fa-location-arrow text-[10px]"></i> View Map
+                                </a>
+                            @endif
+                            <button type="button" onclick="detectAdminJobGps()" class="text-xs font-bold text-accent-blue hover:text-white bg-accent-blue/10 hover:bg-accent-blue border border-accent-blue/20 px-2.5 py-0.5 rounded-lg transition-all inline-flex items-center gap-1 shadow-xs cursor-pointer">
+                                <i class="fas fa-crosshairs"></i> Use Live GPS
+                            </button>
+                        </div>
+                    </div>
+                    <input type="hidden" name="latitude" id="admin_job_lat" value="{{ old('latitude', $job->latitude) }}">
+                    <input type="hidden" name="longitude" id="admin_job_lng" value="{{ old('longitude', $job->longitude) }}">
                     <select name="state_id" id="state_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
                         <option value="">Select State</option>
                         @foreach($states as $state)
@@ -134,6 +148,10 @@
                         @endforeach
                     </select>
                     @error('city_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    <div id="admin_job_gps_badge" class="{{ old('latitude', $job->latitude) ? 'inline-flex' : 'hidden' }} mt-2 items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+                        <i class="fas fa-map-pin"></i>
+                        <span id="admin_job_gps_text">GPS Attached: {{ old('latitude', $job->latitude) }}, {{ old('longitude', $job->longitude) }}</span>
+                    </div>
                 </div>
 
                 <!-- Salary Range -->
@@ -336,6 +354,44 @@
             }
         });
     }
+
+    function detectAdminJobGps(silent = false) {
+        if (typeof window.captureUserLiveLocation === 'function') {
+            window.captureUserLiveLocation(silent, function(coords) {
+                var lat = document.getElementById('admin_job_lat');
+                var lng = document.getElementById('admin_job_lng');
+                if (lat && lng) {
+                    lat.value = coords.lat;
+                    lng.value = coords.lng;
+                }
+                var badge = document.getElementById('admin_job_gps_badge');
+                var text = document.getElementById('admin_job_gps_text');
+                if (badge && text) {
+                    text.textContent = 'GPS Attached (' + Number(coords.lat).toFixed(4) + ', ' + Number(coords.lng).toFixed(4) + ')';
+                    badge.classList.remove('hidden');
+                    badge.classList.add('inline-flex');
+                }
+            });
+        }
+    }
+
+    window.addEventListener('gps-detected', function(e) {
+        if (e.detail && e.detail.lat && e.detail.lng) {
+            var lat = document.getElementById('admin_job_lat');
+            var lng = document.getElementById('admin_job_lng');
+            if (lat && lng) {
+                lat.value = e.detail.lat;
+                lng.value = e.detail.lng;
+                var badge = document.getElementById('admin_job_gps_badge');
+                var text = document.getElementById('admin_job_gps_text');
+                if (badge && text) {
+                    text.textContent = 'GPS Attached (' + Number(e.detail.lat).toFixed(4) + ', ' + Number(e.detail.lng).toFixed(4) + ')';
+                    badge.classList.remove('hidden');
+                    badge.classList.add('inline-flex');
+                }
+            }
+        }
+    });
 </script>
 @endpush
 @endsection

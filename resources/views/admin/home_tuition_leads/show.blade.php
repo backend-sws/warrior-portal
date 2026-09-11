@@ -112,7 +112,16 @@
                             </div>
                             <div class="flex items-start gap-2">
                                 <i class="fas fa-map-marker-alt w-4 mt-1 text-text-dark/40"></i>
-                                <span class="text-sm font-semibold text-text-main">{{ $lead->location }}</span>
+                                <div>
+                                    <span class="text-sm font-semibold text-text-main">{{ $lead->location }}</span>
+                                    @if($lead->google_maps_url)
+                                        <div class="mt-1">
+                                            <a href="{{ $lead->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/20 rounded-lg text-xs font-bold transition-all shadow-2xs">
+                                                <i class="fas fa-location-dot"></i> View on Google Maps ({{ number_format((float)$lead->latitude, 4) }}, {{ number_format((float)$lead->longitude, 4) }})
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -120,11 +129,15 @@
                     <div>
                         <div class="text-[10px] uppercase font-bold tracking-widest text-text-dark/40 mb-1">Tuition Details</div>
                         <ul class="space-y-2 text-sm text-text-main">
-                            <li><span class="text-text-dark/60 inline-block w-20">Class:</span> <span class="font-semibold">{{ $lead->class }}</span></li>
-                            <li><span class="text-text-dark/60 inline-block w-20">Subjects:</span> <span class="font-semibold">{{ $lead->subjects }}</span></li>
-                            <li><span class="text-text-dark/60 inline-block w-20">Timing:</span> <span class="font-semibold">{{ $lead->preferred_timing ?: 'Not specified' }}</span></li>
-                            <li><span class="text-text-dark/60 inline-block w-20">Tutor Pref:</span> <span class="font-semibold">{{ $lead->tutor_preference }}</span></li>
-                            <li><span class="text-text-dark/60 inline-block w-20">Fee:</span> <span class="font-semibold text-green-500">{{ $lead->fee ?: 'Not discussed' }}</span></li>
+                            <li><span class="text-text-dark/60 inline-block w-24">Class:</span> <span class="font-semibold">{{ $lead->class }}</span></li>
+                            <li><span class="text-text-dark/60 inline-block w-24">Board:</span> <span class="font-semibold">{{ $lead->board ?: 'General' }}</span></li>
+                            <li><span class="text-text-dark/60 inline-block w-24">Subjects:</span> <span class="font-semibold">{{ $lead->subjects }}</span></li>
+                            <li><span class="text-text-dark/60 inline-block w-24">Duration:</span> <span class="font-semibold text-accent-blue">{{ $lead->duration_hours ?: 'Not specified' }}</span></li>
+                            <li><span class="text-text-dark/60 inline-block w-24">Days / Week:</span> <span class="font-semibold text-accent-blue">{{ $lead->days_per_week ?: 'Not specified' }}</span></li>
+                            <li><span class="text-text-dark/60 inline-block w-24">Timing:</span> <span class="font-semibold">{{ $lead->preferred_timing ?: 'Not specified' }}</span></li>
+                            <li><span class="text-text-dark/60 inline-block w-24">Tutor Pref:</span> <span class="font-semibold">{{ $lead->tutor_preference }}</span></li>
+                            <li><span class="text-text-dark/60 inline-block w-24">Fee:</span> <span class="font-semibold text-green-500">{{ $lead->fee ?: 'Not discussed' }}</span></li>
+                            <li><span class="text-text-dark/60 inline-block w-24">Remark / Note:</span> <span class="font-semibold text-amber-500">{{ $lead->additional_notes ?: 'Not specified' }}</span></li>
                         </ul>
                     </div>
 

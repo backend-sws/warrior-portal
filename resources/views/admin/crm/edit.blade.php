@@ -52,7 +52,7 @@
                         <i class="fas fa-chalkboard-teacher"></i>
                     </div>
                     <div>
-                        <span class="block text-sm font-black text-text-main">Home Tutor</span>
+                        <span class="block text-sm font-black text-text-main">Home Tutor Only</span>
                         <span class="text-[11px] text-text-dark/50">Only Home Tuitions</span>
                     </div>
                 </label>
@@ -66,7 +66,7 @@
                         <i class="fas fa-school"></i>
                     </div>
                     <div>
-                        <span class="block text-sm font-black text-text-main">School Job</span>
+                        <span class="block text-sm font-black text-text-main">School Job Only</span>
                         <span class="text-[11px] text-text-dark/50">Only School Teaching</span>
                     </div>
                 </label>
@@ -80,8 +80,8 @@
                         <i class="fas fa-layer-group"></i>
                     </div>
                     <div>
-                        <span class="block text-sm font-black text-text-main">Both Categories</span>
-                        <span class="text-[11px] text-text-dark/50">Tutor + School Job</span>
+                        <span class="block text-sm font-black text-text-main">Both (School Job + Home Tuition)</span>
+                        <span class="text-[11px] text-text-dark/50">School Job + Home Tuition</span>
                     </div>
                 </label>
             </div>
@@ -152,9 +152,28 @@
                            class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
                 </div>
                 <div class="md:col-span-3">
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Full Residential Address <span class="text-red-500">*</span></label>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase">Full Residential Address <span class="text-red-500">*</span></label>
+                        <div class="flex items-center gap-2">
+                            @if($profile?->google_maps_url)
+                                <a href="{{ $profile->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-emerald-600 hover:text-white bg-emerald-500/10 hover:bg-emerald-600 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg transition-all inline-flex items-center gap-1 shadow-2xs">
+                                    <i class="fas fa-location-arrow text-[10px]"></i> View on Map
+                                </a>
+                            @endif
+                            <button type="button" onclick="detectAdminCandidateGps()" class="text-xs font-bold text-accent-blue hover:text-white bg-accent-blue/10 hover:bg-accent-blue border border-accent-blue/20 px-2.5 py-0.5 rounded-lg transition-all inline-flex items-center gap-1 shadow-2xs cursor-pointer">
+                                <i class="fas fa-crosshairs text-[10px]"></i> Use Live GPS
+                            </button>
+                        </div>
+                    </div>
+                    <input type="hidden" name="latitude" id="admin_cand_lat" value="{{ old('latitude', $profile?->latitude) }}">
+                    <input type="hidden" name="longitude" id="admin_cand_lng" value="{{ old('longitude', $profile?->longitude) }}">
                     <textarea name="address" rows="2" required 
+                              onfocus="detectAdminCandidateGps(true)"
                               class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">{{ old('address', $profile?->address) }}</textarea>
+                    <div id="admin_cand_gps_badge" class="{{ old('latitude', $profile?->latitude) ? 'inline-flex' : 'hidden' }} mt-2 items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+                        <i class="fas fa-map-pin"></i>
+                        <span id="admin_cand_gps_text">GPS Attached: {{ old('latitude', $profile?->latitude) }}, {{ old('longitude', $profile?->longitude) }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -219,11 +238,11 @@
             @php
                 $savedTuitionSubjs = $profile?->tuition_subjects ?? [];
                 if (!is_array($savedTuitionSubjs)) $savedTuitionSubjs = [];
-                $popularTuitionSubjs = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Science (1-10)', 'Social Science', 'Hindi', 'Computer Science / Coding', 'Commerce / Accounts', 'Economics'];
+                $popularTuitionSubjs = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Science (1-10)', 'Social Science', 'Hindi', 'Computer Science / Coding', 'Commerce / Accounts', 'Economics'];
 
                 $savedClasses = $profile?->classes_interested ?? [];
                 if (!is_array($savedClasses)) $savedClasses = [];
-                $classOptions = ['Pre-Primary / Nursery', 'Class 1 to 5', 'Class 6 to 8', 'Class 9 to 10', 'Class 11 to 12', 'IIT-JEE / NEET Foundation'];
+                $classOptions = ['Pre-Primary', 'Class 1 to 5', 'Class 6 to 8', 'Class 9 to 10', 'Class 11 to 12', 'IIT-JEE', 'NEET', 'Olympiad', 'IIT-JEE / NEET Foundation'];
             @endphp
 
             {{-- Tuition Subjects Multi-Select --}}
@@ -239,6 +258,13 @@
                         </label>
                     @endforeach
                 </div>
+                <div class="mt-2.5 pt-2 border-t border-emerald-500/20 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <span class="text-[11px] font-bold text-emerald-800 whitespace-nowrap flex items-center gap-1">
+                        <i class="fas fa-edit text-emerald-600"></i> Other / Manual Subjects:
+                    </span>
+                    <input type="text" name="manual_tuition_subjects" value="{{ old('manual_tuition_subjects') }}" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
+                           class="w-full bg-white border border-card-border rounded-xl px-3.5 py-1.5 text-xs text-text-main font-medium placeholder-text-dark/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500">
+                </div>
             </div>
 
             {{-- Classes Interested Multi-Select --}}
@@ -253,6 +279,13 @@
                             <span>{{ $cOpt }}</span>
                         </label>
                     @endforeach
+                </div>
+                <div class="mt-2.5 pt-2 border-t border-emerald-500/20 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <span class="text-[11px] font-bold text-emerald-800 whitespace-nowrap flex items-center gap-1">
+                        <i class="fas fa-edit text-emerald-600"></i> Other Classes / Exams:
+                    </span>
+                    <input type="text" name="manual_classes" value="{{ old('manual_classes') }}" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
+                           class="w-full bg-white border border-card-border rounded-xl px-3.5 py-1.5 text-xs text-text-main font-medium placeholder-text-dark/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500">
                 </div>
             </div>
 
@@ -591,6 +624,44 @@
                 }
             });
         });
+    });
+
+    function detectAdminCandidateGps(silent = false) {
+        if (typeof window.captureUserLiveLocation === 'function') {
+            window.captureUserLiveLocation(silent, function(coords) {
+                var lat = document.getElementById('admin_cand_lat');
+                var lng = document.getElementById('admin_cand_lng');
+                if (lat && lng) {
+                    lat.value = coords.lat;
+                    lng.value = coords.lng;
+                }
+                var badge = document.getElementById('admin_cand_gps_badge');
+                var text = document.getElementById('admin_cand_gps_text');
+                if (badge && text) {
+                    text.textContent = 'GPS Attached (' + Number(coords.lat).toFixed(4) + ', ' + Number(coords.lng).toFixed(4) + ')';
+                    badge.classList.remove('hidden');
+                    badge.classList.add('inline-flex');
+                }
+            });
+        }
+    }
+
+    window.addEventListener('gps-detected', function(e) {
+        if (e.detail && e.detail.lat && e.detail.lng) {
+            var lat = document.getElementById('admin_cand_lat');
+            var lng = document.getElementById('admin_cand_lng');
+            if (lat && lng) {
+                lat.value = e.detail.lat;
+                lng.value = e.detail.lng;
+                var badge = document.getElementById('admin_cand_gps_badge');
+                var text = document.getElementById('admin_cand_gps_text');
+                if (badge && text) {
+                    text.textContent = 'GPS Attached (' + Number(e.detail.lat).toFixed(4) + ', ' + Number(e.detail.lng).toFixed(4) + ')';
+                    badge.classList.remove('hidden');
+                    badge.classList.add('inline-flex');
+                }
+            }
+        }
     });
 </script>
 @endpush

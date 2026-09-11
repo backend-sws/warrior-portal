@@ -128,6 +128,12 @@ class ProfileController extends Controller
         if ($request->has('address')) {
             $profile->address = $request->address;
         }
+        if ($request->filled('latitude')) {
+            $profile->latitude = $request->latitude;
+        }
+        if ($request->filled('longitude')) {
+            $profile->longitude = $request->longitude;
+        }
 
         if ($request->hasFile('profile_photo')) {
             $path = $request->file('profile_photo')->store('profile_photos', 'public');
@@ -138,8 +144,20 @@ class ProfileController extends Controller
 
         // Home Tutor fields
         if (in_array($activeCategory, ['home_tutor', 'both'])) {
-            $profile->tuition_subjects = $request->input('tuition_subjects', []);
-            $profile->classes_interested = $request->input('classes_interested', []);
+            $tuitionSubjs = (array) $request->input('tuition_subjects', []);
+            if ($request->filled('manual_tuition_subjects')) {
+                $manualSubs = array_filter(array_map('trim', explode(',', $request->input('manual_tuition_subjects'))));
+                $tuitionSubjs = array_values(array_unique(array_merge($tuitionSubjs, $manualSubs)));
+            }
+            $profile->tuition_subjects = $tuitionSubjs;
+
+            $classesInterested = (array) $request->input('classes_interested', []);
+            if ($request->filled('manual_classes')) {
+                $manualCls = array_filter(array_map('trim', explode(',', $request->input('manual_classes'))));
+                $classesInterested = array_values(array_unique(array_merge($classesInterested, $manualCls)));
+            }
+            $profile->classes_interested = $classesInterested;
+
             $profile->teaching_mode = $request->input('teaching_mode');
             $profile->preferred_areas = $request->input('preferred_areas');
             $profile->available_time_slot = $request->input('available_time_slot');

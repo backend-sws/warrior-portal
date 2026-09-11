@@ -58,6 +58,17 @@ class JobPost extends Model
         return route('jobs.show', $this->id);
     }
 
+    /**
+     * Get Google Maps pinpoint URL if coordinates are available.
+     */
+    public function getGoogleMapsUrlAttribute(): ?string
+    {
+        if ($this->latitude && $this->longitude) {
+            return "https://www.google.com/maps?q={$this->latitude},{$this->longitude}";
+        }
+        return null;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

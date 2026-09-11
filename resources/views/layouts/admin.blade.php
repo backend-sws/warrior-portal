@@ -712,6 +712,71 @@
             });
         }
     </script>
+    <script>
+    // Universal Live GPS Geolocation Capture Script for Admin
+    window.userDetectedLocation = null;
+    window.captureUserLiveLocation = function(silent = false, callback = null) {
+        if (!navigator.geolocation) {
+            if (!silent) alert('Geolocation is not supported by your browser.');
+            return;
+        }
+
+        const buttons = document.querySelectorAll('.btn-detect-gps');
+        buttons.forEach(b => {
+            if (!b.dataset.origHtml) b.dataset.origHtml = b.innerHTML;
+            b.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Detecting GPS...';
+            b.disabled = true;
+        });
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude.toFixed(7);
+                const lng = position.coords.longitude.toFixed(7);
+                window.userDetectedLocation = { lat, lng };
+
+                document.querySelectorAll('input[name="latitude"]').forEach(el => {
+                    el.value = lat;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                document.querySelectorAll('input[name="longitude"]').forEach(el => {
+                    el.value = lng;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+
+                document.querySelectorAll('.gps-status-indicator').forEach(el => {
+                    el.classList.remove('hidden');
+                    el.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                        <i class="fas fa-check-circle text-emerald-400"></i> Live GPS Attached (${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)})
+                    </span>`;
+                });
+
+                buttons.forEach(b => {
+                    b.innerHTML = '<i class="fas fa-check-circle text-emerald-500 mr-1"></i> GPS Detected!';
+                    b.disabled = false;
+                    setTimeout(() => {
+                        b.innerHTML = '<i class="fas fa-location-crosshairs text-emerald-500 mr-1"></i> Update GPS';
+                    }, 2500);
+                });
+
+                window.dispatchEvent(new CustomEvent('gps-detected', { detail: { lat, lng } }));
+                if (typeof callback === 'function') callback({ lat, lng });
+            },
+            function(err) {
+                console.warn('Live GPS detection info:', err.message);
+                buttons.forEach(b => {
+                    if (b.dataset.origHtml) b.innerHTML = b.dataset.origHtml;
+                    b.disabled = false;
+                });
+                if (!silent && err.code === 1) {
+                    alert('Location access was denied in browser.');
+                }
+            },
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 }
+        );
+    };
+    </script>
     @include('partials.copy-job-link')
 </body>
 

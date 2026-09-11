@@ -89,10 +89,25 @@ class CandidateProfile extends Model
     }
 
     /**
+     * Get Google Maps pinpoint URL if coordinates are available.
+     */
+    public function getGoogleMapsUrlAttribute(): ?string
+    {
+        if ($this->latitude && $this->longitude) {
+            return "https://www.google.com/maps?q={$this->latitude},{$this->longitude}";
+        }
+        return null;
+    }
+
+    /**
      * Calculate live profile completion percentage (25%, 50%, 75%, 100%)
      */
     public function getCompletionPercentageAttribute(): int
     {
+        if ($this->is_profile_complete && isset($this->attributes['profile_completion_percentage']) && (int)$this->attributes['profile_completion_percentage'] >= 100) {
+            return 100;
+        }
+
         $category = $this->candidate_category ?: 'both';
         $stepsPassed = 0;
 

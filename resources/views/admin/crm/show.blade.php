@@ -264,8 +264,18 @@
                             <span class="font-bold text-text-main">{{ $profile?->experience_range ?: (($profile?->experience_years ?? 0) . ' Years') }}</span>
                         </div>
                         <div class="bg-secondary-bg p-2.5 rounded-xl border border-card-border col-span-2">
-                            <span class="text-[10px] text-text-dark/50 block">Full Residential Address</span>
-                            <span class="font-medium text-text-main">{{ $profile?->address ?? 'N/A' }}</span>
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] text-text-dark/50 block">Full Residential Address</span>
+                                @if($profile?->google_maps_url)
+                                    <a href="{{ $profile->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 text-[10px] font-bold border border-emerald-500/20 transition-all">
+                                        <i class="fas fa-location-dot text-[9px]"></i> View on Google Maps
+                                    </a>
+                                @endif
+                            </div>
+                            <span class="font-medium text-text-main block mt-0.5">{{ $profile?->address ?? 'N/A' }}</span>
+                            @if($profile?->latitude && $profile?->longitude)
+                                <span class="text-[10px] text-text-dark/40 font-mono block mt-0.5">GPS: {{ number_format((float)$profile->latitude, 4) }}, {{ number_format((float)$profile->longitude, 4) }}</span>
+                            @endif
                         </div>
                     </div>
                 </div>

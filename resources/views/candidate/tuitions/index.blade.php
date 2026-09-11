@@ -1078,6 +1078,18 @@ function printTuitionAgreement() {
                         <span class="font-mono">Pincode: {{ $tuition->pincode }}</span>
                     </div>
                     @endif
+                    @if($tuition->duration_hours)
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-clock w-5 text-sky-500 shrink-0"></i>
+                        <span class="line-clamp-1">Duration: <span class="font-bold">{{ $tuition->duration_hours }}</span></span>
+                    </div>
+                    @endif
+                    @if($tuition->days_per_week)
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-calendar-week w-5 text-indigo-500 shrink-0"></i>
+                        <span class="line-clamp-1">Days / Week: <span class="font-bold">{{ $tuition->days_per_week }}</span></span>
+                    </div>
+                    @endif
                     <div class="flex items-center text-gray-600">
                         <i class="fas fa-venus-mars w-5 text-purple-500 shrink-0"></i>
                         <span class="line-clamp-1">Gender Pref: <span class="font-bold">{{ $tuition->tutor_preference ?: 'Any' }}</span></span>

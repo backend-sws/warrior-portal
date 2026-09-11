@@ -1077,6 +1077,86 @@
         });
     });
     </script>
+    <script>
+    // Universal Live GPS Geolocation Capture Script
+    window.userDetectedLocation = null;
+    window.captureUserLiveLocation = function(silent = false, callback = null) {
+        if (!navigator.geolocation) {
+            if (!silent) alert('Geolocation is not supported by your browser.');
+            return;
+        }
+
+        const buttons = document.querySelectorAll('.btn-detect-gps');
+        buttons.forEach(b => {
+            if (!b.dataset.origHtml) b.dataset.origHtml = b.innerHTML;
+            b.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Detecting GPS...';
+            b.disabled = true;
+        });
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude.toFixed(7);
+                const lng = position.coords.longitude.toFixed(7);
+                window.userDetectedLocation = { lat, lng };
+
+                // Populate all latitude & longitude hidden/text inputs
+                document.querySelectorAll('input[name="latitude"]').forEach(el => {
+                    el.value = lat;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                document.querySelectorAll('input[name="longitude"]').forEach(el => {
+                    el.value = lng;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+
+                // Update status indicators on page
+                document.querySelectorAll('.gps-status-indicator').forEach(el => {
+                    el.classList.remove('hidden');
+                    el.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold">
+                        <i class="fas fa-check-circle text-emerald-500"></i> Live GPS Attached (${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)})
+                    </span>`;
+                });
+
+                buttons.forEach(b => {
+                    b.innerHTML = '<i class="fas fa-check-circle text-emerald-500 mr-1"></i> GPS Detected!';
+                    b.disabled = false;
+                    setTimeout(() => {
+                        b.innerHTML = '<i class="fas fa-location-crosshairs text-emerald-500 mr-1"></i> Update GPS';
+                    }, 2500);
+                });
+
+                // Dispatch event so Alpine components can react
+                window.dispatchEvent(new CustomEvent('gps-detected', { detail: { lat, lng } }));
+
+                if (typeof callback === 'function') callback({ lat, lng });
+            },
+            function(err) {
+                console.warn('Live GPS detection info:', err.message);
+                buttons.forEach(b => {
+                    if (b.dataset.origHtml) b.innerHTML = b.dataset.origHtml;
+                    b.disabled = false;
+                });
+                if (!silent && err.code === 1) {
+                    alert('Location access was denied. Please allow location access in your browser to capture your exact position.');
+                }
+            },
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 }
+        );
+    };
+
+    // Auto-detect when user focuses any address/location input
+    document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('focusin', (e) => {
+            if (e.target && (e.target.name === 'location' || e.target.name === 'address' || e.target.name === 'preferred_areas' || e.target.name === 'preferred_locations_manual')) {
+                if (!window.userDetectedLocation) {
+                    window.captureUserLiveLocation(true);
+                }
+            }
+        });
+    });
+    </script>
     @include('partials.requirement-modal')
     @include('partials.job-registration-popup')
     @include('partials.copy-job-link')

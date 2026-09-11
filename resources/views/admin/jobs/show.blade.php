@@ -86,6 +86,11 @@
                         <span class="inline-flex items-center px-2.5 py-1 rounded bg-green-50 text-green-700 text-sm border border-green-100">
                             <i class="fas fa-map-marker-alt mr-1.5 text-green-400"></i> {{ $job->city?->name ?? 'N/A' }}, {{ $job->state?->name ?? 'N/A' }}
                         </span>
+                        @if($job->google_maps_url)
+                            <a href="{{ $job->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-2.5 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 border border-emerald-500/20 text-sm font-bold transition-all">
+                                <i class="fas fa-location-dot mr-1.5 text-emerald-500"></i> View on Google Maps
+                            </a>
+                        @endif
                     </div>
                 </div>
 

@@ -41,9 +41,9 @@
         @php
             $completionPct = $profile?->completion_percentage ?? 0;
             $catLabel = match($profile?->candidate_category) {
-                'home_tutor' => 'Home Tutor',
-                'school_job' => 'School Job',
-                default => 'Both (Home Tutor + School Job)',
+                'home_tutor' => 'Home Tutor Only',
+                'school_job' => 'School Job Only',
+                default => 'Both (School Job + Home Tuition)',
             };
             $catBadgeColor = match($profile?->candidate_category) {
                 'home_tutor' => 'bg-amber-100 text-amber-900 border-amber-300',

@@ -84,9 +84,9 @@
                 <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Apply Category</label>
                 <select name="candidate_category" class="w-full bg-secondary-bg border border-card-border rounded-lg px-3 py-2 text-xs text-text-main focus:border-accent-blue focus:outline-none">
                     <option value="">All Categories</option>
-                    <option value="home_tutor" {{ request('candidate_category') === 'home_tutor' ? 'selected' : '' }}>🏡 Home Tutor</option>
-                    <option value="school_job" {{ request('candidate_category') === 'school_job' ? 'selected' : '' }}>🏫 School Job</option>
-                    <option value="both" {{ request('candidate_category') === 'both' ? 'selected' : '' }}>✨ Both (Tutor + School)</option>
+                    <option value="home_tutor" {{ request('candidate_category') === 'home_tutor' ? 'selected' : '' }}>🏡 Home Tutor Only</option>
+                    <option value="school_job" {{ request('candidate_category') === 'school_job' ? 'selected' : '' }}>🏫 School Job Only</option>
+                    <option value="both" {{ request('candidate_category') === 'both' ? 'selected' : '' }}>✨ Both (School Job + Home Tuition)</option>
                 </select>
             </div>
 
@@ -259,6 +259,13 @@
                         <span class="text-[11px] text-text-dark/50 flex items-center gap-1 truncate">
                             <i class="fas fa-envelope text-[9px]"></i> {{ $candidate->email }}
                         </span>
+                        @if($prof?->google_maps_url)
+                            <div class="mt-1">
+                                <a href="{{ $prof->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full transition-all">
+                                    <i class="fas fa-location-arrow text-[9px]"></i> View on Map
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </td>
 

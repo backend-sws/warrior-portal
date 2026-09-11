@@ -151,6 +151,18 @@
                         <span class="text-slate-500 font-medium">Gender Pref:</span>
                         <span class="font-bold text-slate-800">{{ $tuition->tutor_preference ?: 'Any' }}</span>
                     </div>
+                    @if(!empty($tuition->duration_hours))
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-500 font-medium">Duration:</span>
+                            <span class="font-bold text-slate-800">{{ $tuition->duration_hours }}</span>
+                        </div>
+                    @endif
+                    @if(!empty($tuition->days_per_week))
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-500 font-medium">Days / Week:</span>
+                            <span class="font-bold text-slate-800">{{ $tuition->days_per_week }}</span>
+                        </div>
+                    @endif
                     <div class="flex items-center justify-between">
                         <span class="text-slate-500 font-medium">Tuition Fee:</span>
                         @auth
@@ -265,6 +277,24 @@
                 <div>
                     <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Pincode</label>
                     <input type="text" name="pincode" value="{{ old('pincode') }}" maxlength="6" pattern="^[0-9]{6}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);" title="Please enter a valid 6-digit Pincode." placeholder="Enter 6-digit Pincode" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Time Duration (Daily Hours)</label>
+                    <input type="text" name="duration_hours" value="{{ old('duration_hours') }}" placeholder="e.g. 1.5 Hours / Day (Kitne ghante padhana hai)" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-[#031b4e] mb-1.5">Days Per Week</label>
+                    <input type="text" name="days_per_week" value="{{ old('days_per_week') }}" placeholder="e.g. 5 Days / Week (Week me kitne din padhana hoga)" class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none">
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-sm font-bold text-[#031b4e]">Remark / Specific Requirements</label>
+                        <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Optional</span>
+                    </div>
+                    <textarea name="remarks" rows="2" maxlength="1500" placeholder="e.g. Female tutor preferred / Evening 5 PM timing / Focus on weak math fundamentals etc." class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 text-[#031b4e] font-medium placeholder-slate-400 focus:ring-2 focus:ring-[#031b4e]/30 focus:border-[#031b4e] transition-colors outline-none resize-none">{{ old('remarks') }}</textarea>
                 </div>
                 
                 <div class="mt-4 flex justify-center">

@@ -141,6 +141,35 @@
                         </div>
                         @error('fee') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Time Duration (Daily Hours)</label>
+                        <div class="relative">
+                            <i class="fas fa-hourglass-half absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                            <input type="text" name="duration_hours" value="{{ old('duration_hours', $lead->duration_hours) }}" placeholder="e.g. 1.5 Hours / Day (Kitne ghante padhana hai)"
+                                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
+                        </div>
+                        @error('duration_hours') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Days Per Week</label>
+                        <div class="relative">
+                            <i class="fas fa-calendar-week absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
+                            <input type="text" name="days_per_week" value="{{ old('days_per_week', $lead->days_per_week) }}" placeholder="e.g. 5 Days / Week (Week me kitne din padhana hoga)"
+                                   class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
+                        </div>
+                        @error('days_per_week') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-1.5">Remark / Specific Requirements <span class="text-xs text-text-dark/40 font-normal lowercase">(optional)</span></label>
+                        <div class="relative">
+                            <textarea name="additional_notes" rows="2" placeholder="e.g. Any special instructions, tutor preference, student learning style, etc."
+                                      class="w-full px-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all resize-none">{{ old('additional_notes', $lead->additional_notes) }}</textarea>
+                        </div>
+                        @error('additional_notes') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
                 </div>
             </div>
 
@@ -148,9 +177,27 @@
 
             <!-- Section 3: Location Details -->
             <div>
-                <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-map-marked-alt text-accent-blue text-sm"></i>
-                    <h4 class="text-xs font-bold text-text-dark/80 uppercase tracking-wider">Location & Address</h4>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-map-marked-alt text-accent-blue text-sm"></i>
+                        <h4 class="text-xs font-bold text-text-dark/80 uppercase tracking-wider">Location & Address</h4>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        @if($lead->google_maps_url)
+                            <a href="{{ $lead->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-emerald-600 hover:text-white bg-emerald-500/10 hover:bg-emerald-600 border border-emerald-500/20 px-3 py-1 rounded-xl transition-all inline-flex items-center gap-1.5 shadow-xs">
+                                <i class="fas fa-location-arrow"></i> View Map
+                            </a>
+                        @endif
+                        <button type="button" onclick="detectAdminLeadGps()" class="text-xs font-bold text-accent-blue hover:text-white bg-accent-blue/10 hover:bg-accent-blue border border-accent-blue/20 px-3 py-1 rounded-xl transition-all inline-flex items-center gap-1.5 shadow-xs cursor-pointer">
+                            <i class="fas fa-crosshairs"></i> Use Live GPS
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" name="latitude" id="admin_lead_lat" value="{{ old('latitude', $lead->latitude) }}">
+                <input type="hidden" name="longitude" id="admin_lead_lng" value="{{ old('longitude', $lead->longitude) }}">
+                <div id="admin_lead_gps_badge" class="{{ old('latitude', $lead->latitude) ? 'inline-flex' : 'hidden' }} mb-3 items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+                    <i class="fas fa-map-pin"></i>
+                    <span id="admin_lead_gps_text">GPS Attached: {{ old('latitude', $lead->latitude) }}, {{ old('longitude', $lead->longitude) }}</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div class="md:col-span-2">
@@ -158,6 +205,7 @@
                         <div class="relative">
                             <i class="fas fa-map-marker-alt absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-xs"></i>
                             <input type="text" name="location" value="{{ old('location', $lead->location) }}" required placeholder="Enter full address or area (e.g. Kankarbagh, Patna)"
+                                   onfocus="detectAdminLeadGps(true)"
                                    class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm font-medium text-text-main focus:bg-card-bg focus:outline-none focus:ring-2 focus:ring-accent-blue/40 focus:border-accent-blue transition-all">
                         </div>
                         @error('location') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
@@ -217,3 +265,45 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function detectAdminLeadGps(silent = false) {
+        if (typeof window.captureUserLiveLocation === 'function') {
+            window.captureUserLiveLocation(silent, function(coords) {
+                var lat = document.getElementById('admin_lead_lat');
+                var lng = document.getElementById('admin_lead_lng');
+                if (lat && lng) {
+                    lat.value = coords.lat;
+                    lng.value = coords.lng;
+                }
+                var badge = document.getElementById('admin_lead_gps_badge');
+                var text = document.getElementById('admin_lead_gps_text');
+                if (badge && text) {
+                    text.textContent = 'GPS Attached (' + Number(coords.lat).toFixed(4) + ', ' + Number(coords.lng).toFixed(4) + ')';
+                    badge.classList.remove('hidden');
+                    badge.classList.add('inline-flex');
+                }
+            });
+        }
+    }
+
+    window.addEventListener('gps-detected', function(e) {
+        if (e.detail && e.detail.lat && e.detail.lng) {
+            var lat = document.getElementById('admin_lead_lat');
+            var lng = document.getElementById('admin_lead_lng');
+            if (lat && lng) {
+                lat.value = e.detail.lat;
+                lng.value = e.detail.lng;
+                var badge = document.getElementById('admin_lead_gps_badge');
+                var text = document.getElementById('admin_lead_gps_text');
+                if (badge && text) {
+                    text.textContent = 'GPS Attached (' + Number(e.detail.lat).toFixed(4) + ', ' + Number(e.detail.lng).toFixed(4) + ')';
+                    badge.classList.remove('hidden');
+                    badge.classList.add('inline-flex');
+                }
+            }
+        }
+    });
+</script>
+@endpush

@@ -118,13 +118,23 @@ class HomeTuitionLeadController extends Controller
             'subjects'      => 'required|string|max:255',
             'location'      => 'required|string|max:255',
             'pincode'       => 'nullable|string|max:20',
+            'duration_hours' => 'nullable|string|max:100',
+            'days_per_week' => 'nullable|string|max:100',
             'tutor_preference' => 'nullable|in:Male,Female,Any',
             'fee'           => 'nullable|string|max:255',
             'status'        => 'required|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
             'is_featured'   => 'nullable|boolean',
+            'additional_notes' => 'nullable|string|max:2000',
+            'remarks'       => 'nullable|string|max:2000',
+            'latitude'      => 'nullable|numeric',
+            'longitude'     => 'nullable|numeric',
         ]);
 
         $validated['is_featured'] = $request->has('is_featured') ? true : false;
+        if ($request->filled('remarks') && empty($validated['additional_notes'])) {
+            $validated['additional_notes'] = $request->input('remarks');
+        }
+        unset($validated['remarks']);
 
         if (!empty($validated['parent_mobile'])) {
             $cleanMobile = preg_replace('/[^0-9]/', '', $validated['parent_mobile']);
@@ -176,13 +186,23 @@ class HomeTuitionLeadController extends Controller
             'subjects' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'pincode' => 'nullable|string|max:20',
+            'duration_hours' => 'nullable|string|max:100',
+            'days_per_week' => 'nullable|string|max:100',
             'tutor_preference' => 'nullable|in:Male,Female,Any',
             'fee' => 'nullable|string|max:255',
             'status' => 'nullable|in:New Lead,Pending,Approved,Demo Scheduled,Demo Completed,Confirmed,Cancelled',
             'is_featured' => 'nullable|boolean',
+            'additional_notes' => 'nullable|string|max:2000',
+            'remarks' => 'nullable|string|max:2000',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $validated['is_featured'] = $request->has('is_featured') ? true : false;
+        if ($request->has('remarks') && !$request->has('additional_notes')) {
+            $validated['additional_notes'] = $request->input('remarks');
+        }
+        unset($validated['remarks']);
 
         $lead->update($validated);
 
