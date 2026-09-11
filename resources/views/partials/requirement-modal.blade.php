@@ -2,6 +2,8 @@
     $modalCategories = $categories ?? \App\Models\Category::where('is_active', true)->orderBy('name')->get();
     $modalStates = $states ?? \App\Models\State::where('is_active', true)->orderBy('name')->get();
     $modalQualifications = $qualifications ?? \App\Models\Qualification::where('is_active', true)->orderBy('name')->get();
+    $modalSubjects = $allSubjects ?? \App\Models\Subject::where('is_active', true)->orderBy('name')->get();
+    $modalCities = $allCities ?? \App\Models\City::where('is_active', true)->orderBy('name')->get();
 @endphp
 
 <script>
@@ -22,6 +24,24 @@ function globalRequirementModal() {
         selectedState: '',
         cities: [],
         loadingCities: false,
+        modal_manual_board: '',
+        modal_manual_category: '',
+        modal_manual_subject: '',
+        modal_manual_qualification: '',
+        modal_manual_state: '',
+        modal_manual_city: '',
+
+        // Live Geolocation State
+        userLat: '',
+        userLng: '',
+        detectLocation(silent = false) {
+            if (typeof window.captureUserLiveLocation === 'function') {
+                window.captureUserLiveLocation(silent, (coords) => {
+                    this.userLat = coords.lat;
+                    this.userLng = coords.lng;
+                });
+            }
+        },
 
         // Candidate Registration in Modal
         isParentTuition: false,
@@ -42,7 +62,7 @@ function globalRequirementModal() {
             }
         },
         toggleAllTuitionSubjects() {
-            const allSubjs = ['All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'];
+            const allSubjs = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'];
             if (this.selectedTuitionSubjects.includes('All Subjects')) {
                 this.selectedTuitionSubjects = [];
             } else {
@@ -132,6 +152,17 @@ function globalRequirementModal() {
                         window.initSearchableSelects(modalEl);
                     }
                 });
+
+                if (!this.userLat && !window.userDetectedLocation) {
+                    this.detectLocation(true);
+                }
+            });
+
+            window.addEventListener('gps-detected', (e) => {
+                if (e.detail && e.detail.lat && e.detail.lng) {
+                    this.userLat = e.detail.lat;
+                    this.userLng = e.detail.lng;
+                }
             });
         },
 
@@ -215,9 +246,7 @@ function globalRequirementModal() {
             this.selectedCategory = catVal;
             const subSelect = document.getElementById('modal_subject_id');
 
-            if (!catVal) {
-                this.subjects = [];
-                this.resetSelect(subSelect, 'Select Subject');
+            if (!catVal || catVal === '__manual__') {
                 return;
             }
             this.loadingSubjects = true;
@@ -244,9 +273,7 @@ function globalRequirementModal() {
             this.selectedState = stateVal;
             const citySelect = document.getElementById('modal_city_id');
 
-            if (!stateVal) {
-                this.cities = [];
-                this.resetSelect(citySelect, 'Select City');
+            if (!stateVal || stateVal === '__manual__') {
                 return;
             }
             this.loadingCities = true;
@@ -267,9 +294,73 @@ function globalRequirementModal() {
                 });
         },
 
+        syncModalManualToSelect(field) {
+            let manualVal = '';
+            let selectEl = null;
+
+            if (field === 'board') {
+                manualVal = (this.modal_manual_board || '').trim();
+                selectEl = document.querySelector('#requirement-modal select[name="board"]');
+            } else {
+                const manualKey = 'modal_manual_' + field;
+                manualVal = (this[manualKey] || '').trim();
+                selectEl = document.getElementById('modal_' + field + '_id');
+                if (field === 'category') {
+                    if (manualVal) {
+                        this.selectedCategory = '__manual__';
+                    } else if (this.selectedCategory === '__manual__') {
+                        this.selectedCategory = '';
+                    }
+                } else if (field === 'state') {
+                    if (manualVal) {
+                        this.selectedState = '__manual__';
+                    } else if (this.selectedState === '__manual__') {
+                        this.selectedState = '';
+                    }
+                }
+            }
+
+            if (selectEl) {
+                let opt = selectEl.querySelector('option[value="__manual__"]');
+                if (!opt) {
+                    opt = document.createElement('option');
+                    opt.value = '__manual__';
+                    if (selectEl.options.length > 1) {
+                        selectEl.insertBefore(opt, selectEl.options[1]);
+                    } else {
+                        selectEl.appendChild(opt);
+                    }
+                }
+                if (manualVal) {
+                    opt.textContent = '✍️ Custom: ' + manualVal;
+                    opt.style.display = '';
+                    opt.selected = true;
+                    selectEl.value = '__manual__';
+                } else {
+                    opt.textContent = '';
+                    opt.style.display = 'none';
+                    if (selectEl.value === '__manual__') selectEl.value = '';
+                }
+            }
+        },
+
+        onModalSelectChange(field, event) {
+            const val = event && event.target ? event.target.value : '';
+            if (val !== '__manual__') {
+                this['modal_manual_' + field] = '';
+            }
+            if (field === 'category') {
+                this.fetchSubjects();
+            } else if (field === 'state') {
+                this.fetchCities();
+            }
+        },
+
         async submitTuitionForm(e) {
             const form = e.target;
             const formData = new FormData(form);
+            if (this.userLat && !formData.get('latitude')) formData.set('latitude', this.userLat);
+            if (this.userLng && !formData.get('longitude')) formData.set('longitude', this.userLng);
             this.submitting = true;
             this.successMessage = '';
             this.errorMessage = '';
@@ -332,6 +423,8 @@ function globalRequirementModal() {
         async submitSchoolForm(e) {
             const form = e.target;
             const formData = new FormData(form);
+            if (this.userLat && !formData.get('latitude')) formData.set('latitude', this.userLat);
+            if (this.userLng && !formData.get('longitude')) formData.set('longitude', this.userLng);
             this.submitting = true;
             this.successMessage = '';
             this.errorMessage = '';
@@ -410,6 +503,8 @@ function globalRequirementModal() {
         async submitCandidateForm(e) {
             const form = e.target;
             const formData = new FormData(form);
+            if (this.userLat && !formData.get('latitude')) formData.set('latitude', this.userLat);
+            if (this.userLng && !formData.get('longitude')) formData.set('longitude', this.userLng);
             this.submitting = true;
             this.successMessage = '';
             this.errorMessage = '';
@@ -608,24 +703,38 @@ function globalRequirementModal() {
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Contact Phone Number <span class="text-red-500">*</span></label>
-                                <input type="tel" name="guest_phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." placeholder="Enter 10-digit phone" 
+                                <input type="tel" name="guest_phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." placeholder="e.g. 9876543210" 
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Student's Class <span class="text-red-500">*</span></label>
-                                <input type="text" name="student_class" required minlength="1" maxlength="50" placeholder="e.g. Class 10 / Class 12" 
+                                <input type="text" name="student_class" required minlength="1" maxlength="50" placeholder="e.g. Class 10 / Class 12 / Nursery" 
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Education Board <span class="text-red-500">*</span></label>
-                                <select data-no-search="true" name="board" required 
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Education Board <span class="text-red-500">*</span></label>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">Select or Type Manual</span>
+                                </div>
+                                <select data-no-search="true" name="board" :required="!modal_manual_board" 
+                                        @change="onModalSelectChange('board', $event)"
                                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer">
                                     <option value="">Select Board</option>
+                                    <option value="__manual__" x-show="modal_manual_board" x-text="modal_manual_board ? '✍️ Custom: ' + modal_manual_board : ''"></option>
                                     <option value="CBSE">CBSE Board</option>
                                     <option value="ICSE">ICSE / ISC</option>
                                     <option value="State Board">State Board</option>
                                     <option value="Other">Other</option>
                                 </select>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#0ea5e9] focus-within:ring-2 focus-within:ring-[#0ea5e9]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_board" x-model="modal_manual_board"
+                                        @input="syncModalManualToSelect('board')"
+                                        placeholder="e.g. CBSE, ICSE, BSEB, NIOS, Cambridge..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
+                                </div>
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Subjects Needed <span class="text-red-500">*</span></label>
@@ -633,14 +742,47 @@ function globalRequirementModal() {
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Location / Area Address <span class="text-red-500">*</span></label>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Location / Area Address <span class="text-red-500">*</span></label>
+                                    <button type="button" @click="detectLocation(false)" class="btn-detect-gps text-[11px] font-bold text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-2 py-0.5 rounded-lg border border-sky-200 transition-colors flex items-center gap-1 cursor-pointer">
+                                        <i class="fas fa-location-crosshairs text-[10px] text-sky-600"></i> Use Live GPS
+                                    </button>
+                                </div>
                                 <input type="text" name="location" required minlength="3" maxlength="200" placeholder="e.g. Kankarbagh, Patna" 
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
+                                <div class="gps-status-indicator mt-1.5" x-show="userLat && userLng" x-cloak>
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">
+                                        <i class="fas fa-check-circle text-emerald-500"></i> GPS Attached (<span x-text="Number(userLat).toFixed(4)"></span>, <span x-text="Number(userLng).toFixed(4)"></span>)
+                                    </span>
+                                </div>
+                                <input type="hidden" name="latitude" x-model="userLat">
+                                <input type="hidden" name="longitude" x-model="userLng">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Pincode</label>
                                 <input type="text" name="pincode" maxlength="6" pattern="^[0-9]{6}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);" title="Please enter a valid 6-digit Pincode." placeholder="6-digit Pincode" 
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Time Duration (Daily Hours)</label>
+                                <input type="text" name="duration_hours" maxlength="50" placeholder="e.g. 1.5 Hours / Day (Kitne ghante padhana hai)" 
+                                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Days Per Week</label>
+                                <input type="text" name="days_per_week" maxlength="50" placeholder="e.g. 5 Days / Week (Week me kitne din padhana hoga)" 
+                                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Remark / Specific Requirements</label>
+                                    <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Optional</span>
+                                </div>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-3.5 text-slate-400"><i class="fas fa-comment-alt text-xs"></i></span>
+                                    <textarea name="remarks" rows="2" maxlength="1500" placeholder="e.g. Female tutor preferred / Timing evening 5:00 PM / Focus on weak math fundamentals, etc." 
+                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all resize-none"></textarea>
+                                </div>
                             </div>
                         </div>
 
@@ -673,19 +815,19 @@ function globalRequirementModal() {
                                     :class="candidateCategory === 'home_tutor' ? 'bg-white text-[#031b4e] shadow-md font-black border-2 border-[#0ea5e9] scale-[1.01]' : 'bg-white/60 text-slate-600 hover:text-slate-900 hover:bg-white font-bold border border-transparent'"
                                     class="py-2.5 px-3 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fas fa-home text-[#0ea5e9]"></i>
-                                <span>Home Tutor</span>
+                                <span>Home Tutor Only</span>
                             </button>
                             <button type="button" @click="candidateCategory = 'school_job'; errorMessage = ''; fieldErrors = {};"
                                     :class="candidateCategory === 'school_job' ? 'bg-white text-[#031b4e] shadow-md font-black border-2 border-amber-500 scale-[1.01]' : 'bg-white/60 text-slate-600 hover:text-slate-900 hover:bg-white font-bold border border-transparent'"
                                     class="py-2.5 px-3 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fas fa-chalkboard-teacher text-amber-500"></i>
-                                <span>Join as a Teacher</span>
+                                <span>School Job Only</span>
                             </button>
                             <button type="button" @click="candidateCategory = 'both'; errorMessage = ''; fieldErrors = {};"
                                     :class="candidateCategory === 'both' ? 'bg-white text-[#031b4e] shadow-md font-black border-2 border-emerald-500 scale-[1.01]' : 'bg-white/60 text-slate-600 hover:text-slate-900 hover:bg-white font-bold border border-transparent'"
                                     class="py-2.5 px-3 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fas fa-handshake text-emerald-600"></i>
-                                <span>Both</span>
+                                <span>Both (School Job + Home Tuition)</span>
                             </button>
                         </div>
                     </div>
@@ -712,12 +854,12 @@ function globalRequirementModal() {
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Email Address <span class="text-red-500">*</span></label>
-                                        <input type="email" name="email" required placeholder="you@example.com"
+                                        <input type="email" name="email" required placeholder="e.g. rahul@example.com"
                                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Mobile Number <span class="text-red-500">*</span></label>
-                                        <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" @input="syncWhatsapp()" placeholder="10-digit mobile"
+                                        <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" @input="syncWhatsapp()" placeholder="e.g. 9876543210"
                                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                     </div>
                                     <div>
@@ -728,7 +870,7 @@ function globalRequirementModal() {
                                                 <span>Same as mobile</span>
                                             </label>
                                         </div>
-                                        <input type="tel" name="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidateWhatsapp" placeholder="10-digit WhatsApp"
+                                        <input type="tel" name="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidateWhatsapp" placeholder="e.g. 9876543210"
                                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                     </div>
                                     <div>
@@ -738,7 +880,7 @@ function globalRequirementModal() {
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Confirm Password <span class="text-red-500">*</span></label>
-                                        <input type="password" name="password_confirmation" required minlength="8" placeholder="••••••••"
+                                        <input type="password" name="password_confirmation" required minlength="8" placeholder="Re-enter password (Min 8 chars)"
                                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                     </div>
                                     <div>
@@ -812,7 +954,7 @@ function globalRequirementModal() {
                                             <span x-text="selectedTuitionSubjects.includes('All Subjects') ? 'Deselect All' : 'Select All'"></span>
                                         </button>
                                     </div>
-                                    @php $modalTuitionSubs = ['All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies']; @endphp
+                                    @php $modalTuitionSubs = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies']; @endphp
                                     <div class="flex flex-wrap gap-1.5">
                                         @foreach($modalTuitionSubs as $subj)
                                             <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-amber-400'">
@@ -822,12 +964,19 @@ function globalRequirementModal() {
                                             </label>
                                         @endforeach
                                     </div>
+                                    <div class="mt-3 pt-2.5 border-t border-amber-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                        <span class="text-[11px] font-bold text-amber-900 whitespace-nowrap flex items-center gap-1">
+                                            <i class="fas fa-edit text-amber-600"></i> Other / Manual Subjects:
+                                        </span>
+                                        <input type="text" name="manual_tuition_subjects" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
+                                               class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                                    </div>
                                 </div>
 
                                 {{-- Classes Card --}}
                                 <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4">
                                     <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span></span>
-                                    @php $modalClassList = ['Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'Competitive / Olympiad', 'Languages / Hobby']; @endphp
+                                    @php $modalClassList = ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby']; @endphp
                                     <div class="flex flex-wrap gap-2">
                                         @foreach($modalClassList as $cls)
                                             <label class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-400'">
@@ -837,12 +986,31 @@ function globalRequirementModal() {
                                             </label>
                                         @endforeach
                                     </div>
+                                    <div class="mt-3 pt-2.5 border-t border-blue-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                        <span class="text-[11px] font-bold text-blue-900 whitespace-nowrap flex items-center gap-1">
+                                            <i class="fas fa-edit text-blue-600"></i> Other Classes / Exams:
+                                        </span>
+                                        <input type="text" name="manual_classes" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
+                                               class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                                    </div>
                                 </div>
 
                                 {{-- Preferred Areas Card --}}
                                 <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
-                                    <span class="text-xs font-black text-emerald-800 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-map-marker-alt text-emerald-500"></i> Preferred Localities / Areas <span class="text-red-500">*</span></span>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-xs font-black text-emerald-800 uppercase tracking-wide flex items-center gap-1.5"><i class="fas fa-map-marker-alt text-emerald-500"></i> Preferred Localities / Areas <span class="text-red-500">*</span></span>
+                                        <button type="button" @click="detectLocation(false)" class="btn-detect-gps text-[11px] font-bold text-emerald-800 hover:text-emerald-950 bg-white hover:bg-emerald-100 px-2 py-0.5 rounded-lg border border-emerald-300 transition-colors flex items-center gap-1 cursor-pointer">
+                                            <i class="fas fa-location-crosshairs text-[10px] text-emerald-600"></i> Use Live GPS
+                                        </button>
+                                    </div>
                                     <textarea name="preferred_areas" id="modal_ht_areas" rows="2" placeholder="e.g. Kankarbagh, Boring Road, Bailey Road, Rajendra Nagar..." class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-400"></textarea>
+                                    <div class="gps-status-indicator mt-1.5" x-show="userLat && userLng" x-cloak>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-[10px] font-bold">
+                                            <i class="fas fa-check-circle text-emerald-600"></i> Live GPS Attached (<span x-text="Number(userLat).toFixed(4)"></span>, <span x-text="Number(userLng).toFixed(4)"></span>)
+                                        </span>
+                                    </div>
+                                    <input type="hidden" name="latitude" x-model="userLat">
+                                    <input type="hidden" name="longitude" x-model="userLng">
                                     <div class="flex flex-wrap gap-1.5 mt-2">
                                         @foreach(['Patna', 'Kankarbagh', 'Boring Road', 'Bailey Road', 'Danapur', 'Rajendra Nagar', 'Anisabad'] as $quickArea)
                                             <button type="button" @click="appendModalArea('{{ $quickArea }}', 'modal_ht_areas')" class="text-[11px] font-bold bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-300 px-2.5 py-1 rounded-lg cursor-pointer transition-colors">
@@ -897,12 +1065,12 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Email Address <span class="text-red-500">*</span></label>
-                                    <input type="email" name="email" required placeholder="you@example.com"
+                                    <input type="email" name="email" required placeholder="e.g. rahul@example.com"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Mobile Number <span class="text-red-500">*</span></label>
-                                    <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" @input="syncWhatsapp()" placeholder="10-digit mobile"
+                                    <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" @input="syncWhatsapp()" placeholder="e.g. 9876543210"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
@@ -913,7 +1081,7 @@ function globalRequirementModal() {
                                             <span>Same as mobile</span>
                                         </label>
                                     </div>
-                                    <input type="tel" name="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidateWhatsapp" placeholder="10-digit WhatsApp"
+                                    <input type="tel" name="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidateWhatsapp" placeholder="e.g. 9876543210"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
@@ -923,7 +1091,7 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Confirm Password <span class="text-red-500">*</span></label>
-                                    <input type="password" name="password_confirmation" required minlength="8" placeholder="••••••••"
+                                    <input type="password" name="password_confirmation" required minlength="8" placeholder="Re-enter password (Min 8 chars)"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
@@ -1000,11 +1168,19 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Current / Last School <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
-                                    <input type="text" name="last_school_name" placeholder="e.g. DPS / DAV / St. Michael's" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                    <input type="text" name="last_school_name" placeholder="e.g. DPS / DAV / St. Xavier's High School" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Expected Monthly Salary (&#8377;) <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
-                                    <input type="number" name="expected_salary" placeholder="e.g. 30000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Last Designation / Role <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
+                                    <input type="text" name="last_designation" placeholder="e.g. PGT Physics / TGT Maths / PRT Teacher" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Last Drawn Monthly Salary (₹) <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
+                                    <input type="number" name="last_drawn_salary" min="0" placeholder="e.g. 25000 (Current / Last Monthly Salary)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Expected Monthly Salary (₹) <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
+                                    <input type="number" name="expected_salary" min="0" placeholder="e.g. 35000 (Expected Monthly Salary)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                             </div>
                             <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
@@ -1014,7 +1190,7 @@ function globalRequirementModal() {
                                         <span x-text="selectedTuitionSubjects.includes('All Subjects') ? 'Deselect All' : 'Select All'"></span>
                                     </button>
                                 </div>
-                                @php $modalSchoolSubs = ['All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies']; @endphp
+                                @php $modalSchoolSubs = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies']; @endphp
                                 <div class="flex flex-wrap gap-1.5">
                                     @foreach($modalSchoolSubs as $subj)
                                         <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-amber-400'">
@@ -1024,10 +1200,17 @@ function globalRequirementModal() {
                                         </label>
                                     @endforeach
                                 </div>
+                                <div class="mt-3 pt-2.5 border-t border-amber-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                    <span class="text-[11px] font-bold text-amber-900 whitespace-nowrap flex items-center gap-1">
+                                        <i class="fas fa-edit text-amber-600"></i> Other / Manual Subjects:
+                                    </span>
+                                    <input type="text" name="manual_tuition_subjects" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
+                                           class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                                </div>
                             </div>
                             <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4">
                                 <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span></span>
-                                @php $modalSchoolClassList = ['Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'Pre-Primary', 'Languages / Hobby']; @endphp
+                                @php $modalSchoolClassList = ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Languages / Hobby']; @endphp
                                 <div class="flex flex-wrap gap-2">
                                     @foreach($modalSchoolClassList as $cls)
                                         <label class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-400'">
@@ -1037,17 +1220,33 @@ function globalRequirementModal() {
                                         </label>
                                     @endforeach
                                 </div>
+                                <div class="mt-3 pt-2.5 border-t border-blue-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                    <span class="text-[11px] font-bold text-blue-900 whitespace-nowrap flex items-center gap-1">
+                                        <i class="fas fa-edit text-blue-600"></i> Other Classes / Exams:
+                                    </span>
+                                    <input type="text" name="manual_classes" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
+                                           class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                                </div>
                             </div>
                             <div class="bg-indigo-50/80 border border-indigo-200 rounded-2xl p-4">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-xs font-black text-indigo-800 uppercase tracking-wide flex items-center gap-1.5">
                                         <i class="fas fa-map-marker-alt text-indigo-500"></i> Preferred School Locations & Address <span class="text-red-500">*</span>
                                     </span>
-                                    <span class="text-[10px] font-bold text-indigo-700 bg-indigo-100/90 px-2.5 py-0.5 rounded-full">Manual Type + Quick Add</span>
+                                    <button type="button" @click="detectLocation(false)" class="btn-detect-gps text-[11px] font-bold text-indigo-800 hover:text-indigo-950 bg-white hover:bg-indigo-100 px-2.5 py-0.5 rounded-lg border border-indigo-300 transition-colors flex items-center gap-1 cursor-pointer">
+                                        <i class="fas fa-location-crosshairs text-[10px] text-indigo-600"></i> Use Live GPS
+                                    </button>
                                 </div>
                                 <textarea name="preferred_locations_manual" id="modal_school_manual_address" rows="2"
                                           placeholder="Type your address or preferred locations (e.g. Boring Road, Kankarbagh, Patna, Hajipur, Muzaffarpur...)"
                                           class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-500"></textarea>
+                                <div class="gps-status-indicator mt-1.5" x-show="userLat && userLng" x-cloak>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-100 border border-indigo-300 text-indigo-800 text-[10px] font-bold">
+                                        <i class="fas fa-check-circle text-indigo-600"></i> Live GPS Attached (<span x-text="Number(userLat).toFixed(4)"></span>, <span x-text="Number(userLng).toFixed(4)"></span>)
+                                    </span>
+                                </div>
+                                <input type="hidden" name="latitude" x-model="userLat">
+                                <input type="hidden" name="longitude" x-model="userLng">
                                 <div class="mt-2">
                                     <span class="block text-[11px] font-bold text-slate-500 mb-1.5">Quick Add Cities (Click to append):</span>
                                     <div class="flex flex-wrap gap-1.5">
@@ -1062,14 +1261,27 @@ function globalRequirementModal() {
                                     </div>
                                 </div>
                             </div>
-                            {{-- Resume Upload (Mandatory for School Job) --}}
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
-                                    Resume / CV Upload <span class="text-red-500">* (Mandatory for School Job)</span>
-                                </label>
-                                <input type="file" name="resume" accept=".pdf,.doc,.docx" required
-                                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
-                                <p class="text-[11px] text-slate-500 mt-1">PDF or DOC format (Max 5MB).</p>
+                            {{-- Document Uploads: Resume & Salary Slip --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div class="bg-slate-50/90 border border-slate-200 rounded-2xl p-4">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5 flex items-center justify-between">
+                                        <span>Resume / CV Upload <span class="text-red-500">*</span></span>
+                                        <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Mandatory</span>
+                                    </label>
+                                    <input type="file" name="resume" accept=".pdf,.doc,.docx" required
+                                           class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                                    <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5"><i class="fas fa-file-pdf text-rose-500"></i> PDF or DOC format (Max 5MB).</p>
+                                </div>
+
+                                <div class="bg-slate-50/90 border border-slate-200 rounded-2xl p-4">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5 flex items-center justify-between">
+                                        <span>Latest Salary Slip</span>
+                                        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Optional (Recommended)</span>
+                                    </label>
+                                    <input type="file" name="salary_slip" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                           class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
+                                    <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5"><i class="fas fa-receipt text-emerald-600"></i> PDF, JPG, PNG or DOC (Max 5MB) for quick verification.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -1110,12 +1322,12 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Email Address <span class="text-red-500">*</span></label>
-                                    <input type="email" name="email" required placeholder="you@example.com"
+                                    <input type="email" name="email" required placeholder="e.g. rahul@example.com"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Mobile Number <span class="text-red-500">*</span></label>
-                                    <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" @input="syncWhatsapp()" placeholder="10-digit mobile"
+                                    <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" @input="syncWhatsapp()" placeholder="e.g. 9876543210"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
@@ -1126,7 +1338,7 @@ function globalRequirementModal() {
                                             <span>Same as mobile</span>
                                         </label>
                                     </div>
-                                    <input type="tel" name="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidateWhatsapp" placeholder="10-digit WhatsApp"
+                                    <input type="tel" name="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidateWhatsapp" placeholder="e.g. 9876543210"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
@@ -1136,7 +1348,7 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Confirm Password <span class="text-red-500">*</span></label>
-                                    <input type="password" name="password_confirmation" required minlength="8" placeholder="••••••••"
+                                    <input type="password" name="password_confirmation" required minlength="8" placeholder="Re-enter password (Min 8 chars)"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
@@ -1190,7 +1402,7 @@ function globalRequirementModal() {
                                     </button>
                                 </div>
                                 @php
-                                    $modalTuitionSubs = ['All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'];
+                                    $modalTuitionSubs = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'];
                                 @endphp
                                 <div class="flex flex-wrap gap-1.5">
                                     @foreach($modalTuitionSubs as $subj)
@@ -1205,13 +1417,20 @@ function globalRequirementModal() {
                                         </label>
                                     @endforeach
                                 </div>
+                                <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                    <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
+                                        <i class="fas fa-edit text-amber-500"></i> Other / Manual Subjects:
+                                    </span>
+                                    <input type="text" name="manual_tuition_subjects" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
+                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                </div>
                             </div>
 
                             {{-- Classes --}}
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Classes You Can Teach <span class="text-red-500">*</span></label>
                                 @php
-                                    $modalClassList = ['Class 1–5', 'Class 6–8', 'Class 9–10', 'Class 11–12', 'Competitive / Olympiad', 'Languages / Hobby'];
+                                    $modalClassList = ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby'];
                                 @endphp
                                 <div class="flex flex-wrap gap-1.5">
                                     @foreach($modalClassList as $cls)
@@ -1225,6 +1444,13 @@ function globalRequirementModal() {
                                             <span>{{ $cls }}</span>
                                         </label>
                                     @endforeach
+                                </div>
+                                <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                    <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
+                                        <i class="fas fa-edit text-blue-500"></i> Other Classes / Exams:
+                                    </span>
+                                    <input type="text" name="manual_classes" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
+                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                             </div>
 
@@ -1249,9 +1475,21 @@ function globalRequirementModal() {
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Preferred Localities / Areas <span class="text-red-500">*</span></label>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Preferred Localities / Areas <span class="text-red-500">*</span></label>
+                                    <button type="button" @click="detectLocation(false)" class="btn-detect-gps text-[11px] font-bold text-emerald-800 hover:text-emerald-950 bg-white hover:bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-300 transition-colors flex items-center gap-1 cursor-pointer">
+                                        <i class="fas fa-location-crosshairs text-[10px] text-emerald-600"></i> Use Live GPS
+                                    </button>
+                                </div>
                                 <textarea name="preferred_areas" id="modal_both_areas" rows="2" placeholder="e.g. Kankarbagh, Boring Road, Bailey Road, Rajendra Nagar..."
                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]"></textarea>
+                                <div class="gps-status-indicator mt-1.5" x-show="userLat && userLng" x-cloak>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-[10px] font-bold">
+                                        <i class="fas fa-check-circle text-emerald-600"></i> Live GPS Attached (<span x-text="Number(userLat).toFixed(4)"></span>, <span x-text="Number(userLng).toFixed(4)"></span>)
+                                    </span>
+                                </div>
+                                <input type="hidden" name="latitude" x-model="userLat">
+                                <input type="hidden" name="longitude" x-model="userLng">
                                 <div class="flex flex-wrap gap-1 mt-1.5">
                                     @foreach(['Patna', 'Kankarbagh', 'Boring Road', 'Bailey Road', 'Danapur', 'Rajendra Nagar', 'Anisabad'] as $quickArea)
                                         <button type="button" @click="appendModalArea('{{ $quickArea }}', 'modal_both_areas')" class="text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full cursor-pointer transition-colors">
@@ -1306,13 +1544,23 @@ function globalRequirementModal() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Current / Last School (Optional)</label>
-                                    <input type="text" name="last_school_name" placeholder="e.g. DPS / DAV / St. Michael's"
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Current / Last School <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
+                                    <input type="text" name="last_school_name" placeholder="e.g. DPS / DAV / St. Xavier's High School"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Expected Monthly Salary (₹)</label>
-                                    <input type="number" name="expected_salary" placeholder="e.g. 30000"
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Last Designation / Role <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
+                                    <input type="text" name="last_designation" placeholder="e.g. PGT Physics / TGT Maths / PRT Teacher"
+                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Last Drawn Monthly Salary (₹) <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
+                                    <input type="number" name="last_drawn_salary" min="0" placeholder="e.g. 25000 (Current / Last Salary)"
+                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Expected Monthly Salary (₹) <span class="text-slate-400 font-normal text-[10px] normal-case">(Optional)</span></label>
+                                    <input type="number" name="expected_salary" min="0" placeholder="e.g. 35000 (Expected Monthly Salary)"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                             </div>
@@ -1343,14 +1591,27 @@ function globalRequirementModal() {
                                 </div>
                             </div>
 
-                            {{-- Resume Upload --}}
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
-                                    Resume / CV Upload <span class="text-red-500">* (Mandatory)</span>
-                                </label>
-                                <input type="file" name="resume" accept=".pdf,.doc,.docx" required
-                                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
-                                <p class="text-[11px] text-slate-500 mt-1">PDF or DOC format (Max 5MB).</p>
+                            {{-- Document Uploads: Resume & Salary Slip --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div class="bg-slate-50/90 border border-slate-200 rounded-2xl p-4">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5 flex items-center justify-between">
+                                        <span>Resume / CV Upload <span class="text-red-500">*</span></span>
+                                        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Mandatory</span>
+                                    </label>
+                                    <input type="file" name="resume" accept=".pdf,.doc,.docx" required
+                                           class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
+                                    <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5"><i class="fas fa-file-pdf text-rose-500"></i> PDF or DOC format (Max 5MB).</p>
+                                </div>
+
+                                <div class="bg-slate-50/90 border border-slate-200 rounded-2xl p-4">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5 flex items-center justify-between">
+                                        <span>Latest Salary Slip</span>
+                                        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Optional (Recommended)</span>
+                                    </label>
+                                    <input type="file" name="salary_slip" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                           class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-600 file:text-white hover:file:bg-teal-700 cursor-pointer">
+                                    <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5"><i class="fas fa-receipt text-teal-600"></i> PDF, JPG, PNG or DOC (Max 5MB) for quick verification.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -1370,93 +1631,229 @@ function globalRequirementModal() {
                 </div>
             </div>
 
-            {{-- TAB 3: SCHOOL TEACHER HIRING FORM --}}
+            {{-- TAB 3: SCHOOL TEACHER HIRING (FOR SCHOOLS / INSTITUTIONS) --}}
             <div x-show="tab === 'school'">
-                    <form @submit.prevent="submitSchoolForm($event)" class="space-y-4 sm:space-y-5">
-                        @csrf
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Job Title / Vacancy <span class="text-red-500">*</span></label>
-                            <input type="text" name="title" required minlength="3" maxlength="150" placeholder="e.g. PGT Physics Teacher / PRT All Subjects" 
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
+                <div class="mb-5 flex items-center justify-between p-3.5 bg-purple-50/80 border border-purple-200/70 rounded-2xl">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
+                            <i class="fas fa-school"></i>
                         </div>
+                        <div>
+                            <h4 class="text-xs font-black text-[#031b4e]">Hire Qualified Teachers for Your School</h4>
+                            <p class="text-[11px] text-slate-500 font-medium">Post your teaching vacancies & get connected with pre-screened educators.</p>
+                        </div>
+                    </div>
+                    <span class="hidden sm:inline-block px-3 py-1 bg-white text-purple-600 text-[11px] font-black rounded-full border border-purple-200">
+                        Verified Faculty Pool
+                    </span>
+                </div>
+
+                <form @submit.prevent="submitSchoolForm($event)" class="space-y-4 sm:space-y-5">
+                    @csrf
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Job Title / Vacancy <span class="text-red-500">*</span></label>
+                        <input type="text" name="title" required minlength="3" maxlength="150" placeholder="e.g. PGT Physics Teacher / PRT All Subjects / Vice Principal" 
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
+                    </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Row 1: School Name | Contact Person -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">School / Institution Name <span class="text-red-500">*</span></label>
-                                <input type="text" name="school_name" required minlength="3" maxlength="150" placeholder="e.g. Delhi Public School" 
+                                <input type="text" name="school_name" required minlength="3" maxlength="150" placeholder="e.g. Delhi Public School / St. Xavier's High School" 
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Contact Person <span class="text-red-500">*</span></label>
-                                <input type="text" name="contact_person" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" title="Please enter contact person name (letters only)." placeholder="e.g. Mr. Sharma (Principal)" 
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Contact Person & Designation <span class="text-red-500">*</span></label>
+                                <input type="text" name="contact_person" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" title="Please enter contact person name (letters only)." placeholder="e.g. Rajesh Sharma (Principal / HR Head)" 
+                                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
+                            </div>
+
+                            <!-- Row 2: Mobile Number | Email -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Contact Mobile Number <span class="text-red-500">*</span></label>
+                                <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." placeholder="e.g. 9876543210" 
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Mobile Number <span class="text-red-500">*</span></label>
-                                <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9." placeholder="Enter 10-digit phone" 
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Official Email Address</label>
+                                    <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Optional</span>
+                                </div>
+                                <input type="email" name="email" placeholder="e.g. hr@schoolname.org" 
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
                             </div>
+
+                            <!-- Row 3: Job Category | Subject (Both Select + OR TYPE) -->
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Email (Optional)</label>
-                                <input type="email" name="email" placeholder="e.g. hr@school.com" 
-                                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Job Category <span class="text-red-500">*</span></label>
-                                <select data-no-search="true" name="category_id" id="modal_category_id" x-model="selectedCategory" @change="fetchSubjects()" required 
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Job Category <span class="text-red-500">*</span></label>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">Select or Type Manual</span>
+                                </div>
+                                <select data-no-search="true" name="category_id" id="modal_category_id" x-model="selectedCategory" @change="onModalSelectChange('category', $event)" :required="!modal_manual_category" 
                                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer">
-                                    <option value="">Select Category</option>
+                                    <option value="">Select Job Category</option>
+                                    <option value="__manual__" x-show="modal_manual_category" x-text="modal_manual_category ? '✍️ Custom: ' + modal_manual_category : ''"></option>
                                     @foreach($modalCategories as $cat)
                                         <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                     @endforeach
                                 </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Subject <span class="text-red-500">*</span></label>
-                                <select data-no-search="true" name="subject_id" id="modal_subject_id" required :disabled="loadingSubjects" 
-                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer disabled:opacity-50">
-                                    <option value="">Select Subject</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Required Qualification <span class="text-red-500">*</span></label>
-                                <select data-no-search="true" name="qualification_id" id="modal_qualification_id" required 
-                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer">
-                                    <option value="">Select Qualification</option>
-                                    @foreach($modalQualifications as $qual)
-                                        <option value="{{ $qual->id }}">{{ $qual->name }}</option>
-                                    @endforeach
-                                </select>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#0ea5e9] focus-within:ring-2 focus-within:ring-[#0ea5e9]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_category" x-model="modal_manual_category"
+                                        @input="syncModalManualToSelect('category')"
+                                        placeholder="e.g. Primary Teacher, PRT, TGT, Music, Sports..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
+                                </div>
                             </div>
                             <div>
                                 <div class="flex items-center justify-between mb-1.5">
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Other / Additional Qualification</label>
-                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">Optional</span>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Subject <span class="text-red-500">*</span></label>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">Select or Type Manual</span>
                                 </div>
-                                <input type="text" name="other_qualification" id="modal_other_qualification" maxlength="150" placeholder="e.g. B.Ed, CTET, NTT, 2+ Yrs Exp..." 
+                                <select data-no-search="true" name="subject_id" id="modal_subject_id" :required="!modal_manual_subject" 
+                                        @change="onModalSelectChange('subject', $event)" 
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer">
+                                    <option value="">Select Subject</option>
+                                    <option value="__manual__" x-show="modal_manual_subject" x-text="modal_manual_subject ? '✍️ Custom: ' + modal_manual_subject : ''"></option>
+                                    @if(isset($modalSubjects))
+                                        @foreach($modalSubjects as $sub)
+                                            <option value="{{ $sub->id }}">{{ $sub->name }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#0ea5e9] focus-within:ring-2 focus-within:ring-[#0ea5e9]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_subject" x-model="modal_manual_subject"
+                                        @input="syncModalManualToSelect('subject')"
+                                        placeholder="e.g. Physics, Mathematics, English, Computer..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
+                                </div>
+                            </div>
+
+                            <!-- Row 4: Required Qualification (Full Width: Left 50% Select, Right 50% OR TYPE) -->
+                            <div class="sm:col-span-2">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Required Qualification <span class="text-red-500">*</span></label>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">Select or Type Manual</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <select data-no-search="true" name="qualification_id" id="modal_qualification_id" :required="!modal_manual_qualification" 
+                                                @change="onModalSelectChange('qualification', $event)" 
+                                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer">
+                                            <option value="">Select Qualification (e.g. B.Ed, M.Sc)</option>
+                                            <option value="__manual__" x-show="modal_manual_qualification" x-text="modal_manual_qualification ? '✍️ Custom: ' + modal_manual_qualification : ''"></option>
+                                            @foreach($modalQualifications as $qual)
+                                                <option value="{{ $qual->id }}">{{ $qual->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#0ea5e9] focus-within:ring-2 focus-within:ring-[#0ea5e9]/20 transition-all shadow-2xs">
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                            <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                        </span>
+                                        <input type="text" name="manual_qualification" x-model="modal_manual_qualification"
+                                            @input="syncModalManualToSelect('qualification')"
+                                            placeholder="e.g. B.Ed, M.Sc, PhD, MCA, CTET, D.El.Ed..." 
+                                            class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Row 5: Salary Range | Other Qualification (Both single inputs, exact same height!) -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Salary Range / Budget (Monthly)</label>
+                                <input type="text" name="salary_range" maxlength="80" placeholder="e.g. ₹25,000 - ₹40,000 / month (or Negotiable)" 
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
                             </div>
+
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Salary Range / Budget</label>
-                                <input type="text" name="salary_range" maxlength="80" placeholder="e.g. ₹25,000 - ₹35,000" 
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Other / Additional Qualification</label>
+                                    <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Optional</span>
+                                </div>
+                                <input type="text" name="other_qualification" id="modal_other_qualification" maxlength="150" placeholder="e.g. CTET qualified, NTT, 2+ Yrs Exp, Fluent English..." 
                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all">
                             </div>
+
+                            <!-- Row 6: State | City (Both Select + OR TYPE) -->
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">State <span class="text-red-500">*</span></label>
-                                <select data-no-search="true" name="state_id" id="modal_state_id" x-model="selectedState" @change="fetchCities()" required 
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">State <span class="text-red-500">*</span></label>
+                                    <div class="flex items-center gap-1.5">
+                                        <button type="button" @click="detectLocation(false)" class="btn-detect-gps text-[11px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 px-2 py-0.5 rounded-lg border border-purple-200 transition-colors flex items-center gap-1 cursor-pointer">
+                                            <i class="fas fa-location-crosshairs text-[10px] text-purple-600"></i> Use Live GPS
+                                        </button>
+                                        <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100 hidden sm:inline-block">Select or Type</span>
+                                    </div>
+                                </div>
+                                <div class="gps-status-indicator mb-2" x-show="userLat && userLng" x-cloak>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">
+                                        <i class="fas fa-check-circle text-emerald-500"></i> Live GPS Attached (<span x-text="Number(userLat).toFixed(4)"></span>, <span x-text="Number(userLng).toFixed(4)"></span>)
+                                    </span>
+                                </div>
+                                <input type="hidden" name="latitude" x-model="userLat">
+                                <input type="hidden" name="longitude" x-model="userLng">
+                                <select data-no-search="true" name="state_id" id="modal_state_id" x-model="selectedState" @change="onModalSelectChange('state', $event)" :required="!modal_manual_state" 
                                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer">
                                     <option value="">Select State</option>
+                                    <option value="__manual__" x-show="modal_manual_state" x-text="modal_manual_state ? '✍️ Custom: ' + modal_manual_state : ''"></option>
                                     @foreach($modalStates as $st)
                                         <option value="{{ $st->id }}">{{ $st->name }}</option>
                                     @endforeach
                                 </select>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#0ea5e9] focus-within:ring-2 focus-within:ring-[#0ea5e9]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_state" x-model="modal_manual_state"
+                                        @input="syncModalManualToSelect('state')"
+                                        placeholder="e.g. Bihar, Uttar Pradesh, Delhi NCR, Jharkhand..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
+                                </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">City <span class="text-red-500">*</span></label>
-                                <select data-no-search="true" name="city_id" id="modal_city_id" required :disabled="loadingCities" 
-                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer disabled:opacity-50">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">City <span class="text-red-500">*</span></label>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">Select or Type Manual</span>
+                                </div>
+                                <select data-no-search="true" name="city_id" id="modal_city_id" :required="!modal_manual_city" 
+                                        @change="onModalSelectChange('city', $event)" 
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all cursor-pointer">
                                     <option value="">Select City</option>
+                                    <option value="__manual__" x-show="modal_manual_city" x-text="modal_manual_city ? '✍️ Custom: ' + modal_manual_city : ''"></option>
+                                    @if(isset($modalCities))
+                                        @foreach($modalCities as $ct)
+                                            <option value="{{ $ct->id }}">{{ $ct->name }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#0ea5e9] focus-within:ring-2 focus-within:ring-[#0ea5e9]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_city" x-model="modal_manual_city"
+                                        @input="syncModalManualToSelect('city')"
+                                        placeholder="e.g. Patna, Muzaffarpur, Gaya, Ranchi, Lucknow..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-[#031b4e] placeholder-slate-400 focus:outline-none focus:ring-0">
+                                </div>
+                            </div>
+
+                            <!-- Row 7: Job Description & Additional Requirements (Full Width) -->
+                            <div class="sm:col-span-2">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Job Description & Experience Requirements</label>
+                                    <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Optional</span>
+                                </div>
+                                <div class="relative">
+                                    <textarea name="description" rows="2" maxlength="1500" placeholder="e.g. Minimum 2+ years teaching experience required. Good English communication skills, student-friendly approach..." 
+                                              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9] transition-all resize-none"></textarea>
+                                </div>
                             </div>
                         </div>
 

@@ -62,6 +62,64 @@ class JobController extends Controller
 
     public function storeJobQuery(Request $request)
     {
+        // Resolve manual inputs if provided alongside selective dropdowns
+        if ($request->filled('manual_category')) {
+            $cat = \App\Models\Category::firstOrCreate(
+                ['name' => trim($request->manual_category)],
+                ['is_active' => true]
+            );
+            $request->merge(['category_id' => $cat->id]);
+        } elseif ($request->category_id === '__manual__') {
+            $request->merge(['category_id' => null]);
+        }
+
+        if ($request->filled('manual_state')) {
+            $st = \App\Models\State::firstOrCreate(
+                ['name' => trim($request->manual_state)],
+                ['is_active' => true]
+            );
+            $request->merge(['state_id' => $st->id]);
+        } elseif ($request->state_id === '__manual__') {
+            $request->merge(['state_id' => null]);
+        }
+
+        if ($request->filled('manual_city')) {
+            $stateId = $request->state_id;
+            if (!$stateId) {
+                $stateId = \App\Models\State::where('is_active', true)->first()->id ?? 1;
+            }
+            $ct = \App\Models\City::firstOrCreate(
+                ['name' => trim($request->manual_city), 'state_id' => $stateId],
+                ['is_active' => true]
+            );
+            $request->merge(['city_id' => $ct->id]);
+        } elseif ($request->city_id === '__manual__') {
+            $request->merge(['city_id' => null]);
+        }
+
+        if ($request->filled('manual_subject')) {
+            $sub = \App\Models\Subject::firstOrCreate(
+                ['name' => trim($request->manual_subject)],
+                ['is_active' => true]
+            );
+            if ($request->category_id && !$sub->categories()->where('categories.id', $request->category_id)->exists()) {
+                $sub->categories()->attach($request->category_id);
+            }
+            $request->merge(['subject_id' => $sub->id]);
+        } elseif ($request->subject_id === '__manual__') {
+            $request->merge(['subject_id' => null]);
+        }
+
+        if ($request->filled('manual_qualification')) {
+            $qual = \App\Models\Qualification::firstOrCreate(
+                ['name' => trim($request->manual_qualification)],
+                ['is_active' => true]
+            );
+            $request->merge(['qualification_id' => $qual->id]);
+        } elseif ($request->qualification_id === '__manual__') {
+            $request->merge(['qualification_id' => null]);
+        }
+
         $request->validate([
             'school_name' => ['required', 'string', 'min:3', 'max:200'],
             'contact_person' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
@@ -90,11 +148,11 @@ class JobController extends Controller
             'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
             'title.required' => 'Please enter the job title / position name.',
             'title.min' => 'Job title must be at least 3 characters long.',
-            'category_id.required' => 'Please select a job category.',
-            'subject_id.required' => 'Please select a subject.',
-            'qualification_id.required' => 'Please select the required qualification.',
-            'state_id.required' => 'Please select a state.',
-            'city_id.required' => 'Please select a city.',
+            'category_id.required' => 'Please select a job category or enter it manually.',
+            'subject_id.required' => 'Please select a subject or enter it manually.',
+            'qualification_id.required' => 'Please select the required qualification or enter it manually.',
+            'state_id.required' => 'Please select a state or enter it manually.',
+            'city_id.required' => 'Please select a city or enter it manually.',
         ]);
 
         JobPost::create([
@@ -114,6 +172,8 @@ class JobController extends Controller
             'state_id' => $request->state_id,
             'city_id' => $request->city_id,
             'salary_range' => $request->salary_range,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'status' => 'pending',
         ]);
 

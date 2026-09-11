@@ -225,6 +225,8 @@ class JobController extends Controller
             'city_id' => 'required|exists:cities,id',
             'salary_range' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'status' => 'required|in:pending,approved,rejected',
         ]);
 
@@ -265,6 +267,8 @@ class JobController extends Controller
             'city_id' => 'required|exists:cities,id',
             'salary_range' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $job->update($validated);

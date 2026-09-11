@@ -10,6 +10,8 @@
         . "📚 *Class & Board:* Class " . ($tuition->class ?? 'N/A') . " (" . ($tuition->board ?: 'General') . ")\n"
         . "📖 *Subjects:* " . ($tuition->subjects ?? 'All Subjects') . "\n"
         . "📍 *Location:* {$tuitionLocation}\n"
+        . ($tuition->duration_hours ? "⏱ *Duration:* {$tuition->duration_hours}\n" : "")
+        . ($tuition->days_per_week ? "📅 *Days/Week:* {$tuition->days_per_week}\n" : "")
         . "💰 *Tuition Fee:* " . (auth()->check() ? ($tuition->fee ? '₹' . $tuition->fee . '/month' : 'Negotiable') : 'Login to View') . "\n"
         . "👤 *Tutor Preference:* " . ($tuition->tutor_preference ?: 'Any Male/Female') . "\n\n"
         . "👉 *Check Details & Apply Directly:* \n{$shareTuitionUrl}";
@@ -137,8 +139,8 @@
                         </div>
                     </div>
 
-                    <!-- 4 Metric Cards Grid -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-6 border-t border-slate-100">
+                    <!-- 6 Metric Cards Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 pt-6 border-t border-slate-100">
                         <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 border border-slate-200/60 flex flex-col justify-center">
                             <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
                                 <i class="fas fa-book text-sky-500"></i> Class & Board
@@ -154,6 +156,24 @@
                             </span>
                             <span class="font-extrabold text-[#031b4e] text-xs sm:text-sm truncate" title="{{ $tuition->subjects }}">
                                 {{ $tuition->subjects }}
+                            </span>
+                        </div>
+
+                        <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 border border-slate-200/60 flex flex-col justify-center">
+                            <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                <i class="fas fa-clock text-sky-600"></i> Duration
+                            </span>
+                            <span class="font-extrabold text-[#031b4e] text-xs sm:text-sm truncate">
+                                {{ $tuition->duration_hours ?: '1.5 Hours / Day' }}
+                            </span>
+                        </div>
+
+                        <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 border border-slate-200/60 flex flex-col justify-center">
+                            <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                <i class="fas fa-calendar-week text-indigo-500"></i> Days / Week
+                            </span>
+                            <span class="font-extrabold text-[#031b4e] text-xs sm:text-sm truncate">
+                                {{ $tuition->days_per_week ?: '5-6 Days / Week' }}
                             </span>
                         </div>
 
@@ -202,6 +222,14 @@
                             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
                                 <span class="text-slate-500 font-medium">Subjects Required:</span>
                                 <span class="font-extrabold text-[#031b4e]">{{ $tuition->subjects }}</span>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                                <span class="text-slate-500 font-medium">Class Duration:</span>
+                                <span class="font-extrabold text-[#031b4e]">{{ $tuition->duration_hours ?: '1.5 Hours / Day (Kitne ghante padhana hai)' }}</span>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                                <span class="text-slate-500 font-medium">Weekly Classes:</span>
+                                <span class="font-extrabold text-[#031b4e]">{{ $tuition->days_per_week ?: '5 Days / Week (Week me kitne din padhana hoga)' }}</span>
                             </div>
                             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
                                 <span class="text-slate-500 font-medium">Preferred Timing:</span>

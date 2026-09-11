@@ -138,9 +138,12 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                    Job Category <span class="text-rose-500">*</span>
-                                </label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                        Job Category <span class="text-rose-500">*</span>
+                                    </label>
+                                    <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Select or Type Manual</span>
+                                </div>
                                 <select name="category_id" id="job_category" required 
                                     class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all appearance-none cursor-pointer font-medium">
                                     <option value="">Select Category</option>
@@ -150,12 +153,23 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#129aef] focus-within:ring-2 focus-within:ring-[#129aef]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_category" id="manual_category" value="{{ old('manual_category') }}"
+                                        placeholder="e.g. Primary Teacher, PRT, TGT, Music, Sports..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0">
+                                </div>
                             </div>
                             
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                    Subject <span class="text-rose-500">*</span>
-                                </label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                        Subject <span class="text-rose-500">*</span>
+                                    </label>
+                                    <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Select or Type Manual</span>
+                                </div>
                                 <select name="subject_id" id="job_subject" required 
                                     class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all appearance-none cursor-pointer font-medium">
                                     <option value="">Select Subject</option>
@@ -165,6 +179,14 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#129aef] focus-within:ring-2 focus-within:ring-[#129aef]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_subject" id="manual_subject" value="{{ old('manual_subject') }}"
+                                        placeholder="e.g. Physics, French, Mathematics, Computer..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0">
+                                </div>
                             </div>
 
                             <div>
@@ -180,10 +202,13 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                    Required Qualification <span class="text-rose-500">*</span>
-                                </label>
-                                <select name="qualification_id" required 
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                        Required Qualification <span class="text-rose-500">*</span>
+                                    </label>
+                                    <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Select or Type Manual</span>
+                                </div>
+                                <select name="qualification_id" id="job_qualification" required 
                                     class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all appearance-none cursor-pointer font-medium">
                                     <option value="">Select Qualification</option>
                                     @foreach($qualifications as $qualification)
@@ -192,6 +217,14 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#129aef] focus-within:ring-2 focus-within:ring-[#129aef]/20 transition-all shadow-2xs">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                        <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                    </span>
+                                    <input type="text" name="manual_qualification" id="manual_qualification" value="{{ old('manual_qualification') }}"
+                                        placeholder="e.g. B.Ed, M.Sc, PhD, CTET, D.El.Ed..." 
+                                        class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0">
+                                </div>
                             </div>
 
                             <div class="md:col-span-2">
@@ -211,18 +244,35 @@
 
                 <!-- Section 3: Location & Salary -->
                 <div class="pt-4 border-t border-slate-100">
-                    <div class="flex items-center gap-3 border-b border-slate-100 pb-3 mb-6">
-                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-[#129aef] flex items-center justify-center text-sm font-bold shadow-sm">
-                            <i class="fas fa-map-marker-alt"></i>
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-[#129aef] flex items-center justify-center text-sm font-bold shadow-sm">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-[#040e2d] tracking-wide">3. Location & Salary Details</h3>
                         </div>
-                        <h3 class="text-lg font-bold text-[#040e2d] tracking-wide">3. Location & Salary Details</h3>
+                        <button type="button" onclick="detectPostJobGps()" class="text-xs font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-all inline-flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                            <i class="fas fa-crosshairs text-blue-600"></i>
+                            <span>Use Live GPS</span>
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="latitude" id="post_job_lat" value="{{ old('latitude') }}">
+                    <input type="hidden" name="longitude" id="post_job_lng" value="{{ old('longitude') }}">
+
+                    <div id="post_job_gps_badge" class="{{ old('latitude') ? 'inline-flex' : 'hidden' }} mb-4 items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+                        <i class="fas fa-map-pin text-emerald-600"></i>
+                        <span id="post_job_gps_text">GPS Attached: {{ old('latitude') }}, {{ old('longitude') }}</span>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                State <span class="text-rose-500">*</span>
-                            </label>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                    State <span class="text-rose-500">*</span>
+                                </label>
+                                <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Select or Type Manual</span>
+                            </div>
                             <select name="state_id" id="state_id" required 
                                 class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all appearance-none cursor-pointer font-medium">
                                 <option value="">Select State</option>
@@ -232,16 +282,35 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#129aef] focus-within:ring-2 focus-within:ring-[#129aef]/20 transition-all shadow-2xs">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                    <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                </span>
+                                <input type="text" name="manual_state" id="manual_state" value="{{ old('manual_state') }}"
+                                    placeholder="e.g. Bihar, Uttar Pradesh, Delhi NCR, Jharkhand..." 
+                                    class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0">
+                            </div>
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                City <span class="text-rose-500">*</span>
-                            </label>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                    City <span class="text-rose-500">*</span>
+                                </label>
+                                <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Select or Type Manual</span>
+                            </div>
                             <select name="city_id" id="city_id" required 
                                 class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#129aef] focus:ring-2 focus:ring-[#129aef]/20 transition-all appearance-none cursor-pointer font-medium">
                                 <option value="">Select City</option>
                             </select>
+                            <div class="mt-2 flex items-center bg-white border border-dashed border-blue-300 rounded-xl px-2.5 py-1.5 focus-within:border-[#129aef] focus-within:ring-2 focus-within:ring-[#129aef]/20 transition-all shadow-2xs">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                    <i class="fas fa-pen-nib text-[9px]"></i> OR TYPE
+                                </span>
+                                <input type="text" name="manual_city" id="manual_city" value="{{ old('manual_city') }}"
+                                    placeholder="e.g. Patna, Muzaffarpur, Gaya, Ranchi, Lucknow..." 
+                                    class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0">
+                            </div>
                         </div>
 
                         <div class="md:col-span-2">
@@ -457,6 +526,100 @@
 
             if (jobSubject.value) {
                 loadSpecializations(jobSubject.value, initialOldSpecId);
+            }
+        }
+
+        // Two-way sync between manual inputs and upper select dropdowns
+        function setupManualSelectSync(selectId, manualInputId) {
+            const selectEl = document.getElementById(selectId);
+            const inputEl = document.getElementById(manualInputId);
+            if (!selectEl || !inputEl) return;
+
+            function syncInputToSelect() {
+                const val = inputEl.value.trim();
+                selectEl.required = !val;
+                let opt = selectEl.querySelector('option[value="__manual__"]');
+                if (!opt) {
+                    opt = document.createElement('option');
+                    opt.value = '__manual__';
+                    if (selectEl.options.length > 1) {
+                        selectEl.insertBefore(opt, selectEl.options[1]);
+                    } else {
+                        selectEl.appendChild(opt);
+                    }
+                }
+                if (val) {
+                    opt.textContent = '✍️ Custom: ' + val;
+                    opt.style.display = '';
+                    opt.selected = true;
+                    selectEl.value = '__manual__';
+                } else {
+                    opt.textContent = '';
+                    opt.style.display = 'none';
+                    if (selectEl.value === '__manual__') {
+                        selectEl.value = '';
+                    }
+                }
+                if (typeof window.refreshSearchableSelect === 'function') {
+                    window.refreshSearchableSelect(selectEl);
+                }
+            }
+
+            inputEl.addEventListener('input', syncInputToSelect);
+
+            selectEl.addEventListener('change', function() {
+                if (this.value !== '__manual__') {
+                    inputEl.value = '';
+                    selectEl.required = true;
+                }
+            });
+
+            if (inputEl.value.trim()) {
+                syncInputToSelect();
+            }
+        }
+
+        setupManualSelectSync('job_category', 'manual_category');
+        setupManualSelectSync('job_subject', 'manual_subject');
+        setupManualSelectSync('job_qualification', 'manual_qualification');
+        setupManualSelectSync('state_id', 'manual_state');
+        setupManualSelectSync('city_id', 'manual_city');
+    });
+
+    function detectPostJobGps(silent = false) {
+        if (typeof window.captureUserLiveLocation === 'function') {
+            window.captureUserLiveLocation(silent, function(coords) {
+                var latInput = document.getElementById('post_job_lat');
+                var lngInput = document.getElementById('post_job_lng');
+                if (latInput && lngInput) {
+                    latInput.value = coords.lat;
+                    lngInput.value = coords.lng;
+                }
+                var badge = document.getElementById('post_job_gps_badge');
+                var text = document.getElementById('post_job_gps_text');
+                if (badge && text) {
+                    text.textContent = 'GPS Attached (' + Number(coords.lat).toFixed(4) + ', ' + Number(coords.lng).toFixed(4) + ')';
+                    badge.classList.remove('hidden');
+                    badge.classList.add('inline-flex');
+                }
+            });
+        }
+    }
+
+    window.addEventListener('gps-detected', function(e) {
+        if (e.detail && e.detail.lat && e.detail.lng) {
+            var latInput = document.getElementById('post_job_lat');
+            var lngInput = document.getElementById('post_job_lng');
+            if (latInput && lngInput) {
+                latInput.value = e.detail.lat;
+                lngInput.value = e.detail.lng;
+                var badge = document.getElementById('post_job_gps_badge');
+                var text = document.getElementById('post_job_gps_text');
+                if (badge && text) {
+                    text.textContent = 'GPS Attached (' + Number(e.detail.lat).toFixed(4) + ', ' + Number(e.detail.lng).toFixed(4) + ')';
+                    badge.classList.remove('hidden');
+                    badge.classList.add('inline-flex');
+                }
             }
         }
     });

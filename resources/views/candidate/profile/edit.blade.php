@@ -55,22 +55,22 @@
                     @if(!$isOldOrBothData)
                         @if($candidateCategory === 'home_tutor')
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 text-xs font-black rounded-full border border-amber-200 shadow-2xs">
-                                <i class="fas fa-chalkboard-teacher text-amber-600"></i> Home Tutor
+                                <i class="fas fa-chalkboard-teacher text-amber-600"></i> Home Tutor Only
                             </span>
                         @elseif($candidateCategory === 'school_job')
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-800 text-xs font-black rounded-full border border-blue-200 shadow-2xs">
-                                <i class="fas fa-school text-blue-600"></i> School Job
+                                <i class="fas fa-school text-blue-600"></i> School Job Only
                             </span>
                         @endif
                     @else
                         <span x-show="activeCategory === 'home_tutor'" class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 text-xs font-black rounded-full border border-amber-200 shadow-2xs">
-                            <i class="fas fa-chalkboard-teacher text-amber-600"></i> Home Tutor
+                            <i class="fas fa-chalkboard-teacher text-amber-600"></i> Home Tutor Only
                         </span>
                         <span x-show="activeCategory === 'school_job'" class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-800 text-xs font-black rounded-full border border-blue-200 shadow-2xs">
-                            <i class="fas fa-school text-blue-600"></i> School Job
+                            <i class="fas fa-school text-blue-600"></i> School Job Only
                         </span>
                         <span x-show="activeCategory === 'both'" class="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-800 text-xs font-black rounded-full border border-purple-200 shadow-2xs">
-                            <i class="fas fa-layer-group text-purple-600"></i> Both (Tutor & School)
+                            <i class="fas fa-layer-group text-purple-600"></i> Both (School Job + Home Tuition)
                         </span>
                     @endif
                     @if($profile->is_verified)
@@ -174,7 +174,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="text-sm font-bold text-slate-800">Home Tutor</h4>
+                                    <h4 class="text-sm font-bold text-slate-800">Home Tutor Only</h4>
                                     <i class="fas fa-check-circle text-amber-500 text-sm" x-show="activeCategory === 'home_tutor'"></i>
                                 </div>
                                 <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
@@ -183,7 +183,7 @@
                             </div>
                         </div>
 
-                        {{-- Option 2: School Teacher Only --}}
+                        {{-- Option 2: School Job Only --}}
                         <div @click="activeCategory = 'school_job'" 
                              class="relative p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex items-start gap-3.5 select-none"
                              :class="activeCategory === 'school_job' 
@@ -195,7 +195,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="text-sm font-bold text-slate-800">School Teacher</h4>
+                                    <h4 class="text-sm font-bold text-slate-800">School Job Only</h4>
                                     <i class="fas fa-check-circle text-blue-600 text-sm" x-show="activeCategory === 'school_job'"></i>
                                 </div>
                                 <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
@@ -216,7 +216,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="text-sm font-bold text-slate-800">Both Roles</h4>
+                                    <h4 class="text-sm font-bold text-slate-800">Both (School Job + Home Tuition)</h4>
                                     <i class="fas fa-check-circle text-purple-600 text-sm" x-show="activeCategory === 'both'"></i>
                                 </div>
                                 <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
@@ -348,10 +348,31 @@
 
                     {{-- Address / Locality (Manual entry) --}}
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Address / Locality</label>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Address / Locality</label>
+                            <div class="flex items-center gap-1.5">
+                                @if($profile->google_maps_url)
+                                    <a href="{{ $profile->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full transition-all inline-flex items-center gap-1 shadow-2xs">
+                                        <i class="fas fa-map-marker-alt text-emerald-600 text-[10px]"></i>
+                                        <span>View Map</span>
+                                    </a>
+                                @endif
+                                <button type="button" onclick="detectCandidateProfileGps()" class="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-0.5 rounded-full transition-all inline-flex items-center gap-1 shadow-2xs cursor-pointer">
+                                    <i class="fas fa-crosshairs text-blue-600 text-[10px]"></i>
+                                    <span>Use Live GPS</span>
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="latitude" id="candidate_profile_lat" value="{{ old('latitude', $profile->latitude) }}">
+                        <input type="hidden" name="longitude" id="candidate_profile_lng" value="{{ old('longitude', $profile->longitude) }}">
                         <input type="text" name="address" value="{{ old('address', $profile->address) }}"
+                            onfocus="detectCandidateProfileGps(true)"
                             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-blue/40 font-medium"
                             placeholder="Residential address / Colony / City">
+                        <div id="candidate_profile_gps_badge" class="{{ old('latitude', $profile->latitude) ? 'inline-flex' : 'hidden' }} mt-1.5 items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                            <i class="fas fa-map-pin text-emerald-600"></i>
+                            <span id="candidate_profile_gps_text">GPS Attached: {{ old('latitude', $profile->latitude) }}, {{ old('longitude', $profile->longitude) }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -380,7 +401,7 @@
                     </label>
                     @php
                         $tuitionSubjectsList = [
-                            'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 
+                            'Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 
                             'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 
                             'Economics', 'Business Studies', 'Others'
                         ];
@@ -398,6 +419,13 @@
                             </label>
                         @endforeach
                     </div>
+                    <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
+                            <i class="fas fa-edit text-amber-500"></i> Other / Manual Subjects:
+                        </span>
+                        <input type="text" name="manual_tuition_subjects" value="{{ old('manual_tuition_subjects') }}" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                    </div>
                 </div>
 
                 {{-- Classes Interested --}}
@@ -407,8 +435,8 @@
                     </label>
                     @php
                         $classList = [
-                            'Nursery – UKG', 'Class nur – 5', 'Class 5 – 8', 'Class 6-10', 
-                            'Class 9 – 10', 'Class 11 – 12', 'IIT JEE', 'NEET', 'Graduation Level'
+                            'Pre-Primary', 'Nursery – UKG', 'Class nur – 5', 'Class 5 – 8', 'Class 6-10', 
+                            'Class 9 – 10', 'Class 11 – 12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Graduation Level'
                         ];
                     @endphp
                     <div class="flex flex-wrap gap-2">
@@ -423,6 +451,13 @@
                                 <span>{{ $cls }}</span>
                             </label>
                         @endforeach
+                    </div>
+                    <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
+                            <i class="fas fa-edit text-blue-500"></i> Other Classes / Exams:
+                        </span>
+                        <input type="text" name="manual_classes" value="{{ old('manual_classes') }}" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
                 </div>
 
@@ -751,3 +786,45 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function detectCandidateProfileGps(silent = false) {
+        if (typeof window.captureUserLiveLocation === 'function') {
+            window.captureUserLiveLocation(silent, function(coords) {
+                var latInput = document.getElementById('candidate_profile_lat');
+                var lngInput = document.getElementById('candidate_profile_lng');
+                if (latInput && lngInput) {
+                    latInput.value = coords.lat;
+                    lngInput.value = coords.lng;
+                }
+                var badge = document.getElementById('candidate_profile_gps_badge');
+                var text = document.getElementById('candidate_profile_gps_text');
+                if (badge && text) {
+                    text.textContent = 'GPS Attached (' + Number(coords.lat).toFixed(4) + ', ' + Number(coords.lng).toFixed(4) + ')';
+                    badge.classList.remove('hidden');
+                    badge.classList.add('inline-flex');
+                }
+            });
+        }
+    }
+
+    window.addEventListener('gps-detected', function(e) {
+        if (e.detail && e.detail.lat && e.detail.lng) {
+            var latInput = document.getElementById('candidate_profile_lat');
+            var lngInput = document.getElementById('candidate_profile_lng');
+            if (latInput && lngInput) {
+                latInput.value = e.detail.lat;
+                lngInput.value = e.detail.lng;
+                var badge = document.getElementById('candidate_profile_gps_badge');
+                var text = document.getElementById('candidate_profile_gps_text');
+                if (badge && text) {
+                    text.textContent = 'GPS Attached (' + Number(e.detail.lat).toFixed(4) + ', ' + Number(e.detail.lng).toFixed(4) + ')';
+                    badge.classList.remove('hidden');
+                    badge.classList.add('inline-flex');
+                }
+            }
+        }
+    });
+</script>
+@endpush

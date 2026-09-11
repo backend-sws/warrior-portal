@@ -117,6 +117,10 @@ class CandidateAuthController extends Controller
             'position_applying_for.required' => 'Please select the school job position you are applying for.',
             'resume.required'                => 'Resume upload is mandatory for School Job applications.',
             'preferred_locations.required'   => 'Please select at least one preferred location.',
+            'last_drawn_salary.numeric'      => 'Last drawn salary must be a valid number.',
+            'expected_salary.numeric'        => 'Expected salary must be a valid number.',
+            'salary_slip.max'                => 'Salary slip file size must not exceed 5MB.',
+            'salary_slip.mimes'              => 'Salary slip must be a PDF, DOC, JPG, JPEG, or PNG file.',
         ];
 
         $request->validate($rules, $messages);
@@ -177,6 +181,20 @@ class CandidateAuthController extends Controller
             ], 422);
         }
 
+        // Process tuition subjects (merge selected checkboxes + manual subjects)
+        $tuitionSubjects = is_array($request->tuition_subjects) ? $request->tuition_subjects : [];
+        if ($request->filled('manual_tuition_subjects')) {
+            $manualSubs = array_filter(array_map('trim', explode(',', $request->manual_tuition_subjects)));
+            $tuitionSubjects = array_values(array_unique(array_merge($tuitionSubjects, $manualSubs)));
+        }
+
+        // Process classes interested (merge selected checkboxes + manual classes)
+        $classesInterested = is_array($request->classes_interested) ? $request->classes_interested : [];
+        if ($request->filled('manual_classes')) {
+            $manualCls = array_filter(array_map('trim', explode(',', $request->manual_classes)));
+            $classesInterested = array_values(array_unique(array_merge($classesInterested, $manualCls)));
+        }
+
         // Generate 6-digit secure numeric OTP
         $otp = sprintf('%06d', mt_rand(100000, 999999));
 
@@ -198,8 +216,8 @@ class CandidateAuthController extends Controller
                 'experience_years'           => $expYears,
 
                 // Home Tutor fields
-                'tuition_subjects'           => $request->tuition_subjects ?? [],
-                'classes_interested'         => $request->classes_interested ?? [],
+                'tuition_subjects'           => $tuitionSubjects,
+                'classes_interested'         => $classesInterested,
                 'teaching_mode'              => $request->teaching_mode,
                 'preferred_areas'            => $request->preferred_areas,
                 'available_time_slot'        => $request->available_time_slot,
@@ -209,17 +227,21 @@ class CandidateAuthController extends Controller
                 'd_el_ed_status'              => $request->d_el_ed_status,
                 'subject_specialization'     => $request->subject_specialization,
                 'position_applying_for'      => $request->position_applying_for,
-                'current_salary'             => $request->current_salary,
+                'current_salary'             => $request->current_salary ?? $request->last_drawn_salary,
                 'expected_salary'            => $request->expected_salary,
                 'last_school_name'           => $request->last_school_name,
                 'last_designation'           => $request->last_designation,
-                'last_drawn_salary'          => $request->last_drawn_salary,
+                'last_drawn_salary'          => $request->last_drawn_salary ?? $request->current_salary,
                 'preferred_locations'        => array_values($prefLocations),
                 'preferred_locations_manual' => $request->preferred_locations_manual,
 
                 // Uploaded files
                 'resume_path'                => $resumePath,
                 'salary_slip_path'           => $salarySlipPath,
+
+                // Geolocation
+                'latitude'                   => $request->latitude,
+                'longitude'                  => $request->longitude,
             ],
             'register_otp' => (string) $otp,
             'register_otp_expires_at' => now()->addMinutes(15),
@@ -341,16 +363,20 @@ class CandidateAuthController extends Controller
             'd_el_ed_status'              => $data['d_el_ed_status'] ?? null,
             'subject_specialization'     => $data['subject_specialization'] ?? null,
             'position_applying_for'      => $data['position_applying_for'] ?? null,
-            'current_salary'             => $data['current_salary'] ?? null,
+            'current_salary'             => $data['current_salary'] ?? $data['last_drawn_salary'] ?? null,
             'expected_salary'            => $data['expected_salary'] ?? null,
             'last_school_name'           => $data['last_school_name'] ?? null,
             'last_designation'           => $data['last_designation'] ?? null,
-            'last_drawn_salary'          => $data['last_drawn_salary'] ?? null,
+            'last_drawn_salary'          => $data['last_drawn_salary'] ?? $data['current_salary'] ?? null,
             'preferred_locations'        => $data['preferred_locations'] ?? null,
 
             // Documents
             'resume_path'                => $data['resume_path'] ?? null,
             'salary_slip_path'           => $data['salary_slip_path'] ?? null,
+
+            // Geolocation
+            'latitude'                   => $data['latitude'] ?? null,
+            'longitude'                  => $data['longitude'] ?? null,
 
             'is_profile_complete'        => true,
             'registration_completed_at'  => now(),

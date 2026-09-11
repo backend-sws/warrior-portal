@@ -148,6 +148,13 @@
                     <div class="text-sm text-text-main flex items-center gap-1.5">
                         <i class="fas fa-map-marker-alt text-red-400"></i> {{ $job->city?->name ?? 'N/A' }}, {{ $job->state?->name ?? '' }}
                     </div>
+                    @if($job->google_maps_url)
+                        <div class="mt-1">
+                            <a href="{{ $job->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full transition-all">
+                                <i class="fas fa-location-arrow text-[9px]"></i> View on Map
+                            </a>
+                        </div>
+                    @endif
                 </td>
                 <td>
                     @if($job->status === 'approved')

@@ -35,14 +35,15 @@ class HomeController extends Controller
         $totalJobs = JobPost::where('status', 'approved')->count();
         $totalApplications = \App\Models\JobApplication::count();
         $totalEmployers = \App\Models\User::where('role', 'employer')->count();
-        $employerTuitions = \App\Models\HomeTuitionLead::where('is_featured', true)
-            ->where('status', 'Approved')
+        $employerTuitions = \App\Models\HomeTuitionLead::whereIn('status', ['Approved', 'Confirmed'])
+            ->orderByDesc('is_featured')
             ->latest()
             ->take(8)
             ->get();
 
         if ($employerTuitions->isEmpty()) {
-            $employerTuitions = \App\Models\HomeTuitionLead::where('status', 'Approved')
+            $employerTuitions = \App\Models\HomeTuitionLead::whereNotIn('status', ['Cancelled', 'Closed', 'Rejected'])
+                ->orderByDesc('is_featured')
                 ->latest()
                 ->take(8)
                 ->get();
@@ -50,12 +51,20 @@ class HomeController extends Controller
 
         $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
         $qualifications = \App\Models\Qualification::where('is_active', true)->orderBy('name')->get();
+        $allSubjects = \App\Models\Subject::where('is_active', true)->orderBy('name')->get();
+        $allCities = \App\Models\City::where('is_active', true)->orderBy('name')->get();
 
-        return view('welcome', compact('recentJobs', 'categories', 'services', 'testimonials', 'clients', 'totalJobs', 'totalApplications', 'totalEmployers', 'employerTuitions', 'states', 'qualifications'));
+        return view('welcome', compact('recentJobs', 'categories', 'services', 'testimonials', 'clients', 'totalJobs', 'totalApplications', 'totalEmployers', 'employerTuitions', 'states', 'qualifications', 'allSubjects', 'allCities'));
     }
 
     public function storeTuition(Request $request)
     {
+        if ($request->filled('manual_board')) {
+            $request->merge(['board' => trim($request->manual_board)]);
+        } elseif ($request->board === '__manual__') {
+            $request->merge(['board' => null]);
+        }
+
         $validated = $request->validate([
             'guest_name' => ['required', 'string', 'min:3', 'max:80', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
             'guest_phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
@@ -64,6 +73,10 @@ class HomeController extends Controller
             'subjects' => ['required', 'string', 'min:2', 'max:200'],
             'location' => ['required', 'string', 'min:3', 'max:255'],
             'pincode' => ['nullable', 'regex:/^\d{6}$/'],
+            'duration_hours' => ['nullable', 'string', 'max:100'],
+            'days_per_week' => ['nullable', 'string', 'max:100'],
+            'remarks' => ['nullable', 'string', 'max:1500'],
+            'additional_notes' => ['nullable', 'string', 'max:1500'],
             'description' => ['nullable', 'string', 'max:1000'],
         ], [
             'guest_name.required' => 'Your Name is required.',
@@ -72,7 +85,7 @@ class HomeController extends Controller
             'guest_phone.required' => 'Phone Number is required.',
             'guest_phone.regex' => 'Phone Number must be a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.',
             'student_class.required' => "Please enter the student's class/grade (e.g. Class 10, Class 5).",
-            'board.required' => 'Please select an education board (e.g. CBSE, ICSE, State Board).',
+            'board.required' => 'Please select an education board or enter it manually.',
             'subjects.required' => 'Please enter the subjects needed for tutoring.',
             'location.required' => 'Please enter your complete area address or locality.',
             'pincode.regex' => 'Pincode must be exactly a 6-digit number (e.g. 800001).',
@@ -86,6 +99,11 @@ class HomeController extends Controller
             'subjects' => $validated['subjects'],
             'location' => $validated['location'],
             'pincode' => $validated['pincode'] ?? null,
+            'duration_hours' => $request->input('duration_hours'),
+            'days_per_week' => $request->input('days_per_week'),
+            'additional_notes' => $request->input('remarks') ?? $request->input('additional_notes') ?? $request->input('description'),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
             'status' => 'New Lead',
             'user_id' => auth()->check() ? auth()->id() : null,
         ]);
@@ -110,6 +128,64 @@ class HomeController extends Controller
 
     public function storeSchoolRequirement(Request $request)
     {
+        // Resolve manual inputs if provided alongside selective dropdowns
+        if ($request->filled('manual_category')) {
+            $cat = \App\Models\Category::firstOrCreate(
+                ['name' => trim($request->manual_category)],
+                ['is_active' => true]
+            );
+            $request->merge(['category_id' => $cat->id]);
+        } elseif ($request->category_id === '__manual__') {
+            $request->merge(['category_id' => null]);
+        }
+
+        if ($request->filled('manual_state')) {
+            $st = \App\Models\State::firstOrCreate(
+                ['name' => trim($request->manual_state)],
+                ['is_active' => true]
+            );
+            $request->merge(['state_id' => $st->id]);
+        } elseif ($request->state_id === '__manual__') {
+            $request->merge(['state_id' => null]);
+        }
+
+        if ($request->filled('manual_city')) {
+            $stateId = $request->state_id;
+            if (!$stateId) {
+                $stateId = \App\Models\State::where('is_active', true)->first()->id ?? 1;
+            }
+            $ct = \App\Models\City::firstOrCreate(
+                ['name' => trim($request->manual_city), 'state_id' => $stateId],
+                ['is_active' => true]
+            );
+            $request->merge(['city_id' => $ct->id]);
+        } elseif ($request->city_id === '__manual__') {
+            $request->merge(['city_id' => null]);
+        }
+
+        if ($request->filled('manual_subject')) {
+            $sub = \App\Models\Subject::firstOrCreate(
+                ['name' => trim($request->manual_subject)],
+                ['is_active' => true]
+            );
+            if ($request->category_id && !$sub->categories()->where('categories.id', $request->category_id)->exists()) {
+                $sub->categories()->attach($request->category_id);
+            }
+            $request->merge(['subject_id' => $sub->id]);
+        } elseif ($request->subject_id === '__manual__') {
+            $request->merge(['subject_id' => null]);
+        }
+
+        if ($request->filled('manual_qualification')) {
+            $qual = \App\Models\Qualification::firstOrCreate(
+                ['name' => trim($request->manual_qualification)],
+                ['is_active' => true]
+            );
+            $request->merge(['qualification_id' => $qual->id]);
+        } elseif ($request->qualification_id === '__manual__') {
+            $request->merge(['qualification_id' => null]);
+        }
+
         $validated = $request->validate([
             'school_name' => ['required', 'string', 'min:3', 'max:200'],
             'contact_person' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
@@ -134,11 +210,11 @@ class HomeController extends Controller
             'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
             'email.email' => 'Please enter a valid official email address.',
             'title.required' => 'Please enter the vacancy / job title.',
-            'category_id.required' => 'Please select a job category.',
-            'subject_id.required' => 'Please select a subject.',
-            'qualification_id.required' => 'Please select the required qualification.',
-            'state_id.required' => 'Please select a state.',
-            'city_id.required' => 'Please select a city.',
+            'category_id.required' => 'Please select a job category or enter it manually.',
+            'subject_id.required' => 'Please select a subject or enter it manually.',
+            'qualification_id.required' => 'Please select the required qualification or enter it manually.',
+            'state_id.required' => 'Please select a state or enter it manually.',
+            'city_id.required' => 'Please select a city or enter it manually.',
         ]);
 
         $baseDescription = $validated['description'] ?? 'Submitted via website quick requirement form';
@@ -159,6 +235,8 @@ class HomeController extends Controller
             'city_id' => $validated['city_id'],
             'salary_range' => $validated['salary_range'] ?? null,
             'description' => $baseDescription,
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
             'status' => 'pending',
         ]);
 
@@ -256,7 +334,7 @@ class HomeController extends Controller
 
     public function tuitions(\Illuminate\Http\Request $request)
     {
-        $query = \App\Models\HomeTuitionLead::where('status', 'Approved');
+        $query = \App\Models\HomeTuitionLead::whereIn('status', ['Approved', 'Confirmed']);
 
         if ($search = $request->input('search')) {
             $query->where(function($q) use ($search) {

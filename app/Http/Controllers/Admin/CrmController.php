@@ -36,29 +36,45 @@ class CrmController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'candidate_category'       => 'required|in:home_tutor,school_job,both',
             'name'                     => 'required|string|max:255',
             'email'                    => 'required|email|unique:users,email',
             'phone'                    => 'required|string|max:20|unique:users,phone',
             'password'                 => 'required|string|min:6',
             'gender'                   => 'required|in:Male,Female,Other',
             'date_of_birth'            => 'required|date',
-            'address'                  => 'required|string',
-            'highest_qualification_id' => 'required|exists:qualifications,id',
-            'subject_id'               => 'required|exists:subjects,id',
-            'category_id'              => 'nullable|exists:categories,id',
+            'address'                  => 'nullable|string',
+            'highest_qualification_id' => 'nullable',
+            'highest_qualification'    => 'nullable|string|max:150',
+            'subject_id'               => 'nullable',
+            'category_id'              => 'nullable',
             'experience_years'         => 'nullable|integer|min:0',
-            'preferred_state_id'       => 'required|exists:states,id',
-            'preferred_city_id'        => 'required|exists:cities,id',
+            'experience_range'         => 'nullable|string|max:50',
+            'preferred_state_id'       => 'nullable',
+            'preferred_city_id'        => 'nullable',
             'current_salary'           => 'nullable|string',
+            'last_drawn_salary'        => 'nullable|string',
             'expected_salary'          => 'nullable|string',
+            'last_school_name'         => 'nullable|string|max:200',
+            'last_designation'         => 'nullable|string|max:150',
+            'position_applying_for'    => 'nullable|string|max:150',
+            'b_ed_status'              => 'nullable|string|max:50',
+            'd_el_ed_status'           => 'nullable|string|max:50',
+            'teaching_mode'            => 'nullable|string|max:50',
+            'available_time_slot'      => 'nullable|string|max:100',
+            'preferred_areas'          => 'nullable|string',
+            'preferred_locations_manual'=> 'nullable|string',
+            'tuition_subjects'         => 'nullable|array',
+            'classes_interested'       => 'nullable|array',
             'english_fluency'          => 'nullable|string',
             'residential_preference'   => 'nullable|string',
             'availability_to_join'     => 'nullable|string',
             'current_school'           => 'nullable|string',
             'resume'                   => 'nullable|mimes:pdf,doc,docx|max:5120',
+            'tutor_resume'             => 'nullable|mimes:pdf,doc,docx|max:5120',
             'profile_photo'            => 'nullable|image|max:5120',
             'live_photo'               => 'nullable|image|max:5120',
-            'salary_slip'              => 'nullable|mimes:pdf,jpg,png,jpeg|max:5120',
+            'salary_slip'              => 'nullable|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
             'offer_letter'             => 'nullable|mimes:pdf,jpg,png,jpeg|max:5120',
             'agreement_pdf'            => 'nullable|mimes:pdf|max:5120',
             'payment_amount'           => 'nullable|numeric|min:0',
@@ -67,6 +83,8 @@ class CrmController extends Controller
         ]);
 
         try {
+            $category = $request->input('candidate_category', 'both');
+
             // 1. Create User
             $user = User::create([
                 'name'              => $request->name,
@@ -79,38 +97,127 @@ class CrmController extends Controller
             ]);
 
             // 2. Handle File Uploads
-            $resumePath = $request->hasFile('resume') ? $request->file('resume')->store('resumes', 'public') : null;
+            $resumeFile = $request->file('resume') ?? $request->file('tutor_resume');
+            $resumePath = $resumeFile ? $resumeFile->store('resumes', 'public') : null;
             $profilePhotoPath = $request->hasFile('profile_photo') ? $request->file('profile_photo')->store('profile_photos', 'public') : null;
             $livePhotoPath = $request->hasFile('live_photo') ? $request->file('live_photo')->store('live_photos', 'public') : null;
             $salarySlipPath = $request->hasFile('salary_slip') ? $request->file('salary_slip')->store('salary_slips', 'public') : null;
             $offerLetterPath = $request->hasFile('offer_letter') ? $request->file('offer_letter')->store('offer_letters', 'public') : null;
             $agreementPdfPath = $request->hasFile('agreement_pdf') ? $request->file('agreement_pdf')->store('agreements', 'public') : null;
 
-            $isJobAgreementSigned = ($agreementPdfPath || $request->boolean('is_agreement_signed'));
-            $isTuitionAgreementSigned = $request->boolean('is_tuition_agreement_signed');
+            // Determine Agreements
+            $isJobAgreementSigned = ($agreementPdfPath || $request->boolean('is_agreement_signed') || in_array($category, ['school_job', 'both']));
+            $isTuitionAgreementSigned = ($request->boolean('is_tuition_agreement_signed') || in_array($category, ['home_tutor', 'both']));
 
             $paymentId = $request->payment_method ? ($request->payment_method . '-ADMIN-' . strtoupper(uniqid())) : null;
+
+            // Derive approximate experience years if range is given
+            $expYears = $request->filled('experience_years') ? (int) $request->experience_years : 0;
+            if (!$expYears && $request->filled('experience_range')) {
+                $range = $request->experience_range;
+                if ($range === '0–1 Year') $expYears = 0;
+                elseif ($range === '1–3 Years') $expYears = 2;
+                elseif ($range === '3–5 Years') $expYears = 4;
+                elseif ($range === '5–10 Years') $expYears = 7;
+                elseif ($range === '10–15 Years') $expYears = 12;
+                elseif ($range === '15+ Years') $expYears = 15;
+            }
+
+            // Highest qualification resolution
+            $qualId = is_numeric($request->highest_qualification_id) ? (int)$request->highest_qualification_id : null;
+            $qualName = $request->highest_qualification;
+            if ($qualId && !$qualName) {
+                $qObj = \App\Models\Qualification::find($qualId);
+                $qualName = $qObj ? $qObj->name : null;
+            }
+
+            // Locations list
+            $prefLocations = [];
+            if ($request->filled('preferred_locations_manual')) {
+                $prefLocations = array_filter(array_map('trim', explode(',', $request->preferred_locations_manual)));
+            } elseif (is_array($request->preferred_locations)) {
+                $prefLocations = $request->preferred_locations;
+            }
+            if (empty($prefLocations) && $request->filled('preferred_areas')) {
+                $prefLocations = array_filter(array_map('trim', explode(',', $request->preferred_areas)));
+            }
+            if (empty($prefLocations) && $request->filled('preferred_city_id')) {
+                $c = \App\Models\City::find($request->preferred_city_id);
+                if ($c) {
+                    $prefLocations = [$c->name];
+                }
+            }
+
+            // Subject Specialization resolution
+            $subjSpecialization = $request->subject_specialization;
+            if (empty($subjSpecialization) && !empty($request->tuition_subjects) && is_array($request->tuition_subjects)) {
+                $subjSpecialization = implode(', ', $request->tuition_subjects);
+            }
+            if (empty($subjSpecialization) && $request->filled('subject_id')) {
+                $sObj = \App\Models\Subject::find($request->subject_id);
+                if ($sObj) {
+                    $subjSpecialization = $sObj->name;
+                }
+            }
+
+            $address = $request->address;
+            if (empty($address)) {
+                $address = $request->preferred_areas ?: ($request->preferred_locations_manual ?: 'Not specified');
+            }
+
+            $lastDrawn = $request->last_drawn_salary ?? $request->current_salary;
+            $currentSal = $request->current_salary ?? $request->last_drawn_salary;
+            $lastSchool = $request->last_school_name ?? $request->current_school;
+
+            // Tuition subjects (merge checkboxes + manual typed subjects)
+            $tuitionSubjects = is_array($request->tuition_subjects) ? $request->tuition_subjects : [];
+            if ($request->filled('manual_tuition_subjects')) {
+                $manualSubs = array_filter(array_map('trim', explode(',', $request->manual_tuition_subjects)));
+                $tuitionSubjects = array_values(array_unique(array_merge($tuitionSubjects, $manualSubs)));
+            }
+
+            // Classes interested (merge checkboxes + manual typed classes)
+            $classesInterested = is_array($request->classes_interested) ? $request->classes_interested : [];
+            if ($request->filled('manual_classes')) {
+                $manualCls = array_filter(array_map('trim', explode(',', $request->manual_classes)));
+                $classesInterested = array_values(array_unique(array_merge($classesInterested, $manualCls)));
+            }
 
             // 3. Create Candidate Profile
             $profile = CandidateProfile::create([
                 'user_id'                    => $user->id,
-                'candidate_category'         => $request->candidate_category ?? 'both',
+                'candidate_category'         => $category,
                 'whatsapp_no'                => $request->whatsapp_no ?? $request->phone,
                 'gender'                     => $request->gender,
                 'date_of_birth'              => $request->date_of_birth,
-                'address'                    => $request->address,
-                'category_id'                => $request->category_id,
-                'subject_id'                 => $request->subject_id,
-                'highest_qualification_id'   => $request->highest_qualification_id,
-                'experience_years'           => $request->experience_years ?? 0,
-                'current_salary'             => $request->current_salary,
+                'address'                    => $address,
+                'category_id'                => is_numeric($request->category_id) ? (int)$request->category_id : null,
+                'subject_id'                 => is_numeric($request->subject_id) ? (int)$request->subject_id : null,
+                'highest_qualification_id'   => $qualId,
+                'highest_qualification_name' => $qualName,
+                'tuition_subjects'           => !empty($tuitionSubjects) ? $tuitionSubjects : null,
+                'classes_interested'         => !empty($classesInterested) ? $classesInterested : null,
+                'teaching_mode'              => $request->teaching_mode,
+                'preferred_areas'            => $request->preferred_areas,
+                'available_time_slot'        => $request->available_time_slot,
+                'b_ed_status'                => $request->b_ed_status,
+                'd_el_ed_status'             => $request->d_el_ed_status,
+                'subject_specialization'     => $subjSpecialization,
+                'position_applying_for'      => $request->position_applying_for,
+                'last_school_name'           => $lastSchool,
+                'last_designation'           => $request->last_designation,
+                'last_drawn_salary'          => $lastDrawn,
+                'preferred_locations'        => !empty($prefLocations) ? array_values($prefLocations) : null,
+                'preferred_state_id'         => is_numeric($request->preferred_state_id) ? (int)$request->preferred_state_id : null,
+                'preferred_city_id'          => is_numeric($request->preferred_city_id) ? (int)$request->preferred_city_id : null,
+                'experience_years'           => $expYears,
+                'experience_range'           => $request->experience_range,
+                'current_salary'             => $currentSal,
                 'expected_salary'            => $request->expected_salary,
-                'preferred_state_id'         => $request->preferred_state_id,
-                'preferred_city_id'          => $request->preferred_city_id,
                 'english_fluency'            => $request->english_fluency,
                 'residential_preference'     => $request->residential_preference,
                 'availability_to_join'       => $request->availability_to_join,
-                'current_school'             => $request->current_school,
+                'current_school'             => $lastSchool,
                 
                 'resume_path'                => $resumePath,
                 'profile_photo_path'         => $profilePhotoPath,
@@ -118,6 +225,9 @@ class CrmController extends Controller
                 'salary_slip_path'           => $salarySlipPath,
                 'offer_letter_path'          => $offerLetterPath,
                 'agreement_pdf_path'         => $agreementPdfPath,
+
+                'latitude'                   => $request->latitude,
+                'longitude'                  => $request->longitude,
 
                 'is_profile_complete'        => true,
                 'is_fee_paid'                => true,
@@ -136,7 +246,7 @@ class CrmController extends Controller
                 'tuition_agreement_signed_at'=> $isTuitionAgreementSigned ? now() : null,
             ]);
 
-            $profile->profile_completion_percentage = $profile->completion_percentage;
+            $profile->profile_completion_percentage = 100;
             $profile->save();
 
             // 4. Create Payment Transaction if fee was collected
@@ -265,6 +375,18 @@ class CrmController extends Controller
             
             $user->update($userData);
 
+            $updTuitionSubjects = is_array($request->tuition_subjects) ? $request->tuition_subjects : [];
+            if ($request->filled('manual_tuition_subjects')) {
+                $manualSubs = array_filter(array_map('trim', explode(',', $request->manual_tuition_subjects)));
+                $updTuitionSubjects = array_values(array_unique(array_merge($updTuitionSubjects, $manualSubs)));
+            }
+
+            $updClasses = is_array($request->classes_interested) ? $request->classes_interested : [];
+            if ($request->filled('manual_classes')) {
+                $manualCls = array_filter(array_map('trim', explode(',', $request->manual_classes)));
+                $updClasses = array_values(array_unique(array_merge($updClasses, $manualCls)));
+            }
+
             $updates = [
                 'candidate_category'       => $request->candidate_category ?? 'both',
                 'whatsapp_no'              => $request->whatsapp_no ?? $request->phone,
@@ -285,8 +407,8 @@ class CrmController extends Controller
                 'residential_preference'   => $request->residential_preference,
                 'availability_to_join'     => $request->availability_to_join,
                 'current_school'           => $request->current_school,
-                'tuition_subjects'         => $request->tuition_subjects ?? [],
-                'classes_interested'       => $request->classes_interested ?? [],
+                'tuition_subjects'         => $updTuitionSubjects,
+                'classes_interested'       => $updClasses,
                 'teaching_mode'            => $request->teaching_mode,
                 'preferred_areas'          => $request->preferred_areas,
                 'available_time_slot'      => $request->available_time_slot,
@@ -300,6 +422,13 @@ class CrmController extends Controller
                 'preferred_locations'      => $request->preferred_locations ?? [],
                 'total_allowed_applications' => 9999,
             ];
+
+            if ($request->filled('latitude')) {
+                $updates['latitude'] = $request->latitude;
+            }
+            if ($request->filled('longitude')) {
+                $updates['longitude'] = $request->longitude;
+            }
 
             if ($request->hasFile('resume')) {
                 $updates['resume_path'] = $request->file('resume')->store('resumes', 'public');

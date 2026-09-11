@@ -60,6 +60,8 @@ class TuitionController extends Controller
             'subjects' => ['required', 'string', 'min:2', 'max:200'],
             'location' => ['required', 'string', 'min:3', 'max:255'],
             'pincode' => ['nullable', 'regex:/^\d{6}$/'],
+            'duration_hours' => ['nullable', 'string', 'max:100'],
+            'days_per_week' => ['nullable', 'string', 'max:100'],
         ], [
             'name.required' => 'Please enter your full name.',
             'name.min' => 'Name must be at least 3 characters long.',
@@ -85,6 +87,9 @@ class TuitionController extends Controller
             'board' => $request->board,
             'subjects' => $request->subjects,
             'location' => $locationWithPincode,
+            'pincode' => $request->pincode ?? null,
+            'duration_hours' => $request->duration_hours,
+            'days_per_week' => $request->days_per_week,
             'status' => 'New Lead',
             'user_id' => auth()->id(),
         ]);

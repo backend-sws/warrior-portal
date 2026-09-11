@@ -8,7 +8,8 @@ class HomeTuitionLead extends Model
 {
     protected $fillable = [
         'tuition_id', 'user_id', 'parent_name', 'parent_mobile', 'email', 'teacher_name', 'teacher_contact', 'location', 
-        'pincode', 'class', 'board', 'subjects', 'fee', 'preferred_timing', 'enquiry_date', 
+        'latitude', 'longitude',
+        'pincode', 'class', 'board', 'subjects', 'fee', 'preferred_timing', 'duration_hours', 'days_per_week', 'enquiry_date', 
         'tutor_preference', 'dues', 'additional_notes', 'status', 'follow_up_date',
         'id_proof_front', 'id_proof_back', 'teacher_passport_photo', 'is_finally_appointed', 'is_featured'
     ];
@@ -63,6 +64,17 @@ class HomeTuitionLead extends Model
     public function getPublicUrlAttribute(): string
     {
         return route('tuitions.show', $this->id);
+    }
+
+    /**
+     * Get Google Maps pinpoint URL if coordinates are available.
+     */
+    public function getGoogleMapsUrlAttribute(): ?string
+    {
+        if ($this->latitude && $this->longitude) {
+            return "https://www.google.com/maps?q={$this->latitude},{$this->longitude}";
+        }
+        return null;
     }
 
     public function followUps()

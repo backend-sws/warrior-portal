@@ -375,6 +375,8 @@ class SchoolController extends Controller
             'city_id'          => $request->city_id,
             'salary_range'     => $request->salary_range,
             'description'      => $request->description ?: 'Vacancy for ' . $request->title . ' at ' . $school->school_name,
+            'latitude'         => $request->latitude,
+            'longitude'        => $request->longitude,
             'status'           => 'approved',
             'email'            => $school->email ?: ($school->user?->email ?? 'hr@school.com'),
             'phone'            => $school->phone ?: ($school->user?->phone ?? 'N/A'),

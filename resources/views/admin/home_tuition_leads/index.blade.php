@@ -163,6 +163,13 @@
                     @if($lead->pincode)
                         <div class="text-[11px] text-text-dark/60 mt-0.5 font-mono">Pincode: {{ $lead->pincode }}</div>
                     @endif
+                    @if($lead->google_maps_url)
+                        <div class="mt-1">
+                            <a href="{{ $lead->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full transition-all">
+                                <i class="fas fa-location-arrow text-[9px]"></i> View on Map
+                            </a>
+                        </div>
+                    @endif
                 </td>
                 <td class="align-middle">
                     @php
