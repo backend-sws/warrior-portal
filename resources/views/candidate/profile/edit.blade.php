@@ -4,7 +4,9 @@
 @include('candidate.partials.nav')
 
 @php
-    $activeCategory = $profile->candidate_category ?: 'both';
+    $candidateCategory = $profile->candidate_category ?: 'both';
+    $isOldOrBothData = empty($profile->candidate_category) || $profile->candidate_category === 'both';
+    $activeCategory = old('candidate_category', $candidateCategory);
     $curQual = $profile->highest_qualification_name ?: ($profile->highestQualification?->name ?? '');
 @endphp
 
@@ -50,15 +52,27 @@
             <div>
                 <h1 class="text-xl sm:text-2xl font-black text-[#031b4e] flex flex-wrap items-center gap-2">
                     My Educator Profile
-                    <span x-show="activeCategory === 'home_tutor'" class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 text-xs font-black rounded-full border border-amber-200 shadow-2xs">
-                        <i class="fas fa-chalkboard-teacher text-amber-600"></i> Home Tutor
-                    </span>
-                    <span x-show="activeCategory === 'school_job'" class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-800 text-xs font-black rounded-full border border-blue-200 shadow-2xs">
-                        <i class="fas fa-school text-blue-600"></i> School Job
-                    </span>
-                    <span x-show="activeCategory === 'both'" class="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-800 text-xs font-black rounded-full border border-purple-200 shadow-2xs">
-                        <i class="fas fa-layer-group text-purple-600"></i> Both (Tutor & School)
-                    </span>
+                    @if(!$isOldOrBothData)
+                        @if($candidateCategory === 'home_tutor')
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 text-xs font-black rounded-full border border-amber-200 shadow-2xs">
+                                <i class="fas fa-chalkboard-teacher text-amber-600"></i> Home Tutor
+                            </span>
+                        @elseif($candidateCategory === 'school_job')
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-800 text-xs font-black rounded-full border border-blue-200 shadow-2xs">
+                                <i class="fas fa-school text-blue-600"></i> School Job
+                            </span>
+                        @endif
+                    @else
+                        <span x-show="activeCategory === 'home_tutor'" class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 text-xs font-black rounded-full border border-amber-200 shadow-2xs">
+                            <i class="fas fa-chalkboard-teacher text-amber-600"></i> Home Tutor
+                        </span>
+                        <span x-show="activeCategory === 'school_job'" class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-800 text-xs font-black rounded-full border border-blue-200 shadow-2xs">
+                            <i class="fas fa-school text-blue-600"></i> School Job
+                        </span>
+                        <span x-show="activeCategory === 'both'" class="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-800 text-xs font-black rounded-full border border-purple-200 shadow-2xs">
+                            <i class="fas fa-layer-group text-purple-600"></i> Both (Tutor & School)
+                        </span>
+                    @endif
                     @if($profile->is_verified)
                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-extrabold uppercase tracking-wider rounded-full">
                             <i class="fas fa-check-circle text-blue-600"></i> Verified
@@ -66,9 +80,17 @@
                     @endif
                 </h1>
                 <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                    <span x-show="activeCategory === 'home_tutor'">Update your home tuition preferences, subjects, and contact details anytime.</span>
-                    <span x-show="activeCategory === 'school_job'">Update your school teaching credentials, experience, and contact details anytime.</span>
-                    <span x-show="activeCategory === 'both'">Update your profile, teaching preferences, subjects, and contact details anytime.</span>
+                    @if(!$isOldOrBothData)
+                        @if($candidateCategory === 'home_tutor')
+                            Update your home tuition preferences, subjects, and contact details anytime.
+                        @elseif($candidateCategory === 'school_job')
+                            Update your school teaching credentials, experience, and contact details anytime.
+                        @endif
+                    @else
+                        <span x-show="activeCategory === 'home_tutor'">Update your home tuition preferences, subjects, and contact details anytime.</span>
+                        <span x-show="activeCategory === 'school_job'">Update your school teaching credentials, experience, and contact details anytime.</span>
+                        <span x-show="activeCategory === 'both'">Update your profile, teaching preferences, subjects, and contact details anytime.</span>
+                    @endif
                 </p>
             </div>
         </div>
@@ -116,93 +138,98 @@
         <form action="{{ route('candidate.profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            {{-- Teaching Role / Category Selector --}}
-            <div class="p-6 md:p-8 border-b border-slate-100 bg-gradient-to-r from-slate-50 via-blue-50/20 to-slate-50">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
-                            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                Select Your Teaching Role / Category
-                            </h3>
+            @if($isOldOrBothData)
+                {{-- Teaching Role / Category Selector (Only for Old / Unassigned Candidates) --}}
+                <div class="p-6 md:p-8 border-b border-slate-100 bg-gradient-to-r from-slate-50 via-blue-50/20 to-slate-50">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
+                                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                    Select Your Teaching Role / Category
+                                </h3>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">
+                                Choose your desired role below. Your form fields and dashboard will adapt immediately to your selection.
+                            </p>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">
-                            Choose your desired role below. Your form fields and dashboard will adapt immediately to your selection.
-                        </p>
+                        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-700 bg-blue-100/60 px-3 py-1 rounded-full border border-blue-200 self-start sm:self-auto">
+                            <i class="fas fa-hand-pointer text-[10px]"></i> Click to Switch
+                        </span>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-700 bg-blue-100/60 px-3 py-1 rounded-full border border-blue-200 self-start sm:self-auto">
-                        <i class="fas fa-hand-pointer text-[10px]"></i> Click to Switch
-                    </span>
+
+                    {{-- Hidden input bound to Alpine activeCategory for form submission --}}
+                    <input type="hidden" name="candidate_category" :value="activeCategory">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                        {{-- Option 1: Home Tutor Only --}}
+                        <div @click="activeCategory = 'home_tutor'" 
+                             class="relative p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex items-start gap-3.5 select-none"
+                             :class="activeCategory === 'home_tutor' 
+                                ? 'bg-amber-50/70 border-amber-500 shadow-sm ring-2 ring-amber-500/20' 
+                                : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/80'">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-base shrink-0 transition-colors"
+                                 :class="activeCategory === 'home_tutor' ? 'bg-amber-500 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-bold text-slate-800">Home Tutor</h4>
+                                    <i class="fas fa-check-circle text-amber-500 text-sm" x-show="activeCategory === 'home_tutor'"></i>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                    Private home & online tuitions
+                                </p>
+                            </div>
+                        </div>
+
+                        {{-- Option 2: School Teacher Only --}}
+                        <div @click="activeCategory = 'school_job'" 
+                             class="relative p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex items-start gap-3.5 select-none"
+                             :class="activeCategory === 'school_job' 
+                                ? 'bg-blue-50/70 border-blue-600 shadow-sm ring-2 ring-blue-600/20' 
+                                : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/80'">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-base shrink-0 transition-colors"
+                                 :class="activeCategory === 'school_job' ? 'bg-blue-600 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
+                                <i class="fas fa-school"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-bold text-slate-800">School Teacher</h4>
+                                    <i class="fas fa-check-circle text-blue-600 text-sm" x-show="activeCategory === 'school_job'"></i>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                    School & college faculty jobs
+                                </p>
+                            </div>
+                        </div>
+
+                        {{-- Option 3: Both Categories --}}
+                        <div @click="activeCategory = 'both'" 
+                             class="relative p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex items-start gap-3.5 select-none"
+                             :class="activeCategory === 'both' 
+                                ? 'bg-purple-50/70 border-purple-600 shadow-sm ring-2 ring-purple-600/20' 
+                                : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/80'">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-base shrink-0 transition-colors"
+                                 :class="activeCategory === 'both' ? 'bg-purple-600 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-bold text-slate-800">Both Roles</h4>
+                                    <i class="fas fa-check-circle text-purple-600 text-sm" x-show="activeCategory === 'both'"></i>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                    Home tuitions + school jobs
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                {{-- Hidden input bound to Alpine activeCategory for form submission --}}
-                <input type="hidden" name="candidate_category" :value="activeCategory">
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                    {{-- Option 1: Home Tutor Only --}}
-                    <div @click="activeCategory = 'home_tutor'" 
-                         class="relative p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex items-start gap-3.5 select-none"
-                         :class="activeCategory === 'home_tutor' 
-                            ? 'bg-amber-50/70 border-amber-500 shadow-sm ring-2 ring-amber-500/20' 
-                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/80'">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-base shrink-0 transition-colors"
-                             :class="activeCategory === 'home_tutor' ? 'bg-amber-500 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
-                            <i class="fas fa-home"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between">
-                                <h4 class="text-sm font-bold text-slate-800">Home Tutor</h4>
-                                <i class="fas fa-check-circle text-amber-500 text-sm" x-show="activeCategory === 'home_tutor'"></i>
-                            </div>
-                            <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                                Private home & online tuitions
-                            </p>
-                        </div>
-                    </div>
-
-                    {{-- Option 2: School Teacher Only --}}
-                    <div @click="activeCategory = 'school_job'" 
-                         class="relative p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex items-start gap-3.5 select-none"
-                         :class="activeCategory === 'school_job' 
-                            ? 'bg-blue-50/70 border-blue-600 shadow-sm ring-2 ring-blue-600/20' 
-                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/80'">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-base shrink-0 transition-colors"
-                             :class="activeCategory === 'school_job' ? 'bg-blue-600 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
-                            <i class="fas fa-school"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between">
-                                <h4 class="text-sm font-bold text-slate-800">School Teacher</h4>
-                                <i class="fas fa-check-circle text-blue-600 text-sm" x-show="activeCategory === 'school_job'"></i>
-                            </div>
-                            <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                                School & college faculty jobs
-                            </p>
-                        </div>
-                    </div>
-
-                    {{-- Option 3: Both Categories --}}
-                    <div @click="activeCategory = 'both'" 
-                         class="relative p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex items-start gap-3.5 select-none"
-                         :class="activeCategory === 'both' 
-                            ? 'bg-purple-50/70 border-purple-600 shadow-sm ring-2 ring-purple-600/20' 
-                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/80'">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-base shrink-0 transition-colors"
-                             :class="activeCategory === 'both' ? 'bg-purple-600 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
-                            <i class="fas fa-layer-group"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between">
-                                <h4 class="text-sm font-bold text-slate-800">Both Roles</h4>
-                                <i class="fas fa-check-circle text-purple-600 text-sm" x-show="activeCategory === 'both'"></i>
-                            </div>
-                            <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                                Home tuitions + school jobs
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @else
+                {{-- Fixed category hidden field for registered Home Tutor or School Job candidates --}}
+                <input type="hidden" name="candidate_category" value="{{ $candidateCategory }}">
+            @endif
 
             {{-- Section 1: Basic & Personal Information (Common) --}}
             <div class="p-6 md:p-8 border-b border-slate-100">
@@ -329,6 +356,7 @@
                 </div>
             </div>
 
+            @if($candidateCategory === 'home_tutor' || $isOldOrBothData)
             {{-- Section 2: Home Tuition Preferences --}}
             <div x-show="activeCategory === 'home_tutor' || activeCategory === 'both'" 
                  x-transition:enter="transition ease-out duration-300"
@@ -430,7 +458,9 @@
                     </div>
                 </div>
             </div>
+            @endif
             
+            @if($candidateCategory === 'school_job' || $isOldOrBothData)
             {{-- Section 3: School Job Details --}}
             <div x-show="activeCategory === 'school_job' || activeCategory === 'both'" 
                  x-transition:enter="transition ease-out duration-300"
@@ -657,6 +687,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             {{-- Save Button --}}
             <div class="p-6 md:p-8 bg-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">
