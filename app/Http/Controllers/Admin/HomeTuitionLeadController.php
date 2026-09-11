@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 
 use App\Models\ParentServiceChargeInvoice;
 use App\Models\User;
+use App\Models\PaymentTransaction;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class HomeTuitionLeadController extends Controller
@@ -427,5 +429,63 @@ class HomeTuitionLeadController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Documents uploaded and appointment finalized successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $lead = HomeTuitionLead::findOrFail($id);
+
+        // Delete uploaded teacher documents if any
+        if ($lead->id_proof_front) {
+            Storage::disk('public')->delete($lead->id_proof_front);
+        }
+        if ($lead->id_proof_back) {
+            Storage::disk('public')->delete($lead->id_proof_back);
+        }
+        if ($lead->teacher_passport_photo) {
+            Storage::disk('public')->delete($lead->teacher_passport_photo);
+        }
+
+        // Unlink any payment transactions referencing this lead
+        PaymentTransaction::where('tuition_lead_id', $lead->id)->update(['tuition_lead_id' => null]);
+
+        // Explicitly clean up related child records
+        $lead->followUps()->delete();
+        $lead->tuitionApplications()->delete();
+        $lead->serviceChargeInvoices()->delete();
+
+        $lead->delete();
+
+        return redirect()->route('admin.tuition-leads.index')->with('success', 'Tuition lead deleted successfully.');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:home_tuition_leads,id',
+        ]);
+
+        $leads = HomeTuitionLead::whereIn('id', $request->ids)->get();
+
+        foreach ($leads as $lead) {
+            if ($lead->id_proof_front) {
+                Storage::disk('public')->delete($lead->id_proof_front);
+            }
+            if ($lead->id_proof_back) {
+                Storage::disk('public')->delete($lead->id_proof_back);
+            }
+            if ($lead->teacher_passport_photo) {
+                Storage::disk('public')->delete($lead->teacher_passport_photo);
+            }
+
+            PaymentTransaction::where('tuition_lead_id', $lead->id)->update(['tuition_lead_id' => null]);
+            $lead->followUps()->delete();
+            $lead->tuitionApplications()->delete();
+            $lead->serviceChargeInvoices()->delete();
+            $lead->delete();
+        }
+
+        return redirect()->route('admin.tuition-leads.index')->with('success', count($request->ids) . ' tuition leads deleted successfully.');
     }
 }

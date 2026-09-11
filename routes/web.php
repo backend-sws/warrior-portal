@@ -303,6 +303,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/tuition-leads/{id}/service-charge-invoice', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'storeInvoice'])->name('tuition-leads.invoice.store');
     Route::put('/tuition-leads/service-charge-invoice/{invoiceId}/status', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'updateInvoiceStatus'])->name('tuition-leads.invoice.status');
     Route::post('/tuition-leads/{id}/upload-documents', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'uploadTeacherDocuments'])->name('tuition-leads.upload-documents');
+    Route::delete('/tuition-leads/{id}', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'destroy'])->name('tuition-leads.destroy');
+    Route::post('/tuition-leads/bulk-delete', [\App\Http\Controllers\Admin\HomeTuitionLeadController::class, 'bulkDelete'])->name('tuition-leads.bulk-delete');
 
     // Candidate Tuition Appointment & Applications
     Route::get('/tuition-applications', [\App\Http\Controllers\Admin\TuitionApplicationController::class, 'index'])->name('tuition-applications.index');

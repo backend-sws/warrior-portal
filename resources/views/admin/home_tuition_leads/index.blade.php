@@ -60,11 +60,15 @@
     </a>
 </div>
 
-{{-- Filter/Search Bar --}}
 <div class="bg-card-bg rounded-t-2xl border-x border-t border-card-border p-4 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
-    <div class="flex items-center gap-2 text-xs sm:text-sm text-text-dark/60 font-medium whitespace-nowrap">
-        <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span>Showing <strong>{{ $leads->firstItem() ?? 0 }}–{{ $leads->lastItem() ?? 0 }}</strong> of <strong>{{ $leads->total() }}</strong> entries</span>
+    <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex items-center gap-2 text-xs sm:text-sm text-text-dark/60 font-medium whitespace-nowrap">
+            <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Showing <strong>{{ $leads->firstItem() ?? 0 }}–{{ $leads->lastItem() ?? 0 }}</strong> of <strong>{{ $leads->total() }}</strong> entries</span>
+        </div>
+        <button type="submit" form="bulkDeleteForm" id="bulkDeleteBtn" style="display: none;" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center gap-1.5 animate-pulse cursor-pointer">
+            <i class="fas fa-trash-alt text-xs"></i> <span>Delete Selected (<span id="selectedCount">0</span>)</span>
+        </button>
     </div>
 
     <form action="{{ url()->current() }}" method="GET" class="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
@@ -114,6 +118,9 @@
     <table class="w-full text-left border-collapse admin-table">
         <thead>
             <tr>
+                <th class="w-10 text-center">
+                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" class="rounded border-card-border text-accent-blue focus:ring-accent-blue/40 transition-all cursor-pointer">
+                </th>
                 <th class="w-28">Tuition ID</th>
                 <th>Parent Info</th>
                 <th>Class & Board</th>
@@ -126,6 +133,9 @@
         <tbody class="divide-y divide-card-border">
             @forelse($leads as $lead)
             <tr class="group hover:bg-secondary-bg/30 transition-colors">
+                <td class="align-middle text-center">
+                    <input type="checkbox" name="ids[]" value="{{ $lead->id }}" form="bulkDeleteForm" class="lead-checkbox rounded border-card-border text-accent-blue focus:ring-accent-blue/40 transition-all cursor-pointer" onchange="updateSelectedCount()">
+                </td>
                 <td class="align-middle">
                     <span class="inline-flex items-center gap-1 font-mono text-xs font-bold text-accent-blue bg-accent-blue/10 px-2 py-0.5 rounded border border-accent-blue/20">
                         <i class="fas fa-hashtag text-[9px] opacity-70"></i>{{ $lead->tuition_id ?: 'TUI-' . str_pad($lead->id, 4, '0', STR_PAD_LEFT) }}
@@ -250,12 +260,21 @@
                         <a href="https://wa.me/91{{ preg_replace('/[^0-9]/', '', $lead->parent_mobile) }}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white transition-colors" title="WhatsApp Parent">
                             <i class="fab fa-whatsapp text-sm"></i>
                         </a>
+
+                        {{-- Delete Lead Button --}}
+                        <form action="{{ route('admin.tuition-leads.destroy', $lead->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this tuition lead ({{ addslashes($lead->parent_name) }})? This action cannot be undone.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors cursor-pointer" title="Delete Tuition Lead">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                        </form>
                     </div>
                 </td>
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="text-center py-12">
+                <td colspan="8" class="text-center py-12">
                     <div class="flex flex-col items-center justify-center text-text-dark/40">
                         <i class="fas fa-chalkboard-teacher text-4xl mb-3"></i>
                         <p class="text-base font-semibold">No tuition requirements found</p>
@@ -347,5 +366,36 @@
 </div>
 
 </div>
+
+{{-- Form for Bulk Delete --}}
+<form id="bulkDeleteForm" action="{{ route('admin.tuition-leads.bulk-delete') }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete all selected tuition leads? This action cannot be undone.');" style="display: none;">
+    @csrf
+</form>
+
+<script>
+function toggleSelectAll(master) {
+    const checkboxes = document.querySelectorAll('.lead-checkbox');
+    checkboxes.forEach(cb => cb.checked = master.checked);
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const checkedBoxes = document.querySelectorAll('.lead-checkbox:checked');
+    const count = checkedBoxes.length;
+    const btn = document.getElementById('bulkDeleteBtn');
+    const countSpan = document.getElementById('selectedCount');
+    
+    if (countSpan) countSpan.textContent = count;
+    if (btn) {
+        if (count > 0) {
+            btn.style.display = 'inline-flex';
+        } else {
+            btn.style.display = 'none';
+            const master = document.getElementById('selectAllCheckbox');
+            if (master) master.checked = false;
+        }
+    }
+}
+</script>
 
 @endsection

@@ -4,9 +4,18 @@
 @section('subtitle', 'Review details and manage tuition requirement publishing status.')
 
 @section('actions')
-    <a href="{{ route('admin.tuition-leads.index') }}" class="px-4 py-2 bg-secondary-bg border border-card-border hover:border-accent-blue/40 text-text-main rounded-xl text-sm font-semibold transition-all inline-flex items-center gap-2">
-        <i class="fas fa-arrow-left"></i> Back to Tuition Leads
-    </a>
+    <div class="flex items-center gap-2">
+        <a href="{{ route('admin.tuition-leads.index') }}" class="px-4 py-2 bg-secondary-bg border border-card-border hover:border-accent-blue/40 text-text-main rounded-xl text-sm font-semibold transition-all inline-flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Back to Tuition Leads
+        </a>
+        <form action="{{ route('admin.tuition-leads.destroy', $lead->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this tuition requirement? All related data will be removed.');" class="inline">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="px-4 py-2 bg-red-500/10 text-red-600 hover:bg-red-600 hover:text-white border border-red-500/20 rounded-xl text-sm font-semibold transition-all inline-flex items-center gap-2 cursor-pointer">
+                <i class="fas fa-trash-alt text-xs"></i> Delete Lead
+            </button>
+        </form>
+    </div>
 @endsection
 
 @section('content')
