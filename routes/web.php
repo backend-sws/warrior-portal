@@ -13,6 +13,13 @@ Route::post('/school-requirement/post', [\App\Http\Controllers\HomeController::c
 Route::get('/school-hiring-success', function () {
     return view('pages.school-hiring-success');
 })->name('school.requirement.success');
+
+// Direct Shareable Routes for Modal Forms
+Route::redirect('/join-as-tutor', '/?form=home_tutor');
+Route::redirect('/join-as-teacher', '/?form=school_job');
+Route::redirect('/post-tuition', '/?form=tuition');
+Route::redirect('/school-hiring', '/?form=school');
+Route::redirect('/both-registration', '/?form=both');
 Route::get('/jobs', [\App\Http\Controllers\HomeController::class, 'jobs'])->name('jobs');
 Route::get('/tuitions', [\App\Http\Controllers\HomeController::class, 'tuitions'])->name('tuitions');
 Route::get('/tuitions/{tuition}', [\App\Http\Controllers\HomeController::class, 'showTuition'])->name('tuitions.show');

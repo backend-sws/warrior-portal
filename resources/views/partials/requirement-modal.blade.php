@@ -7,17 +7,19 @@
 @endphp
 
 <script>
-window.openRequirementModal = function(tab = 'tuition') {
-    window.dispatchEvent(new CustomEvent('open-requirement-modal', { detail: { tab: tab } }));
+window.openRequirementModal = function(tab = 'tuition', category = null) {
+    window.dispatchEvent(new CustomEvent('open-requirement-modal', { detail: { tab: tab, category: category } }));
 };
 
 function globalRequirementModal() {
     return {
         openPostModal: false,
+        isDirectLink: false,
         tab: 'tuition',
         submitting: false,
         successMessage: '',
         errorMessage: '',
+        fieldErrors: {},
         selectedCategory: '',
         subjects: [],
         loadingSubjects: false,
@@ -104,6 +106,14 @@ function globalRequirementModal() {
         },
 
         init() {
+            // Check URL parameters on page load
+            this.checkUrlParams();
+
+            // Support Browser Back / Forward buttons
+            window.addEventListener('popstate', () => {
+                this.checkUrlParams();
+            });
+
             this.$watch('tab', () => {
                 this.$nextTick(() => {
                     const modalEl = document.getElementById('requirement-modal');
@@ -123,6 +133,7 @@ function globalRequirementModal() {
             });
 
             window.addEventListener('open-requirement-modal', (e) => {
+                this.isDirectLink = false;
                 this.openPostModal = true;
                 if (e.detail && e.detail.tab) {
                     const reqTab = e.detail.tab;
@@ -130,19 +141,25 @@ function globalRequirementModal() {
                         this.tab = 'tuition';
                     } else if (reqTab === 'school') {
                         this.tab = 'school';
-                    } else if (reqTab === 'home_tutor') {
+                    } else if (reqTab === 'home_tutor' || reqTab === 'tutor') {
                         this.tab = 'teacher';
                         this.candidateCategory = 'home_tutor';
-                    } else if (reqTab === 'teacher' || reqTab === 'school_job') {
+                    } else if (reqTab === 'school_job' || reqTab === 'school_teacher') {
                         this.tab = 'teacher';
                         this.candidateCategory = 'school_job';
-                    } else if (reqTab === 'both') {
+                    } else if (reqTab === 'both' || reqTab === 'dual') {
                         this.tab = 'teacher';
                         this.candidateCategory = 'both';
+                    } else if (reqTab === 'teacher') {
+                        this.tab = 'teacher';
+                        if (e.detail.category) {
+                            this.candidateCategory = e.detail.category;
+                        }
                     } else {
                         this.tab = reqTab;
                     }
                 }
+                this.updateUrl(this.tab, this.candidateCategory);
                 this.successMessage = '';
                 this.errorMessage = '';
                 this.fieldErrors = {};
@@ -164,6 +181,109 @@ function globalRequirementModal() {
                     this.userLng = e.detail.lng;
                 }
             });
+        },
+
+        checkUrlParams() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const formParam = params.get('form') || params.get('open');
+                const typeParam = params.get('type') || params.get('category');
+
+                if (formParam) {
+                    const rawForm = formParam.toLowerCase().trim().replace(/-/g, '_');
+                    const rawType = typeParam ? typeParam.toLowerCase().trim().replace(/-/g, '_') : '';
+
+                    this.isDirectLink = true;
+                    this.openPostModal = true;
+                    this.successMessage = '';
+                    this.errorMessage = '';
+                    this.fieldErrors = {};
+
+                    if (rawForm === 'tuition' || rawForm === 'tuition_need' || rawForm === 'tuition_post' || rawForm === 'parent') {
+                        this.tab = 'tuition';
+                    } else if (rawForm === 'school' || rawForm === 'school_hiring') {
+                        this.tab = 'school';
+                    } else if (rawForm === 'home_tutor' || rawForm === 'tutor' || (rawForm === 'teacher' && (rawType === 'home_tutor' || rawType === 'tutor'))) {
+                        this.tab = 'teacher';
+                        this.candidateCategory = 'home_tutor';
+                    } else if (rawForm === 'school_job' || rawForm === 'school_teacher' || (rawForm === 'teacher' && (rawType === 'school_job' || rawType === 'school_teacher'))) {
+                        this.tab = 'teacher';
+                        this.candidateCategory = 'school_job';
+                    } else if (rawForm === 'both' || rawForm === 'dual' || (rawForm === 'teacher' && (rawType === 'both' || rawType === 'dual'))) {
+                        this.tab = 'teacher';
+                        this.candidateCategory = 'both';
+                    } else if (rawForm === 'teacher') {
+                        this.tab = 'teacher';
+                        this.candidateCategory = 'home_tutor';
+                    } else {
+                        this.tab = rawForm;
+                    }
+
+                    this.$nextTick(() => {
+                        const modalEl = document.getElementById('requirement-modal');
+                        if (modalEl && typeof window.initSearchableSelects === 'function') {
+                            window.initSearchableSelects(modalEl);
+                        }
+                    });
+
+                    if (!this.userLat && !window.userDetectedLocation) {
+                        this.detectLocation(true);
+                    }
+                }
+            } catch (err) {
+                console.warn('URL param parse error:', err);
+            }
+        },
+
+        closeModal() {
+            this.openPostModal = false;
+            this.isDirectLink = false;
+            this.clearUrlParams();
+        },
+
+        clearUrlParams() {
+            try {
+                const url = new URL(window.location.href);
+                let changed = false;
+                ['form', 'open', 'type', 'category'].forEach(p => {
+                    if (url.searchParams.has(p)) {
+                        url.searchParams.delete(p);
+                        changed = true;
+                    }
+                });
+                if (changed) {
+                    const cleanUrl = url.pathname + (url.search ? url.search : '') + url.hash;
+                    window.history.replaceState({}, '', cleanUrl);
+                }
+            } catch (e) {}
+        },
+
+        updateUrl(tab, category = null) {
+            try {
+                if (this.isDirectLink) return;
+                const url = new URL(window.location.href);
+                if (tab === 'tuition') {
+                    url.searchParams.set('form', 'tuition');
+                    url.searchParams.delete('type');
+                    url.searchParams.delete('category');
+                } else if (tab === 'school') {
+                    url.searchParams.set('form', 'school');
+                    url.searchParams.delete('type');
+                    url.searchParams.delete('category');
+                } else if (tab === 'teacher') {
+                    const cat = category || this.candidateCategory || 'home_tutor';
+                    if (cat === 'home_tutor') {
+                        url.searchParams.set('form', 'home_tutor');
+                    } else if (cat === 'school_job') {
+                        url.searchParams.set('form', 'school_job');
+                    } else if (cat === 'both') {
+                        url.searchParams.set('form', 'both');
+                    }
+                    url.searchParams.delete('type');
+                    url.searchParams.delete('category');
+                }
+                window.history.replaceState({}, '', url.toString());
+            } catch (e) {}
         },
 
         setSelectLoading(selectEl, placeholder) {
@@ -566,12 +686,12 @@ function globalRequirementModal() {
 
 <div id="requirement-modal" 
      x-data="globalRequirementModal()" 
-     x-on:open-requirement-modal.window="openPostModal = true; if($event.detail && $event.detail.tab) { tab = $event.detail.tab; } successMessage = ''; errorMessage = ''; fieldErrors = {};"
+     x-on:open-requirement-modal.window="isDirectLink = false; openPostModal = true; if($event.detail && $event.detail.tab) { tab = $event.detail.tab; if($event.detail.category) candidateCategory = $event.detail.category; } successMessage = ''; errorMessage = ''; fieldErrors = {}; updateUrl(tab, candidateCategory);"
      class="relative z-[9999]">
 
     <div x-show="openPostModal" style="display: none;" class="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md overflow-y-auto" x-transition.opacity>
         <div class="min-h-screen flex items-start justify-center p-3 sm:p-6 py-10 md:py-12">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-100 relative" @click.away="openPostModal = false" x-transition.scale>
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-100 relative" @click.away="closeModal()" x-transition.scale>
                 
                 <!-- Modal Header -->
                 <div class="bg-[#031b4e] p-5 sm:p-7 text-white relative shrink-0">
@@ -601,26 +721,38 @@ function globalRequirementModal() {
                                 </span>
                             </p>
                         </div>
-                        <button type="button" @click="openPostModal = false" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors shrink-0 ml-3 cursor-pointer">
+                        <button type="button" @click="closeModal()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors shrink-0 ml-3 cursor-pointer">
                             <i class="fas fa-times text-sm"></i>
                         </button>
                     </div>
 
-                    <!-- Modern 3-Tab Switcher -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 bg-white/10 p-1.5 rounded-2xl gap-2 mt-5 relative z-10 border border-white/10">
-                        <button type="button" @click="tab = 'tuition'; successMessage = ''; errorMessage = ''; fieldErrors = {};" 
+                    <!-- Direct Form Indicator (Shown when opened via specific shareable link) -->
+                    <div x-show="isDirectLink" class="mt-4 flex flex-wrap items-center justify-between bg-white/10 px-4 py-2 rounded-2xl border border-white/15 gap-2" style="display: none;">
+                        <div class="flex items-center gap-2 text-xs text-white/90 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Direct Form View</span>
+                        </div>
+                        <button type="button" @click="isDirectLink = false" class="text-[11px] font-bold text-amber-300 hover:text-white underline flex items-center gap-1 transition-colors cursor-pointer">
+                            <span>Show all registration options</span>
+                            <i class="fas fa-chevron-down text-[9px]"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modern 3-Tab Switcher (Hidden when visiting via direct shareable link) -->
+                    <div x-show="!isDirectLink" class="grid grid-cols-1 sm:grid-cols-3 bg-white/10 p-1.5 rounded-2xl gap-2 mt-5 relative z-10 border border-white/10">
+                        <button type="button" @click="tab = 'tuition'; successMessage = ''; errorMessage = ''; fieldErrors = {}; updateUrl('tuition');" 
                                 :class="tab === 'tuition' ? 'bg-white text-[#031b4e] shadow-lg font-black scale-[1.01]' : 'text-white/80 hover:text-white font-bold'" 
                                 class="py-2.5 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                             <i class="fas fa-graduation-cap text-[#0ea5e9]"></i> 
                             <span>Tuition Post Requirement</span>
                         </button>
-                        <button type="button" @click="tab = 'school'; successMessage = ''; errorMessage = ''; fieldErrors = {};" 
+                        <button type="button" @click="tab = 'school'; successMessage = ''; errorMessage = ''; fieldErrors = {}; updateUrl('school');" 
                                 :class="tab === 'school' ? 'bg-white text-[#031b4e] shadow-lg font-black scale-[1.01]' : 'text-white/80 hover:text-white font-bold'" 
                                 class="py-2.5 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                             <i class="fas fa-school text-purple-400"></i> 
                             <span>School Hiring</span>
                         </button>
-                        <button type="button" @click="tab = 'teacher'; successMessage = ''; errorMessage = ''; fieldErrors = {};" 
+                        <button type="button" @click="tab = 'teacher'; successMessage = ''; errorMessage = ''; fieldErrors = {}; updateUrl('teacher', candidateCategory);" 
                                 :class="tab === 'teacher' ? 'bg-white text-[#031b4e] shadow-lg font-black scale-[1.01]' : 'text-white/80 hover:text-white font-bold'" 
                                 class="py-2.5 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                             <i class="fas fa-chalkboard-teacher text-amber-400"></i> 
@@ -787,7 +919,7 @@ function globalRequirementModal() {
                         </div>
 
                         <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 items-center">
-                            <button type="button" @click="openPostModal = false" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
+                            <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
                                 Cancel
                             </button>
                             <button type="submit" :disabled="submitting" class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-xs transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
@@ -802,8 +934,8 @@ function globalRequirementModal() {
 
                 {{-- TAB 2: JOIN AS A TEACHER (HOME TUTOR, SCHOOL TEACHER & BOTH) --}}
                 <div x-show="tab === 'teacher'">
-                    {{-- Sub-Switcher for Teacher Modes: Home Tutor, Join as Teacher (School), Both --}}
-                    <div class="mb-6 p-2 bg-gradient-to-r from-slate-100 via-sky-50/50 to-slate-100 rounded-2xl border border-slate-200/80 shadow-xs">
+                    {{-- Sub-Switcher for Teacher Modes: Home Tutor, Join as Teacher (School), Both (Hidden on direct shareable links) --}}
+                    <div x-show="!isDirectLink" class="mb-6 p-2 bg-gradient-to-r from-slate-100 via-sky-50/50 to-slate-100 rounded-2xl border border-slate-200/80 shadow-xs">
                         <div class="px-2 py-1 mb-1.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
                             <span class="flex items-center gap-1.5">
                                 <i class="fas fa-chalkboard-teacher text-amber-500"></i> Select Your Teaching Preference:
@@ -811,19 +943,19 @@ function globalRequirementModal() {
                             <span class="text-[10px] font-semibold text-slate-400">Choose one to display registration form</span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <button type="button" @click="candidateCategory = 'home_tutor'; errorMessage = ''; fieldErrors = {};"
+                            <button type="button" @click="candidateCategory = 'home_tutor'; errorMessage = ''; fieldErrors = {}; updateUrl('teacher', 'home_tutor');"
                                     :class="candidateCategory === 'home_tutor' ? 'bg-white text-[#031b4e] shadow-md font-black border-2 border-[#0ea5e9] scale-[1.01]' : 'bg-white/60 text-slate-600 hover:text-slate-900 hover:bg-white font-bold border border-transparent'"
                                     class="py-2.5 px-3 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fas fa-home text-[#0ea5e9]"></i>
                                 <span>Home Tutor Only</span>
                             </button>
-                            <button type="button" @click="candidateCategory = 'school_job'; errorMessage = ''; fieldErrors = {};"
+                            <button type="button" @click="candidateCategory = 'school_job'; errorMessage = ''; fieldErrors = {}; updateUrl('teacher', 'school_job');"
                                     :class="candidateCategory === 'school_job' ? 'bg-white text-[#031b4e] shadow-md font-black border-2 border-amber-500 scale-[1.01]' : 'bg-white/60 text-slate-600 hover:text-slate-900 hover:bg-white font-bold border border-transparent'"
                                     class="py-2.5 px-3 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fas fa-chalkboard-teacher text-amber-500"></i>
                                 <span>School Job Only</span>
                             </button>
-                            <button type="button" @click="candidateCategory = 'both'; errorMessage = ''; fieldErrors = {};"
+                            <button type="button" @click="candidateCategory = 'both'; errorMessage = ''; fieldErrors = {}; updateUrl('teacher', 'both');"
                                     :class="candidateCategory === 'both' ? 'bg-white text-[#031b4e] shadow-md font-black border-2 border-emerald-500 scale-[1.01]' : 'bg-white/60 text-slate-600 hover:text-slate-900 hover:bg-white font-bold border border-transparent'"
                                     class="py-2.5 px-3 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fas fa-handshake text-emerald-600"></i>
@@ -1030,7 +1162,7 @@ function globalRequirementModal() {
 
                             {{-- Submit & Cancel Button Row --}}
                             <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 items-center">
-                                <button type="button" @click="openPostModal = false" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
+                                <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
                                     Cancel
                                 </button>
                                 <button type="submit" :disabled="submitting" class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-xs transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
@@ -1287,7 +1419,7 @@ function globalRequirementModal() {
 
                         {{-- Submit & Cancel Button Row --}}
                         <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 items-center">
-                            <button type="button" @click="openPostModal = false" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
+                            <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
                                 Cancel
                             </button>
                             <button type="submit" :disabled="submitting" class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-xs transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
@@ -1617,7 +1749,7 @@ function globalRequirementModal() {
 
                         {{-- Submit & Cancel Button Row --}}
                         <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 items-center">
-                            <button type="button" @click="openPostModal = false" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
+                            <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
                                 Cancel
                             </button>
                             <button type="submit" :disabled="submitting" class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-xs transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
@@ -1858,7 +1990,7 @@ function globalRequirementModal() {
                         </div>
 
                         <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 items-center">
-                            <button type="button" @click="openPostModal = false" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
+                            <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
                                 Cancel
                             </button>
                             <button type="submit" :disabled="submitting" class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-xs transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"

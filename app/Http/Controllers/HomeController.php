@@ -190,7 +190,7 @@ class HomeController extends Controller
             'school_name' => ['required', 'string', 'min:3', 'max:200'],
             'contact_person' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
             'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
-            'email' => ['nullable', 'email:rfc,dns', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
             'title' => ['required', 'string', 'min:3', 'max:200'],
             'category_id' => ['required', 'exists:categories,id'],
             'subject_id' => ['required', 'exists:subjects,id'],
@@ -219,9 +219,49 @@ class HomeController extends Controller
 
         $baseDescription = $validated['description'] ?? 'Submitted via website quick requirement form';
 
-        // 1. Create JobPost with pending approval status
+        // 1. Resolve or auto-register Employer User & Profile for Schools CRM
+        $cleanPhone = preg_replace('/[^0-9]/', '', $validated['phone']);
+        $schoolEmail = $validated['email'] ?? ($cleanPhone . '@school.warriorseducare.com');
+
+        $employerUser = null;
+        if (auth()->check() && auth()->user()->role === 'employer') {
+            $employerUser = auth()->user();
+        } else {
+            $employerUser = \App\Models\User::where('phone', $validated['phone'])
+                ->orWhere('email', $schoolEmail)
+                ->first();
+
+            if (!$employerUser) {
+                $employerUser = \App\Models\User::create([
+                    'name' => $validated['school_name'],
+                    'phone' => $validated['phone'],
+                    'email' => $schoolEmail,
+                    'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
+                    'role' => 'employer',
+                    'is_active' => true,
+                    'email_verified_at' => now(),
+                ]);
+            }
+        }
+
+        // Upsert EmployerProfile so the submission is instantly visible in Admin -> Schools & Colleges CRM!
+        \App\Models\EmployerProfile::updateOrCreate(
+            ['user_id' => $employerUser->id],
+            [
+                'school_name' => $validated['school_name'],
+                'contact_person' => $validated['contact_person'],
+                'phone' => $validated['phone'],
+                'email' => $validated['email'] ?? null,
+                'state_id' => $validated['state_id'],
+                'city_id' => $validated['city_id'],
+                'institution_type' => 'School',
+                'status' => 'Lead / Prospect',
+            ]
+        );
+
+        // 2. Create JobPost with pending approval status
         $jobPost = \App\Models\JobPost::create([
-            'user_id' => (auth()->check() && auth()->user()->role === 'employer') ? auth()->id() : null,
+            'user_id' => $employerUser->id,
             'school_name' => $validated['school_name'],
             'contact_person' => $validated['contact_person'],
             'email' => $validated['email'] ?? ($validated['phone'] . '@school.warriorseducare.com'),
@@ -240,7 +280,7 @@ class HomeController extends Controller
             'status' => 'pending',
         ]);
 
-        // 2. Notify Admin to review and approve in Job Approvals
+        // 3. Notify Admin to review and approve in Job Approvals
         \App\Helpers\NotificationHelper::notifyAdmin(
             'New Job Requirement Awaiting Approval',
             $validated['school_name'] . ' submitted a new job: "' . $validated['title'] . '". Review and approve in Job Approvals.',

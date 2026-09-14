@@ -173,10 +173,10 @@
 
                 <a href="{{ route('admin.jobs.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.jobs.*') ? 'active' : '' }} px-4 py-2.5 rounded-lg flex items-center gap-3 text-sm">
-                    <i class="fas fa-briefcase w-5 text-center"></i> All Jobs
+                    <i class="fas fa-briefcase w-5 text-center"></i> School Job Posts
                     @php $pendingJobsCount = \App\Models\JobPost::where('status', 'pending')->count(); @endphp
                     @if($pendingJobsCount > 0)
-                        <span class="ml-auto bg-accent-yellow text-[#031b4e] text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $pendingJobsCount }}</span>
+                        <span class="ml-auto bg-accent-yellow text-[#031b4e] text-[10px] font-black px-2 py-0.5 rounded-full" title="{{ $pendingJobsCount }} Awaiting Approval">{{ $pendingJobsCount }} Pending</span>
                     @endif
                 </a>
                 <a href="{{ route('admin.applications.index') }}"

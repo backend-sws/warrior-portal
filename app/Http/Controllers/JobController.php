@@ -123,7 +123,7 @@ class JobController extends Controller
         $request->validate([
             'school_name' => ['required', 'string', 'min:3', 'max:200'],
             'contact_person' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
-            'email' => ['required', 'email:rfc,dns', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
             'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
             'title' => ['required', 'string', 'min:3', 'max:200'],
             'description' => ['nullable', 'string', 'max:3000'],
@@ -155,8 +155,45 @@ class JobController extends Controller
             'city_id.required' => 'Please select a city or enter it manually.',
         ]);
 
+        // Resolve or auto-register Employer User & Profile for Schools CRM
+        $employerUser = null;
+        if (auth()->check() && auth()->user()->role === 'employer') {
+            $employerUser = auth()->user();
+        } else {
+            $employerUser = \App\Models\User::where('phone', $request->phone)
+                ->orWhere('email', $request->email)
+                ->first();
+
+            if (!$employerUser) {
+                $employerUser = \App\Models\User::create([
+                    'name' => $request->school_name,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
+                    'role' => 'employer',
+                    'is_active' => true,
+                    'email_verified_at' => now(),
+                ]);
+            }
+        }
+
+        // Upsert EmployerProfile so it immediately appears in Admin -> Schools & Colleges CRM!
+        \App\Models\EmployerProfile::updateOrCreate(
+            ['user_id' => $employerUser->id],
+            [
+                'school_name' => $request->school_name,
+                'contact_person' => $request->contact_person,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'state_id' => $request->state_id,
+                'city_id' => $request->city_id,
+                'institution_type' => 'School',
+                'status' => 'Lead / Prospect',
+            ]
+        );
+
         JobPost::create([
-            'user_id' => auth()->check() && auth()->user()->role === 'employer' ? auth()->id() : null,
+            'user_id' => $employerUser->id,
             'school_name' => $request->school_name,
             'contact_person' => $request->contact_person,
             'email' => $request->email,

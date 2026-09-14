@@ -12,6 +12,29 @@
 
 @section('content')
 
+@php
+    $pendingJobsCount = \App\Models\JobPost::where('status', 'pending')->count();
+@endphp
+@if($pendingJobsCount > 0)
+    <div class="mb-6 bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border border-amber-300/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500 text-[#031b4e] flex items-center justify-center font-bold text-base shadow-sm">
+                <i class="fas fa-briefcase"></i>
+            </div>
+            <div>
+                <h4 class="font-black text-[#031b4e] text-sm flex items-center gap-2">
+                    <span>{{ $pendingJobsCount }} School Teacher Requirement(s) Awaiting Approval</span>
+                    <span class="bg-amber-200 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-black">Action Required</span>
+                </h4>
+                <p class="text-xs text-slate-600 mt-0.5">Institutions have submitted hiring requirements from the portal. Review and approve them to go live.</p>
+            </div>
+        </div>
+        <a href="{{ route('admin.jobs.index', ['status' => 'pending']) }}" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-[#031b4e] font-black text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 whitespace-nowrap">
+            <i class="fas fa-check-circle"></i> <span>Review & Approve Jobs</span> <i class="fas fa-arrow-right text-[10px]"></i>
+        </a>
+    </div>
+@endif
+
 {{-- Quick Stats Cards --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <a href="{{ route('admin.schools.index') }}"
