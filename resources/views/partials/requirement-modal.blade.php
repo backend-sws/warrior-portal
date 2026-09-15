@@ -8,8 +8,23 @@
 
 <script>
 window.openRequirementModal = function(tab = 'tuition', category = null) {
-    window.dispatchEvent(new CustomEvent('open-requirement-modal', { detail: { tab: tab, category: category } }));
+    if (tab === 'school') {
+        window.location.href = "{{ route('forms.hire-teacher') }}";
+        return;
+    }
+    if (tab === 'teacher' || tab === 'candidate') {
+        if (category === 'home_tutor') {
+            window.location.href = "{{ route('apply.home-tutor') }}";
+        } else if (category === 'school_teacher' || category === 'school') {
+            window.location.href = "{{ route('apply.school-teacher') }}";
+        } else {
+            window.location.href = "{{ route('apply.both') }}";
+        }
+        return;
+    }
+    window.location.href = "{{ route('forms.need-tutor') }}";
 };
+
 
 function globalRequirementModal() {
     return {

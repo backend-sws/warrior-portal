@@ -15,11 +15,21 @@ Route::get('/school-hiring-success', function () {
 })->name('school.requirement.success');
 
 // Direct Shareable Routes for Modal Forms
-Route::redirect('/join-as-tutor', '/?form=home_tutor');
-Route::redirect('/join-as-teacher', '/?form=school_job');
-Route::redirect('/post-tuition', '/?form=tuition');
-Route::redirect('/school-hiring', '/?form=school');
-Route::redirect('/both-registration', '/?form=both');
+Route::redirect('/join-as-tutor', '/apply/home-tutor');
+Route::redirect('/join-as-teacher', '/apply/school-teacher');
+// Standalone Public Forms (Dedicated Shareable Pages)
+Route::get('/apply/home-tutor', [\App\Http\Controllers\PublicFormController::class, 'homeTutor'])->name('apply.home-tutor');
+Route::get('/apply/school-teacher', [\App\Http\Controllers\PublicFormController::class, 'schoolTeacher'])->name('apply.school-teacher');
+Route::get('/apply/both', [\App\Http\Controllers\PublicFormController::class, 'both'])->name('apply.both');
+Route::get('/need-tutor', [\App\Http\Controllers\PublicFormController::class, 'needTutor'])->name('forms.need-tutor');
+Route::get('/hire-teacher', [\App\Http\Controllers\PublicFormController::class, 'hireTeacher'])->name('forms.hire-teacher');
+
+// Friendly aliases and redirects
+Route::redirect('/post-tuition', '/need-tutor');
+Route::redirect('/school-hiring', '/hire-teacher');
+Route::redirect('/both-registration', '/apply/both');
+Route::redirect('/apply/tutor', '/apply/home-tutor');
+Route::redirect('/apply/teacher', '/apply/school-teacher');
 Route::get('/jobs', [\App\Http\Controllers\HomeController::class, 'jobs'])->name('jobs');
 Route::get('/tuitions', [\App\Http\Controllers\HomeController::class, 'tuitions'])->name('tuitions');
 Route::get('/tuitions/{tuition}', [\App\Http\Controllers\HomeController::class, 'showTuition'])->name('tuitions.show');

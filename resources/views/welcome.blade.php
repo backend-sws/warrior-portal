@@ -72,8 +72,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 relative z-10">
                 
                 <!-- Card 1: Tuition Post Requirement -->
-                <button type="button" 
-                        @click="showWelcomeModal = false; openRequirementModal('tuition')" 
+                <a href="{{ route('forms.need-tutor') }}" 
                         class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-blue-50/60 via-white to-blue-50/30 hover:from-blue-50/90 hover:to-white border-2 border-blue-100 hover:border-blue-500 shadow-xs hover:shadow-xl hover:shadow-blue-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-blue-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
@@ -91,11 +90,10 @@
                             <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
                         </div>
                     </div>
-                </button>
+                </a>
                 
                 <!-- Card 2: School Hiring Form -->
-                <button type="button" 
-                        @click="showWelcomeModal = false; openRequirementModal('school')" 
+                <a href="{{ route('forms.hire-teacher') }}" 
                         class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-indigo-50/60 via-white to-purple-50/30 hover:from-indigo-50/90 hover:to-white border-2 border-indigo-100 hover:border-indigo-500 shadow-xs hover:shadow-xl hover:shadow-indigo-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-indigo-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
@@ -113,11 +111,10 @@
                             <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
                         </div>
                     </div>
-                </button>
+                </a>
                 
                 <!-- Card 3: Teacher Registration Form -->
-                <button type="button" 
-                        @click="showWelcomeModal = false; openRequirementModal('teacher')" 
+                <a href="{{ route('apply.both') }}" 
                         class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-amber-50/60 via-white to-orange-50/30 hover:from-amber-50/90 hover:to-white border-2 border-amber-100 hover:border-amber-500 shadow-xs hover:shadow-xl hover:shadow-amber-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
                     <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
@@ -135,7 +132,7 @@
                             <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
                         </div>
                     </div>
-                </button>
+                </a>
 
             </div>
             
@@ -239,10 +236,10 @@
         }
     </style>
 
-    <section class="relative w-full bg-[#f4f7f9] pt-[140px] pb-16 lg:pt-[160px] lg:pb-24 overflow-hidden font-sans">
+    <section class="relative z-30 w-full bg-[#f4f7f9] pt-[140px] pb-20 lg:pt-[160px] lg:pb-32 font-sans">
         
-        <!-- Blurred Background Pattern -->
-        <div class="absolute inset-0 z-0 pointer-events-none">
+        <!-- Blurred Background Pattern (overflow-hidden only on background orbs to avoid clipping dropdown) -->
+        <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
             
             <!-- Blurred Gradient Orbs -->
             <div class="absolute -top-[15%] -left-[10%] w-[50%] h-[70%] rounded-full bg-gradient-to-br from-blue-400/20 to-indigo-500/10 blur-[100px]"></div>
@@ -289,8 +286,7 @@
 
                 <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-3.5">
                     <!-- Button 1: Need a Home Tutor (Tuition Requirement Form) -->
-                    <button type="button" 
-                            onclick="openRequirementModal('tuition')" 
+                    <a href="{{ route('forms.need-tutor') }}" 
                             id="btn-tuition" 
                             title="Tuition Requirement Form"
                             class="group bg-[#031b4e] hover:bg-[#021030] text-white px-5 sm:px-6 py-3 rounded-2xl sm:rounded-full text-center hover:scale-105 transition-all shadow-lg hover:shadow-xl hover:shadow-blue-950/25 flex items-center justify-center gap-2.5 cursor-pointer">
@@ -299,11 +295,10 @@
                             <span class="block font-black text-[13px] sm:text-[14px] leading-tight">Need a Home Tutor</span>
                             <span class="block text-[10px] text-cyan-300 font-semibold tracking-wide mt-0.5">Tuition Requirement Form →</span>
                         </div>
-                    </button>
+                    </a>
 
                     <!-- Button 2: Hire School Staff (School Hiring Form) -->
-                    <button type="button" 
-                            onclick="openRequirementModal('school')" 
+                    <a href="{{ route('forms.hire-teacher') }}" 
                             id="btn-school" 
                             title="School Hiring Form"
                             class="group bg-[#0ea5e9] hover:bg-[#0284c7] text-white px-5 sm:px-6 py-3 rounded-2xl sm:rounded-full text-center hover:scale-105 transition-all shadow-lg hover:shadow-xl hover:shadow-sky-500/25 flex items-center justify-center gap-2.5 cursor-pointer">
@@ -312,21 +307,67 @@
                             <span class="block font-black text-[13px] sm:text-[14px] leading-tight">Hire School Staff</span>
                             <span class="block text-[10px] text-white/95 font-semibold tracking-wide mt-0.5">School Hiring Form →</span>
                         </div>
-                    </button>
+                    </a>
 
-                    <!-- Button 3: Join as Teacher / Tutor (Teacher Registration Form) -->
+                    <!-- Button 3: Join as Teacher / Tutor (Teacher Registration Form with Dropdown) -->
                     @guest
-                        <button type="button" 
-                                onclick="openTeacherModal()" 
-                                id="btn-join" 
-                                title="Teacher Registration Form"
-                                class="group bg-white hover:bg-slate-50 text-[#031b4e] px-5 sm:px-6 py-3 rounded-2xl sm:rounded-full text-center hover:scale-105 transition-all border-2 border-slate-200 hover:border-[#031b4e]/40 shadow-md flex items-center justify-center gap-2.5 cursor-pointer">
-                            <i class="fas fa-chalkboard-teacher text-amber-500 text-base"></i>
-                            <div class="text-left">
-                                <span class="block font-black text-[13px] sm:text-[14px] leading-tight">Join as Teacher / Tutor</span>
-                                <span class="block text-[10px] text-slate-500 font-semibold tracking-wide mt-0.5">Teacher Registration Form →</span>
+                        <div class="relative" x-data="{ openHeroTeacher: false }" @click.away="openHeroTeacher = false">
+                            <button type="button" 
+                                    @click="openHeroTeacher = !openHeroTeacher"
+                                    id="btn-join" 
+                                    title="Teacher Registration Form"
+                                    class="group bg-white hover:bg-slate-50 text-[#031b4e] px-5 sm:px-6 py-3 rounded-2xl sm:rounded-full text-center hover:scale-105 transition-all border-2 border-slate-200 hover:border-[#031b4e]/40 shadow-md flex items-center justify-center gap-2.5 cursor-pointer">
+                                <i class="fas fa-chalkboard-teacher text-amber-500 text-base"></i>
+                                <div class="text-left">
+                                    <span class="block font-black text-[13px] sm:text-[14px] leading-tight flex items-center gap-1.5">
+                                        <span>Join as Teacher / Tutor</span>
+                                        <i class="fas fa-chevron-down text-[10px] text-amber-500 transition-transform duration-200" :class="openHeroTeacher ? 'rotate-180' : ''"></i>
+                                    </span>
+                                    <span class="block text-[10px] text-slate-500 font-semibold tracking-wide mt-0.5">Teacher Registration Form ▾</span>
+                                </div>
+                            </button>
+
+                            <div x-show="openHeroTeacher"
+                                 x-cloak
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                 class="absolute left-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border-2 border-amber-300 p-2.5 z-[100] text-left">
+                                <div class="px-2.5 py-1 mb-1 border-b border-slate-100">
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Choose Teaching Role</span>
+                                </div>
+                                <a href="{{ route('apply.home-tutor') }}" class="flex items-center gap-3 p-2 rounded-xl hover:bg-emerald-50 transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm shrink-0 group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-home"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <span class="block text-xs font-bold text-[#031b4e]">Home Tutor Registration</span>
+                                        <span class="block text-[10px] text-slate-500">Private tuitions at home/online</span>
+                                    </div>
+                                </a>
+                                <a href="{{ route('apply.school-teacher') }}" class="flex items-center gap-3 p-2 rounded-xl hover:bg-amber-50 transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm shrink-0 group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <span class="block text-xs font-bold text-[#031b4e]">School Teacher Job</span>
+                                        <span class="block text-[10px] text-slate-500">CBSE & ICSE school vacancies</span>
+                                    </div>
+                                </a>
+                                <a href="{{ route('apply.both') }}" class="flex items-center gap-3 p-2 rounded-xl hover:bg-indigo-50 transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm shrink-0 group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-layer-group"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <span class="block text-xs font-bold text-[#031b4e]">Both (Tutor + School)</span>
+                                        <span class="block text-[10px] text-slate-500">Dual profile for all opportunities</span>
+                                    </div>
+                                </a>
                             </div>
-                        </button>
+                        </div>
                     @else
                         <a href="{{ route('candidate.dashboard') }}" 
                            id="btn-join" 
@@ -334,8 +375,8 @@
                            class="group bg-white hover:bg-slate-50 text-[#031b4e] px-5 sm:px-6 py-3 rounded-2xl sm:rounded-full text-center hover:scale-105 transition-all border-2 border-slate-200 hover:border-[#031b4e]/40 shadow-md flex items-center justify-center gap-2.5 cursor-pointer">
                             <i class="fas fa-chalkboard-teacher text-amber-500 text-base"></i>
                             <div class="text-left">
-                                <span class="block font-black text-[13px] sm:text-[14px] leading-tight">Join as Teacher / Tutor</span>
-                                <span class="block text-[10px] text-slate-500 font-semibold tracking-wide mt-0.5">Teacher Registration Form →</span>
+                                <span class="block font-black text-[13px] sm:text-[14px] leading-tight">Candidate Dashboard</span>
+                                <span class="block text-[10px] text-slate-500 font-semibold tracking-wide mt-0.5">Manage Your Applications →</span>
                             </div>
                         </a>
                     @endguest
@@ -378,7 +419,7 @@
     </section>
 
     <!-- Lifestyle and Wellness Section -->
-    <section class="relative w-full bg-[#031b4e] text-white">
+    <section class="relative z-10 w-full bg-[#031b4e] text-white">
         <!-- The S-Curve Light Overlay on the Right -->
         <div class="absolute top-[-1px] right-0 w-[55%] lg:w-[45%] h-[80px] lg:h-[120px] bg-[#f4f7f9] rounded-bl-[3rem] lg:rounded-bl-[5rem] z-10">
             <!-- Inverted Corner to blend with the dark left side -->
@@ -863,9 +904,9 @@
                         </div>
                         <h4 class="font-extrabold text-slate-800 text-base mb-1">No Active Openings Right Now</h4>
                         <p class="text-xs text-slate-500 max-w-sm mx-auto mb-4">New teaching and academic positions are added daily. You can post your requirement or register as a teacher.</p>
-                        <button type="button" onclick="openRequirementModal('school')" class="px-6 py-2.5 bg-[#031b4e] text-white rounded-full text-xs font-bold shadow-md hover:bg-[#092b77] transition-all">
+                        <a href="{{ route('forms.hire-teacher') }}" class="inline-block px-6 py-2.5 bg-[#031b4e] text-white rounded-full text-xs font-bold shadow-md hover:bg-[#092b77] transition-all">
                             Post School Requirement
-                        </button>
+                        </a>
                     </div>
                     @endforelse
                 </div>
@@ -1110,10 +1151,9 @@
                                                     <span>Apply</span>
                                                 </a>
                                             @endif
-                                        @else
-                                            <button type="button" onclick="openRequirementModal('teacher')" class="text-white bg-[#031b4e] hover:bg-blue-600 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors shadow-xs flex items-center active:scale-95 cursor-pointer">
+                                            <a href="{{ route('apply.home-tutor') }}" class="text-white bg-[#031b4e] hover:bg-blue-600 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors shadow-xs flex items-center active:scale-95 cursor-pointer">
                                                 <span>Apply</span>
-                                            </button>
+                                            </a>
                                         @endauth
                                     </div>
                                 </div>

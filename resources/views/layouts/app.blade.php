@@ -146,6 +146,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        [x-cloak] { display: none !important; }
         .marquee-swiper {
             -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
             mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
@@ -368,7 +369,7 @@
     </style>
 </head>
 
-<body class="{{ request()->is('candidate*') || request()->is('employer*') ? 'bg-[#f4f7f5] text-gray-900' : 'bg-secondary-bg text-text-dark' }} {{ session()->has('impersonate_admin_id') ? 'pt-10' : '' }}">
+<body class="{{ request()->is('candidate*') || request()->is('employer*') || request()->is('need-tutor') || request()->is('hire-teacher') || request()->is('apply*') || request()->routeIs('forms.*') ? 'bg-[#f8fafc] text-gray-900' : 'bg-secondary-bg text-text-dark' }} {{ session()->has('impersonate_admin_id') ? 'pt-10' : '' }}">
     @if(!empty($gtmId) && str_starts_with($gtmId, 'GTM-'))
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}"
@@ -451,6 +452,86 @@
                        class="{{ request()->routeIs('tuitions') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200">
                        Home Tuition
                     </a>
+                </li>
+                <!-- Forms Dropdown (Standalone Pages) -->
+                <li class="relative" x-data="{ openForms: false }" @click.away="openForms = false">
+                    <button @click="openForms = !openForms"
+                            type="button"
+                            class="{{ (request()->routeIs('forms.*') || request()->routeIs('apply.*')) ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1 cursor-pointer">
+                        <span>Forms</span>
+                        <i class="fas fa-chevron-down text-[9px] transition-transform duration-200" :class="openForms ? 'rotate-180 text-blue-600' : ''"></i>
+                    </button>
+
+                    <div x-show="openForms"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                         class="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200/90 p-2.5 z-50 text-left">
+                        
+                        <div class="px-2.5 py-1 mb-1 border-b border-slate-100 flex items-center justify-between">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Post Requirement</span>
+                            <span class="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Clients</span>
+                        </div>
+                        
+                        <a href="{{ route('forms.need-tutor') }}" class="flex items-center gap-2.5 p-2 rounded-xl hover:bg-sky-50 transition-colors group">
+                            <div class="w-7 h-7 rounded-lg bg-sky-100 text-[#0ea5e9] flex items-center justify-center text-xs shrink-0 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="block text-xs font-bold text-[#031b4e] group-hover:text-[#0ea5e9] transition-colors">Tuition Requirement</span>
+                                <span class="block text-[10px] text-slate-500">Hire home / online tutor</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('forms.hire-teacher') }}" class="flex items-center gap-2.5 p-2 rounded-xl hover:bg-purple-50 transition-colors group">
+                            <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xs shrink-0 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-school"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="block text-xs font-bold text-[#031b4e] group-hover:text-purple-600 transition-colors">School Hiring Form</span>
+                                <span class="block text-[10px] text-slate-500">Hire school teachers & staff</span>
+                            </div>
+                        </a>
+
+                        <div class="px-2.5 pt-2 pb-1 my-1 border-t border-b border-slate-100 flex items-center justify-between">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Teacher Registration</span>
+                            <span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Educators</span>
+                        </div>
+
+                        <a href="{{ route('apply.home-tutor') }}" class="flex items-center gap-2.5 p-2 rounded-xl hover:bg-emerald-50 transition-colors group">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs shrink-0 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="block text-xs font-bold text-[#031b4e] group-hover:text-emerald-600 transition-colors">Apply: Home Tutor</span>
+                                <span class="block text-[10px] text-slate-500">Home tuition batches</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('apply.school-teacher') }}" class="flex items-center gap-2.5 p-2 rounded-xl hover:bg-amber-50 transition-colors group">
+                            <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-xs shrink-0 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="block text-xs font-bold text-[#031b4e] group-hover:text-amber-600 transition-colors">Apply: School Teacher</span>
+                                <span class="block text-[10px] text-slate-500">CBSE & ICSE school jobs</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('apply.both') }}" class="flex items-center gap-2.5 p-2 rounded-xl hover:bg-indigo-50 transition-colors group">
+                            <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs shrink-0 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="block text-xs font-bold text-[#031b4e] group-hover:text-indigo-600 transition-colors">Apply: Dual Profile (Both)</span>
+                                <span class="block text-[10px] text-slate-500">Tutor + School Teaching</span>
+                            </div>
+                        </a>
+                    </div>
                 </li>
                 <li>
                     <a href="{{ route('hiring') }}"
@@ -580,6 +661,34 @@
                 <li><a href="{{ route('tuitions') }}"
                         class="{{ request()->routeIs('tuitions') ? 'text-[#fbc043]' : 'text-white/80 hover:text-white' }} transition-colors">Home Tuition</a>
                 </li>
+                <li x-data="{ openMobileForms: false }">
+                    <button @click="openMobileForms = !openMobileForms" type="button" class="w-full flex items-center justify-between text-white/80 hover:text-white transition-colors cursor-pointer py-1">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-file-alt text-[#fbc043] text-sm"></i> Forms
+                        </span>
+                        <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="openMobileForms ? 'rotate-180 text-[#fbc043]' : ''"></i>
+                    </button>
+                    <div x-show="openMobileForms" x-cloak class="pl-4 mt-2 flex flex-col gap-2.5 border-l-2 border-white/20 text-sm font-medium">
+                        <span class="text-[10px] uppercase font-black tracking-wider text-[#fbc043] pt-1">Post Requirements</span>
+                        <a href="{{ route('forms.need-tutor') }}" class="text-white/90 hover:text-[#fbc043] flex items-center gap-2 transition-colors">
+                            <i class="fas fa-graduation-cap text-[#0ea5e9] w-4"></i> Tuition Requirement Form
+                        </a>
+                        <a href="{{ route('forms.hire-teacher') }}" class="text-white/90 hover:text-[#fbc043] flex items-center gap-2 transition-colors">
+                            <i class="fas fa-school text-purple-300 w-4"></i> School Hiring Form
+                        </a>
+
+                        <span class="text-[10px] uppercase font-black tracking-wider text-[#fbc043] pt-2">Teacher Registration</span>
+                        <a href="{{ route('apply.home-tutor') }}" class="text-white/90 hover:text-[#fbc043] flex items-center gap-2 transition-colors">
+                            <i class="fas fa-home text-emerald-400 w-4"></i> Home Tutor Registration
+                        </a>
+                        <a href="{{ route('apply.school-teacher') }}" class="text-white/90 hover:text-[#fbc043] flex items-center gap-2 transition-colors">
+                            <i class="fas fa-chalkboard-teacher text-amber-300 w-4"></i> School Teacher Registration
+                        </a>
+                        <a href="{{ route('apply.both') }}" class="text-white/90 hover:text-[#fbc043] flex items-center gap-2 transition-colors">
+                            <i class="fas fa-layer-group text-sky-300 w-4"></i> Both (Home Tutor + School)
+                        </a>
+                    </div>
+                </li>
                 <li><a href="{{ route('resume.builder') }}"
                         class="{{ request()->routeIs('resume.builder') ? 'text-[#fbc043]' : 'text-white/80 hover:text-white' }} transition-colors">Resume
                         Builder <span
@@ -618,7 +727,7 @@
         </div>
     </div>
 
-    <main class="min-h-screen" @style(['padding-top: 140px;' => !request()->routeIs('home')])>
+    <main class="min-h-screen {{ request()->is('need-tutor') || request()->is('hire-teacher') || request()->is('apply*') || request()->routeIs('forms.*') ? 'bg-[#f8fafc]' : '' }}" @style(['padding-top: 140px;' => !request()->routeIs('home')])>
         @yield('content')
     </main>
 
@@ -669,11 +778,11 @@
             <div>
                 <h4 class="text-[16px] font-bold text-gray-900 mb-5 relative inline-block">Portals & Policies<span class="absolute bottom-[-6px] left-0 w-1/2 h-[2px] bg-[#031b4e]"></span></h4>
                 <ul class="flex flex-col gap-3 text-[13.5px] text-gray-600 font-semibold mt-2">
-                    @guest
-                        <li><button type="button" onclick="openTeacherModal()" class="hover:text-[#031b4e] transition-colors flex items-center gap-2 text-blue-700 font-bold cursor-pointer text-left"><i class="fas fa-user-plus text-[9px]"></i> Join as Teacher / Tutor</button></li>
-                    @else
-                        <li><a href="{{ route('candidate.dashboard') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2 text-blue-700 font-bold"><i class="fas fa-user-plus text-[9px]"></i> Join as Teacher / Tutor</a></li>
-                    @endguest
+                    <li><a href="{{ route('forms.need-tutor') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-graduation-cap text-[9px] text-emerald-600"></i> Request Home Tutor</a></li>
+                    <li><a href="{{ route('forms.hire-teacher') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-school text-[9px] text-purple-600"></i> School Faculty Hiring</a></li>
+                    <li><a href="{{ route('apply.home-tutor') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chalkboard-teacher text-[9px] text-sky-600"></i> Apply as Home Tutor</a></li>
+                    <li><a href="{{ route('apply.school-teacher') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-briefcase text-[9px] text-amber-600"></i> School Teaching Jobs</a></li>
+                    <li><a href="{{ route('apply.both') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-layer-group text-[9px] text-indigo-600"></i> Dual Profile (Both)</a></li>
                     <li><a href="{{ route('resume.builder') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-file-alt text-[9px] text-[#031b4e]/60"></i> Free Resume Builder</a></li>
                     <li><a href="{{ route('terms') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-shield-alt text-[8px] text-[#031b4e]/60"></i> Terms & Conditions</a></li>
                     <li><a href="{{ route('privacy') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-lock text-[8px] text-[#031b4e]/60"></i> Privacy Policy</a></li>
@@ -993,7 +1102,8 @@
                 btn.addEventListener('click', () => applyFont(btn.dataset.setFont));
             });
 
-            const savedTheme = localStorage.getItem('Warriors Educare-theme') || 'dark';
+            const isFormPage = window.location.pathname.includes('/need-tutor') || window.location.pathname.includes('/hire-teacher') || window.location.pathname.includes('/apply/');
+            const savedTheme = isFormPage ? 'light' : (localStorage.getItem('Warriors Educare-theme') || 'light');
             const savedFont = localStorage.getItem('Warriors Educare-font') || 'outfit';
             applyTheme(savedTheme);
             applyFont(savedFont);

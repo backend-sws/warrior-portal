@@ -15,7 +15,7 @@ class CandidateAuthController extends Controller
 {
     public function showRegistrationForm(Request $request)
     {
-        return redirect()->route('login');
+        return redirect()->route('login', ['tab' => 'signup']);
     }
 
     /**

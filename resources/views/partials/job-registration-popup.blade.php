@@ -103,22 +103,12 @@
 
 <script>
     window.openTeacherModal = function(cat = 'teacher') {
-        if (typeof window.openRequirementModal === 'function') {
-            window.openRequirementModal(cat);
-            return;
-        }
-        const popup = document.getElementById('jobRegPopup');
-        if (popup) {
-            const content = popup.querySelector('.popup-content');
-            popup.classList.remove('hidden');
-            popup.style.display = 'flex';
-            setTimeout(() => {
-                popup.classList.remove('opacity-0');
-                popup.style.opacity = '1';
-                if (content) content.style.transform = 'scale(1)';
-            }, 20);
+        if (cat === 'home_tutor') {
+            window.location.href = "{{ route('apply.home-tutor') }}";
+        } else if (cat === 'school_teacher' || cat === 'school') {
+            window.location.href = "{{ route('apply.school-teacher') }}";
         } else {
-            window.location.href = "{{ route('candidate.register') }}";
+            window.location.href = "{{ route('apply.both') }}";
         }
     };
 
