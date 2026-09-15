@@ -111,7 +111,7 @@
             {{-- Top Branding --}}
             <div class="relative z-10">
                 <a href="{{ route('home') }}" class="inline-block">
-                    <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-10 brightness-0 invert">
+                    <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-10">
                 </a>
             </div>
 
@@ -173,31 +173,31 @@
                             <i class="fas fa-graduation-cap"></i>
                         </div>
                         <div class="w-full flex-1 flex flex-col justify-center">
-                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">Tuition Post Requirement</div>
+                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">Tuition Requirement Form</div>
                             <div class="text-[9px] sm:text-[10px] text-slate-500 font-semibold leading-tight mt-1">Parent / Student</div>
                         </div>
                     </button>
 
-                    {{-- Button 2: School Hiring --}}
+                    {{-- Button 2: School Hiring Form --}}
                     <button type="button" onclick="openRequirementModal('school')"
                             class="flex flex-col items-center justify-between text-center p-2.5 sm:p-3 rounded-2xl bg-purple-50/90 hover:bg-purple-100 border border-purple-200/80 hover:border-purple-400 hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-pointer h-full">
                         <div class="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-xs mb-2 group-hover:scale-110 transition-transform shrink-0">
                             <i class="fas fa-school"></i>
                         </div>
                         <div class="w-full flex-1 flex flex-col justify-center">
-                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">School Hiring</div>
+                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">School Hiring Form</div>
                             <div class="text-[9px] sm:text-[10px] text-slate-500 font-semibold leading-tight mt-1">Post Vacancy</div>
                         </div>
                     </button>
 
-                    {{-- Button 3: Join as a Teacher --}}
+                    {{-- Button 3: Teacher Registration Form --}}
                     <button type="button" onclick="openRequirementModal('teacher')"
                             class="flex flex-col items-center justify-between text-center p-2.5 sm:p-3 rounded-2xl bg-amber-50/90 hover:bg-amber-100 border border-amber-200/80 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-pointer h-full">
                         <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-xs mb-2 group-hover:scale-110 transition-transform shrink-0">
                             <i class="fas fa-chalkboard-teacher"></i>
                         </div>
                         <div class="w-full flex-1 flex flex-col justify-center">
-                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">Join as a Teacher</div>
+                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">Teacher Registration Form</div>
                             <div class="text-[9px] sm:text-[10px] text-slate-500 font-semibold leading-tight mt-1">Tutor, School & Both</div>
                         </div>
                     </button>

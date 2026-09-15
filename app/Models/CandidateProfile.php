@@ -21,6 +21,8 @@ class CandidateProfile extends Model
         'signature_date_time' => 'datetime',
         'tuition_agreement_signed_at' => 'datetime',
         'plan_started_at' => 'datetime',
+        'tuition_upgrade_requested_at' => 'datetime',
+        'tuition_upgrade_approved_at' => 'datetime',
         'agreement_status' => 'string',
         'tuition_agreement_status' => 'string',
         'tuition_subjects' => 'array',
@@ -88,6 +90,21 @@ class CandidateProfile extends Model
         return in_array($this->candidate_category, ['school_job', 'both']) || empty($this->candidate_category);
     }
 
+    public function canRequestTuitionUpgrade(): bool
+    {
+        return $this->candidate_category === 'school_job' && ($this->tuition_upgrade_status === 'none' || empty($this->tuition_upgrade_status));
+    }
+
+    public function isTuitionUpgradeRequested(): bool
+    {
+        return $this->candidate_category === 'school_job' && $this->tuition_upgrade_status === 'requested';
+    }
+
+    public function isTuitionUpgradeApproved(): bool
+    {
+        return $this->candidate_category === 'school_job' && $this->tuition_upgrade_status === 'approved';
+    }
+
     /**
      * Get Google Maps pinpoint URL if coordinates are available.
      */
@@ -104,11 +121,17 @@ class CandidateProfile extends Model
      */
     public function getCompletionPercentageAttribute(): int
     {
-        if ($this->is_profile_complete && isset($this->attributes['profile_completion_percentage']) && (int)$this->attributes['profile_completion_percentage'] >= 100) {
-            return 100;
+        $category = $this->candidate_category ?: 'both';
+
+        if ($this->is_profile_complete) {
+            if ($category === 'school_job' && !empty($this->position_applying_for) && !empty($this->resume_path)) {
+                return 100;
+            }
+            if (isset($this->attributes['profile_completion_percentage']) && (int)$this->attributes['profile_completion_percentage'] >= 100) {
+                return 100;
+            }
         }
 
-        $category = $this->candidate_category ?: 'both';
         $stepsPassed = 0;
 
         // Step 1: Basic Personal Details (Common) - 25%
@@ -130,10 +153,9 @@ class CandidateProfile extends Model
                 && (!empty($this->classes_interested) && count($this->classes_interested) > 0)
                 && (!empty($this->teaching_mode) || !empty($this->preferred_areas));
         } elseif ($category === 'school_job') {
-            // Needs position applying for, specialization or category, and expected salary
+            // Needs position applying for, and specialization / category / b_ed_status
             $hasPreferences = !empty($this->position_applying_for) 
-                && (!empty($this->subject_specialization) || !empty($this->category_id))
-                && (!empty($this->expected_salary) || !empty($this->current_salary));
+                && (!empty($this->subject_specialization) || !empty($this->category_id) || !empty($this->b_ed_status) || !empty($this->d_el_ed_status));
         } else {
             // Both: At least tuition subjects and school position
             $hasPreferences = (!empty($this->tuition_subjects) && count($this->tuition_subjects) > 0)
@@ -146,8 +168,8 @@ class CandidateProfile extends Model
             // Resume or preferred areas / time slots
             $hasDocsLoc = !empty($this->resume_path) || (!empty($this->preferred_areas) && !empty($this->available_time_slot));
         } elseif ($category === 'school_job') {
-            // Resume is mandatory, and preferred locations selected
-            $hasDocsLoc = !empty($this->resume_path) && (!empty($this->preferred_locations) && count($this->preferred_locations) > 0);
+            // Resume is mandatory, and preferred locations or address selected
+            $hasDocsLoc = !empty($this->resume_path) && (!empty($this->preferred_locations) || !empty($this->address));
         } else {
             // Both: Resume and preferred locations/areas
             $hasDocsLoc = !empty($this->resume_path) && (!empty($this->preferred_locations) || !empty($this->preferred_areas));
@@ -201,7 +223,7 @@ class CandidateProfile extends Model
             if (empty($this->resume_path)) {
                 $missing[] = 'Resume / CV';
             }
-            if (empty($this->preferred_locations) || count($this->preferred_locations) === 0) {
+            if ((empty($this->preferred_locations) || count($this->preferred_locations) === 0) && empty($this->address)) {
                 $missing[] = 'Preferred Locations';
             }
         }

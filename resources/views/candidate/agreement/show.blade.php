@@ -14,16 +14,28 @@
         <p class="text-xs sm:text-sm text-[#031b4e]/70 mt-1.5 max-w-md mx-auto">Please read the terms and conditions carefully and provide your digital signature below.</p>
         
         {{-- Agreement Type Tabs --}}
-        <div class="inline-flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl mt-4 border border-slate-200 shadow-inner">
-            <a href="{{ route('candidate.agreement.show') }}" class="px-4 py-2 bg-[#031b4e] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5">
-                <i class="fas fa-school text-xs text-sky-400"></i>
+        @php
+            $isTuitionApproved = in_array($profile?->candidate_category, ['home_tutor', 'both']) 
+                || in_array($profile?->tuition_upgrade_status, ['approved', 'completed']);
+        @endphp
+
+        @if($isTuitionApproved)
+            <div class="inline-flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl mt-4 border border-slate-200 shadow-inner">
+                <a href="{{ route('candidate.agreement.show') }}" class="px-4 py-2 bg-[#031b4e] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5">
+                    <i class="fas fa-school text-xs text-sky-400"></i>
+                    <span>Teacher Placement Agreement</span>
+                </a>
+                <a href="{{ route('candidate.tuitions.index', ['open_agreement' => 1]) }}" class="px-4 py-2 text-slate-600 hover:text-[#031b4e] font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5">
+                    <i class="fas fa-chalkboard-teacher text-xs text-amber-500"></i>
+                    <span>Home Tuition Agreement</span>
+                </a>
+            </div>
+        @else
+            <div class="inline-flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-xl mt-4 border border-slate-200 text-xs font-bold text-[#031b4e]">
+                <i class="fas fa-school text-sky-500"></i>
                 <span>Teacher Placement Agreement</span>
-            </a>
-            <a href="{{ route('candidate.tuitions.index') }}" class="px-4 py-2 text-slate-600 hover:text-[#031b4e] font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5">
-                <i class="fas fa-chalkboard-teacher text-xs text-amber-500"></i>
-                <span>Home Tuition Agreement</span>
-            </a>
-        </div>
+            </div>
+        @endif
     </div>
 
     @if(session('error'))

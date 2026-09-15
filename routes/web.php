@@ -134,7 +134,7 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
         $activeJobInterviews = $user->applications()
             ->with(['jobPost.city', 'jobPost.state', 'jobPost.subject', 'jobPost.category'])
             ->where(function($q) {
-                $q->whereIn('status', ['shortlisted', 'hired'])
+                $q->whereIn('status', ['shortlisted', 'forwarded_to_school', 'demo_scheduled', 'hired'])
                   ->orWhereNotNull('interview_date');
             })
             ->latest('updated_at')
@@ -155,6 +155,8 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
     Route::get('/profile', [\App\Http\Controllers\Candidate\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\Candidate\ProfileController::class, 'update'])->name('profile.update');
     Route::post('/password', [\App\Http\Controllers\Candidate\ProfileController::class, 'updatePassword'])->name('password.update');
+    Route::post('/tuition-upgrade/request', [\App\Http\Controllers\Candidate\ProfileController::class, 'requestTuitionUpgrade'])->name('tuition-upgrade.request');
+    Route::post('/tuition-upgrade/complete', [\App\Http\Controllers\Candidate\ProfileController::class, 'completeTuitionUpgrade'])->name('tuition-upgrade.complete');
 
     Route::get('/agreement', [\App\Http\Controllers\Candidate\AgreementController::class, 'show'])->name('agreement.show');
     Route::post('/agreement/request', [\App\Http\Controllers\Candidate\AgreementController::class, 'requestActivation'])->name('agreement.request');
@@ -279,6 +281,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/crm/candidate/{id}/magic-login', [\App\Http\Controllers\Admin\CrmController::class, 'magicLogin'])->name('crm.candidate.magic-login');
     Route::post('/crm/candidate/{id}/upload-agreement', [\App\Http\Controllers\Admin\CrmController::class, 'uploadAgreement'])->name('crm.candidate.upload-agreement');
     Route::post('/crm/candidate/{id}/update-agreement-status', [\App\Http\Controllers\Admin\CrmController::class, 'updateAgreementStatus'])->name('crm.candidate.update-agreement-status');
+    Route::post('/crm/candidate/{id}/approve-tuition-upgrade', [\App\Http\Controllers\Admin\CrmController::class, 'approveTuitionUpgrade'])->name('crm.candidate.approve-tuition-upgrade');
 
     // Applications & Transactions
     Route::get('/applications', [\App\Http\Controllers\Admin\ApplicationController::class, 'index'])->name('applications.index');

@@ -53,23 +53,57 @@ class ApplicationController extends Controller
             })
             ->get();
 
-        // Calculate match scores
+        // Calculate match scores (supporting both ID and text-based matching)
         $matchedJobs = $jobs->map(function ($job) use ($profile) {
             $score = 0;
             
             if ($profile) {
-                // Subject match is most important (40%)
-                if (!empty($profile->subject_id) && $job->subject_id == $profile->subject_id) $score += 40;
+                // Subject match (40%)
+                if (!empty($profile->subject_id) && $job->subject_id == $profile->subject_id) {
+                    $score += 40;
+                } elseif (!empty($profile->subject_specialization)) {
+                    $spec = mb_strtolower($profile->subject_specialization);
+                    $subName = mb_strtolower($job->subject?->name ?? '');
+                    $title = mb_strtolower($job->title ?? '');
+                    if (($subName && (str_contains($subName, $spec) || str_contains($spec, $subName))) || ($title && str_contains($title, $spec))) {
+                        $score += 40;
+                    }
+                }
                 
                 // Category match (30%)
-                if (!empty($profile->category_id) && $job->category_id == $profile->category_id) $score += 30;
+                if (!empty($profile->category_id) && $job->category_id == $profile->category_id) {
+                    $score += 30;
+                } elseif (!empty($profile->position_applying_for)) {
+                    $pos = mb_strtolower($profile->position_applying_for);
+                    $catName = mb_strtolower($job->category?->name ?? '');
+                    $title = mb_strtolower($job->title ?? '');
+                    if (($catName && (str_contains($catName, $pos) || str_contains($pos, $catName))) || ($title && str_contains($title, $pos))) {
+                        $score += 30;
+                    }
+                }
                 
                 // Qualification match (20%)
-                if (!empty($profile->highest_qualification_id) && $job->qualification_id == $profile->highest_qualification_id) $score += 20;
+                if (!empty($profile->highest_qualification_id) && $job->qualification_id == $profile->highest_qualification_id) {
+                    $score += 20;
+                } elseif (!empty($profile->highest_qualification_name)) {
+                    $qName = mb_strtolower($profile->highest_qualification_name);
+                    $jobQ = mb_strtolower($job->qualification?->name ?? '');
+                    if ($jobQ && (str_contains($qName, $jobQ) || str_contains($jobQ, $qName))) {
+                        $score += 20;
+                    }
+                }
                 
                 // Location match (10%)
-                if (!empty($profile->preferred_city_id) && $job->city_id == $profile->preferred_city_id) $score += 10;
-                elseif (!empty($profile->preferred_state_id) && $job->state_id == $profile->preferred_state_id) $score += 5;
+                if (!empty($profile->preferred_city_id) && $job->city_id == $profile->preferred_city_id) {
+                    $score += 10;
+                } elseif (!empty($profile->preferred_locations) && is_array($profile->preferred_locations)) {
+                    $cityName = $job->city?->name;
+                    if ($cityName && in_array($cityName, $profile->preferred_locations)) {
+                        $score += 10;
+                    }
+                } elseif (!empty($profile->preferred_state_id) && $job->state_id == $profile->preferred_state_id) {
+                    $score += 5;
+                }
             }
             
             $job->match_score = $score;
@@ -86,17 +120,74 @@ class ApplicationController extends Controller
         $user = auth()->user();
         $profile = $user->profile;
 
-        if (!$profile || !$profile->gender || !$profile->date_of_birth || !$profile->address || !$profile->preferred_state_id || !$profile->preferred_city_id || !$profile->highest_qualification_id || !$profile->subject_id || !$profile->category_id || !$profile->resume_path) {
-            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your Professional Teaching Profile (Category, Subject, Qualification & Resume Upload) before applying for school jobs.');
+        if (!$profile) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your candidate profile before applying.');
+        }
+
+        // Resume is mandatory for school jobs
+        if (empty($profile->resume_path)) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Resume upload is mandatory for school job applications. Please upload your Resume/CV to continue.');
+        }
+
+        // Basic details check
+        if (empty($profile->gender) || empty($profile->date_of_birth)) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Please complete your basic profile (Gender and Date of Birth) before applying.');
+        }
+
+        // Qualification check
+        if (empty($profile->highest_qualification_id) && empty($profile->highest_qualification_name)) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Please specify your highest qualification in your profile before applying.');
+        }
+
+        // Position / Specialization check
+        if (empty($profile->position_applying_for) && empty($profile->subject_specialization) && empty($profile->category_id) && empty($profile->subject_id)) {
+            return redirect()->route('candidate.profile.edit')->with('error', 'Please specify your teaching post or subject specialization in your profile before applying.');
         }
 
         // Calculate score again for saving
         $score = 0;
-        if ($job->subject_id == $profile->subject_id) $score += 40;
-        if ($job->category_id == $profile->category_id) $score += 30;
-        if ($job->qualification_id == $profile->highest_qualification_id) $score += 20;
-        if ($job->city_id == $profile->preferred_city_id) $score += 10;
-        elseif ($job->state_id == $profile->preferred_state_id) $score += 5;
+        if (!empty($profile->subject_id) && $job->subject_id == $profile->subject_id) {
+            $score += 40;
+        } elseif (!empty($profile->subject_specialization)) {
+            $spec = mb_strtolower($profile->subject_specialization);
+            $subName = mb_strtolower($job->subject?->name ?? '');
+            $title = mb_strtolower($job->title ?? '');
+            if (($subName && (str_contains($subName, $spec) || str_contains($spec, $subName))) || ($title && str_contains($title, $spec))) {
+                $score += 40;
+            }
+        }
+
+        if (!empty($profile->category_id) && $job->category_id == $profile->category_id) {
+            $score += 30;
+        } elseif (!empty($profile->position_applying_for)) {
+            $pos = mb_strtolower($profile->position_applying_for);
+            $catName = mb_strtolower($job->category?->name ?? '');
+            $title = mb_strtolower($job->title ?? '');
+            if (($catName && (str_contains($catName, $pos) || str_contains($pos, $catName))) || ($title && str_contains($title, $pos))) {
+                $score += 30;
+            }
+        }
+
+        if (!empty($profile->highest_qualification_id) && $job->qualification_id == $profile->highest_qualification_id) {
+            $score += 20;
+        } elseif (!empty($profile->highest_qualification_name)) {
+            $qName = mb_strtolower($profile->highest_qualification_name);
+            $jobQ = mb_strtolower($job->qualification?->name ?? '');
+            if ($jobQ && (str_contains($qName, $jobQ) || str_contains($jobQ, $qName))) {
+                $score += 20;
+            }
+        }
+
+        if (!empty($profile->preferred_city_id) && $job->city_id == $profile->preferred_city_id) {
+            $score += 10;
+        } elseif (!empty($profile->preferred_locations) && is_array($profile->preferred_locations)) {
+            $cityName = $job->city?->name;
+            if ($cityName && in_array($cityName, $profile->preferred_locations)) {
+                $score += 10;
+            }
+        } elseif (!empty($profile->preferred_state_id) && $job->state_id == $profile->preferred_state_id) {
+            $score += 5;
+        }
 
         // Prevent duplicate application
         if (JobApplication::where('job_post_id', $job->id)->where('candidate_id', $user->id)->exists()) {

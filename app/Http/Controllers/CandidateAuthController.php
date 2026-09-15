@@ -75,6 +75,7 @@ class CandidateAuthController extends Controller
                 $rules['b_ed_status']            = ['required', 'string', 'max:100'];
                 $rules['d_el_ed_status']          = ['required', 'string', 'max:100'];
                 $rules['position_applying_for']  = ['required', 'string', 'max:100'];
+                $rules['subject_specialization'] = ['nullable', 'string', 'max:150'];
                 $rules['current_salary']         = ['nullable', 'numeric', 'min:0'];
                 $rules['expected_salary']        = ['nullable', 'numeric', 'min:0'];
                 $rules['last_school_name']       = ['nullable', 'string', 'max:200'];
@@ -109,7 +110,7 @@ class CandidateAuthController extends Controller
             'gender.required'                => 'Please select your gender.',
             'date_of_birth.required'         => 'Please enter your date of birth.',
             'highest_qualification.required' => 'Please select your highest qualification.',
-            'experience_range.required'      => 'Please select your teaching experience.',
+            'experience_range.required'      => 'Please enter your teaching experience.',
             'tuition_subjects.required'      => 'Please select at least one tuition subject.',
             'classes_interested.required'    => 'Please select at least one class you are interested to teach.',
             'teaching_mode.required'         => 'Please choose your teaching mode (Offline, Online, or Both).',
@@ -138,15 +139,14 @@ class CandidateAuthController extends Controller
             $salarySlipPath = $request->file('salary_slip')->store('salary_slips', 'public');
         }
 
-        // Derive approximate experience years from selected range
+        // Derive approximate experience years from manual text or range
         $expYears = 0;
-        $range = $request->experience_range;
-        if ($range === '0–1 Year') $expYears = 0;
-        elseif ($range === '1–3 Years') $expYears = 2;
-        elseif ($range === '3–5 Years') $expYears = 4;
-        elseif ($range === '5–10 Years') $expYears = 7;
-        elseif ($range === '10–15 Years') $expYears = 12;
-        elseif ($range === '15+ Years') $expYears = 15;
+        $range = trim((string) $request->experience_range);
+        if (stripos($range, 'fresher') !== false) {
+            $expYears = 0;
+        } elseif (preg_match('/(\d+(\.\d+)?)/', $range, $matches)) {
+            $expYears = (float) $matches[1];
+        }
 
         // Determine actual qualification (support direct manual text input)
         $qualificationName = trim($request->highest_qualification);
@@ -389,8 +389,9 @@ class CandidateAuthController extends Controller
             $profile = $user->profile()->create($profileData);
         }
 
-        // Save calculated profile completion percentage
-        $profile->profile_completion_percentage = $profile->completion_percentage;
+        // Save profile completion percentage (guaranteed 100% on registration completion)
+        $profile->is_profile_complete = true;
+        $profile->profile_completion_percentage = 100;
         $profile->save();
 
         // Clear registration session & any stale intended URLs

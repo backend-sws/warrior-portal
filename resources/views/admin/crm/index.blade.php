@@ -87,6 +87,7 @@
                     <option value="home_tutor" {{ request('candidate_category') === 'home_tutor' ? 'selected' : '' }}>🏡 Home Tutor Only</option>
                     <option value="school_job" {{ request('candidate_category') === 'school_job' ? 'selected' : '' }}>🏫 School Job Only</option>
                     <option value="both" {{ request('candidate_category') === 'both' ? 'selected' : '' }}>✨ Both (School Job + Home Tuition)</option>
+                    <option value="tuition_upgrade_requested" {{ request('candidate_category') === 'tuition_upgrade_requested' ? 'selected' : '' }}>⚡ Tuition Upgrade Requested</option>
                 </select>
             </div>
 
@@ -284,6 +285,13 @@
                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200">
                                 <i class="fas fa-layer-group text-[9px]"></i> Both (Tutor + School)
                             </span>
+                        @endif
+                        @if($prof?->tuition_upgrade_status === 'requested')
+                            <div>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800 border border-amber-300 animate-pulse mt-1 shadow-2xs">
+                                    <i class="fas fa-arrow-circle-up text-[9px]"></i> Tuition Request Pending
+                                </span>
+                            </div>
                         @endif
                     </div>
 

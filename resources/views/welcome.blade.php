@@ -81,7 +81,7 @@
                         </div>
                         <div class="flex-grow text-left md:text-center">
                             <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-blue-100/90 text-blue-800 group-hover:bg-blue-600 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Parents & Students</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-blue-600 mb-0.5 md:mb-1 transition-colors">Tuition Post Requirement</h3>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-blue-600 mb-0.5 md:mb-1 transition-colors">Tuition Requirement Form</h3>
                             <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Find verified & experienced home tutors for all classes & subjects.</p>
                         </div>
                     </div>
@@ -93,7 +93,7 @@
                     </div>
                 </button>
                 
-                <!-- Card 2: School Hiring -->
+                <!-- Card 2: School Hiring Form -->
                 <button type="button" 
                         @click="showWelcomeModal = false; openRequirementModal('school')" 
                         class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-indigo-50/60 via-white to-purple-50/30 hover:from-indigo-50/90 hover:to-white border-2 border-indigo-100 hover:border-indigo-500 shadow-xs hover:shadow-xl hover:shadow-indigo-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
@@ -103,7 +103,7 @@
                         </div>
                         <div class="flex-grow text-left md:text-center">
                             <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-indigo-100/90 text-indigo-800 group-hover:bg-indigo-600 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Schools & Institutes</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-indigo-600 mb-0.5 md:mb-1 transition-colors">School Hiring</h3>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-indigo-600 mb-0.5 md:mb-1 transition-colors">School Hiring Form</h3>
                             <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Access 10,000+ pre-verified PGT, TGT, PRT teachers & staff.</p>
                         </div>
                     </div>
@@ -115,7 +115,7 @@
                     </div>
                 </button>
                 
-                <!-- Card 3: Join as a Teacher -->
+                <!-- Card 3: Teacher Registration Form -->
                 <button type="button" 
                         @click="showWelcomeModal = false; openRequirementModal('teacher')" 
                         class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-amber-50/60 via-white to-orange-50/30 hover:from-amber-50/90 hover:to-white border-2 border-amber-100 hover:border-amber-500 shadow-xs hover:shadow-xl hover:shadow-amber-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
@@ -125,7 +125,7 @@
                         </div>
                         <div class="flex-grow text-left md:text-center">
                             <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-amber-100/90 text-amber-900 group-hover:bg-amber-500 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Teachers & Tutors</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-amber-800 mb-0.5 md:mb-1 transition-colors">Join as a Teacher</h3>
+                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-amber-800 mb-0.5 md:mb-1 transition-colors">Teacher Registration Form</h3>
                             <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Find verified home tuitions & school teaching jobs in your city.</p>
                         </div>
                     </div>
@@ -287,12 +287,57 @@
                     </p>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button type="button" onclick="openRequirementModal('tuition')" id="btn-hire" class="bg-[#031b4e] text-white px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-[#021030] hover:scale-105 transition-all shadow-lg flex items-center justify-center cursor-pointer">Need a Home Tutor (Parent)</button>
+                <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-3.5">
+                    <!-- Button 1: Need a Home Tutor (Tuition Requirement Form) -->
+                    <button type="button" 
+                            onclick="openRequirementModal('tuition')" 
+                            id="btn-tuition" 
+                            title="Tuition Requirement Form"
+                            class="group bg-[#031b4e] hover:bg-[#021030] text-white px-5 sm:px-6 py-3 rounded-2xl sm:rounded-full text-center hover:scale-105 transition-all shadow-lg hover:shadow-xl hover:shadow-blue-950/25 flex items-center justify-center gap-2.5 cursor-pointer">
+                        <i class="fas fa-graduation-cap text-[#0ea5e9] text-base"></i>
+                        <div class="text-left">
+                            <span class="block font-black text-[13px] sm:text-[14px] leading-tight">Need a Home Tutor</span>
+                            <span class="block text-[10px] text-cyan-300 font-semibold tracking-wide mt-0.5">Tuition Requirement Form →</span>
+                        </div>
+                    </button>
+
+                    <!-- Button 2: Hire School Staff (School Hiring Form) -->
+                    <button type="button" 
+                            onclick="openRequirementModal('school')" 
+                            id="btn-school" 
+                            title="School Hiring Form"
+                            class="group bg-[#0ea5e9] hover:bg-[#0284c7] text-white px-5 sm:px-6 py-3 rounded-2xl sm:rounded-full text-center hover:scale-105 transition-all shadow-lg hover:shadow-xl hover:shadow-sky-500/25 flex items-center justify-center gap-2.5 cursor-pointer">
+                        <i class="fas fa-school text-white text-base"></i>
+                        <div class="text-left">
+                            <span class="block font-black text-[13px] sm:text-[14px] leading-tight">Hire School Staff</span>
+                            <span class="block text-[10px] text-white/95 font-semibold tracking-wide mt-0.5">School Hiring Form →</span>
+                        </div>
+                    </button>
+
+                    <!-- Button 3: Join as Teacher / Tutor (Teacher Registration Form) -->
                     @guest
-                        <button type="button" onclick="openTeacherModal()" id="btn-join" class="bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 hover:scale-105 transition-all border border-gray-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer">Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i></button>
+                        <button type="button" 
+                                onclick="openTeacherModal()" 
+                                id="btn-join" 
+                                title="Teacher Registration Form"
+                                class="group bg-white hover:bg-slate-50 text-[#031b4e] px-5 sm:px-6 py-3 rounded-2xl sm:rounded-full text-center hover:scale-105 transition-all border-2 border-slate-200 hover:border-[#031b4e]/40 shadow-md flex items-center justify-center gap-2.5 cursor-pointer">
+                            <i class="fas fa-chalkboard-teacher text-amber-500 text-base"></i>
+                            <div class="text-left">
+                                <span class="block font-black text-[13px] sm:text-[14px] leading-tight">Join as Teacher / Tutor</span>
+                                <span class="block text-[10px] text-slate-500 font-semibold tracking-wide mt-0.5">Teacher Registration Form →</span>
+                            </div>
+                        </button>
                     @else
-                        <a href="{{ route('candidate.dashboard') }}" id="btn-join" class="bg-white text-[#031b4e] px-8 py-3.5 rounded-full font-bold text-[14px] text-center hover:bg-gray-50 hover:scale-105 transition-all border border-gray-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer">Join as a Teacher / Tutor <i class="fas fa-arrow-right"></i></a>
+                        <a href="{{ route('candidate.dashboard') }}" 
+                           id="btn-join" 
+                           title="Teacher Registration Form"
+                           class="group bg-white hover:bg-slate-50 text-[#031b4e] px-5 sm:px-6 py-3 rounded-2xl sm:rounded-full text-center hover:scale-105 transition-all border-2 border-slate-200 hover:border-[#031b4e]/40 shadow-md flex items-center justify-center gap-2.5 cursor-pointer">
+                            <i class="fas fa-chalkboard-teacher text-amber-500 text-base"></i>
+                            <div class="text-left">
+                                <span class="block font-black text-[13px] sm:text-[14px] leading-tight">Join as Teacher / Tutor</span>
+                                <span class="block text-[10px] text-slate-500 font-semibold tracking-wide mt-0.5">Teacher Registration Form →</span>
+                            </div>
+                        </a>
                     @endguest
                 </div>
             </div>

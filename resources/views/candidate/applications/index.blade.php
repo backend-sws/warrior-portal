@@ -88,7 +88,7 @@
                         <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                                 <div class="flex items-center gap-3">
-                                    @if(in_array($app->status, ['shortlisted', 'hired']) || $app->interview_date)
+                                    @if(in_array($app->status, ['shortlisted', 'forwarded_to_school', 'demo_scheduled', 'hired']) || $app->interview_date)
                                         <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center justify-center text-sm font-black shrink-0">
                                             {{ strtoupper(substr($app->jobPost->school_name ?: 'SC', 0, 2)) }}
                                         </div>
@@ -109,7 +109,7 @@
                                             </a>
                                         </h3>
                                         <p class="text-xs text-slate-500 mt-0.5">
-                                            @if(in_array($app->status, ['shortlisted', 'hired']) || $app->interview_date)
+                                            @if(in_array($app->status, ['shortlisted', 'forwarded_to_school', 'demo_scheduled', 'hired']) || $app->interview_date)
                                                 <i class="fas fa-university mr-1 text-indigo-600"></i> <strong class="text-[#031b4e]">{{ $app->jobPost->school_name }}</strong> &bull;
                                             @else
                                                 <i class="fas fa-shield-alt mr-1 text-[#0ea5e9]"></i> Verified Educational Institution &bull;
@@ -124,23 +124,35 @@
                                         <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
                                             <i class="fas fa-trophy text-emerald-600"></i> Selected & Placed 🎉
                                         </span>
-                                    @elseif($app->status === 'rejected')
-                                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-red-100 text-red-700 border border-red-200">
-                                            <i class="fas fa-times"></i> Not Selected
+                                    @elseif($app->status === 'demo_scheduled')
+                                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-purple-100 text-purple-900 border border-purple-200 flex items-center gap-1">
+                                            <i class="fas fa-chalkboard-teacher text-purple-600"></i> Demo Scheduled 🎯
+                                        </span>
+                                    @elseif($app->status === 'forwarded_to_school')
+                                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-100 text-indigo-900 border border-indigo-200 flex items-center gap-1">
+                                            <i class="fas fa-paper-plane text-indigo-600"></i> Forwarded to School
                                         </span>
                                     @elseif($app->status === 'shortlisted')
-                                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-200">
-                                            <i class="fas fa-star text-amber-600"></i> Shortlisted / Interview
+                                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-blue-100 text-blue-900 border border-blue-200 flex items-center gap-1">
+                                            <i class="fas fa-star text-blue-600"></i> Shortlisted
+                                        </span>
+                                    @elseif($app->status === 'tutor_backed_out')
+                                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-orange-100 text-orange-900 border border-orange-200 flex items-center gap-1">
+                                            <i class="fas fa-user-slash text-orange-600"></i> Tutor Backed Out
+                                        </span>
+                                    @elseif(in_array($app->status, ['rejected_by_school', 'rejected_by_admin', 'rejected']))
+                                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-red-100 text-red-700 border border-red-200 flex items-center gap-1">
+                                            <i class="fas fa-times text-red-600"></i> {{ $app->status_label }}
                                         </span>
                                     @else
-                                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-sky-100 text-sky-800 border border-sky-200">
-                                            <i class="fas fa-clock"></i> Applied (Under Review)
+                                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-sky-100 text-sky-800 border border-sky-200 flex items-center gap-1">
+                                            <i class="fas fa-clock text-sky-600"></i> New applied (Under Review)
                                         </span>
                                     @endif
                                 </div>
                             </div>
 
-                            @if($app->interview_date || in_array($app->status, ['shortlisted', 'hired']))
+                            @if($app->interview_date || in_array($app->status, ['shortlisted', 'forwarded_to_school', 'demo_scheduled', 'hired']))
                                 <div class="mb-4 p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-xs">
                                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                                         <div class="space-y-1">
@@ -151,7 +163,7 @@
                                             @if($app->interview_date)
                                                 <div class="text-amber-800 font-bold flex items-center gap-1.5">
                                                     <i class="fas fa-calendar-check text-amber-600"></i>
-                                                    <span>Interview Scheduled: {{ $app->interview_date->format('l, d M Y \a\t h:i A') }}</span>
+                                                    <span>Interview / Demo: {{ $app->interview_date->format('l, d M Y \a\t h:i A') }}</span>
                                                 </div>
                                             @endif
                                             @if($app->jobPost->contact_person || $app->jobPost->phone)
@@ -163,7 +175,7 @@
                                         </div>
                                         @if($app->interview_link)
                                             <a href="{{ $app->interview_link }}" target="_blank" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-extrabold shadow-sm transition-all flex items-center gap-1.5 whitespace-nowrap">
-                                                <span>Join Interview</span> <i class="fas fa-arrow-right text-xs"></i>
+                                                <span>Join Demo / Meeting</span> <i class="fas fa-arrow-right text-xs"></i>
                                             </a>
                                         @endif
                                     </div>
@@ -171,9 +183,9 @@
                             @endif
 
                             {{-- Rejection Feedback or Admin Notes --}}
-                            @if($app->status === 'rejected' && $app->remarks)
+                            @if(in_array($app->status, ['rejected_by_school', 'rejected_by_admin', 'rejected', 'tutor_backed_out']) && $app->remarks)
                                 <div class="mb-4 p-3.5 rounded-2xl bg-red-50/80 border border-red-200 text-xs text-red-900">
-                                    <p class="font-bold mb-1">Feedback from Institution:</p>
+                                    <p class="font-bold mb-1">Feedback / Notes:</p>
                                     <p>{{ $app->remarks }}</p>
                                 </div>
                             @elseif($app->remarks)

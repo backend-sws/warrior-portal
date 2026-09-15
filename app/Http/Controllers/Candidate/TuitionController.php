@@ -17,6 +17,12 @@ class TuitionController extends Controller
         /** @var \App\Models\User $user */
         $user = $request->user();
         $profile = $user->profile;
+
+        // If candidate is school_job only and hasn't been approved for tuition upgrade
+        if ($profile && $profile->candidate_category === 'school_job' && !in_array($profile->tuition_upgrade_status, ['approved', 'completed'])) {
+            return redirect()->route('candidate.dashboard')->with('info', 'Please request admin approval to join as a tuition teacher before accessing Home Tuitions.');
+        }
+
         $tuitionAgreementStatus = $profile?->tuition_agreement_status ?? 'not_required';
         $isAgreementSigned = ($tuitionAgreementStatus === 'signed' || (bool) $profile?->is_tuition_agreement_signed);
         $isAgreementActive = ($tuitionAgreementStatus === 'pending_signature');
