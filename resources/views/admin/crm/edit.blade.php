@@ -114,8 +114,9 @@
                            class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-all">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">WhatsApp Number</label>
-                    <input type="text" name="whatsapp_no" value="{{ old('whatsapp_no', $user->whatsapp_no ?: ($profile?->whatsapp_no ?? $user->phone)) }}"
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">WhatsApp Number <span class="text-text-dark/40 font-normal lowercase text-[11px]">(Can be different)</span></label>
+                    <input type="text" name="whatsapp_no" value="{{ old('whatsapp_no', $user->whatsapp_no ?: ($profile?->whatsapp_no ?? '')) }}"
+                           placeholder="e.g. 9876543210 (Leave blank if same as phone)"
                            class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-all">
                 </div>
                 <div>

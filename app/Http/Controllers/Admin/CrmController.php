@@ -40,6 +40,7 @@ class CrmController extends Controller
             'name'                     => 'required|string|max:255',
             'email'                    => 'required|email|unique:users,email',
             'phone'                    => 'required|string|max:20|unique:users,phone',
+            'whatsapp_no'              => 'nullable|string|max:20',
             'password'                 => 'required|string|min:6',
             'gender'                   => 'required|in:Male,Female,Other',
             'date_of_birth'            => 'required|date',
@@ -90,7 +91,7 @@ class CrmController extends Controller
                 'name'              => $request->name,
                 'email'             => $request->email,
                 'phone'             => $request->phone,
-                'whatsapp_no'       => $request->whatsapp_no ?? $request->phone,
+                'whatsapp_no'       => $request->filled('whatsapp_no') ? $request->whatsapp_no : $request->phone,
                 'role'              => 'candidate',
                 'password'          => Hash::make($request->password),
                 'email_verified_at' => now(),
@@ -192,7 +193,7 @@ class CrmController extends Controller
             $profile = CandidateProfile::create([
                 'user_id'                    => $user->id,
                 'candidate_category'         => $category,
-                'whatsapp_no'                => $request->whatsapp_no ?? $request->phone,
+                'whatsapp_no'                => $request->filled('whatsapp_no') ? $request->whatsapp_no : $request->phone,
                 'gender'                     => $request->gender,
                 'date_of_birth'              => $request->date_of_birth,
                 'address'                    => $address,
@@ -372,7 +373,7 @@ class CrmController extends Controller
                 'name'        => $request->name,
                 'email'       => $request->email,
                 'phone'       => $request->phone,
-                'whatsapp_no' => $request->whatsapp_no ?? $request->phone,
+                'whatsapp_no' => $request->filled('whatsapp_no') ? $request->whatsapp_no : $request->phone,
             ];
             
             if ($request->filled('password')) {
@@ -418,7 +419,7 @@ class CrmController extends Controller
 
             $updates = [
                 'candidate_category'       => $request->candidate_category ?? 'both',
-                'whatsapp_no'              => $request->whatsapp_no ?? $request->phone,
+                'whatsapp_no'              => $request->filled('whatsapp_no') ? $request->whatsapp_no : $request->phone,
                 'gender'                   => $request->gender,
                 'date_of_birth'            => $request->date_of_birth,
                 'address'                  => $request->address,
@@ -1178,4 +1179,37 @@ class CrmController extends Controller
 
         return back()->with('success', 'Tuition teacher upgrade request approved for ' . $candidate->name . '. The candidate can now fill in tuition details on their dashboard.');
     }
+
+    /**
+     * Admin quickly updates candidate's phone and WhatsApp numbers.
+     */
+    public function updateContactNumbers(Request $request, $id)
+    {
+        $user = User::where('role', 'candidate')->findOrFail($id);
+
+        $request->validate([
+            'phone'       => 'required|string|min:10|max:20|unique:users,phone,' . $user->id,
+            'whatsapp_no' => 'nullable|string|min:10|max:20',
+        ], [
+            'phone.required' => 'Mobile number is required.',
+            'phone.unique'   => 'This mobile number is already registered with another user.',
+        ]);
+
+        $cleanPhone = preg_replace('/[^0-9]/', '', $request->phone);
+        $cleanWhatsapp = $request->filled('whatsapp_no') 
+            ? preg_replace('/[^0-9]/', '', $request->whatsapp_no) 
+            : $cleanPhone;
+
+        $user->phone = $cleanPhone;
+        $user->whatsapp_no = $cleanWhatsapp;
+        $user->save();
+
+        if ($user->profile) {
+            $user->profile->whatsapp_no = $cleanWhatsapp;
+            $user->profile->save();
+        }
+
+        return back()->with('success', 'Candidate contact numbers updated successfully!');
+    }
 }
+

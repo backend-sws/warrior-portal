@@ -241,11 +241,16 @@
                     </div>
 
                     {{-- Contact --}}
-                    <div class="mt-2 space-y-0.5 text-xs text-text-dark/70">
-                        <p class="flex items-center gap-1.5">
-                            <i class="fas fa-phone-alt text-[10px] text-text-dark/40"></i>
-                            <a href="tel:{{ $candidate->phone }}" class="hover:text-accent-blue font-semibold">{{ $candidate->phone }}</a>
-                        </p>
+                    <div class="mt-2 space-y-1 text-xs text-text-dark/70" x-data="{ editNumbersModal: false }">
+                        <div class="flex items-center justify-between gap-1">
+                            <p class="flex items-center gap-1.5">
+                                <i class="fas fa-phone-alt text-[10px] text-text-dark/40"></i>
+                                <a href="tel:{{ $candidate->phone }}" class="hover:text-accent-blue font-semibold">{{ $candidate->phone }}</a>
+                            </p>
+                            <button type="button" @click="editNumbersModal = true" class="text-[10px] text-accent-blue hover:text-blue-700 font-bold px-2 py-0.5 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors flex items-center gap-1" title="Change Phone or WhatsApp number">
+                                <i class="fas fa-pen text-[9px]"></i> <span>Change</span>
+                            </button>
+                        </div>
                         @if($candidate->whatsapp_no || $profile?->whatsapp_no)
                             @php $wNo = preg_replace('/[^0-9]/', '', $candidate->whatsapp_no ?: $profile?->whatsapp_no); @endphp
                             <p class="flex items-center gap-1.5">
@@ -253,13 +258,71 @@
                                 <a href="https://wa.me/{{ str_starts_with($wNo, '91') ? $wNo : '91'.$wNo }}" target="_blank" class="text-emerald-700 font-bold hover:underline">
                                     {{ $candidate->whatsapp_no ?: $profile?->whatsapp_no }}
                                 </a>
+                                @if(($candidate->whatsapp_no ?: $profile?->whatsapp_no) !== $candidate->phone)
+                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">Different</span>
+                                @endif
                             </p>
                         @endif
                         <p class="flex items-center gap-1.5 truncate">
                             <i class="fas fa-envelope text-[10px] text-text-dark/40"></i>
                             <a href="mailto:{{ $candidate->email }}" class="hover:text-accent-blue truncate">{{ $candidate->email }}</a>
                         </p>
+
+                        {{-- Edit Numbers Modal --}}
+                        <div x-show="editNumbersModal" 
+                             x-cloak 
+                             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+                             @keydown.escape.window="editNumbersModal = false">
+                            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative text-left"
+                                 @click.away="editNumbersModal = false">
+                                <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+                                            <i class="fas fa-phone-alt"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-sm font-black text-[#031b4e]">Update Contact Numbers</h3>
+                                            <p class="text-[11px] text-slate-500">{{ $candidate->name }}</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="editNumbersModal = false" class="text-slate-400 hover:text-slate-700 text-sm">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+
+                                <form action="{{ route('admin.crm.candidate.update-numbers', $candidate->id) }}" method="POST" class="space-y-4">
+                                    @csrf
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
+                                            Mobile / Calling Number <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="tel" name="phone" value="{{ old('phone', $candidate->phone) }}" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);"
+                                               placeholder="10-digit mobile number"
+                                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
+                                            WhatsApp Number <span class="text-slate-400 font-normal lowercase text-[11px]">(Leave blank if same as mobile)</span>
+                                        </label>
+                                        <input type="tel" name="whatsapp_no" value="{{ old('whatsapp_no', $candidate->whatsapp_no ?: ($profile?->whatsapp_no ?? '')) }}" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);"
+                                               placeholder="Different 10-digit WhatsApp number"
+                                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                                    </div>
+
+                                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                                        <button type="button" @click="editNumbersModal = false" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="px-5 py-2 rounded-xl text-xs font-black text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all flex items-center gap-1.5">
+                                            <i class="fas fa-check"></i> <span>Save Numbers</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
