@@ -4,22 +4,163 @@
 @section('content')
 <x-page-header title="Find Tuitions" :breadcrumbs="['Home' => route('home'), 'Tuitions' => null]" image="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" />
 
-<!-- Tutor Search Section -->
-<div class="bg-[#031b4e] py-12 px-6 lg:px-[5%] relative overflow-hidden">
-    <div class="max-w-4xl mx-auto relative z-10">
-        <h2 class="text-3xl font-extrabold text-white text-center mb-6">Search for a Tutor</h2>
-        <form action="{{ route('tutors.search') }}" method="GET" class="bg-white p-4 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-4 items-center">
-            <div class="flex-1 w-full relative">
-                <i class="fas fa-book absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" name="subject" value="{{ request('subject') }}" placeholder="Search Subject (e.g. Mathematics)" style="padding-left: 2.5rem;" class="w-full pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-accent-blue/50 outline-none text-[#031b4e] font-semibold placeholder:text-slate-400">
+<!-- Tuition Search Section -->
+<div class="bg-[#031b4e] py-10 sm:py-12 px-4 sm:px-6 lg:px-[5%] relative overflow-hidden">
+    <!-- Decorative background elements -->
+    <div class="absolute inset-0 z-0 opacity-10" style="background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
+    <div class="absolute top-0 right-0 w-80 h-80 bg-[#0ea5e9]/15 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-5xl mx-auto relative z-10">
+        <div class="text-center mb-6">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Search Tuition Requirements</h2>
+            <p class="text-blue-200/80 text-xs sm:text-sm font-medium max-w-lg mx-auto">Find matching home tuition posts by Job ID, Subject, or Location / Pincode</p>
+        </div>
+
+        <style>
+            .tuition-search-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                align-items: center;
+            }
+            @media (min-width: 768px) {
+                .tuition-search-grid {
+                    grid-template-columns: 1.15fr 1.25fr 1.35fr auto;
+                }
+            }
+            .tuition-field-box {
+                position: relative;
+                width: 100%;
+            }
+            .tuition-field-box input {
+                width: 100%;
+                height: 48px;
+                padding-left: 2.5rem;
+                padding-right: 0.85rem;
+                border-radius: 0.85rem;
+                border: 1.5px solid #e2e8f0;
+                background-color: #f8fafc;
+                color: #031b4e;
+                font-weight: 700;
+                font-size: 0.875rem;
+                outline: none;
+                transition: all 0.2s ease;
+                box-sizing: border-box;
+            }
+            .tuition-field-box input:focus {
+                background-color: #ffffff;
+                border-color: #0ea5e9;
+                box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+            }
+            .tuition-field-icon {
+                position: absolute;
+                left: 0.95rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #94a3b8;
+                font-size: 0.875rem;
+                pointer-events: none;
+            }
+            .tuition-action-group {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            @media (min-width: 768px) {
+                .tuition-action-group {
+                    width: auto;
+                }
+            }
+            .tuition-submit-btn {
+                height: 48px;
+                padding: 0 1.5rem;
+                border-radius: 0.85rem;
+                background-color: #0ea5e9;
+                color: #ffffff;
+                font-weight: 800;
+                font-size: 0.875rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                white-space: nowrap;
+                transition: all 0.2s ease;
+                box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
+                border: none;
+                cursor: pointer;
+                flex: 1;
+            }
+            @media (min-width: 768px) {
+                .tuition-submit-btn {
+                    flex: initial;
+                }
+            }
+            .tuition-submit-btn:hover {
+                background-color: #0284c7;
+                box-shadow: 0 6px 18px rgba(14, 165, 233, 0.45);
+                transform: translateY(-1px);
+            }
+            .tuition-clear-link {
+                height: 48px;
+                width: 48px;
+                border-radius: 0.85rem;
+                background-color: #f1f5f9;
+                color: #64748b;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+                border: 1px solid #e2e8f0;
+                flex-shrink: 0;
+            }
+            .tuition-clear-link:hover {
+                background-color: #e2e8f0;
+                color: #0f172a;
+            }
+        </style>
+
+        <form action="{{ route('tuitions') }}" method="GET" class="bg-white p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 tuition-search-grid">
+            
+            <!-- Input 1: Job ID / Tuition ID -->
+            <div class="tuition-field-box">
+                <i class="fas fa-hashtag tuition-field-icon"></i>
+                <input type="text" 
+                       name="job_id" 
+                       value="{{ request('job_id') ?? request('tuition_id') }}" 
+                       placeholder="Job ID (e.g. TUI-0034)">
             </div>
-            <div class="flex-1 w-full relative">
-                <i class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" name="location" value="{{ request('location') }}" placeholder="Enter Location / Pincode" style="padding-left: 2.5rem;" class="w-full pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-accent-blue/50 outline-none text-[#031b4e] font-semibold placeholder:text-slate-400">
+
+            <!-- Input 2: Subject -->
+            <div class="tuition-field-box">
+                <i class="fas fa-book tuition-field-icon"></i>
+                <input type="text" 
+                       name="subject" 
+                       value="{{ request('subject') }}" 
+                       placeholder="Subject (e.g. Mathematics)">
             </div>
-            <button type="submit" class="w-full md:w-auto bg-accent-blue text-white font-bold py-3 px-8 rounded-xl hover:bg-blue-600 transition-colors shadow-glow-blue whitespace-nowrap">
-                Get Started <i class="fas fa-arrow-right ml-2"></i>
-            </button>
+
+            <!-- Input 3: Location / Pincode -->
+            <div class="tuition-field-box">
+                <i class="fas fa-map-marker-alt tuition-field-icon"></i>
+                <input type="text" 
+                       name="location" 
+                       value="{{ request('location') ?? request('pincode') }}" 
+                       placeholder="Location / Pincode (e.g. 800001)">
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="tuition-action-group">
+                <button type="submit" class="tuition-submit-btn">
+                    <i class="fas fa-search text-xs"></i>
+                    <span>Search</span>
+                </button>
+                @if(request()->hasAny(['job_id', 'tuition_id', 'subject', 'location', 'pincode', 'search']))
+                    <a href="{{ route('tuitions') }}" title="Clear Search Filters" class="tuition-clear-link" aria-label="Clear filters">
+                        <i class="fas fa-times"></i>
+                    </a>
+                @endif
+            </div>
         </form>
     </div>
 </div>
@@ -28,89 +169,40 @@
     <div class="absolute inset-0 z-0 opacity-[0.02]" style="background-image: radial-gradient(#000000 1.5px, transparent 1.5px); background-size: 32px 32px;"></div>
 
     <div class="w-full lg:w-2/3 relative z-10">
-        @if(isset($tutors))
-            <h3 class="text-2xl font-bold text-[#031b4e] mb-6 border-b border-slate-100 pb-4">
-                {{ $subject ? $subject . ' ' : '' }}Tutors {{ $location ? 'near ' . $location : '' }}
-            </h3>
-            <style>
-                .tutor-grid {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.75rem;
-                }
-                @media (min-width: 768px) {
-                    .tutor-grid {
-                        display: grid;
-                        grid-template-columns: 2fr 1.5fr 1fr 2.5fr;
-                        gap: 1rem;
-                        align-items: center;
-                    }
-                }
-            </style>
-            <div class="flex flex-col gap-4">
-                @forelse($tutors as $tutor)
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between hover:border-accent-blue/50 hover:shadow-xl transition-all duration-300 group gap-4 relative">
-                    <div class="flex-1 overflow-hidden">
-                        <!-- Desktop Header (Hidden on small screens) -->
-                        <div class="hidden md:grid mb-2 border-b border-slate-100 pb-2 tutor-grid">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tutor</div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Subject</div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Experience</div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Location</div>
-                        </div>
-                        
-                        <!-- Content Grid -->
-                        <div class="tutor-grid">
-                            <!-- Tutor Name -->
-                            <div class="font-bold text-[#031b4e] group-hover:text-accent-blue transition-colors flex items-center gap-3">
-                                @if($tutor->profile && $tutor->profile->profile_photo_path)
-                                    <img src="{{ Storage::url($tutor->profile->profile_photo_path) }}" class="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-sm shrink-0">
-                                @else
-                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-sm shrink-0"><i class="fas fa-user"></i></div>
-                                @endif
-                                <span class="text-base truncate">{{ $tutor->name }}</span>
-                            </div>
-                            
-                            <!-- Subject -->
-                            <div class="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                                <span class="md:hidden text-xs text-slate-400">Subject:</span>
-                                {{ $tutor->profile->subject->name ?? 'Various' }}
-                            </div>
-                            
-                            <!-- Experience -->
-                            <div class="text-sm text-slate-600 font-medium whitespace-nowrap flex items-center gap-2">
-                                <span class="md:hidden text-xs text-slate-400">Exp:</span>
-                                {{ $tutor->profile->experience_years ?? 0 }} Years
-                            </div>
-                            
-                            <!-- Location -->
-                            <div class="text-sm text-slate-600 leading-tight flex items-start gap-2">
-                                <span class="md:hidden text-xs text-slate-400 mt-0.5">Loc:</span>
-                                <span>{{ $tutor->profile->address ?? 'N/A' }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="md:pl-4 md:border-l border-slate-100 shrink-0 mt-2 md:mt-0">
-                        <button type="button" @click="showDemoModal = true; selectedTutorId = {{ $tutor->id }}; selectedTutorName = '{{ addslashes($tutor->name) }}'" class="w-full md:w-auto bg-accent-blue text-white font-bold py-2.5 px-6 rounded-xl hover:bg-blue-600 transition-colors shadow-glow-blue text-sm whitespace-nowrap">
-                            Request Demo
-                        </button>
+        @if(request()->hasAny(['job_id', 'tuition_id', 'subject', 'location', 'pincode', 'search']))
+            <div class="flex items-center justify-between flex-wrap gap-3 mb-6 border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-2xl font-bold text-[#031b4e]">
+                        Matching Tuition Requirements
+                    </h3>
+                    <div class="flex items-center flex-wrap gap-1.5 mt-1.5">
+                        <span class="text-xs text-slate-500 font-medium">Found {{ $tuitions->total() }} post{{ $tuitions->total() == 1 ? '' : 's' }}</span>
+                        @if($qId = (request('job_id') ?: request('tuition_id')))
+                            <span class="inline-flex items-center gap-1 bg-blue-50 text-accent-blue px-2.5 py-0.5 rounded-md text-xs font-bold border border-blue-100">
+                                <i class="fas fa-hashtag text-[9px]"></i> {{ $qId }}
+                            </span>
+                        @endif
+                        @if($qSub = request('subject'))
+                            <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-md text-xs font-bold border border-emerald-100">
+                                <i class="fas fa-book text-[9px]"></i> {{ $qSub }}
+                            </span>
+                        @endif
+                        @if($qLoc = (request('location') ?: request('pincode')))
+                            <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-md text-xs font-bold border border-amber-100">
+                                <i class="fas fa-map-marker-alt text-[9px]"></i> {{ $qLoc }}
+                            </span>
+                        @endif
                     </div>
                 </div>
-                @empty
-                <div class="col-span-full text-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-300 shadow-sm text-2xl mx-auto mb-4"><i class="fas fa-search"></i></div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-2">No Tutors Found</h3>
-                    <p class="text-slate-500 text-sm max-w-md mx-auto">Try adjusting your search criteria to find matching tutors.</p>
-                </div>
-                @endforelse
-            </div>
-            <div class="mt-8">
-                {{ $tutors->links() }}
+                <a href="{{ route('tuitions') }}" class="text-xs font-bold text-accent-blue hover:text-blue-700 flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-100 transition-colors">
+                    <i class="fas fa-undo text-[10px]"></i> View All Requirements
+                </a>
             </div>
         @else
             <h3 class="text-2xl font-bold text-[#031b4e] mb-6 border-b border-slate-100 pb-4">Recent Tuition Requirements</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        @endif
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         @forelse($tuitions as $tuition)
         <div class="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col justify-between hover:border-accent-blue/50 hover:shadow-xl transition-all duration-300 group reveal">
             <div>
@@ -202,17 +294,21 @@
         </div>
         @empty
         <div class="col-span-full text-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">
-            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-300 shadow-sm text-2xl mx-auto mb-4"><i class="fas fa-chalkboard-teacher"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">No Active Tuitions</h3>
-            <p class="text-slate-500 text-sm max-w-md mx-auto">We currently don't have any tuition openings.</p>
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-300 shadow-sm text-2xl mx-auto mb-4">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">No Matching Tuition Requirements</h3>
+            <p class="text-slate-500 text-sm max-w-md mx-auto mb-5">We couldn't find any tuition requirements matching your search criteria. Try adjusting the Job ID, Subject, or Pincode.</p>
+            <a href="{{ route('tuitions') }}" class="inline-flex items-center gap-2 bg-[#0ea5e9] hover:bg-[#0284c7] text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-colors shadow-sm">
+                <i class="fas fa-undo"></i> View All Tuition Requirements
+            </a>
         </div>
         @endforelse
 
-            </div>
-            <div class="mt-12">
-                {{ $tuitions->links() }}
-            </div>
-        @endif
+        </div>
+        <div class="mt-12">
+            {{ $tuitions->links() }}
+        </div>
     </div>
 
     <div class="w-full lg:w-1/3 relative z-10">

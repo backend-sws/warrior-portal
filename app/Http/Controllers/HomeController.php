@@ -376,15 +376,51 @@ class HomeController extends Controller
     {
         $query = \App\Models\HomeTuitionLead::whereIn('status', ['Approved', 'Confirmed']);
 
-        if ($search = $request->input('search')) {
+        // 1. Job ID / Tuition ID search (e.g. TUI-0034, 0034, 34)
+        $jobId = trim((string)($request->input('job_id') ?: $request->input('tuition_id')));
+        if ($jobId !== '') {
+            $query->where(function($q) use ($jobId) {
+                $q->where('tuition_id', 'like', "%{$jobId}%");
+                if (preg_match('/^(?:tui-?)0*(\d+)$/i', $jobId, $m)) {
+                    $q->orWhere('id', (int)$m[1]);
+                } elseif (is_numeric($jobId)) {
+                    $q->orWhere('id', (int)$jobId);
+                }
+            });
+        }
+
+        // 2. Subject search (e.g. Mathematics, Science, English, etc.)
+        $subject = trim((string)$request->input('subject'));
+        if ($subject !== '') {
+            $query->where(function($q) use ($subject) {
+                $q->where('subjects', 'like', "%{$subject}%")
+                  ->orWhere('class', 'like', "%{$subject}%")
+                  ->orWhere('board', 'like', "%{$subject}%");
+            });
+        }
+
+        // 3. Location / Pincode search (e.g. 800001, Patna, etc.)
+        $location = trim((string)($request->input('location') ?: $request->input('pincode')));
+        if ($location !== '') {
+            $query->where(function($q) use ($location) {
+                $q->where('pincode', 'like', "%{$location}%")
+                  ->orWhere('location', 'like', "%{$location}%");
+            });
+        }
+
+        // 4. General search query (fallback if 'search' is provided)
+        $search = trim((string)$request->input('search'));
+        if ($search !== '') {
             $query->where(function($q) use ($search) {
                 $q->where('tuition_id', 'like', "%{$search}%")
                   ->orWhere('class', 'like', "%{$search}%")
                   ->orWhere('subjects', 'like', "%{$search}%")
                   ->orWhere('location', 'like', "%{$search}%")
                   ->orWhere('pincode', 'like', "%{$search}%");
-                if (is_numeric($search)) {
-                    $q->orWhere('id', $search);
+                if (preg_match('/^(?:tui-?)0*(\d+)$/i', $search, $m)) {
+                    $q->orWhere('id', (int)$m[1]);
+                } elseif (is_numeric($search)) {
+                    $q->orWhere('id', (int)$search);
                 }
             });
         }
