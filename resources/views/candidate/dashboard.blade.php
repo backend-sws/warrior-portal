@@ -41,9 +41,9 @@
         @php
             $completionPct = $profile?->completion_percentage ?? 0;
             $catLabel = match($profile?->candidate_category) {
-                'home_tutor' => 'Home Tutor Only',
-                'school_job' => 'School Job Only',
-                default => 'Both (School Job + Home Tuition)',
+                'home_tutor' => 'Home Tutor',
+                'school_job' => 'School Teacher',
+                default => 'Dual Profile (School + Tuition)',
             };
             $catBadgeColor = match($profile?->candidate_category) {
                 'home_tutor' => 'bg-amber-100 text-amber-900 border-amber-300',
@@ -63,12 +63,22 @@
                             <div class="flex flex-wrap items-center gap-2 mb-1">
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-xs">Registration Pending</span>
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black border {{ $catBadgeColor }}">{{ $catLabel }}</span>
-                                <span class="text-xs font-bold text-amber-900 font-mono">{{ $completionPct }}% Completed (80% Required for Leads)</span>
+                                <span class="text-xs font-bold text-amber-900 font-mono">{{ $completionPct }}% Completed (80% Required for {{ $profile?->candidate_category === 'school_job' ? 'School Jobs' : 'Leads' }})</span>
                             </div>
-                            <h3 class="font-extrabold text-[#031b4e] text-base sm:text-lg">Action Required: Complete Profile to Unlock Tuition Leads</h3>
+                            <h3 class="font-extrabold text-[#031b4e] text-base sm:text-lg">
+                                @if($profile?->candidate_category === 'school_job')
+                                    Action Required: Complete Profile to Unlock School Vacancies
+                                @elseif($profile?->candidate_category === 'home_tutor')
+                                    Action Required: Complete Profile to Unlock Tuition Leads
+                                @else
+                                    Action Required: Complete Profile to Unlock Jobs & Tuition Leads
+                                @endif
+                            </h3>
                             <p class="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
                                 Missing fields: <strong class="text-amber-900">{{ !empty($profile?->missing_profile_fields) ? implode(', ', $profile->missing_profile_fields) : 'Basic preferences' }}</strong>. 
-                                @if($profile?->appliesForHomeTuition())
+                                @if($profile?->candidate_category === 'school_job')
+                                    <span class="text-amber-800 font-bold block mt-0.5"><i class="fas fa-lock text-[10px] mr-1"></i> School job applications and direct school interviews require at least 80% profile completion.</span>
+                                @elseif($profile?->appliesForHomeTuition())
                                     <span class="text-amber-800 font-bold block mt-0.5"><i class="fas fa-lock text-[10px] mr-1"></i> Home Tuition leads remain hidden until your profile reaches at least 80%.</span>
                                 @endif
                             </p>
@@ -105,217 +115,21 @@
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black border {{ $catBadgeColor }}">{{ $catLabel }}</span>
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">Verified & Active</span>
                         </div>
-                        <p class="text-xs text-slate-600">Your profile is eligible and active. Tuition leads and school job applications are fully unlocked!</p>
+                        <p class="text-xs text-slate-600">
+                            @if($profile?->candidate_category === 'school_job')
+                                Your school teaching profile is eligible and active. Verified school job openings are fully unlocked!
+                            @elseif($profile?->candidate_category === 'home_tutor')
+                                Your home tutoring profile is eligible and active. Tuition leads and parent inquiries are fully unlocked!
+                            @else
+                                Your profile is eligible and active. Tuition leads and school job applications are fully unlocked!
+                            @endif
+                        </p>
                     </div>
                 </div>
                 <a href="{{ route('candidate.profile.edit') }}" class="px-4 py-2 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 flex items-center gap-1.5">
                     <i class="fas fa-edit text-xs"></i> Update Profile
                 </a>
             </div>
-        @endif
-
-        {{-- ================= TUITION TEACHER UPGRADE SECTION (FOR SCHOOL JOB CANDIDATES) ================= --}}
-        @if($profile && $profile->candidate_category === 'school_job')
-            @if($profile->tuition_upgrade_status === 'none' || empty($profile->tuition_upgrade_status))
-                {{-- State 1: Ask to join as a tuition teacher also CTA --}}
-                <div class="bg-gradient-to-r from-amber-50 via-orange-50/50 to-blue-50 border-2 border-amber-300 rounded-3xl p-6 mb-8 shadow-md reveal">
-                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                        <div class="flex items-start gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-amber-500/25">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                            </div>
-                            <div>
-                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black uppercase tracking-wider mb-1.5 shadow-2xs">
-                                    <i class="fas fa-star text-amber-600"></i> Expand Your Opportunities
-                                </div>
-                                <h3 class="text-lg sm:text-xl font-extrabold text-[#031b4e]">
-                                    Ask to join as a tuition teacher also
-                                </h3>
-                                <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
-                                    You are currently registered for <strong>School Teaching Jobs only</strong>. If you would also like to receive verified <strong>Home Tuition leads</strong> and private tutoring inquiries in your preferred areas, click below to request admin approval.
-                                </p>
-                            </div>
-                        </div>
-                        <form action="{{ route('candidate.tuition-upgrade.request') }}" method="POST" class="shrink-0 w-full md:w-auto">
-                            @csrf
-                            <button type="submit" onclick="return confirm('Send request to admin to join as a tuition teacher also?');"
-                                    style="background: linear-gradient(135deg, #d97706 0%, #ea580c 100%); color: #ffffff !important; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4); border: none;"
-                                    class="w-full md:w-auto px-6 py-3.5 text-white font-black rounded-2xl text-xs sm:text-sm hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md">
-                                <i class="fas fa-paper-plane text-white text-xs"></i>
-                                <span class="text-white font-black">Ask to join as a tuition teacher also</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            @elseif($profile->tuition_upgrade_status === 'requested')
-                {{-- State 2: Request Pending Admin Review --}}
-                <div class="bg-gradient-to-r from-amber-50 via-orange-50/60 to-amber-50 border-2 border-amber-300 rounded-3xl p-6 mb-8 shadow-sm reveal">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl shrink-0 shadow-md shadow-amber-500/20">
-                                <i class="fas fa-hourglass-half animate-spin" style="animation-duration: 4s;"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white">Upgrade Request Sent</span>
-                                    <span class="text-xs font-semibold text-slate-500">Submitted {{ $profile->tuition_upgrade_requested_at?->diffForHumans() ?? 'recently' }}</span>
-                                </div>
-                                <h3 class="text-base sm:text-lg font-black text-[#031b4e]">
-                                    Tuition Teacher Request Pending Admin Approval
-                                </h3>
-                                <p class="text-xs text-slate-600 mt-0.5">
-                                    Your request to join as a tuition teacher has been submitted to the admin team. Once approved, the tuition preference form will open right here so you can set your subjects, classes, and areas to activate your dual profile.
-                                </p>
-                            </div>
-                        </div>
-                        <span class="px-4 py-2 bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-xs font-black shrink-0">
-                            <i class="fas fa-clock mr-1"></i> Under Admin Review
-                        </span>
-                    </div>
-                </div>
-            @elseif($profile->tuition_upgrade_status === 'approved')
-                {{-- State 3: Approved - Tuition Preferences Form to complete and convert to 'both' --}}
-                <div class="bg-gradient-to-br from-emerald-50 via-teal-50/40 to-blue-50 border-2 border-emerald-400 rounded-3xl p-6 sm:p-8 mb-8 shadow-lg reveal">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-emerald-200/80 mb-6">
-                        <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-emerald-500/20">
-                                <i class="fas fa-user-check"></i>
-                            </div>
-                            <div>
-                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-black uppercase tracking-wider mb-1">
-                                    <i class="fas fa-check-circle text-emerald-600"></i> Request Approved by Admin!
-                                </div>
-                                <h3 class="text-lg sm:text-xl font-extrabold text-[#031b4e]">
-                                    Complete Your Tuition Profile & Upgrade to Both
-                                </h3>
-                                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
-                                    Admin has approved your request! Select your tuition preferences below and save to convert your account into a <strong>Dual Profile (School Teacher + Home Tutor)</strong>.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Tuition Preferences Form --}}
-                    <form action="{{ route('candidate.tuition-upgrade.complete') }}" method="POST" class="space-y-6">
-                        @csrf
-
-                        {{-- Subjects You Teach --}}
-                        <div>
-                            <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
-                                <i class="fas fa-book-open text-amber-500 mr-1"></i> Subjects You Teach for Home Tuition *
-                            </label>
-                            @php
-                                $tuitionSubjectsList = [
-                                    'Pre-Primary', 'All Subjects (1-5)', 'All Subjects (6-8)', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 
-                                    'English', 'Hindi', 'Social Science', 'Computer Science', 'Spoken English', 'Accounts', 
-                                    'Economics', 'Business Studies'
-                                ];
-                                $existingSubjs = (array) ($profile->tuition_subjects ?? []);
-                                if (empty($existingSubjs) && $profile->subject_specialization) {
-                                    $existingSubjs[] = $profile->subject_specialization;
-                                }
-                            @endphp
-                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
-                                @foreach($tuitionSubjectsList as $subj)
-                                    <label class="flex items-center gap-2 p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-amber-400 cursor-pointer transition-all has-[:checked]:bg-amber-500 has-[:checked]:text-white has-[:checked]:border-amber-500 shadow-2xs">
-                                        <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}" {{ in_array($subj, $existingSubjs) ? 'checked' : '' }} class="rounded text-amber-600 focus:ring-amber-500">
-                                        <span>{{ $subj }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                            <div class="mt-2.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                                <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap">
-                                    <i class="fas fa-pencil-alt text-amber-500"></i> Other Subjects (comma separated):
-                                </span>
-                                <input type="text" name="manual_tuition_subjects" placeholder="e.g. Sanskrit, French, Vedic Maths..."
-                                       class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
-                            </div>
-                        </div>
-
-                        {{-- Classes Interested To Teach --}}
-                        <div>
-                            <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
-                                <i class="fas fa-graduation-cap text-blue-500 mr-1"></i> Classes Interested To Teach *
-                            </label>
-                            @php
-                                $classList = [
-                                    'Pre-Primary', 'Nursery – UKG', 'Class 1 – 5', 'Class 6 – 8', 
-                                    'Class 9 – 10', 'Class 11 – 12', 'IIT-JEE', 'NEET', 'Competitive / Olympiad'
-                                ];
-                                $existingClasses = (array) ($profile->classes_interested ?? []);
-                            @endphp
-                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-2.5">
-                                @foreach($classList as $cls)
-                                    <label class="flex items-center gap-2 p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-blue-400 cursor-pointer transition-all has-[:checked]:bg-blue-600 has-[:checked]:text-white has-[:checked]:border-blue-600 shadow-2xs">
-                                        <input type="checkbox" name="classes_interested[]" value="{{ $cls }}" {{ in_array($cls, $existingClasses) ? 'checked' : '' }} class="rounded text-blue-600 focus:ring-blue-500">
-                                        <span>{{ $cls }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                            <div class="mt-2.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                                <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap">
-                                    <i class="fas fa-pencil-alt text-blue-500"></i> Other Classes:
-                                </span>
-                                <input type="text" name="manual_classes" placeholder="e.g. B.Com, BCA, Engineering..."
-                                       class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            {{-- Teaching Mode --}}
-                            <div>
-                                <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
-                                    <i class="fas fa-laptop-house text-purple-500 mr-1"></i> Teaching Mode *
-                                </label>
-                                <select name="teaching_mode" required class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
-                                    <option value="Offline" {{ ($profile->teaching_mode ?? 'Offline') === 'Offline' ? 'selected' : '' }}>Offline (At Student's Home / Tutor Center)</option>
-                                    <option value="Online" {{ ($profile->teaching_mode ?? '') === 'Online' ? 'selected' : '' }}>Online (Google Meet / Zoom)</option>
-                                    <option value="Both" {{ ($profile->teaching_mode ?? '') === 'Both' ? 'selected' : '' }}>Both (Offline & Online)</option>
-                                </select>
-                            </div>
-
-                            {{-- Available Time Slot --}}
-                            <div>
-                                <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
-                                    <i class="fas fa-clock text-teal-500 mr-1"></i> Available Time Slot
-                                </label>
-                                <select name="available_time_slot" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
-                                    <option value="Flexible / Any Time" {{ ($profile->available_time_slot ?? '') === 'Flexible / Any Time' ? 'selected' : '' }}>Flexible / Any Time</option>
-                                    <option value="Morning (6:00 AM - 10:00 AM)" {{ ($profile->available_time_slot ?? '') === 'Morning (6:00 AM - 10:00 AM)' ? 'selected' : '' }}>Morning (6:00 AM - 10:00 AM)</option>
-                                    <option value="Evening (4:00 PM - 8:00 PM)" {{ ($profile->available_time_slot ?? 'Evening (4:00 PM - 8:00 PM)') === 'Evening (4:00 PM - 8:00 PM)' ? 'selected' : '' }}>Evening (4:00 PM - 8:00 PM)</option>
-                                    <option value="After School (3:00 PM - 7:00 PM)" {{ ($profile->available_time_slot ?? '') === 'After School (3:00 PM - 7:00 PM)' ? 'selected' : '' }}>After School (3:00 PM - 7:00 PM)</option>
-                                    <option value="Weekends Only" {{ ($profile->available_time_slot ?? '') === 'Weekends Only' ? 'selected' : '' }}>Weekends Only</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Preferred Areas / Localities --}}
-                        <div>
-                            <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1.5">
-                                <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> Preferred Areas / Localities for Home Tuitions *
-                            </label>
-                            <input type="text" name="preferred_areas" required
-                                   value="{{ old('preferred_areas', $profile->preferred_areas ?: (is_array($profile->preferred_locations) ? implode(', ', $profile->preferred_locations) : ($profile->address ?? ''))) }}"
-                                   placeholder="e.g. Kankarbagh, Boring Road, Bailey Road, Rajendra Nagar"
-                                   class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500">
-                            <p class="text-[11px] text-slate-500 mt-1">Enter localities or colonies where you are able to travel for home tuitions.</p>
-                        </div>
-
-                        {{-- Submit Button --}}
-                        <div class="pt-4 border-t border-emerald-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <p class="text-xs text-slate-600">
-                                <i class="fas fa-info-circle text-blue-500 mr-1"></i> Saving this form will permanently upgrade your profile to <strong>Both (School Job + Home Tuition)</strong> with 100% completion.
-                            </p>
-                            <button type="submit"
-                                    style="background: linear-gradient(135deg, #059669 0%, #0d9488 100%); color: #ffffff !important; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.4); border: none;"
-                                    class="w-full sm:w-auto px-8 py-3.5 text-white font-black text-sm rounded-2xl shadow-lg hover:opacity-95 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer">
-                                <i class="fas fa-save text-white"></i>
-                                <span class="text-white font-black">Save & Upgrade to Both (Dual Profile)</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            @endif
         @endif
 
         {{-- ================= FULLY REGISTERED DASHBOARD ================= --}}
@@ -643,6 +457,210 @@
                     @endif
                 </div>
 
+                {{-- ================= TUITION TEACHER UPGRADE SECTION (FOR SCHOOL JOB CANDIDATES) ================= --}}
+                @if($profile && $profile->candidate_category === 'school_job')
+                    @if($profile->tuition_upgrade_status === 'none' || empty($profile->tuition_upgrade_status))
+                        {{-- State 1: Ask to join as a tuition teacher also CTA --}}
+                        <div class="bg-gradient-to-r from-amber-50 via-orange-50/50 to-blue-50 border border-amber-300 rounded-3xl p-6 shadow-sm reveal">
+                            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl shrink-0 shadow-md shadow-amber-500/20">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                    </div>
+                                    <div>
+                                        <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black uppercase tracking-wider mb-1">
+                                            <i class="fas fa-star text-amber-600"></i> Additional Earning Opportunity
+                                        </div>
+                                        <h3 class="text-base sm:text-lg font-extrabold text-[#031b4e]">
+                                            Want to take private Home Tuitions as well?
+                                        </h3>
+                                        <p class="text-xs text-slate-600 mt-1 max-w-xl leading-relaxed">
+                                            You are currently registered for <strong>School Teaching Jobs</strong>. If you would also like to receive verified <strong>Home Tuition leads</strong> in your preferred areas, you can request admin approval to activate a Dual Profile.
+                                        </p>
+                                    </div>
+                                </div>
+                                <form action="{{ route('candidate.tuition-upgrade.request') }}" method="POST" class="shrink-0 w-full md:w-auto">
+                                    @csrf
+                                    <button type="submit" onclick="return confirm('Send request to admin to join as a tuition teacher also?');"
+                                            style="background: linear-gradient(135deg, #d97706 0%, #ea580c 100%); color: #ffffff !important; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.3); border: none;"
+                                            class="w-full md:w-auto px-5 py-3 text-white font-bold rounded-xl text-xs hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                                        <i class="fas fa-paper-plane text-white text-xs"></i>
+                                        <span class="text-white font-bold">Ask to join as Tuition Teacher</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @elseif($profile->tuition_upgrade_status === 'requested')
+                        {{-- State 2: Request Pending Admin Review --}}
+                        <div class="bg-gradient-to-r from-amber-50 via-orange-50/60 to-amber-50 border border-amber-300 rounded-3xl p-6 shadow-sm reveal">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl shrink-0 shadow-md shadow-amber-500/20">
+                                        <i class="fas fa-hourglass-half animate-spin" style="animation-duration: 4s;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white">Upgrade Request Sent</span>
+                                            <span class="text-xs font-semibold text-slate-500">Submitted {{ $profile->tuition_upgrade_requested_at?->diffForHumans() ?? 'recently' }}</span>
+                                        </div>
+                                        <h3 class="text-base font-black text-[#031b4e]">
+                                            Tuition Teacher Request Pending Admin Approval
+                                        </h3>
+                                        <p class="text-xs text-slate-600 mt-0.5">
+                                            Your request to join as a tuition teacher has been submitted to the admin team. Once approved, the tuition preference form will open right here so you can set your subjects, classes, and areas to activate your dual profile.
+                                        </p>
+                                    </div>
+                                </div>
+                                <span class="px-4 py-2 bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-xs font-black shrink-0">
+                                    <i class="fas fa-clock mr-1"></i> Under Admin Review
+                                </span>
+                            </div>
+                        </div>
+                    @elseif($profile->tuition_upgrade_status === 'approved')
+                        {{-- State 3: Approved - Tuition Preferences Form to complete and convert to 'both' --}}
+                        <div class="bg-gradient-to-br from-emerald-50 via-teal-50/40 to-blue-50 border-2 border-emerald-400 rounded-3xl p-6 sm:p-8 shadow-lg reveal">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-emerald-200/80 mb-6">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-14 h-14 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-emerald-500/20">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div>
+                                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-black uppercase tracking-wider mb-1">
+                                            <i class="fas fa-check-circle text-emerald-600"></i> Request Approved by Admin!
+                                        </div>
+                                        <h3 class="text-lg sm:text-xl font-extrabold text-[#031b4e]">
+                                            Complete Your Tuition Profile & Upgrade to Both
+                                        </h3>
+                                        <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+                                            Admin has approved your request! Select your tuition preferences below and save to convert your account into a <strong>Dual Profile (School Teacher + Home Tutor)</strong>.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Tuition Preferences Form --}}
+                            <form action="{{ route('candidate.tuition-upgrade.complete') }}" method="POST" class="space-y-6">
+                                @csrf
+
+                                {{-- Subjects You Teach --}}
+                                <div>
+                                    <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
+                                        <i class="fas fa-book-open text-amber-500 mr-1"></i> Subjects You Teach for Home Tuition *
+                                    </label>
+                                    @php
+                                        $tuitionSubjectsList = [
+                                            'Pre-Primary', 'All Subjects (1-5)', 'All Subjects (6-8)', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 
+                                            'English', 'Hindi', 'Social Science', 'Computer Science', 'Spoken English', 'Accounts', 
+                                            'Economics', 'Business Studies'
+                                        ];
+                                        $existingSubjs = (array) ($profile->tuition_subjects ?? []);
+                                        if (empty($existingSubjs) && $profile->subject_specialization) {
+                                            $existingSubjs[] = $profile->subject_specialization;
+                                        }
+                                    @endphp
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                                        @foreach($tuitionSubjectsList as $subj)
+                                            <label class="flex items-center gap-2 p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-amber-400 cursor-pointer transition-all has-[:checked]:bg-amber-500 has-[:checked]:text-white has-[:checked]:border-amber-500 shadow-2xs">
+                                                <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}" {{ in_array($subj, $existingSubjs) ? 'checked' : '' }} class="rounded text-amber-600 focus:ring-amber-500">
+                                                <span>{{ $subj }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    <div class="mt-2.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                        <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap">
+                                            <i class="fas fa-pencil-alt text-amber-500"></i> Other Subjects (comma separated):
+                                        </span>
+                                        <input type="text" name="manual_tuition_subjects" placeholder="e.g. Sanskrit, French, Vedic Maths..."
+                                               class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                                    </div>
+                                </div>
+
+                                {{-- Classes Interested To Teach --}}
+                                <div>
+                                    <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
+                                        <i class="fas fa-graduation-cap text-blue-500 mr-1"></i> Classes Interested To Teach *
+                                    </label>
+                                    @php
+                                        $classList = [
+                                            'Pre-Primary', 'Nursery – UKG', 'Class 1 – 5', 'Class 6 – 8', 
+                                            'Class 9 – 10', 'Class 11 – 12', 'IIT-JEE', 'NEET', 'Competitive / Olympiad'
+                                        ];
+                                        $existingClasses = (array) ($profile->classes_interested ?? []);
+                                    @endphp
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-2.5">
+                                        @foreach($classList as $cls)
+                                            <label class="flex items-center gap-2 p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-blue-400 cursor-pointer transition-all has-[:checked]:bg-blue-600 has-[:checked]:text-white has-[:checked]:border-blue-600 shadow-2xs">
+                                                <input type="checkbox" name="classes_interested[]" value="{{ $cls }}" {{ in_array($cls, $existingClasses) ? 'checked' : '' }} class="rounded text-blue-600 focus:ring-blue-500">
+                                                <span>{{ $cls }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    <div class="mt-2.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                        <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap">
+                                            <i class="fas fa-pencil-alt text-blue-500"></i> Other Classes:
+                                        </span>
+                                        <input type="text" name="manual_classes" placeholder="e.g. B.Com, BCA, Engineering..."
+                                               class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    {{-- Teaching Mode --}}
+                                    <div>
+                                        <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
+                                            <i class="fas fa-laptop-house text-purple-500 mr-1"></i> Teaching Mode *
+                                        </label>
+                                        <select name="teaching_mode" required class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
+                                            <option value="Offline" {{ ($profile->teaching_mode ?? 'Offline') === 'Offline' ? 'selected' : '' }}>Offline (At Student's Home / Tutor Center)</option>
+                                            <option value="Online" {{ ($profile->teaching_mode ?? '') === 'Online' ? 'selected' : '' }}>Online (Google Meet / Zoom)</option>
+                                            <option value="Both" {{ ($profile->teaching_mode ?? '') === 'Both' ? 'selected' : '' }}>Both (Offline & Online)</option>
+                                        </select>
+                                    </div>
+
+                                    {{-- Available Time Slot --}}
+                                    <div>
+                                        <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
+                                            <i class="fas fa-clock text-teal-500 mr-1"></i> Available Time Slot
+                                        </label>
+                                        <select name="available_time_slot" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
+                                            <option value="Flexible / Any Time" {{ ($profile->available_time_slot ?? '') === 'Flexible / Any Time' ? 'selected' : '' }}>Flexible / Any Time</option>
+                                            <option value="Morning (6:00 AM - 10:00 AM)" {{ ($profile->available_time_slot ?? '') === 'Morning (6:00 AM - 10:00 AM)' ? 'selected' : '' }}>Morning (6:00 AM - 10:00 AM)</option>
+                                            <option value="Evening (4:00 PM - 8:00 PM)" {{ ($profile->available_time_slot ?? 'Evening (4:00 PM - 8:00 PM)') === 'Evening (4:00 PM - 8:00 PM)' ? 'selected' : '' }}>Evening (4:00 PM - 8:00 PM)</option>
+                                            <option value="After School (3:00 PM - 7:00 PM)" {{ ($profile->available_time_slot ?? '') === 'After School (3:00 PM - 7:00 PM)' ? 'selected' : '' }}>After School (3:00 PM - 7:00 PM)</option>
+                                            <option value="Weekends Only" {{ ($profile->available_time_slot ?? '') === 'Weekends Only' ? 'selected' : '' }}>Weekends Only</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- Preferred Areas / Localities --}}
+                                <div>
+                                    <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1.5">
+                                        <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> Preferred Areas / Localities for Home Tuitions *
+                                    </label>
+                                    <input type="text" name="preferred_areas" required
+                                           value="{{ old('preferred_areas', $profile->preferred_areas ?: (is_array($profile->preferred_locations) ? implode(', ', $profile->preferred_locations) : ($profile->address ?? ''))) }}"
+                                           placeholder="e.g. Kankarbagh, Boring Road, Bailey Road, Rajendra Nagar"
+                                           class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500">
+                                    <p class="text-[11px] text-slate-500 mt-1">Enter localities or colonies where you are able to travel for home tuitions.</p>
+                                </div>
+
+                                {{-- Submit Button --}}
+                                <div class="pt-4 border-t border-emerald-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <p class="text-xs text-slate-600">
+                                        <i class="fas fa-info-circle text-blue-500 mr-1"></i> Saving this form will permanently upgrade your profile to <strong>Both (School Job + Home Tuition)</strong> with 100% completion.
+                                    </p>
+                                    <button type="submit"
+                                            style="background: linear-gradient(135deg, #059669 0%, #0d9488 100%); color: #ffffff !important; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.4); border: none;"
+                                            class="w-full sm:w-auto px-8 py-3.5 text-white font-black text-sm rounded-2xl shadow-lg hover:opacity-95 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer">
+                                        <i class="fas fa-save text-white"></i>
+                                        <span class="text-white font-black">Save & Upgrade to Both (Dual Profile)</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    @endif
+                @endif
+
                 {{-- ================= ACTIVE PLACEMENTS, INTERVIEWS & ASSIGNED TUITIONS ================= --}}
                 @php
                     $dashCat = $profile?->candidate_category ?: 'both';
@@ -954,6 +972,28 @@
                                     <div class="flex justify-between items-center py-1">
                                         <span class="text-slate-500">Specialization</span>
                                         <span class="font-bold text-[#031b4e]">{{ $profile->subject_specialization }}</span>
+                                    </div>
+                                @endif
+
+                                @if(!empty($profile->tuition_subjects) && is_array($profile->tuition_subjects))
+                                    <div class="py-1">
+                                        <span class="text-[11px] text-slate-500 block mb-1">Subjects You Teach:</span>
+                                        <div class="flex flex-wrap gap-1">
+                                            @foreach($profile->tuition_subjects as $sub)
+                                                <span class="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-bold">{{ $sub }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if(!empty($profile->classes_interested) && is_array($profile->classes_interested))
+                                    <div class="py-1">
+                                        <span class="text-[11px] text-slate-500 block mb-1">Classes You Teach:</span>
+                                        <div class="flex flex-wrap gap-1">
+                                            @foreach($profile->classes_interested as $cls)
+                                                <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 border border-blue-200 text-[10px] font-bold">{{ $cls }}</span>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 @endif
 
