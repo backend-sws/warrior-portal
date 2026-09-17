@@ -17,7 +17,6 @@
          email: '{{ old('email', '') }}',
          phone: '{{ old('phone', '') }}',
          whatsapp_no: '{{ old('whatsapp_no', '') }}',
-         sameAsMobile: true,
          password: '{{ old('password', 'Warrior@' . rand(100, 999)) }}',
          password_confirmation: '{{ old('password_confirmation', '') }}',
          gender: '{{ old('gender', '') }}',
@@ -47,11 +46,6 @@
                      this.userLng = e.detail.lng;
                  }
              });
-         },
-         syncWhatsapp() {
-             if (this.sameAsMobile) {
-                 this.whatsapp_no = this.phone;
-             }
          },
          syncPassword() {
              this.password_confirmation = this.password;
@@ -174,17 +168,11 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Mobile Number <span class="text-red-500">*</span></label>
-                        <input type="tel" name="phone" x-model="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" @input="syncWhatsapp()" placeholder="e.g. 9876543210"
+                        <input type="tel" name="phone" x-model="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" placeholder="e.g. 9876543210"
                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
                     <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">WhatsApp Number</label>
-                            <label class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600 cursor-pointer">
-                                <input type="checkbox" x-model="sameAsMobile" @change="syncWhatsapp()" class="rounded text-blue-600">
-                                <span>Same as mobile</span>
-                            </label>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">WhatsApp Number <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional / Can be different)</span></label>
                         <input type="tel" name="whatsapp_no" x-model="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" placeholder="e.g. 9876543210"
                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
@@ -219,15 +207,8 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Total Teaching Experience <span class="text-red-500">*</span></label>
-                        <select name="experience_range" x-model="experience_range" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                            <option value="">Select Experience</option>
-                            <option value="0–1 Year">Fresher (0–1 Year)</option>
-                            <option value="1–3 Years">1–3 Years</option>
-                            <option value="3–5 Years">3–5 Years</option>
-                            <option value="5–10 Years">5–10 Years</option>
-                            <option value="10–15 Years">10–15 Years</option>
-                            <option value="15+ Years">15+ Years</option>
-                        </select>
+                        <input type="text" name="experience_range" x-model="experience_range" list="admin_create_exp_suggestions" required placeholder="e.g. Fresher / 2 Years / 3.5 Years / 5+ Years"
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
                 </div>
             </div>
@@ -385,17 +366,11 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Mobile Number <span class="text-red-500">*</span></label>
-                        <input type="tel" name="phone" x-model="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" @input="syncWhatsapp()" placeholder="e.g. 9876543210"
+                        <input type="tel" name="phone" x-model="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" placeholder="e.g. 9876543210"
                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
                     <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">WhatsApp Number</label>
-                            <label class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600 cursor-pointer">
-                                <input type="checkbox" x-model="sameAsMobile" @change="syncWhatsapp()" class="rounded text-blue-600">
-                                <span>Same as mobile</span>
-                            </label>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">WhatsApp Number <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional / Can be different)</span></label>
                         <input type="tel" name="whatsapp_no" x-model="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" placeholder="e.g. 9876543210"
                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
@@ -430,15 +405,8 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Total Teaching Experience <span class="text-red-500">*</span></label>
-                        <select name="experience_range" x-model="experience_range" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                            <option value="">Select Experience</option>
-                            <option value="0–1 Year">Fresher (0–1 Year)</option>
-                            <option value="1–3 Years">1–3 Years</option>
-                            <option value="3–5 Years">3–5 Years</option>
-                            <option value="5–10 Years">5–10 Years</option>
-                            <option value="10–15 Years">10–15 Years</option>
-                            <option value="15+ Years">15+ Years</option>
-                        </select>
+                        <input type="text" name="experience_range" x-model="experience_range" list="admin_create_exp_suggestions" required placeholder="e.g. Fresher / 2 Years / 3.5 Years / 5+ Years"
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
                 </div>
             </div>
@@ -451,7 +419,7 @@
                     <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 ml-auto">School Candidate Details</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div class="sm:col-span-2">
+                    <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Teaching Post Applying For <span class="text-red-500">*</span></label>
                         <select name="position_applying_for" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                             <option value="">Select Teaching Post</option>
@@ -463,6 +431,11 @@
                             <option value="Principal / Vice Principal">Principal / Vice Principal</option>
                             <option value="Admin / Non-Teaching Staff">Admin / Non-Teaching Staff</option>
                         </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Subject Specialization <span class="text-red-500">*</span></label>
+                        <input type="text" name="subject_specialization" required placeholder="e.g. Mathematics, Physics, Chemistry, English, Social Studies, Biology..."
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">B.Ed Status <span class="text-red-500">*</span></label>
@@ -648,17 +621,11 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Mobile Number <span class="text-red-500">*</span></label>
-                        <input type="tel" name="phone" x-model="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" @input="syncWhatsapp()" placeholder="e.g. 9876543210"
+                        <input type="tel" name="phone" x-model="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" placeholder="e.g. 9876543210"
                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
                     <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">WhatsApp Number</label>
-                            <label class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600 cursor-pointer">
-                                <input type="checkbox" x-model="sameAsMobile" @change="syncWhatsapp()" class="rounded text-blue-600">
-                                <span>Same as mobile</span>
-                            </label>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">WhatsApp Number <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional / Can be different)</span></label>
                         <input type="tel" name="whatsapp_no" x-model="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" placeholder="e.g. 9876543210"
                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
@@ -693,15 +660,8 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Total Teaching Experience <span class="text-red-500">*</span></label>
-                        <select name="experience_range" x-model="experience_range" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                            <option value="">Select Experience</option>
-                            <option value="0–1 Year">Fresher (0–1 Year)</option>
-                            <option value="1–3 Years">1–3 Years</option>
-                            <option value="3–5 Years">3–5 Years</option>
-                            <option value="5–10 Years">5–10 Years</option>
-                            <option value="10–15 Years">10–15 Years</option>
-                            <option value="15+ Years">15+ Years</option>
-                        </select>
+                        <input type="text" name="experience_range" x-model="experience_range" list="admin_create_exp_suggestions" required placeholder="e.g. Fresher / 2 Years / 3.5 Years / 5+ Years"
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
                 </div>
             </div>
@@ -833,7 +793,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Subject Specialization <span class="text-red-500">*</span></label>
-                        <input type="text" name="subject_specialization" required placeholder="e.g. Mathematics, Physics, English..."
+                        <input type="text" name="subject_specialization" required placeholder="e.g. Mathematics, Physics, Chemistry, English, Social Studies, Biology..."
                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                     </div>
                     <div>
@@ -948,5 +908,17 @@
             </div>
         </form>
     </div>
+    <datalist id="admin_create_exp_suggestions">
+        <option value="Fresher (0 Years)">
+        <option value="1 Year">
+        <option value="2 Years">
+        <option value="3 Years">
+        <option value="4 Years">
+        <option value="5 Years">
+        <option value="5+ Years">
+        <option value="7+ Years">
+        <option value="10+ Years">
+        <option value="15+ Years">
+    </datalist>
 </div>
 @endsection

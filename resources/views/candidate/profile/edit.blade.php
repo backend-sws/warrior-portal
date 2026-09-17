@@ -5,8 +5,9 @@
 
 @php
     $candidateCategory = $profile->candidate_category ?: 'both';
-    $isOldOrBothData = empty($profile->candidate_category) || $profile->candidate_category === 'both';
-    $activeCategory = old('candidate_category', $candidateCategory);
+    $isTuitionUpgradeApproved = $profile->tuition_upgrade_status === 'approved';
+    $isOldOrBothData = empty($profile->candidate_category) || $profile->candidate_category === 'both' || $isTuitionUpgradeApproved;
+    $activeCategory = $isTuitionUpgradeApproved ? 'both' : old('candidate_category', $candidateCategory);
     $curQual = $profile->highest_qualification_name ?: ($profile->highestQualification?->name ?? '');
 @endphp
 
@@ -130,6 +131,21 @@
                     </ul>
                 </div>
             </div>
+        </div>
+    @endif
+
+    @if($isTuitionUpgradeApproved)
+        <div class="mb-6 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border-2 border-emerald-400 p-5 rounded-2xl flex items-center justify-between gap-4 shadow-sm reveal">
+            <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-lg shrink-0 shadow-md">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <h4 class="text-sm font-black text-emerald-950">Tuition Upgrade Request Approved by Admin! 🎉</h4>
+                    <p class="text-xs text-emerald-800">You can now configure Section 2 (Home Tuition Preferences) below. When you click Save Profile Details, your account will be upgraded to <strong>Both (School Teacher & Home Tutor)</strong>.</p>
+                </div>
+            </div>
+            <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-lg border border-emerald-300 shrink-0">Ready to Activate</span>
         </div>
     @endif
 
@@ -736,6 +752,51 @@
             </div>
         </form>
     </div>
+
+    {{-- Tuition Upgrade Section (For School Job Candidates) --}}
+    @if($candidateCategory === 'school_job' && !$isTuitionUpgradeApproved)
+        @if($profile->tuition_upgrade_status === 'none' || empty($profile->tuition_upgrade_status))
+            <div class="bg-gradient-to-r from-amber-50 via-orange-50/50 to-blue-50 border-2 border-amber-300 rounded-3xl p-6 mt-8 shadow-md reveal">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl shrink-0 shadow-md">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black uppercase tracking-wider mb-1">
+                                <i class="fas fa-star text-amber-600"></i> Also Interested in Tuitions?
+                            </div>
+                            <h3 class="text-base sm:text-lg font-extrabold text-[#031b4e]">
+                                Ask to join as a tuition teacher also
+                            </h3>
+                            <p class="text-xs text-slate-600 mt-0.5 max-w-xl">
+                                Request admin approval to teach private home tuitions and online batches alongside your school teaching profile.
+                            </p>
+                        </div>
+                    </div>
+                    <form action="{{ route('candidate.tuition-upgrade.request') }}" method="POST" class="shrink-0 w-full md:w-auto">
+                        @csrf
+                        <button type="submit" onclick="return confirm('Send request to admin to join as a tuition teacher also?');"
+                                style="background: linear-gradient(135deg, #d97706 0%, #ea580c 100%); color: #ffffff !important; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4); border: none;"
+                                class="w-full md:w-auto px-6 py-3.5 text-white font-extrabold rounded-xl text-xs sm:text-sm hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                            <i class="fas fa-paper-plane text-white text-xs sm:text-sm"></i>
+                            <span class="text-white font-black">Ask to join as a tuition teacher also</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @elseif($profile->tuition_upgrade_status === 'requested')
+            <div class="bg-amber-50 border border-amber-300 rounded-2xl p-5 mt-8 shadow-sm flex items-center gap-3.5 reveal">
+                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg shrink-0 shadow-md">
+                    <i class="fas fa-hourglass-half animate-spin" style="animation-duration: 4s;"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs font-black text-amber-950">Tuition Upgrade Request Pending Admin Approval</h4>
+                    <p class="text-[11px] text-amber-800">Your request to join as a tuition teacher is under review. You will receive a notification as soon as it is approved.</p>
+                </div>
+            </div>
+        @endif
+    @endif
 
     {{-- Change Password Card --}}
     <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xl mt-8 reveal">

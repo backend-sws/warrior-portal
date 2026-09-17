@@ -59,14 +59,13 @@
                         <div class="text-xs text-[#031b4e]/70">{{ $app->candidate->profile->highestQualification->name ?? 'N/A' }}</div>
                     </td>
                     <td class="py-4 px-6">
-                        @if($app->status === 'shortlisted')
-                            <span class="bg-accent-yellow/10 text-accent-yellow px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1 w-max">
-                                <i class="fas fa-hourglass-half"></i> Pending Interview
-                            </span>
-                        @elseif($app->status === 'hired')
-                            <span class="bg-green-500/10 text-green-400 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1 w-max">
-                                <i class="fas fa-check-circle"></i> Selected
-                            </span>
+                        <span class="{{ $app->status_badge_class }} px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1 w-max">
+                            {{ $app->status_label }}
+                        </span>
+                        @if($app->interview_date)
+                            <div class="text-[11px] text-purple-700 font-semibold mt-1 flex items-center gap-1">
+                                <i class="fas fa-calendar-alt"></i> {{ $app->interview_date->format('d M, h:i A') }}
+                            </div>
                         @endif
                     </td>
                 </tr>

@@ -34,6 +34,17 @@
             <i class="fas fa-edit"></i> <span>Edit Profile</span>
         </a>
 
+        @if($candidate->profile && $candidate->profile->tuition_upgrade_status === 'requested')
+            <form action="{{ route('admin.crm.candidate.approve-tuition-upgrade', $candidate->id) }}" method="POST" class="inline">
+                @csrf
+                <button type="submit" onclick="return confirm('Approve {{ addslashes($candidate->name) }} to join as a tuition teacher also?');"
+                        style="background: linear-gradient(135deg, #d97706 0%, #ea580c 100%); color: #ffffff !important; border: none;"
+                        class="px-4 py-2 text-white text-xs font-black rounded-xl transition-all flex items-center gap-1.5 shadow-md animate-pulse cursor-pointer">
+                    <i class="fas fa-chalkboard-teacher text-white"></i> <span>Approve Tuition Upgrade</span>
+                </button>
+            </form>
+        @endif
+
         <a href="{{ route('admin.crm.candidate.magic-login', $candidate->id) }}" target="_blank" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
             <i class="fas fa-sign-in-alt"></i> <span>Candidate Portal</span>
         </a>
@@ -61,6 +72,51 @@
     $pct = $profile?->completion_percentage ?? 0;
     $missingFields = $profile?->missing_profile_fields ?? [];
 @endphp
+
+{{-- Tuition Upgrade Request Banner --}}
+@if($profile && $profile->tuition_upgrade_status === 'requested')
+    <div class="mb-6 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border-2 border-amber-400 rounded-3xl p-5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl shrink-0 shadow-md">
+                <i class="fas fa-chalkboard-teacher animate-bounce"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-xs">Upgrade Request Pending</span>
+                    <span class="text-xs text-slate-500">Requested {{ $profile->tuition_upgrade_requested_at?->diffForHumans() ?? 'recently' }}</span>
+                </div>
+                <h3 class="text-base font-extrabold text-[#031b4e]">
+                    Candidate Requested to Join as a Tuition Teacher Also
+                </h3>
+                <p class="text-xs text-slate-600 mt-0.5">
+                    This candidate registered for <strong>School Jobs only</strong> and has submitted a request to also teach <strong>Home Tuitions</strong>. Click Approve to grant access and allow them to fill their tuition subjects, classes, and areas.
+                </p>
+            </div>
+        </div>
+        <form action="{{ route('admin.crm.candidate.approve-tuition-upgrade', $candidate->id) }}" method="POST" class="shrink-0">
+            @csrf
+            <button type="submit" onclick="return confirm('Approve {{ addslashes($candidate->name) }} to join as a tuition teacher?');"
+                    style="background: #059669; color: #ffffff !important; border: none;"
+                    class="px-5 py-2.5 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer">
+                <i class="fas fa-check-circle text-sm text-white"></i>
+                <span>Approve Tuition Upgrade</span>
+            </button>
+        </form>
+    </div>
+@elseif($profile && $profile->tuition_upgrade_status === 'approved')
+    <div class="mb-6 bg-emerald-50 border border-emerald-300 rounded-2xl p-4 shadow-xs flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-sm shrink-0">
+                <i class="fas fa-check"></i>
+            </div>
+            <div>
+                <h4 class="text-xs font-bold text-emerald-900">Tuition Upgrade Request Approved</h4>
+                <p class="text-[11px] text-emerald-700">Candidate was approved on {{ $profile->tuition_upgrade_approved_at?->format('d M Y, h:i A') ?? 'N/A' }}. Waiting for candidate to complete tuition preferences on their dashboard.</p>
+            </div>
+        </div>
+        <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-lg border border-emerald-300">Approved</span>
+    </div>
+@endif
 
 {{-- Top Readiness & Agreement Status Strip --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -185,11 +241,16 @@
                     </div>
 
                     {{-- Contact --}}
-                    <div class="mt-2 space-y-0.5 text-xs text-text-dark/70">
-                        <p class="flex items-center gap-1.5">
-                            <i class="fas fa-phone-alt text-[10px] text-text-dark/40"></i>
-                            <a href="tel:{{ $candidate->phone }}" class="hover:text-accent-blue font-semibold">{{ $candidate->phone }}</a>
-                        </p>
+                    <div class="mt-2 space-y-1 text-xs text-text-dark/70" x-data="{ editNumbersModal: false }">
+                        <div class="flex items-center justify-between gap-1">
+                            <p class="flex items-center gap-1.5">
+                                <i class="fas fa-phone-alt text-[10px] text-text-dark/40"></i>
+                                <a href="tel:{{ $candidate->phone }}" class="hover:text-accent-blue font-semibold">{{ $candidate->phone }}</a>
+                            </p>
+                            <button type="button" @click="editNumbersModal = true" class="text-[10px] text-accent-blue hover:text-blue-700 font-bold px-2 py-0.5 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors flex items-center gap-1" title="Change Phone or WhatsApp number">
+                                <i class="fas fa-pen text-[9px]"></i> <span>Change</span>
+                            </button>
+                        </div>
                         @if($candidate->whatsapp_no || $profile?->whatsapp_no)
                             @php $wNo = preg_replace('/[^0-9]/', '', $candidate->whatsapp_no ?: $profile?->whatsapp_no); @endphp
                             <p class="flex items-center gap-1.5">
@@ -197,13 +258,71 @@
                                 <a href="https://wa.me/{{ str_starts_with($wNo, '91') ? $wNo : '91'.$wNo }}" target="_blank" class="text-emerald-700 font-bold hover:underline">
                                     {{ $candidate->whatsapp_no ?: $profile?->whatsapp_no }}
                                 </a>
+                                @if(($candidate->whatsapp_no ?: $profile?->whatsapp_no) !== $candidate->phone)
+                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">Different</span>
+                                @endif
                             </p>
                         @endif
                         <p class="flex items-center gap-1.5 truncate">
                             <i class="fas fa-envelope text-[10px] text-text-dark/40"></i>
                             <a href="mailto:{{ $candidate->email }}" class="hover:text-accent-blue truncate">{{ $candidate->email }}</a>
                         </p>
+
+                        {{-- Edit Numbers Modal --}}
+                        <div x-show="editNumbersModal" 
+                             x-cloak 
+                             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+                             @keydown.escape.window="editNumbersModal = false">
+                            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative text-left"
+                                 @click.away="editNumbersModal = false">
+                                <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+                                            <i class="fas fa-phone-alt"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-sm font-black text-[#031b4e]">Update Contact Numbers</h3>
+                                            <p class="text-[11px] text-slate-500">{{ $candidate->name }}</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="editNumbersModal = false" class="text-slate-400 hover:text-slate-700 text-sm">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+
+                                <form action="{{ route('admin.crm.candidate.update-numbers', $candidate->id) }}" method="POST" class="space-y-4">
+                                    @csrf
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
+                                            Mobile / Calling Number <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="tel" name="phone" value="{{ old('phone', $candidate->phone) }}" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);"
+                                               placeholder="10-digit mobile number"
+                                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
+                                            WhatsApp Number <span class="text-slate-400 font-normal lowercase text-[11px]">(Leave blank if same as mobile)</span>
+                                        </label>
+                                        <input type="tel" name="whatsapp_no" value="{{ old('whatsapp_no', $candidate->whatsapp_no ?: ($profile?->whatsapp_no ?? '')) }}" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);"
+                                               placeholder="Different 10-digit WhatsApp number"
+                                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                                    </div>
+
+                                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                                        <button type="button" @click="editNumbersModal = false" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="px-5 py-2 rounded-xl text-xs font-black text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all flex items-center gap-1.5">
+                                            <i class="fas fa-check"></i> <span>Save Numbers</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -801,9 +920,8 @@
                                     <p class="text-xs text-text-dark/60 mt-0.5">{{ $app->jobPost->school_name ?? 'School' }} • {{ $app->jobPost->city->name ?? '' }}</p>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full 
-                                        {{ $app->status === 'hired' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($app->status === 'shortlisted' ? 'bg-amber-50 text-amber-700 border border-amber-200' : ($app->status === 'rejected' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-blue-50 text-accent-blue border border-blue-200')) }}">
-                                        {{ ucfirst($app->status) }}
+                                    <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full {{ $app->status_badge_class }}">
+                                        {{ $app->status_label }}
                                     </span>
                                 </div>
                             </div>
@@ -815,10 +933,14 @@
                                     <div>
                                         <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Status</label>
                                         <select name="status" class="w-full bg-card-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                                            <option value="applied" {{ $app->status === 'applied' ? 'selected' : '' }}>Applied (New)</option>
-                                            <option value="shortlisted" {{ $app->status === 'shortlisted' ? 'selected' : '' }}>Shortlisted (Schedule Interview)</option>
-                                            <option value="hired" {{ $app->status === 'hired' ? 'selected' : '' }}>Hired (Selected)</option>
-                                            <option value="rejected" {{ $app->status === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                                            <option value="applied" {{ $app->status === 'applied' ? 'selected' : '' }}>New applied</option>
+                                            <option value="shortlisted" {{ $app->status === 'shortlisted' ? 'selected' : '' }}>Shortlisted</option>
+                                            <option value="forwarded_to_school" {{ $app->status === 'forwarded_to_school' ? 'selected' : '' }}>Forwarded to school/institute</option>
+                                            <option value="demo_scheduled" {{ $app->status === 'demo_scheduled' ? 'selected' : '' }}>Demo scheduled</option>
+                                            <option value="hired" {{ $app->status === 'hired' ? 'selected' : '' }}>Selected/hired</option>
+                                            <option value="rejected_by_school" {{ $app->status === 'rejected_by_school' ? 'selected' : '' }}>Rejected by school</option>
+                                            <option value="tutor_backed_out" {{ $app->status === 'tutor_backed_out' ? 'selected' : '' }}>Tutor backed out</option>
+                                            <option value="rejected_by_admin" {{ in_array($app->status, ['rejected_by_admin', 'rejected']) ? 'selected' : '' }}>Rejected by admin</option>
                                         </select>
                                     </div>
                                     <div>

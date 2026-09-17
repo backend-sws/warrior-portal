@@ -40,6 +40,7 @@ class CrmController extends Controller
             'name'                     => 'required|string|max:255',
             'email'                    => 'required|email|unique:users,email',
             'phone'                    => 'required|string|max:20|unique:users,phone',
+            'whatsapp_no'              => 'nullable|string|max:20',
             'password'                 => 'required|string|min:6',
             'gender'                   => 'required|in:Male,Female,Other',
             'date_of_birth'            => 'required|date',
@@ -90,7 +91,7 @@ class CrmController extends Controller
                 'name'              => $request->name,
                 'email'             => $request->email,
                 'phone'             => $request->phone,
-                'whatsapp_no'       => $request->whatsapp_no ?? $request->phone,
+                'whatsapp_no'       => $request->filled('whatsapp_no') ? $request->whatsapp_no : $request->phone,
                 'role'              => 'candidate',
                 'password'          => Hash::make($request->password),
                 'email_verified_at' => now(),
@@ -111,16 +112,19 @@ class CrmController extends Controller
 
             $paymentId = $request->payment_method ? ($request->payment_method . '-ADMIN-' . strtoupper(uniqid())) : null;
 
-            // Derive approximate experience years if range is given
-            $expYears = $request->filled('experience_years') ? (int) $request->experience_years : 0;
-            if (!$expYears && $request->filled('experience_range')) {
-                $range = $request->experience_range;
-                if ($range === '0–1 Year') $expYears = 0;
-                elseif ($range === '1–3 Years') $expYears = 2;
-                elseif ($range === '3–5 Years') $expYears = 4;
-                elseif ($range === '5–10 Years') $expYears = 7;
-                elseif ($range === '10–15 Years') $expYears = 12;
-                elseif ($range === '15+ Years') $expYears = 15;
+            // Derive approximate experience years if range/manual text is given
+            $expYears = $request->filled('experience_years') ? (float) $request->experience_years : null;
+            if ($expYears === null && $request->filled('experience_range')) {
+                $range = trim((string) $request->experience_range);
+                if (stripos($range, 'fresher') !== false) {
+                    $expYears = 0;
+                } elseif (preg_match('/(\d+(\.\d+)?)/', $range, $matches)) {
+                    $expYears = (float) $matches[1];
+                } else {
+                    $expYears = 0;
+                }
+            } elseif ($expYears === null) {
+                $expYears = 0;
             }
 
             // Highest qualification resolution
@@ -133,10 +137,12 @@ class CrmController extends Controller
 
             // Locations list
             $prefLocations = [];
+            if (is_array($request->preferred_locations)) {
+                $prefLocations = array_filter($request->preferred_locations, fn($l) => !empty($l) && $l !== 'Other');
+            }
             if ($request->filled('preferred_locations_manual')) {
-                $prefLocations = array_filter(array_map('trim', explode(',', $request->preferred_locations_manual)));
-            } elseif (is_array($request->preferred_locations)) {
-                $prefLocations = $request->preferred_locations;
+                $manualLocs = array_filter(array_map('trim', explode(',', $request->preferred_locations_manual)));
+                $prefLocations = array_values(array_unique(array_merge($prefLocations, $manualLocs)));
             }
             if (empty($prefLocations) && $request->filled('preferred_areas')) {
                 $prefLocations = array_filter(array_map('trim', explode(',', $request->preferred_areas)));
@@ -187,7 +193,7 @@ class CrmController extends Controller
             $profile = CandidateProfile::create([
                 'user_id'                    => $user->id,
                 'candidate_category'         => $category,
-                'whatsapp_no'                => $request->whatsapp_no ?? $request->phone,
+                'whatsapp_no'                => $request->filled('whatsapp_no') ? $request->whatsapp_no : $request->phone,
                 'gender'                     => $request->gender,
                 'date_of_birth'              => $request->date_of_birth,
                 'address'                    => $address,
@@ -353,6 +359,7 @@ class CrmController extends Controller
             'last_designation'         => 'nullable|string',
             'last_drawn_salary'        => 'nullable|string',
             'preferred_locations'      => 'nullable|array',
+            'preferred_locations_manual' => 'nullable|string|max:500',
             'resume'                   => 'nullable|mimes:pdf,doc,docx|max:5120',
             'profile_photo'            => 'nullable|image|max:5120',
             'live_photo'               => 'nullable|image|max:5120',
@@ -366,7 +373,7 @@ class CrmController extends Controller
                 'name'        => $request->name,
                 'email'       => $request->email,
                 'phone'       => $request->phone,
-                'whatsapp_no' => $request->whatsapp_no ?? $request->phone,
+                'whatsapp_no' => $request->filled('whatsapp_no') ? $request->whatsapp_no : $request->phone,
             ];
             
             if ($request->filled('password')) {
@@ -387,9 +394,32 @@ class CrmController extends Controller
                 $updClasses = array_values(array_unique(array_merge($updClasses, $manualCls)));
             }
 
+            // Calculate experience years from manual input or range
+            $updExpYears = $request->filled('experience_years') ? (float) $request->experience_years : null;
+            if ($updExpYears === null && $request->filled('experience_range')) {
+                $r = trim((string) $request->experience_range);
+                if (stripos($r, 'fresher') !== false) {
+                    $updExpYears = 0;
+                } elseif (preg_match('/(\d+(\.\d+)?)/', $r, $matches)) {
+                    $updExpYears = (float) $matches[1];
+                } else {
+                    $updExpYears = 0;
+                }
+            } elseif ($updExpYears === null) {
+                $updExpYears = 0;
+            }
+
+            // Merge selective checkboxes and manual custom locations
+            $updLocations = is_array($request->preferred_locations) ? $request->preferred_locations : [];
+            $updLocations = array_filter($updLocations, fn($l) => !empty($l) && $l !== 'Other');
+            if ($request->filled('preferred_locations_manual')) {
+                $manualLocs = array_filter(array_map('trim', explode(',', $request->preferred_locations_manual)));
+                $updLocations = array_values(array_unique(array_merge($updLocations, $manualLocs)));
+            }
+
             $updates = [
                 'candidate_category'       => $request->candidate_category ?? 'both',
-                'whatsapp_no'              => $request->whatsapp_no ?? $request->phone,
+                'whatsapp_no'              => $request->filled('whatsapp_no') ? $request->whatsapp_no : $request->phone,
                 'gender'                   => $request->gender,
                 'date_of_birth'            => $request->date_of_birth,
                 'address'                  => $request->address,
@@ -397,7 +427,7 @@ class CrmController extends Controller
                 'subject_id'               => $request->subject_id,
                 'highest_qualification_id' => $request->highest_qualification_id,
                 'highest_qualification_name' => $request->highest_qualification_name,
-                'experience_years'         => $request->experience_years ?? 0,
+                'experience_years'         => $updExpYears,
                 'experience_range'         => $request->experience_range,
                 'current_salary'           => $request->current_salary,
                 'expected_salary'          => $request->expected_salary,
@@ -419,7 +449,7 @@ class CrmController extends Controller
                 'last_school_name'         => $request->last_school_name,
                 'last_designation'         => $request->last_designation,
                 'last_drawn_salary'        => $request->last_drawn_salary,
-                'preferred_locations'      => $request->preferred_locations ?? [],
+                'preferred_locations'      => array_values($updLocations),
                 'total_allowed_applications' => 9999,
             ];
 
@@ -501,10 +531,12 @@ class CrmController extends Controller
             });
         }
 
-        // 1. Candidate Category Filter (Home Tutor, School Job, Both)
+        // 1. Candidate Category Filter (Home Tutor, School Job, Both, Tuition Upgrade Requested)
         if ($category = $request->input('candidate_category')) {
             $query->whereHas('profile', function($q) use ($category) {
-                if ($category === 'both') {
+                if ($category === 'tuition_upgrade_requested') {
+                    $q->where('tuition_upgrade_status', 'requested');
+                } elseif ($category === 'both') {
                     $q->where(function($sq) {
                         $sq->where('candidate_category', 'both')
                            ->orWhereNull('candidate_category')
@@ -1120,4 +1152,64 @@ class CrmController extends Controller
 
         return back()->with('success', 'Candidate rating saved successfully.');
     }
+
+    /**
+     * Admin approves candidate's request to join as a tuition teacher also.
+     */
+    public function approveTuitionUpgrade($id)
+    {
+        $candidate = User::where('role', 'candidate')->findOrFail($id);
+        $profile = $candidate->profile;
+
+        if (!$profile) {
+            return back()->with('error', 'Candidate profile not found.');
+        }
+
+        $profile->tuition_upgrade_status = 'approved';
+        $profile->tuition_upgrade_approved_at = now();
+        $profile->save();
+
+        NotificationHelper::notifyUser(
+            $candidate->id,
+            'Tuition Teacher Request Approved! 🎉',
+            'Your request to join as a tuition teacher has been approved! Please fill in your tuition details on your dashboard to activate your dual profile.',
+            route('candidate.dashboard'),
+            'fas fa-chalkboard-teacher'
+        );
+
+        return back()->with('success', 'Tuition teacher upgrade request approved for ' . $candidate->name . '. The candidate can now fill in tuition details on their dashboard.');
+    }
+
+    /**
+     * Admin quickly updates candidate's phone and WhatsApp numbers.
+     */
+    public function updateContactNumbers(Request $request, $id)
+    {
+        $user = User::where('role', 'candidate')->findOrFail($id);
+
+        $request->validate([
+            'phone'       => 'required|string|min:10|max:20|unique:users,phone,' . $user->id,
+            'whatsapp_no' => 'nullable|string|min:10|max:20',
+        ], [
+            'phone.required' => 'Mobile number is required.',
+            'phone.unique'   => 'This mobile number is already registered with another user.',
+        ]);
+
+        $cleanPhone = preg_replace('/[^0-9]/', '', $request->phone);
+        $cleanWhatsapp = $request->filled('whatsapp_no') 
+            ? preg_replace('/[^0-9]/', '', $request->whatsapp_no) 
+            : $cleanPhone;
+
+        $user->phone = $cleanPhone;
+        $user->whatsapp_no = $cleanWhatsapp;
+        $user->save();
+
+        if ($user->profile) {
+            $user->profile->whatsapp_no = $cleanWhatsapp;
+            $user->profile->save();
+        }
+
+        return back()->with('success', 'Candidate contact numbers updated successfully!');
+    }
 }
+

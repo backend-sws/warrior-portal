@@ -13,6 +13,23 @@ Route::post('/school-requirement/post', [\App\Http\Controllers\HomeController::c
 Route::get('/school-hiring-success', function () {
     return view('pages.school-hiring-success');
 })->name('school.requirement.success');
+
+// Direct Shareable Routes for Modal Forms
+Route::redirect('/join-as-tutor', '/apply/home-tutor');
+Route::redirect('/join-as-teacher', '/apply/school-teacher');
+// Standalone Public Forms (Dedicated Shareable Pages)
+Route::get('/apply/home-tutor', [\App\Http\Controllers\PublicFormController::class, 'homeTutor'])->name('apply.home-tutor');
+Route::get('/apply/school-teacher', [\App\Http\Controllers\PublicFormController::class, 'schoolTeacher'])->name('apply.school-teacher');
+Route::get('/apply/both', [\App\Http\Controllers\PublicFormController::class, 'both'])->name('apply.both');
+Route::get('/need-tutor', [\App\Http\Controllers\PublicFormController::class, 'needTutor'])->name('forms.need-tutor');
+Route::get('/hire-teacher', [\App\Http\Controllers\PublicFormController::class, 'hireTeacher'])->name('forms.hire-teacher');
+
+// Friendly aliases and redirects
+Route::redirect('/post-tuition', '/need-tutor');
+Route::redirect('/school-hiring', '/hire-teacher');
+Route::redirect('/both-registration', '/apply/both');
+Route::redirect('/apply/tutor', '/apply/home-tutor');
+Route::redirect('/apply/teacher', '/apply/school-teacher');
 Route::get('/jobs', [\App\Http\Controllers\HomeController::class, 'jobs'])->name('jobs');
 Route::get('/tuitions', [\App\Http\Controllers\HomeController::class, 'tuitions'])->name('tuitions');
 Route::get('/tuitions/{tuition}', [\App\Http\Controllers\HomeController::class, 'showTuition'])->name('tuitions.show');
@@ -127,7 +144,7 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
         $activeJobInterviews = $user->applications()
             ->with(['jobPost.city', 'jobPost.state', 'jobPost.subject', 'jobPost.category'])
             ->where(function($q) {
-                $q->whereIn('status', ['shortlisted', 'hired'])
+                $q->whereIn('status', ['shortlisted', 'forwarded_to_school', 'demo_scheduled', 'hired'])
                   ->orWhereNotNull('interview_date');
             })
             ->latest('updated_at')
@@ -148,6 +165,8 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
     Route::get('/profile', [\App\Http\Controllers\Candidate\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\Candidate\ProfileController::class, 'update'])->name('profile.update');
     Route::post('/password', [\App\Http\Controllers\Candidate\ProfileController::class, 'updatePassword'])->name('password.update');
+    Route::post('/tuition-upgrade/request', [\App\Http\Controllers\Candidate\ProfileController::class, 'requestTuitionUpgrade'])->name('tuition-upgrade.request');
+    Route::post('/tuition-upgrade/complete', [\App\Http\Controllers\Candidate\ProfileController::class, 'completeTuitionUpgrade'])->name('tuition-upgrade.complete');
 
     Route::get('/agreement', [\App\Http\Controllers\Candidate\AgreementController::class, 'show'])->name('agreement.show');
     Route::post('/agreement/request', [\App\Http\Controllers\Candidate\AgreementController::class, 'requestActivation'])->name('agreement.request');
@@ -272,6 +291,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/crm/candidate/{id}/magic-login', [\App\Http\Controllers\Admin\CrmController::class, 'magicLogin'])->name('crm.candidate.magic-login');
     Route::post('/crm/candidate/{id}/upload-agreement', [\App\Http\Controllers\Admin\CrmController::class, 'uploadAgreement'])->name('crm.candidate.upload-agreement');
     Route::post('/crm/candidate/{id}/update-agreement-status', [\App\Http\Controllers\Admin\CrmController::class, 'updateAgreementStatus'])->name('crm.candidate.update-agreement-status');
+    Route::post('/crm/candidate/{id}/approve-tuition-upgrade', [\App\Http\Controllers\Admin\CrmController::class, 'approveTuitionUpgrade'])->name('crm.candidate.approve-tuition-upgrade');
+    Route::post('/crm/candidate/{id}/update-contact-numbers', [\App\Http\Controllers\Admin\CrmController::class, 'updateContactNumbers'])->name('crm.candidate.update-numbers');
 
     // Applications & Transactions
     Route::get('/applications', [\App\Http\Controllers\Admin\ApplicationController::class, 'index'])->name('applications.index');

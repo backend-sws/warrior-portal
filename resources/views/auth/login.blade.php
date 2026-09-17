@@ -4,7 +4,7 @@
 @section('meta_description', 'Log in to your Warriors Educare account to access verified home tuition leads, school teaching jobs, and faculty recruitment services across India.')
 
 @section('content')
-<div x-data="{}" class="min-h-[85vh] flex items-center justify-center bg-[#f4f7f5] py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
+<div x-data="{ activeTab: '{{ request('tab') === 'signup' || request('tab') === 'register' ? 'signup' : 'signin' }}' }" class="min-h-[85vh] flex items-center justify-center bg-[#f4f7f5] py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
     <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden reveal">
         
         {{-- Left Panel - Branding --}}
@@ -111,7 +111,7 @@
             {{-- Top Branding --}}
             <div class="relative z-10">
                 <a href="{{ route('home') }}" class="inline-block">
-                    <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-10 brightness-0 invert">
+                    <img src="{{ asset('adobe.png') }}" alt="Warriors Educare Logo" class="h-10">
                 </a>
             </div>
 
@@ -142,7 +142,7 @@
             </div>
         </div>
 
-        {{-- Right Panel - Login Form --}}
+        {{-- Right Panel - Login & Registration Form --}}
         <div class="p-6 sm:p-8 lg:p-10 flex flex-col justify-center">
             {{-- Mobile Logo --}}
             <div class="lg:hidden flex justify-center mb-6">
@@ -151,131 +151,225 @@
                 </a>
             </div>
 
-            <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-[#031b4e]">Sign In</h2>
-                <p class="mt-1 text-xs sm:text-sm text-gray-500">Enter your credentials to access your account</p>
-            </div>
-
-            {{-- 3 Requirement & Registration Buttons Above Login Form --}}
+            {{-- Header & Sign In / Sign Up Switcher Buttons --}}
             <div class="mb-6">
-                <div class="flex items-center justify-between mb-2.5">
-                    <span class="text-[11px] font-black uppercase tracking-wider text-[#031b4e]">
-                        <i class="fas fa-layer-group text-blue-600 mr-1"></i> Apply / Post Requirement
-                    </span>
-                    <span class="text-[10px] font-bold text-slate-400">Choose your category</span>
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-[#031b4e]" x-text="activeTab === 'signin' ? 'Sign In' : 'Teacher Registration'">Sign In</h2>
+                        <p class="mt-1 text-xs sm:text-sm text-slate-500 font-medium" 
+                           x-text="activeTab === 'signin' ? 'Enter your credentials to access your account or post a requirement' : 'Choose your teaching category to register as an educator'"></p>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-2 sm:gap-2.5">
-                    {{-- Button 1: Tuition Post Requirement --}}
-                    <button type="button" onclick="openRequirementModal('tuition')"
-                            class="flex flex-col items-center justify-between text-center p-2.5 sm:p-3 rounded-2xl bg-sky-50/90 hover:bg-sky-100 border border-sky-200/80 hover:border-sky-400 hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-pointer h-full">
-                        <div class="w-9 h-9 rounded-xl bg-[#0ea5e9] text-white flex items-center justify-center text-sm font-bold shadow-xs mb-2 group-hover:scale-110 transition-transform shrink-0">
-                            <i class="fas fa-graduation-cap"></i>
-                        </div>
-                        <div class="w-full flex-1 flex flex-col justify-center">
-                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">Tuition Post Requirement</div>
-                            <div class="text-[9px] sm:text-[10px] text-slate-500 font-semibold leading-tight mt-1">Parent / Student</div>
-                        </div>
+                {{-- Segmented Toggle Switcher --}}
+                <div class="p-1 bg-slate-100 rounded-2xl flex items-center border border-slate-200">
+                    <button type="button" 
+                            @click="activeTab = 'signin'" 
+                            :class="activeTab === 'signin' 
+                                ? 'bg-white text-[#031b4e] font-black shadow-sm border border-slate-200/60' 
+                                : 'text-slate-500 hover:text-slate-800 font-bold'"
+                            class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fas fa-sign-in-alt text-xs" :class="activeTab === 'signin' ? 'text-blue-600' : ''"></i>
+                        <span>Sign In</span>
                     </button>
-
-                    {{-- Button 2: School Hiring --}}
-                    <button type="button" onclick="openRequirementModal('school')"
-                            class="flex flex-col items-center justify-between text-center p-2.5 sm:p-3 rounded-2xl bg-purple-50/90 hover:bg-purple-100 border border-purple-200/80 hover:border-purple-400 hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-pointer h-full">
-                        <div class="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-xs mb-2 group-hover:scale-110 transition-transform shrink-0">
-                            <i class="fas fa-school"></i>
-                        </div>
-                        <div class="w-full flex-1 flex flex-col justify-center">
-                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">School Hiring</div>
-                            <div class="text-[9px] sm:text-[10px] text-slate-500 font-semibold leading-tight mt-1">Post Vacancy</div>
-                        </div>
-                    </button>
-
-                    {{-- Button 3: Join as a Teacher --}}
-                    <button type="button" onclick="openRequirementModal('teacher')"
-                            class="flex flex-col items-center justify-between text-center p-2.5 sm:p-3 rounded-2xl bg-amber-50/90 hover:bg-amber-100 border border-amber-200/80 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-pointer h-full">
-                        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-xs mb-2 group-hover:scale-110 transition-transform shrink-0">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
-                        <div class="w-full flex-1 flex flex-col justify-center">
-                            <div class="text-[11px] sm:text-xs font-black text-[#031b4e] leading-snug">Join as a Teacher</div>
-                            <div class="text-[9px] sm:text-[10px] text-slate-500 font-semibold leading-tight mt-1">Tutor, School & Both</div>
-                        </div>
+                    <button type="button" 
+                            @click="activeTab = 'signup'" 
+                            :class="activeTab === 'signup' 
+                                ? 'bg-[#031b4e] text-white font-black shadow-md shadow-blue-950/20' 
+                                : 'text-slate-500 hover:text-slate-800 font-bold'"
+                            class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fas fa-user-plus text-xs" :class="activeTab === 'signup' ? 'text-amber-400' : ''"></i>
+                        <span>Sign Up</span>
                     </button>
                 </div>
             </div>
 
-            <div class="relative flex py-1 items-center mb-5">
-                <div class="flex-grow border-t border-gray-200"></div>
-                <span class="flex-shrink mx-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Or Sign In with Account</span>
-                <div class="flex-grow border-t border-gray-200"></div>
-            </div>
+            {{-- TAB 1: SIGN IN FORM --}}
+            <div x-show="activeTab === 'signin'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4">
+                
+                {{-- Post Requirement Section for Parents & Schools --}}
+                <div class="p-3 sm:p-3.5 bg-slate-50/90 border border-slate-200 rounded-2xl">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-black uppercase tracking-wider text-[#031b4e] flex items-center gap-1.5">
+                            <i class="fas fa-clipboard-list text-blue-600"></i> Post Requirement:
+                        </span>
+                        <span class="text-[10px] font-bold text-slate-400">For Parents &amp; Schools</span>
+                    </div>
 
-            @if($errors->any())
-                <div class="mb-6 bg-red-500/10 border border-red-500/30 p-4 rounded-xl">
-                    <div class="flex items-start gap-3">
-                        <i class="fas fa-exclamation-circle text-red-400 mt-0.5"></i>
-                        <div>
-                            <p class="text-sm font-semibold text-red-400">Authentication Error</p>
-                            <ul class="mt-1.5 text-sm text-red-300/80 list-disc pl-4 space-y-0.5">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {{-- Button 1: Tuition Requirement Form (Need Tutor) --}}
+                        <a href="{{ route('forms.need-tutor') }}"
+                           class="flex items-center gap-3 p-2.5 rounded-xl bg-white hover:bg-sky-50/90 border border-sky-200/90 hover:border-sky-400 hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-pointer">
+                            <div class="w-10 h-10 rounded-xl bg-[#0ea5e9] text-white flex items-center justify-center text-base font-bold shadow-xs shrink-0 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="min-w-0 flex-1 text-left">
+                                <div class="text-xs font-black text-[#031b4e] leading-tight">Need a Home Tutor</div>
+                                <div class="text-[10px] text-sky-800 font-bold leading-tight mt-0.5">Parent / Student Form</div>
+                                <span class="mt-1 inline-block text-[9px] font-bold text-sky-800 bg-sky-100/90 px-2 py-0.5 rounded-full border border-sky-200">100% Free</span>
+                            </div>
+                        </a>
+
+                        {{-- Button 2: School Hiring Form (Hire Teachers) --}}
+                        <a href="{{ route('forms.hire-teacher') }}"
+                           class="flex items-center gap-3 p-2.5 rounded-xl bg-white hover:bg-purple-50/90 border border-purple-200/90 hover:border-purple-400 hover:shadow-md hover:-translate-y-0.5 transition-all group cursor-pointer">
+                            <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center text-base font-bold shadow-xs shrink-0 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-school"></i>
+                            </div>
+                            <div class="min-w-0 flex-1 text-left">
+                                <div class="text-xs font-black text-[#031b4e] leading-tight">Hire School Teacher</div>
+                                <div class="text-[10px] text-purple-800 font-bold leading-tight mt-0.5">School / College Form</div>
+                                <span class="mt-1 inline-block text-[9px] font-bold text-purple-800 bg-purple-100/90 px-2 py-0.5 rounded-full border border-purple-200">Post Vacancy</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Divider --}}
+                <div class="relative my-2 text-center">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+                    <span class="relative bg-white px-3 text-[10.5px] text-slate-400 font-bold uppercase tracking-wider">Or Sign In with Email</span>
+                </div>
+
+                @if($errors->any())
+                    <div class="mb-5 bg-red-500/10 border border-red-500/30 p-4 rounded-xl">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
+                            <div>
+                                <p class="text-sm font-semibold text-red-600">Authentication Error</p>
+                                <ul class="mt-1 text-xs text-red-600 list-disc pl-4 space-y-0.5">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-            @endif
+                @endif
 
-            <form action="{{ route('login.post') }}" method="POST" class="space-y-4">
-                @csrf
-                <div>
-                    <label for="email-address" class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Email Address</label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i class="fas fa-envelope text-sm"></i></span>
-                        <input id="email-address" name="email" type="email" autocomplete="email" required
-                            class="w-full bg-[#f3f4f6] border-none rounded-xl pl-11 pr-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] transition-all font-medium"
-                            placeholder="you@example.com" value="{{ old('email') }}">
+                <form action="{{ route('login.post') }}" method="POST" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label for="email-address" class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Email Address</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i class="fas fa-envelope text-sm"></i></span>
+                            <input id="email-address" name="email" type="email" autocomplete="email" required
+                                class="w-full bg-[#f3f4f6] border-none rounded-xl pl-11 pr-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] transition-all font-medium"
+                                placeholder="you@example.com" value="{{ old('email') }}">
+                        </div>
                     </div>
-                </div>
 
-                <div>
-                    <label for="password" class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Password</label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i class="fas fa-lock text-sm"></i></span>
-                        <input id="password" name="password" type="password" autocomplete="current-password" required
-                            class="w-full bg-[#f3f4f6] border-none rounded-xl pl-11 pr-11 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] transition-all font-medium"
-                            placeholder="••••••••">
-                        <button type="button" id="toggle-password" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors" title="Toggle Password Visibility">
-                            <i class="fas fa-eye text-sm" id="toggle-password-icon"></i>
+                    <div>
+                        <label for="password" class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Password</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i class="fas fa-lock text-sm"></i></span>
+                            <input id="password" name="password" type="password" autocomplete="current-password" required
+                                class="w-full bg-[#f3f4f6] border-none rounded-xl pl-11 pr-11 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] transition-all font-medium"
+                                placeholder="••••••••">
+                            <button type="button" id="toggle-password" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors cursor-pointer" title="Toggle Password Visibility">
+                                <i class="fas fa-eye text-sm" id="toggle-password-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <label class="flex items-center gap-2.5 cursor-pointer group select-none">
+                            <input id="remember-me" name="remember" type="checkbox"
+                                class="w-4 h-4 rounded border-gray-300 text-[#1e3a8a] focus:ring-[#1e3a8a] cursor-pointer">
+                            <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Remember me</span>
+                        </label>
+                        <a href="{{ route('password.request') }}" class="text-sm font-bold text-[#1e3a8a] hover:underline transition-colors">Forgot password?</a>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-[#031b4e] hover:bg-[#021338] text-white font-bold py-3.5 rounded-xl hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-md">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Sign In</span>
+                    </button>
+                </form>
+
+                <div class="mt-5 pt-4 border-t border-gray-100 text-center">
+                    <p class="text-xs text-gray-500 font-medium">
+                        Looking for a teaching job or tuitions? 
+                        <button type="button" @click="activeTab = 'signup'" class="text-[#0ea5e9] font-bold hover:underline ml-1 cursor-pointer">
+                            Register as a Teacher here
                         </button>
-                    </div>
+                    </p>
+                </div>
+            </div>
+
+            {{-- TAB 2: SIGN UP OPTIONS (TEACHER REGISTRATION ONLY) --}}
+            <div x-show="activeTab === 'signup'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-[11px] font-black uppercase tracking-wider text-[#031b4e] flex items-center gap-1.5">
+                        <i class="fas fa-chalkboard-teacher text-amber-500"></i> Teacher Registration Forms:
+                    </span>
+                    <span class="text-[10px] font-bold text-slate-400">Select your role</span>
                 </div>
 
-                <div class="flex items-center justify-between pt-1">
-                    <label class="flex items-center gap-2.5 cursor-pointer group">
-                        <input id="remember-me" name="remember" type="checkbox"
-                            class="w-4 h-4 rounded border-gray-300 text-[#1e3a8a] focus:ring-[#1e3a8a] cursor-pointer">
-                        <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Remember me</span>
-                    </label>
-                    <a href="{{ route('password.request') }}" class="text-sm font-bold text-[#1e3a8a] hover:underline transition-colors">Forgot password?</a>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    {{-- 1. Home Tutor --}}
+                    <a href="{{ route('apply.home-tutor') }}" 
+                       class="p-3.5 rounded-2xl bg-white hover:bg-sky-50/90 border border-slate-200 hover:border-sky-400 hover:shadow-md hover:-translate-y-0.5 transition-all group flex flex-col justify-between cursor-pointer">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-base font-bold mb-2 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="text-xs font-black text-[#031b4e] leading-snug">Home Tutor Form</div>
+                            <div class="text-[10px] text-sky-800 font-bold leading-tight mt-0.5">Private Tutor</div>
+                            <p class="text-[10.5px] text-slate-500 font-medium mt-1 leading-tight">
+                                Teach private home tuitions at student's home or online
+                            </p>
+                        </div>
+                        <span class="mt-3 text-[10px] font-bold text-sky-700 flex items-center gap-1">
+                            Apply as Home Tutor <i class="fas fa-arrow-right text-[8px] group-hover:translate-x-0.5 transition-transform"></i>
+                        </span>
+                    </a>
+
+                    {{-- 2. School Teacher --}}
+                    <a href="{{ route('apply.school-teacher') }}" 
+                       class="p-3.5 rounded-2xl bg-white hover:bg-amber-50/90 border border-slate-200 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 transition-all group flex flex-col justify-between cursor-pointer">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-base font-bold mb-2 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-school"></i>
+                            </div>
+                            <div class="text-xs font-black text-[#031b4e] leading-snug">School Teacher Form</div>
+                            <div class="text-[10px] text-amber-800 font-bold leading-tight mt-0.5">School / College Job</div>
+                            <p class="text-[10.5px] text-slate-500 font-medium mt-1 leading-tight">
+                                Apply for PRT, TGT &amp; PGT teaching vacancies in schools
+                            </p>
+                        </div>
+                        <span class="mt-3 text-[10px] font-bold text-amber-700 flex items-center gap-1">
+                            Apply for School Job <i class="fas fa-arrow-right text-[8px] group-hover:translate-x-0.5 transition-transform"></i>
+                        </span>
+                    </a>
+
+                    {{-- 3. Dual Profile --}}
+                    <a href="{{ route('apply.both') }}" 
+                       class="p-3.5 rounded-2xl bg-white hover:bg-purple-50/90 border border-slate-200 hover:border-purple-400 hover:shadow-md hover:-translate-y-0.5 transition-all group flex flex-col justify-between cursor-pointer">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-base font-bold mb-2 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="text-xs font-black text-[#031b4e] leading-snug">Dual Profile Form</div>
+                            <div class="text-[10px] text-purple-800 font-bold leading-tight mt-0.5">Tutor + School Job</div>
+                            <p class="text-[10.5px] text-slate-500 font-medium mt-1 leading-tight">
+                                Apply for both School Teaching &amp; Home Tuitions together
+                            </p>
+                        </div>
+                        <span class="mt-3 text-[10px] font-bold text-purple-700 flex items-center gap-1">
+                            Apply for Both <i class="fas fa-arrow-right text-[8px] group-hover:translate-x-0.5 transition-transform"></i>
+                        </span>
+                    </a>
                 </div>
 
-                <button type="submit"
-                    class="w-full bg-[#031b4e] hover:bg-[#021338] text-white font-bold py-3.5 rounded-xl hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 mt-2">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Sign In
-                </button>
-            </form>
-
-            {{-- Quick Requirement / Registration Links Below Sign In --}}
-            <div class="mt-6 pt-5 border-t border-gray-100 text-center">
-                <p class="text-xs text-gray-500 mb-2 font-medium">New to Warriors Educare? Register or post requirement:</p>
-                <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-[#031b4e]">
-                    <button type="button" onclick="openRequirementModal('tuition')" class="hover:text-blue-600 transition-colors cursor-pointer">Tuition Post Requirement</button>
-                    <span class="text-gray-300">•</span>
-                    <button type="button" onclick="openRequirementModal('school')" class="hover:text-purple-600 transition-colors cursor-pointer">School Hiring</button>
-                    <span class="text-gray-300">•</span>
-                    <button type="button" onclick="openRequirementModal('teacher')" class="hover:text-amber-600 transition-colors cursor-pointer">Join as a Teacher</button>
+                <div class="pt-4 border-t border-slate-100 text-center">
+                    <p class="text-xs text-slate-500 font-medium">
+                        Already have an account? 
+                        <button type="button" @click="activeTab = 'signin'" class="text-blue-600 font-bold hover:underline ml-1 cursor-pointer">
+                            Sign In here
+                        </button>
+                    </p>
                 </div>
             </div>
         </div>
@@ -301,11 +395,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleIcon.classList.add('fa-eye-slash');
             }
         });
-    }
-
-    // Clean query parameters from URL if any were passed
-    if (window.location.search && (window.location.search.includes('tab=') || window.location.search.includes('apply_for='))) {
-        window.history.replaceState({}, document.title, window.location.pathname);
     }
 });
 </script>

@@ -7,17 +7,34 @@
 @endphp
 
 <script>
-window.openRequirementModal = function(tab = 'tuition') {
-    window.dispatchEvent(new CustomEvent('open-requirement-modal', { detail: { tab: tab } }));
+window.openRequirementModal = function(tab = 'tuition', category = null) {
+    if (tab === 'school') {
+        window.location.href = "{{ route('forms.hire-teacher') }}";
+        return;
+    }
+    if (tab === 'teacher' || tab === 'candidate') {
+        if (category === 'home_tutor') {
+            window.location.href = "{{ route('apply.home-tutor') }}";
+        } else if (category === 'school_teacher' || category === 'school') {
+            window.location.href = "{{ route('apply.school-teacher') }}";
+        } else {
+            window.location.href = "{{ route('apply.both') }}";
+        }
+        return;
+    }
+    window.location.href = "{{ route('forms.need-tutor') }}";
 };
+
 
 function globalRequirementModal() {
     return {
         openPostModal: false,
+        isDirectLink: false,
         tab: 'tuition',
         submitting: false,
         successMessage: '',
         errorMessage: '',
+        fieldErrors: {},
         selectedCategory: '',
         subjects: [],
         loadingSubjects: false,
@@ -48,7 +65,6 @@ function globalRequirementModal() {
         candidateCategory: 'home_tutor',
         candidatePhone: '',
         candidateWhatsapp: '',
-        sameAsMobile: true,
         selectedTuitionSubjects: [],
         selectedClasses: [],
         selectedLocations: [],
@@ -83,11 +99,6 @@ function globalRequirementModal() {
                 this.selectedLocations.push(loc);
             }
         },
-        syncWhatsapp() {
-            if (this.sameAsMobile) {
-                this.candidateWhatsapp = this.candidatePhone;
-            }
-        },
         appendModalArea(area, inputId = 'modal_ht_areas') {
             let el = document.getElementById(inputId);
             if (!el) {
@@ -104,6 +115,14 @@ function globalRequirementModal() {
         },
 
         init() {
+            // Check URL parameters on page load
+            this.checkUrlParams();
+
+            // Support Browser Back / Forward buttons
+            window.addEventListener('popstate', () => {
+                this.checkUrlParams();
+            });
+
             this.$watch('tab', () => {
                 this.$nextTick(() => {
                     const modalEl = document.getElementById('requirement-modal');
@@ -123,6 +142,7 @@ function globalRequirementModal() {
             });
 
             window.addEventListener('open-requirement-modal', (e) => {
+                this.isDirectLink = false;
                 this.openPostModal = true;
                 if (e.detail && e.detail.tab) {
                     const reqTab = e.detail.tab;
@@ -130,19 +150,25 @@ function globalRequirementModal() {
                         this.tab = 'tuition';
                     } else if (reqTab === 'school') {
                         this.tab = 'school';
-                    } else if (reqTab === 'home_tutor') {
+                    } else if (reqTab === 'home_tutor' || reqTab === 'tutor') {
                         this.tab = 'teacher';
                         this.candidateCategory = 'home_tutor';
-                    } else if (reqTab === 'teacher' || reqTab === 'school_job') {
+                    } else if (reqTab === 'school_job' || reqTab === 'school_teacher') {
                         this.tab = 'teacher';
                         this.candidateCategory = 'school_job';
-                    } else if (reqTab === 'both') {
+                    } else if (reqTab === 'both' || reqTab === 'dual') {
                         this.tab = 'teacher';
                         this.candidateCategory = 'both';
+                    } else if (reqTab === 'teacher') {
+                        this.tab = 'teacher';
+                        if (e.detail.category) {
+                            this.candidateCategory = e.detail.category;
+                        }
                     } else {
                         this.tab = reqTab;
                     }
                 }
+                this.updateUrl(this.tab, this.candidateCategory);
                 this.successMessage = '';
                 this.errorMessage = '';
                 this.fieldErrors = {};
@@ -164,6 +190,109 @@ function globalRequirementModal() {
                     this.userLng = e.detail.lng;
                 }
             });
+        },
+
+        checkUrlParams() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const formParam = params.get('form') || params.get('open');
+                const typeParam = params.get('type') || params.get('category');
+
+                if (formParam) {
+                    const rawForm = formParam.toLowerCase().trim().replace(/-/g, '_');
+                    const rawType = typeParam ? typeParam.toLowerCase().trim().replace(/-/g, '_') : '';
+
+                    this.isDirectLink = true;
+                    this.openPostModal = true;
+                    this.successMessage = '';
+                    this.errorMessage = '';
+                    this.fieldErrors = {};
+
+                    if (rawForm === 'tuition' || rawForm === 'tuition_need' || rawForm === 'tuition_post' || rawForm === 'parent') {
+                        this.tab = 'tuition';
+                    } else if (rawForm === 'school' || rawForm === 'school_hiring') {
+                        this.tab = 'school';
+                    } else if (rawForm === 'home_tutor' || rawForm === 'tutor' || (rawForm === 'teacher' && (rawType === 'home_tutor' || rawType === 'tutor'))) {
+                        this.tab = 'teacher';
+                        this.candidateCategory = 'home_tutor';
+                    } else if (rawForm === 'school_job' || rawForm === 'school_teacher' || (rawForm === 'teacher' && (rawType === 'school_job' || rawType === 'school_teacher'))) {
+                        this.tab = 'teacher';
+                        this.candidateCategory = 'school_job';
+                    } else if (rawForm === 'both' || rawForm === 'dual' || (rawForm === 'teacher' && (rawType === 'both' || rawType === 'dual'))) {
+                        this.tab = 'teacher';
+                        this.candidateCategory = 'both';
+                    } else if (rawForm === 'teacher') {
+                        this.tab = 'teacher';
+                        this.candidateCategory = 'home_tutor';
+                    } else {
+                        this.tab = rawForm;
+                    }
+
+                    this.$nextTick(() => {
+                        const modalEl = document.getElementById('requirement-modal');
+                        if (modalEl && typeof window.initSearchableSelects === 'function') {
+                            window.initSearchableSelects(modalEl);
+                        }
+                    });
+
+                    if (!this.userLat && !window.userDetectedLocation) {
+                        this.detectLocation(true);
+                    }
+                }
+            } catch (err) {
+                console.warn('URL param parse error:', err);
+            }
+        },
+
+        closeModal() {
+            this.openPostModal = false;
+            this.isDirectLink = false;
+            this.clearUrlParams();
+        },
+
+        clearUrlParams() {
+            try {
+                const url = new URL(window.location.href);
+                let changed = false;
+                ['form', 'open', 'type', 'category'].forEach(p => {
+                    if (url.searchParams.has(p)) {
+                        url.searchParams.delete(p);
+                        changed = true;
+                    }
+                });
+                if (changed) {
+                    const cleanUrl = url.pathname + (url.search ? url.search : '') + url.hash;
+                    window.history.replaceState({}, '', cleanUrl);
+                }
+            } catch (e) {}
+        },
+
+        updateUrl(tab, category = null) {
+            try {
+                if (this.isDirectLink) return;
+                const url = new URL(window.location.href);
+                if (tab === 'tuition') {
+                    url.searchParams.set('form', 'tuition');
+                    url.searchParams.delete('type');
+                    url.searchParams.delete('category');
+                } else if (tab === 'school') {
+                    url.searchParams.set('form', 'school');
+                    url.searchParams.delete('type');
+                    url.searchParams.delete('category');
+                } else if (tab === 'teacher') {
+                    const cat = category || this.candidateCategory || 'home_tutor';
+                    if (cat === 'home_tutor') {
+                        url.searchParams.set('form', 'home_tutor');
+                    } else if (cat === 'school_job') {
+                        url.searchParams.set('form', 'school_job');
+                    } else if (cat === 'both') {
+                        url.searchParams.set('form', 'both');
+                    }
+                    url.searchParams.delete('type');
+                    url.searchParams.delete('category');
+                }
+                window.history.replaceState({}, '', url.toString());
+            } catch (e) {}
         },
 
         setSelectLoading(selectEl, placeholder) {
@@ -566,12 +695,12 @@ function globalRequirementModal() {
 
 <div id="requirement-modal" 
      x-data="globalRequirementModal()" 
-     x-on:open-requirement-modal.window="openPostModal = true; if($event.detail && $event.detail.tab) { tab = $event.detail.tab; } successMessage = ''; errorMessage = ''; fieldErrors = {};"
+     x-on:open-requirement-modal.window="isDirectLink = false; openPostModal = true; if($event.detail && $event.detail.tab) { tab = $event.detail.tab; if($event.detail.category) candidateCategory = $event.detail.category; } successMessage = ''; errorMessage = ''; fieldErrors = {}; updateUrl(tab, candidateCategory);"
      class="relative z-[9999]">
 
     <div x-show="openPostModal" style="display: none;" class="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md overflow-y-auto" x-transition.opacity>
         <div class="min-h-screen flex items-start justify-center p-3 sm:p-6 py-10 md:py-12">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-100 relative" @click.away="openPostModal = false" x-transition.scale>
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-100 relative" @click.away="closeModal()" x-transition.scale>
                 
                 <!-- Modal Header -->
                 <div class="bg-[#031b4e] p-5 sm:p-7 text-white relative shrink-0">
@@ -583,13 +712,9 @@ function globalRequirementModal() {
                                 <i class="fas fa-bolt text-[#ff8800] text-xs"></i> <span>Warriors Educare Portal</span>
                             </div>
                             <h3 class="text-xl sm:text-2xl font-black text-white">
-                                <span x-show="tab === 'tuition'">Post Tuition Requirement</span>
-                                <span x-show="tab === 'school'">School Teacher Hiring</span>
-                                <span x-show="tab === 'teacher'">
-                                    <span x-show="candidateCategory === 'home_tutor'">Home Tutor Registration</span>
-                                    <span x-show="candidateCategory === 'school_job'">Join as School Teacher</span>
-                                    <span x-show="candidateCategory === 'both'">Dual Profile Registration (Both)</span>
-                                </span>
+                                <span x-show="tab === 'tuition'">Tuition Requirement Form</span>
+                                <span x-show="tab === 'school'">School Hiring Form</span>
+                                <span x-show="tab === 'teacher'">Teacher Registration Form</span>
                             </h3>
                             <p class="text-xs sm:text-sm text-slate-300 mt-1">
                                 <span x-show="tab === 'tuition'">Get matched with verified & expert home tutors near your locality.</span>
@@ -601,30 +726,42 @@ function globalRequirementModal() {
                                 </span>
                             </p>
                         </div>
-                        <button type="button" @click="openPostModal = false" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors shrink-0 ml-3 cursor-pointer">
+                        <button type="button" @click="closeModal()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors shrink-0 ml-3 cursor-pointer">
                             <i class="fas fa-times text-sm"></i>
                         </button>
                     </div>
 
-                    <!-- Modern 3-Tab Switcher -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 bg-white/10 p-1.5 rounded-2xl gap-2 mt-5 relative z-10 border border-white/10">
-                        <button type="button" @click="tab = 'tuition'; successMessage = ''; errorMessage = ''; fieldErrors = {};" 
+                    <!-- Direct Form Indicator (Shown when opened via specific shareable link) -->
+                    <div x-show="isDirectLink" class="mt-4 flex flex-wrap items-center justify-between bg-white/10 px-4 py-2 rounded-2xl border border-white/15 gap-2" style="display: none;">
+                        <div class="flex items-center gap-2 text-xs text-white/90 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Direct Form View</span>
+                        </div>
+                        <button type="button" @click="isDirectLink = false" class="text-[11px] font-bold text-amber-300 hover:text-white underline flex items-center gap-1 transition-colors cursor-pointer">
+                            <span>Show all registration options</span>
+                            <i class="fas fa-chevron-down text-[9px]"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modern 3-Tab Switcher (Hidden when visiting via direct shareable link) -->
+                    <div x-show="!isDirectLink" class="grid grid-cols-1 sm:grid-cols-3 bg-white/10 p-1.5 rounded-2xl gap-2 mt-5 relative z-10 border border-white/10">
+                        <button type="button" @click="tab = 'tuition'; successMessage = ''; errorMessage = ''; fieldErrors = {}; updateUrl('tuition');" 
                                 :class="tab === 'tuition' ? 'bg-white text-[#031b4e] shadow-lg font-black scale-[1.01]' : 'text-white/80 hover:text-white font-bold'" 
                                 class="py-2.5 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                             <i class="fas fa-graduation-cap text-[#0ea5e9]"></i> 
-                            <span>Tuition Post Requirement</span>
+                            <span>Tuition Requirement Form</span>
                         </button>
-                        <button type="button" @click="tab = 'school'; successMessage = ''; errorMessage = ''; fieldErrors = {};" 
+                        <button type="button" @click="tab = 'school'; successMessage = ''; errorMessage = ''; fieldErrors = {}; updateUrl('school');" 
                                 :class="tab === 'school' ? 'bg-white text-[#031b4e] shadow-lg font-black scale-[1.01]' : 'text-white/80 hover:text-white font-bold'" 
                                 class="py-2.5 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                             <i class="fas fa-school text-purple-400"></i> 
-                            <span>School Hiring</span>
+                            <span>School Hiring Form</span>
                         </button>
-                        <button type="button" @click="tab = 'teacher'; successMessage = ''; errorMessage = ''; fieldErrors = {};" 
+                        <button type="button" @click="tab = 'teacher'; successMessage = ''; errorMessage = ''; fieldErrors = {}; updateUrl('teacher', candidateCategory);" 
                                 :class="tab === 'teacher' ? 'bg-white text-[#031b4e] shadow-lg font-black scale-[1.01]' : 'text-white/80 hover:text-white font-bold'" 
                                 class="py-2.5 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                             <i class="fas fa-chalkboard-teacher text-amber-400"></i> 
-                            <span>Join as a Teacher</span>
+                            <span>Teacher Registration Form</span>
                         </button>
                     </div>
                 </div>
@@ -787,7 +924,7 @@ function globalRequirementModal() {
                         </div>
 
                         <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 items-center">
-                            <button type="button" @click="openPostModal = false" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
+                            <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
                                 Cancel
                             </button>
                             <button type="submit" :disabled="submitting" class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-xs transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
@@ -802,8 +939,8 @@ function globalRequirementModal() {
 
                 {{-- TAB 2: JOIN AS A TEACHER (HOME TUTOR, SCHOOL TEACHER & BOTH) --}}
                 <div x-show="tab === 'teacher'">
-                    {{-- Sub-Switcher for Teacher Modes: Home Tutor, Join as Teacher (School), Both --}}
-                    <div class="mb-6 p-2 bg-gradient-to-r from-slate-100 via-sky-50/50 to-slate-100 rounded-2xl border border-slate-200/80 shadow-xs">
+                    {{-- Sub-Switcher for Teacher Modes: Home Tutor, Join as Teacher (School), Both (Hidden on direct shareable links) --}}
+                    <div x-show="!isDirectLink" class="mb-6 p-2 bg-gradient-to-r from-slate-100 via-sky-50/50 to-slate-100 rounded-2xl border border-slate-200/80 shadow-xs">
                         <div class="px-2 py-1 mb-1.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
                             <span class="flex items-center gap-1.5">
                                 <i class="fas fa-chalkboard-teacher text-amber-500"></i> Select Your Teaching Preference:
@@ -811,19 +948,19 @@ function globalRequirementModal() {
                             <span class="text-[10px] font-semibold text-slate-400">Choose one to display registration form</span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <button type="button" @click="candidateCategory = 'home_tutor'; errorMessage = ''; fieldErrors = {};"
+                            <button type="button" @click="candidateCategory = 'home_tutor'; errorMessage = ''; fieldErrors = {}; updateUrl('teacher', 'home_tutor');"
                                     :class="candidateCategory === 'home_tutor' ? 'bg-white text-[#031b4e] shadow-md font-black border-2 border-[#0ea5e9] scale-[1.01]' : 'bg-white/60 text-slate-600 hover:text-slate-900 hover:bg-white font-bold border border-transparent'"
                                     class="py-2.5 px-3 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fas fa-home text-[#0ea5e9]"></i>
                                 <span>Home Tutor Only</span>
                             </button>
-                            <button type="button" @click="candidateCategory = 'school_job'; errorMessage = ''; fieldErrors = {};"
+                            <button type="button" @click="candidateCategory = 'school_job'; errorMessage = ''; fieldErrors = {}; updateUrl('teacher', 'school_job');"
                                     :class="candidateCategory === 'school_job' ? 'bg-white text-[#031b4e] shadow-md font-black border-2 border-amber-500 scale-[1.01]' : 'bg-white/60 text-slate-600 hover:text-slate-900 hover:bg-white font-bold border border-transparent'"
                                     class="py-2.5 px-3 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fas fa-chalkboard-teacher text-amber-500"></i>
                                 <span>School Job Only</span>
                             </button>
-                            <button type="button" @click="candidateCategory = 'both'; errorMessage = ''; fieldErrors = {};"
+                            <button type="button" @click="candidateCategory = 'both'; errorMessage = ''; fieldErrors = {}; updateUrl('teacher', 'both');"
                                     :class="candidateCategory === 'both' ? 'bg-white text-[#031b4e] shadow-md font-black border-2 border-emerald-500 scale-[1.01]' : 'bg-white/60 text-slate-600 hover:text-slate-900 hover:bg-white font-bold border border-transparent'"
                                     class="py-2.5 px-3 rounded-xl text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fas fa-handshake text-emerald-600"></i>
@@ -859,17 +996,11 @@ function globalRequirementModal() {
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Mobile Number <span class="text-red-500">*</span></label>
-                                        <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" @input="syncWhatsapp()" placeholder="e.g. 9876543210"
+                                        <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" placeholder="e.g. 9876543210"
                                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                     </div>
                                     <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">WhatsApp Number</label>
-                                            <label class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600 cursor-pointer">
-                                                <input type="checkbox" x-model="sameAsMobile" @change="syncWhatsapp()" class="rounded text-blue-600">
-                                                <span>Same as mobile</span>
-                                            </label>
-                                        </div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">WhatsApp Number <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional / Can be different)</span></label>
                                         <input type="tel" name="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidateWhatsapp" placeholder="e.g. 9876543210"
                                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                     </div>
@@ -904,15 +1035,8 @@ function globalRequirementModal() {
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Total Teaching Experience <span class="text-red-500">*</span></label>
-                                        <select data-no-search="true" name="experience_range" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                                            <option value="">Select Experience</option>
-                                            <option value="0–1 Year">Fresher (0–1 Year)</option>
-                                            <option value="1–3 Years">1–3 Years</option>
-                                            <option value="3–5 Years">3–5 Years</option>
-                                            <option value="5–10 Years">5–10 Years</option>
-                                            <option value="10–15 Years">10–15 Years</option>
-                                            <option value="15+ Years">15+ Years</option>
-                                        </select>
+                                        <input type="text" name="experience_range" list="modal_exp_suggestions" required placeholder="e.g. Fresher / 2 Years / 3.5 Years / 5+ Years"
+                                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                     </div>
                                 </div>
                             </div>
@@ -1030,7 +1154,7 @@ function globalRequirementModal() {
 
                             {{-- Submit & Cancel Button Row --}}
                             <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 items-center">
-                                <button type="button" @click="openPostModal = false" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
+                                <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
                                     Cancel
                                 </button>
                                 <button type="submit" :disabled="submitting" class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-xs transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
@@ -1070,17 +1194,11 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Mobile Number <span class="text-red-500">*</span></label>
-                                    <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" @input="syncWhatsapp()" placeholder="e.g. 9876543210"
+                                    <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" placeholder="e.g. 9876543210"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">WhatsApp Number</label>
-                                        <label class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600 cursor-pointer">
-                                            <input type="checkbox" x-model="sameAsMobile" @change="syncWhatsapp()" class="rounded text-blue-600">
-                                            <span>Same as mobile</span>
-                                        </label>
-                                    </div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">WhatsApp Number <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional / Can be different)</span></label>
                                     <input type="tel" name="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidateWhatsapp" placeholder="e.g. 9876543210"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
@@ -1115,15 +1233,8 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Total Teaching Experience <span class="text-red-500">*</span></label>
-                                    <select data-no-search="true" name="experience_range" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                                        <option value="">Select Experience</option>
-                                        <option value="0–1 Year">Fresher (0–1 Year)</option>
-                                        <option value="1–3 Years">1–3 Years</option>
-                                        <option value="3–5 Years">3–5 Years</option>
-                                        <option value="5–10 Years">5–10 Years</option>
-                                        <option value="10–15 Years">10–15 Years</option>
-                                        <option value="15+ Years">15+ Years</option>
-                                    </select>
+                                    <input type="text" name="experience_range" list="modal_exp_suggestions" required placeholder="e.g. Fresher / 2 Years / 3.5 Years / 5+ Years"
+                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                             </div>
                         </div>
@@ -1137,7 +1248,7 @@ function globalRequirementModal() {
                                 <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 ml-auto">School Candidate Details</span>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                                <div class="sm:col-span-2">
+                                <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Teaching Post Applying For <span class="text-red-500">*</span></label>
                                     <select data-no-search="true" name="position_applying_for" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                         <option value="">Select Teaching Post</option>
@@ -1149,6 +1260,11 @@ function globalRequirementModal() {
                                         <option value="Principal / Vice Principal">Principal / Vice Principal</option>
                                         <option value="Admin / Non-Teaching Staff">Admin / Non-Teaching Staff</option>
                                     </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Subject Specialization <span class="text-red-500">*</span></label>
+                                    <input type="text" name="subject_specialization" required placeholder="e.g. Mathematics, Physics, Chemistry, English, Social Studies, Biology..."
+                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">B.Ed Status <span class="text-red-500">*</span></label>
@@ -1228,8 +1344,8 @@ function globalRequirementModal() {
                                            class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
                                 </div>
                             </div>
-                            <div class="bg-indigo-50/80 border border-indigo-200 rounded-2xl p-4">
-                                <div class="flex items-center justify-between mb-2">
+                            <div class="bg-indigo-50/80 border border-indigo-200 rounded-2xl p-4 space-y-3">
+                                <div class="flex items-center justify-between">
                                     <span class="text-xs font-black text-indigo-800 uppercase tracking-wide flex items-center gap-1.5">
                                         <i class="fas fa-map-marker-alt text-indigo-500"></i> Preferred School Locations & Address <span class="text-red-500">*</span>
                                     </span>
@@ -1237,25 +1353,51 @@ function globalRequirementModal() {
                                         <i class="fas fa-location-crosshairs text-[10px] text-indigo-600"></i> Use Live GPS
                                     </button>
                                 </div>
-                                <textarea name="preferred_locations_manual" id="modal_school_manual_address" rows="2"
-                                          placeholder="Type your address or preferred locations (e.g. Boring Road, Kankarbagh, Patna, Hajipur, Muzaffarpur...)"
-                                          class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-500"></textarea>
-                                <div class="gps-status-indicator mt-1.5" x-show="userLat && userLng" x-cloak>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">Select Preferred City / Region</label>
+                                        <select data-no-search="true" @change="
+                                            if ($event.target.value === 'Other') {
+                                                let el = document.getElementById('modal_school_manual_address');
+                                                if (el) { el.focus(); }
+                                            } else if ($event.target.value) {
+                                                appendModalArea($event.target.value, 'modal_school_manual_address');
+                                            }
+                                        " class="w-full bg-white border border-indigo-200 rounded-xl px-3 py-2.5 text-xs text-[#031b4e] font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-500">
+                                            <option value="">-- Choose City / Region --</option>
+                                            @php $schoolPrefCities = ['Patna', 'Hajipur', 'Muzaffarpur', 'Gaya', 'Bhagalpur', 'Darbhanga', 'Begusarai', 'Supaul', 'Purnea', 'Ara', 'Danapur', 'Ranchi', 'Delhi-NCR', 'Pan-India']; @endphp
+                                            @foreach($schoolPrefCities as $cOpt)
+                                                <option value="{{ $cOpt }}">{{ $cOpt }}</option>
+                                            @endforeach
+                                            <option value="Other">Other (Type Custom Location Below)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">Manual Address / Places <span class="text-red-500">*</span></label>
+                                        <textarea name="preferred_locations_manual" id="modal_school_manual_address" rows="2" required
+                                                  placeholder="Type your address or preferred locations (e.g. Boring Road, Kankarbagh, Patna, Hajipur, Muzaffarpur...)"
+                                                  class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-xs text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-500"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="gps-status-indicator" x-show="userLat && userLng" x-cloak>
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-100 border border-indigo-300 text-indigo-800 text-[10px] font-bold">
                                         <i class="fas fa-check-circle text-indigo-600"></i> Live GPS Attached (<span x-text="Number(userLat).toFixed(4)"></span>, <span x-text="Number(userLng).toFixed(4)"></span>)
                                     </span>
                                 </div>
                                 <input type="hidden" name="latitude" x-model="userLat">
                                 <input type="hidden" name="longitude" x-model="userLng">
-                                <div class="mt-2">
-                                    <span class="block text-[11px] font-bold text-slate-500 mb-1.5">Quick Add Cities (Click to append):</span>
+
+                                <div>
+                                    <span class="block text-[10px] font-bold text-slate-500 mb-1">Quick Add Cities (Click to append):</span>
                                     <div class="flex flex-wrap gap-1.5">
                                         @php $modalLocs = ['Patna', 'Hajipur', 'Muzaffarpur', 'Bhagalpur', 'Gaya', 'Darbhanga', 'Begusarai', 'Supaul', 'Danapur', 'Ara']; @endphp
                                         @foreach($modalLocs as $loc)
                                             <button type="button" 
                                                     @click="appendModalArea('{{ $loc }}', 'modal_school_manual_address')"
-                                                    class="text-[11px] font-bold bg-white hover:bg-indigo-100 text-indigo-700 border border-indigo-300 px-2.5 py-1 rounded-lg cursor-pointer transition-colors flex items-center gap-1 shadow-2xs">
-                                                <i class="fas fa-plus text-[9px]"></i> {{ $loc }}
+                                                    class="text-[11px] font-bold bg-white hover:bg-indigo-100 text-indigo-700 border border-indigo-300 px-2 py-0.5 rounded-lg cursor-pointer transition-colors flex items-center gap-1 shadow-2xs">
+                                                <i class="fas fa-plus text-[8px]"></i> {{ $loc }}
                                             </button>
                                         @endforeach
                                     </div>
@@ -1287,7 +1429,7 @@ function globalRequirementModal() {
 
                         {{-- Submit & Cancel Button Row --}}
                         <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 items-center">
-                            <button type="button" @click="openPostModal = false" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
+                            <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
                                 Cancel
                             </button>
                             <button type="submit" :disabled="submitting" class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-xs transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
@@ -1327,17 +1469,11 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Mobile Number <span class="text-red-500">*</span></label>
-                                    <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" @input="syncWhatsapp()" placeholder="e.g. 9876543210"
+                                    <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidatePhone" placeholder="e.g. 9876543210"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">WhatsApp Number</label>
-                                        <label class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600 cursor-pointer">
-                                            <input type="checkbox" x-model="sameAsMobile" @change="syncWhatsapp()" class="rounded text-blue-600">
-                                            <span>Same as mobile</span>
-                                        </label>
-                                    </div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">WhatsApp Number <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional / Can be different)</span></label>
                                     <input type="tel" name="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" x-model="candidateWhatsapp" placeholder="e.g. 9876543210"
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
@@ -1372,15 +1508,8 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Total Teaching Experience <span class="text-red-500">*</span></label>
-                                    <select data-no-search="true" name="experience_range" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                                        <option value="">Select Experience</option>
-                                        <option value="0–1 Year">Fresher (0–1 Year)</option>
-                                        <option value="1–3 Years">1–3 Years</option>
-                                        <option value="3–5 Years">3–5 Years</option>
-                                        <option value="5–10 Years">5–10 Years</option>
-                                        <option value="10–15 Years">10–15 Years</option>
-                                        <option value="15+ Years">15+ Years</option>
-                                    </select>
+                                    <input type="text" name="experience_range" list="modal_exp_suggestions" required placeholder="e.g. Fresher / 2 Years / 3.5 Years / 5+ Years"
+                                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                             </div>
                         </div>
@@ -1524,7 +1653,7 @@ function globalRequirementModal() {
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Subject Specialization <span class="text-red-500">*</span></label>
-                                    <input type="text" name="subject_specialization" required placeholder="e.g. Mathematics, Physics, English..."
+                                    <input type="text" name="subject_specialization" required placeholder="e.g. Mathematics, Physics, Chemistry, English, Social Studies, Biology..."
                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 </div>
                                 <div>
@@ -1566,25 +1695,50 @@ function globalRequirementModal() {
                             </div>
 
                             {{-- Preferred School Locations --}}
-                            <div class="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                            <div class="bg-indigo-50/80 border border-indigo-200 rounded-2xl p-4 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-black text-indigo-800 uppercase tracking-wide flex items-center gap-1.5">
                                         <i class="fas fa-map-marker-alt text-indigo-500"></i> Preferred School Locations & Address <span class="text-red-500">*</span>
                                     </span>
-                                    <span class="text-[10px] font-bold text-indigo-700 bg-indigo-100/90 px-2.5 py-0.5 rounded-full">Manual Type + Quick Add</span>
+                                    <span class="text-[10px] font-bold text-indigo-700 bg-indigo-100/90 px-2.5 py-0.5 rounded-full">Selective + Manual</span>
                                 </div>
-                                <textarea name="preferred_locations_manual" id="modal_both_school_manual_address" rows="2"
-                                          placeholder="Type your address or preferred locations (e.g. Boring Road, Kankarbagh, Patna, Hajipur, Muzaffarpur...)"
-                                          class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]"></textarea>
-                                <div class="mt-2">
-                                    <span class="block text-[11px] font-bold text-slate-500 mb-1.5">Quick Add Cities (Click to append):</span>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">Select Preferred City / Region</label>
+                                        <select data-no-search="true" @change="
+                                            if ($event.target.value === 'Other') {
+                                                let el = document.getElementById('modal_both_school_manual_address');
+                                                if (el) { el.focus(); }
+                                            } else if ($event.target.value) {
+                                                appendModalArea($event.target.value, 'modal_both_school_manual_address');
+                                            }
+                                        " class="w-full bg-white border border-indigo-200 rounded-xl px-3 py-2.5 text-xs text-[#031b4e] font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-500">
+                                            <option value="">-- Choose City / Region --</option>
+                                            @php $bothSchoolCities = ['Patna', 'Hajipur', 'Muzaffarpur', 'Gaya', 'Bhagalpur', 'Darbhanga', 'Begusarai', 'Supaul', 'Purnea', 'Ara', 'Danapur', 'Ranchi', 'Delhi-NCR', 'Pan-India']; @endphp
+                                            @foreach($bothSchoolCities as $cOpt)
+                                                <option value="{{ $cOpt }}">{{ $cOpt }}</option>
+                                            @endforeach
+                                            <option value="Other">Other (Type Custom Location Below)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">Manual Address / Places <span class="text-red-500">*</span></label>
+                                        <textarea name="preferred_locations_manual" id="modal_both_school_manual_address" rows="2" required
+                                                  placeholder="Type your address or preferred locations (e.g. Boring Road, Kankarbagh, Patna, Hajipur, Muzaffarpur...)"
+                                                  class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-xs text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-500"></textarea>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <span class="block text-[10px] font-bold text-slate-500 mb-1">Quick Add Cities (Click to append):</span>
                                     <div class="flex flex-wrap gap-1.5">
                                         @php $modalLocs = ['Patna', 'Hajipur', 'Muzaffarpur', 'Bhagalpur', 'Gaya', 'Darbhanga', 'Begusarai', 'Supaul', 'Danapur', 'Ara']; @endphp
                                         @foreach($modalLocs as $quickLoc)
                                             <button type="button" 
                                                     @click="appendModalArea('{{ $quickLoc }}', 'modal_both_school_manual_address')"
-                                                    class="text-[11px] font-bold bg-white hover:bg-indigo-100 text-indigo-700 border border-indigo-300 px-2.5 py-1 rounded-lg cursor-pointer transition-colors flex items-center gap-1 shadow-2xs">
-                                                <i class="fas fa-plus text-[9px]"></i> {{ $quickLoc }}
+                                                    class="text-[11px] font-bold bg-white hover:bg-indigo-100 text-indigo-700 border border-indigo-300 px-2 py-0.5 rounded-lg cursor-pointer transition-colors flex items-center gap-1 shadow-2xs">
+                                                <i class="fas fa-plus text-[8px]"></i> {{ $quickLoc }}
                                             </button>
                                         @endforeach
                                     </div>
@@ -1617,7 +1771,7 @@ function globalRequirementModal() {
 
                         {{-- Submit & Cancel Button Row --}}
                         <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 items-center">
-                            <button type="button" @click="openPostModal = false" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
+                            <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
                                 Cancel
                             </button>
                             <button type="submit" :disabled="submitting" class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-xs transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
@@ -1858,7 +2012,7 @@ function globalRequirementModal() {
                         </div>
 
                         <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 items-center">
-                            <button type="button" @click="openPostModal = false" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
+                            <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors text-center cursor-pointer">
                                 Cancel
                             </button>
                             <button type="submit" :disabled="submitting" class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-xs transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
@@ -1874,4 +2028,16 @@ function globalRequirementModal() {
             </div>
         </div>
     </div>
+    <datalist id="modal_exp_suggestions">
+        <option value="Fresher (0 Years)">
+        <option value="1 Year">
+        <option value="2 Years">
+        <option value="3 Years">
+        <option value="4 Years">
+        <option value="5 Years">
+        <option value="5+ Years">
+        <option value="7+ Years">
+        <option value="10+ Years">
+        <option value="15+ Years">
+    </datalist>
 </div>

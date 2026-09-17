@@ -8,6 +8,7 @@ use App\Models\State;
 use App\Models\City;
 use App\Models\Qualification;
 use App\Models\Subject;
+use App\Helpers\NotificationHelper;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -142,6 +143,13 @@ class ProfileController extends Controller
 
         $activeCategory = $profile->candidate_category ?: 'both';
 
+        // If candidate was approved for tuition upgrade and is submitting tuition fields
+        if ($profile->tuition_upgrade_status === 'approved' && ($request->filled('teaching_mode') || $request->filled('tuition_subjects') || $request->input('candidate_category') === 'both')) {
+            $profile->candidate_category = 'both';
+            $profile->tuition_upgrade_status = 'completed';
+            $activeCategory = 'both';
+        }
+
         // Home Tutor fields
         if (in_array($activeCategory, ['home_tutor', 'both'])) {
             $tuitionSubjs = (array) $request->input('tuition_subjects', []);
@@ -223,5 +231,109 @@ class ProfileController extends Controller
         ]);
 
         return back()->with('password_success', 'Password updated successfully.');
+    }
+
+    /**
+     * Candidate requests to join as a tuition teacher also.
+     */
+    public function requestTuitionUpgrade()
+    {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $profile = $user->profile;
+
+        if (!$profile) {
+            return back()->with('error', 'Candidate profile not found.');
+        }
+
+        if ($profile->candidate_category === 'both') {
+            return back()->with('info', 'You already have access to both School Jobs and Home Tuitions.');
+        }
+
+        if ($profile->tuition_upgrade_status === 'requested') {
+            return back()->with('info', 'Your request to join as a tuition teacher is already pending admin review.');
+        }
+
+        if ($profile->tuition_upgrade_status === 'approved') {
+            return back()->with('info', 'Your request has already been approved! Please complete your tuition details below.');
+        }
+
+        $profile->tuition_upgrade_status = 'requested';
+        $profile->tuition_upgrade_requested_at = now();
+        $profile->save();
+
+        NotificationHelper::notifyAdmin(
+            'Tuition Teacher Upgrade Request 🎓',
+            "{$user->name} ({$user->phone}) has requested to join as a tuition teacher also.",
+            route('admin.crm.show', $user->id),
+            'fas fa-chalkboard-teacher'
+        );
+
+        return back()->with('success', 'Your request to join as a tuition teacher has been sent to Admin for approval!');
+    }
+
+    /**
+     * Candidate completes tuition preferences after admin approval, converting profile to 'both'.
+     */
+    public function completeTuitionUpgrade(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $profile = $user->profile;
+
+        if (!$profile) {
+            return back()->with('error', 'Candidate profile not found.');
+        }
+
+        if ($profile->tuition_upgrade_status !== 'approved' && $profile->candidate_category !== 'both') {
+            return back()->with('error', 'You need admin approval before activating your tuition teacher profile.');
+        }
+
+        $request->validate([
+            'tuition_subjects'        => 'nullable|array',
+            'manual_tuition_subjects' => 'nullable|string|max:500',
+            'classes_interested'      => 'nullable|array',
+            'manual_classes'          => 'nullable|string|max:500',
+            'teaching_mode'           => 'required|in:Offline,Online,Both',
+            'preferred_areas'         => 'required|string|max:1000',
+            'available_time_slot'     => 'nullable|string|max:150',
+        ]);
+
+        $tuitionSubjs = (array) $request->input('tuition_subjects', []);
+        if ($request->filled('manual_tuition_subjects')) {
+            $manualSubs = array_filter(array_map('trim', explode(',', $request->input('manual_tuition_subjects'))));
+            $tuitionSubjs = array_values(array_unique(array_merge($tuitionSubjs, $manualSubs)));
+        }
+        if (empty($tuitionSubjs) && $profile->subject_specialization) {
+            $tuitionSubjs = [$profile->subject_specialization];
+        }
+        $profile->tuition_subjects = $tuitionSubjs;
+
+        $classesInterested = (array) $request->input('classes_interested', []);
+        if ($request->filled('manual_classes')) {
+            $manualCls = array_filter(array_map('trim', explode(',', $request->input('manual_classes'))));
+            $classesInterested = array_values(array_unique(array_merge($classesInterested, $manualCls)));
+        }
+        $profile->classes_interested = $classesInterested;
+
+        $profile->teaching_mode = $request->input('teaching_mode');
+        $profile->preferred_areas = $request->input('preferred_areas');
+        $profile->available_time_slot = $request->input('available_time_slot');
+
+        // Convert category to both
+        $profile->candidate_category = 'both';
+        $profile->tuition_upgrade_status = 'completed';
+        $profile->is_profile_complete = true;
+        $profile->profile_completion_percentage = 100;
+        $profile->save();
+
+        NotificationHelper::notifyAdmin(
+            'Candidate Upgraded to Dual Profile (Both) ✅',
+            "{$user->name} has completed tuition details and is now active for both School Jobs & Home Tuitions.",
+            route('admin.crm.show', $user->id),
+            'fas fa-user-graduate'
+        );
+
+        return redirect()->route('candidate.dashboard')->with('success', 'Congratulations! Your profile has been upgraded to Both (School Teacher & Home Tutor). You can now apply for Home Tuitions as well!');
     }
 }

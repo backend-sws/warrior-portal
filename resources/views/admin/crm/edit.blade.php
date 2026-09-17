@@ -114,8 +114,9 @@
                            class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-all">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">WhatsApp Number</label>
-                    <input type="text" name="whatsapp_no" value="{{ old('whatsapp_no', $user->whatsapp_no ?: ($profile?->whatsapp_no ?? $user->phone)) }}"
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">WhatsApp Number <span class="text-text-dark/40 font-normal lowercase text-[11px]">(Can be different)</span></label>
+                    <input type="text" name="whatsapp_no" value="{{ old('whatsapp_no', $user->whatsapp_no ?: ($profile?->whatsapp_no ?? '')) }}"
+                           placeholder="e.g. 9876543210 (Leave blank if same as phone)"
                            class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-all">
                 </div>
                 <div>
@@ -206,13 +207,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Experience Range</label>
-                    <select name="experience_range" class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                        <option value="">Select Range</option>
-                        @foreach(['Fresher', '1-3 Years', '3-5 Years', '5-10 Years', '10+ Years'] as $expR)
-                            <option value="{{ $expR }}" {{ old('experience_range', $profile?->experience_range) == $expR ? 'selected' : '' }}>{{ $expR }}</option>
-                        @endforeach
-                    </select>
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1.5">Experience Range / Details</label>
+                    <input type="text" name="experience_range" list="admin_exp_suggestions" value="{{ old('experience_range', $profile?->experience_range) }}" placeholder="e.g. Fresher / 2 Years / 3.5 Years / 5+ Years"
+                           class="w-full bg-secondary-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
                 </div>
 
                 <div>
@@ -420,13 +417,15 @@
                 </div>
             </div>
 
-            {{-- Preferred Locations Multi-Select --}}
+            {{-- Preferred Locations Multi-Select & Manual --}}
             <div>
                 <label class="block text-xs font-bold text-text-dark/70 uppercase mb-2">Preferred School Job Locations</label>
                 @php
                     $savedLocs = $profile?->preferred_locations ?? [];
                     if (!is_array($savedLocs)) $savedLocs = [];
                     $commonLocs = ['Patna', 'Ranchi', 'Gaya', 'Muzaffarpur', 'Bhagalpur', 'Darbhanga', 'Dhanbad', 'Jamshedpur', 'Bokaro', 'Delhi-NCR', 'Pan-India'];
+                    $customLocs = array_diff($savedLocs, $commonLocs);
+                    $customLocsStr = implode(', ', $customLocs);
                 @endphp
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     @foreach($commonLocs as $locItem)
@@ -437,6 +436,22 @@
                             <span>{{ $locItem }}</span>
                         </label>
                     @endforeach
+                    <label class="flex items-center gap-2 p-2 bg-indigo-50/60 border border-indigo-200 rounded-xl text-xs text-indigo-900 font-bold cursor-pointer hover:bg-indigo-100/60">
+                        <input type="checkbox" name="preferred_locations[]" value="Other"
+                               {{ (in_array('Other', old('preferred_locations', $savedLocs)) || !empty($customLocsStr)) ? 'checked' : '' }}
+                               class="rounded text-indigo-600 focus:ring-indigo-500">
+                        <span>Other (Custom)</span>
+                    </label>
+                </div>
+
+                {{-- Manual Custom Locations Input --}}
+                <div class="mt-3">
+                    <label class="block text-xs font-bold text-text-dark/70 uppercase mb-1 flex items-center gap-1.5">
+                        <i class="fas fa-edit text-indigo-500"></i> Other / Custom Preferred Locations (Manual Entry)
+                    </label>
+                    <input type="text" name="preferred_locations_manual" value="{{ old('preferred_locations_manual', $customLocsStr) }}"
+                           placeholder="Type custom cities or locations separated by comma (e.g. Supaul, Begusarai, Samastipur, Hajipur...)"
+                           class="w-full bg-card-bg border border-card-border rounded-xl text-sm py-2.5 px-3.5 text-text-main focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500">
                 </div>
             </div>
         </div>
@@ -567,6 +582,18 @@
             </button>
         </div>
     </form>
+    <datalist id="admin_exp_suggestions">
+        <option value="Fresher (0 Years)">
+        <option value="1 Year">
+        <option value="2 Years">
+        <option value="3 Years">
+        <option value="4 Years">
+        <option value="5 Years">
+        <option value="5+ Years">
+        <option value="7+ Years">
+        <option value="10+ Years">
+        <option value="15+ Years">
+    </datalist>
 </div>
 
 @push('scripts')

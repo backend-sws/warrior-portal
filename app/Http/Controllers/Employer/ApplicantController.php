@@ -10,12 +10,12 @@ class ApplicantController extends Controller
 {
     public function index(Request $request)
     {
-        // Only show applications that are shortlisted or hired for this employer's jobs
+        // Show candidates forwarded, scheduled for demo, shortlisted, hired, or resolved for this employer
         $query = JobApplication::with(['candidate.profile', 'jobPost'])
             ->whereHas('jobPost', function ($q) {
                 $q->where('user_id', auth()->id());
             })
-            ->whereIn('status', ['shortlisted', 'hired']);
+            ->whereIn('status', ['forwarded_to_school', 'demo_scheduled', 'shortlisted', 'hired', 'rejected_by_school', 'tutor_backed_out']);
 
         if ($jobId = $request->input('job_post_id')) {
             $query->where('job_post_id', $jobId);
