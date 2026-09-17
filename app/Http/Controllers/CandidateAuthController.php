@@ -338,13 +338,13 @@ class CandidateAuthController extends Controller
             ->first();
 
         if (!$user) {
-            // Create brand new authentic candidate
+            // Create brand new authentic user with proper role
             $user = User::create([
                 'name'        => $data['name'],
                 'email'       => $data['email'],
                 'phone'       => $data['phone'],
                 'whatsapp_no' => $data['whatsapp_no'] ?? $data['phone'],
-                'role'        => 'candidate',
+                'role'        => $data['role'] ?? 'candidate',
                 'password'    => $data['password'],
                 'is_active'   => true,
             ]);
@@ -443,7 +443,21 @@ class CandidateAuthController extends Controller
             Log::warning('Registration notification failed: ' . $e->getMessage());
         }
 
-        return redirect()->route('candidate.dashboard')->with('success', 'Email verified successfully! Welcome to your dashboard.');
+        $userRole = $user->role ?: ($data['role'] ?? 'candidate');
+        if ($userRole === 'employer') {
+            return redirect()->route('employer.dashboard')->with('success', 'Email verified successfully! Welcome to your school recruitment dashboard.');
+        }
+        if ($userRole === 'parent') {
+            return redirect()->route('parent.dashboard')->with('success', 'Email verified successfully! Welcome to your parent dashboard.');
+        }
+
+        $categoryMsg = match($profile->candidate_category ?? 'both') {
+            'school_job' => 'Email verified successfully! Welcome to your School Teacher Dashboard.',
+            'home_tutor' => 'Email verified successfully! Welcome to your Home Tutor Dashboard.',
+            default      => 'Email verified successfully! Welcome to your Dashboard.',
+        };
+
+        return redirect()->route('candidate.dashboard')->with('success', $categoryMsg);
     }
 
     /**
