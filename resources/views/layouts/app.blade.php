@@ -2,6 +2,23 @@
 <html lang="en" class="scroll-smooth">
 
 <head>
+    @php
+        $configuredGtmId = env('GTM_CONTAINER_ID') ?: env('GTM_ID');
+        $gtmId = ($configuredGtmId && str_starts_with($configuredGtmId, 'GTM-')) ? $configuredGtmId : 'GTM-NWBQ2MVS';
+        $googleTagId = env('GOOGLE_TAG_ID', 'GT-T9HC6XV6');
+        $googleAdsId = env('GOOGLE_ADS_ID', 'AW-18341660766');
+        $ga4Id = env('GA4_MEASUREMENT_ID') ?: env('GA4_ID');
+        $metaPixelId = env('META_PIXEL_ID');
+    @endphp
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','{{ $gtmId }}');</script>
+    <!-- End Google Tag Manager -->
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Warriors Educare — #1 Education Recruitment Agency & Verified Home Tutors in India')</title>
@@ -26,24 +43,6 @@
     <meta name="twitter:title" content="@yield('title', 'Warriors Educare — #1 Education Recruitment Agency & Verified Home Tutors in India')">
     <meta name="twitter:description" content="@yield('meta_description', 'India’s trusted education network. Hire verified home tutors for all subjects, recruit top school & college faculty, or apply for high-paying teaching jobs.')">
     <meta name="twitter:image" content="@yield('og_image', asset('adobe.png'))">
-
-    @php
-        $gtmId = env('GTM_CONTAINER_ID') ?: env('GTM_ID');
-        $googleTagId = env('GOOGLE_TAG_ID', 'GT-T9HC6XV6');
-        $googleAdsId = env('GOOGLE_ADS_ID', 'AW-18341660766');
-        $ga4Id = env('GA4_MEASUREMENT_ID') ?: env('GA4_ID');
-        $metaPixelId = env('META_PIXEL_ID');
-    @endphp
-
-    @if($gtmId && str_starts_with($gtmId, 'GTM-'))
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','{{ $gtmId }}');</script>
-    <!-- End Google Tag Manager -->
-    @endif
 
     <!-- Google Tag (gtag.js) for Google Tag & Google Ads -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ $googleTagId }}"></script>
@@ -370,12 +369,10 @@
 </head>
 
 <body class="{{ request()->is('candidate*') || request()->is('employer*') || request()->is('need-tutor') || request()->is('hire-teacher') || request()->is('apply*') || request()->routeIs('forms.*') ? 'bg-[#f8fafc] text-gray-900' : 'bg-secondary-bg text-text-dark' }} {{ session()->has('impersonate_admin_id') ? 'pt-10' : '' }}">
-    @if(!empty($gtmId) && str_starts_with($gtmId, 'GTM-'))
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    @endif
 
     <!-- Preloader removed per user request -->
 
