@@ -136,7 +136,8 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Teaching Mode <span class="text-red-500">*</span></label>
-                            <select data-no-search="true" name="teaching_mode" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                            <select data-no-search="true" name="teaching_mode" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                <option value="">Select Teaching Mode</option>
                                 <option value="Offline">Offline (Student's Home)</option>
                                 <option value="Online">Online (Zoom / Google Meet)</option>
                                 <option value="Both">Both (Offline &amp; Online)</option>
@@ -145,6 +146,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Available Time Slot</label>
                             <select data-no-search="true" name="available_time_slot" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                <option value="">Select Available Time Slot (Optional)</option>
                                 <option value="Flexible / Any Time">Flexible / Any Time</option>
                                 <option value="Morning (6 AM - 10 AM)">Morning (6 AM - 10 AM)</option>
                                 <option value="Afternoon (12 PM - 4 PM)">Afternoon (12 PM - 4 PM)</option>
@@ -318,10 +320,10 @@ function homeTutorForm() {
         fieldErrors: {},
         standardSubjects: ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'],
         standardClasses: ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby'],
-        selectedTuitionSubjects: ['All Subjects'],
+        selectedTuitionSubjects: [],
         customSubjects: [],
         manualSubjectInput: '',
-        selectedClasses: ['Class 1-5', 'Class 6-8', 'Class 9-10'],
+        selectedClasses: [],
         customClasses: [],
         manualClassInput: '',
         userLat: '',

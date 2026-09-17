@@ -23,8 +23,8 @@
          date_of_birth: '{{ old('date_of_birth', '') }}',
          highest_qualification: '{{ old('highest_qualification', '') }}',
          experience_range: '{{ old('experience_range', '') }}',
-         selectedTuitionSubjects: {{ json_encode(old('tuition_subjects', ['All Subjects'])) }},
-         selectedClasses: {{ json_encode(old('classes_interested', ['Class 1-5', 'Class 6-8', 'Class 9-10'])) }},
+         selectedTuitionSubjects: {{ json_encode(old('tuition_subjects', [])) }},
+         selectedClasses: {{ json_encode(old('classes_interested', [])) }},
          userLat: '{{ old('latitude', '') }}',
          userLng: '{{ old('longitude', '') }}',
          detectLocation(silent = false) {
@@ -440,6 +440,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">B.Ed Status <span class="text-red-500">*</span></label>
                         <select name="b_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                            <option value="">Select B.Ed Status</option>
                             <option value="Yes">Yes (Completed)</option>
                             <option value="Pursuing">Pursuing</option>
                             <option value="No">No</option>
@@ -448,6 +449,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">D.El.Ed Status <span class="text-red-500">*</span></label>
                         <select name="d_el_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                            <option value="">Select D.El.Ed Status</option>
                             <option value="No">No</option>
                             <option value="Yes">Yes (Completed)</option>
                             <option value="Pursuing">Pursuing</option>
@@ -799,6 +801,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">B.Ed Status <span class="text-red-500">*</span></label>
                         <select name="b_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                            <option value="">Select B.Ed Status</option>
                             <option value="Yes">Yes (Completed)</option>
                             <option value="Pursuing">Pursuing</option>
                             <option value="No">No</option>
@@ -807,6 +810,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">D.El.Ed Status <span class="text-red-500">*</span></label>
                         <select name="d_el_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                            <option value="">Select D.El.Ed Status</option>
                             <option value="No">No</option>
                             <option value="Yes">Yes (Completed)</option>
                             <option value="Pursuing">Pursuing</option>

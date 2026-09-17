@@ -262,15 +262,17 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Teaching Mode <span class="text-red-500">*</span></label>
-                            <select data-no-search="true" name="teaching_mode" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                            <select data-no-search="true" name="teaching_mode" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                <option value="">Select Teaching Mode</option>
                                 <option value="Offline">Offline (Student's Home)</option>
                                 <option value="Online">Online (Zoom / Google Meet)</option>
-                                <option value="Both" selected>Both (Offline & Online)</option>
+                                <option value="Both">Both (Offline & Online)</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Available Time Slot</label>
                             <select data-no-search="true" name="available_time_slot" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                <option value="">Select Available Time Slot (Optional)</option>
                                 <option value="Flexible / Any Time">Flexible / Any Time</option>
                                 <option value="Morning (6 AM - 10 AM)">Morning (6 AM - 10 AM)</option>
                                 <option value="Afternoon (12 PM - 4 PM)">Afternoon (12 PM - 4 PM)</option>
@@ -345,16 +347,18 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">B.Ed Degree Status <span class="text-red-500">*</span></label>
                             <select data-no-search="true" name="b_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
+                                <option value="">Select B.Ed Status</option>
                                 <option value="Yes">Yes (Completed)</option>
                                 <option value="Pursuing">Pursuing</option>
-                                <option value="No" selected>No</option>
+                                <option value="No">No</option>
                             </select>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">D.El.Ed Degree Status <span class="text-red-500">*</span></label>
                             <select data-no-search="true" name="d_el_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
-                                <option value="No" selected>No</option>
+                                <option value="">Select D.El.Ed Status</option>
+                                <option value="No">No</option>
                                 <option value="Yes">Yes (Completed)</option>
                                 <option value="Pursuing">Pursuing</option>
                             </select>
@@ -531,10 +535,10 @@ function bothCandidatesForm() {
         date_of_birth: '',
         standardSubjects: ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'],
         standardClasses: ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby'],
-        selectedTuitionSubjects: ['All Subjects'],
+        selectedTuitionSubjects: [],
         customSubjects: [],
         manualSubjectInput: '',
-        selectedClasses: ['Class 1-5', 'Class 6-8', 'Class 9-10'],
+        selectedClasses: [],
         customClasses: [],
         manualClassInput: '',
         userLat: '',

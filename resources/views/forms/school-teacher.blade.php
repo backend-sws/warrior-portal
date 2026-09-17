@@ -154,6 +154,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">B.Ed Status <span class="text-red-500">*</span></label>
                             <select data-no-search="true" name="b_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                <option value="">Select B.Ed Status</option>
                                 <option value="Yes">Yes (Completed)</option>
                                 <option value="Pursuing">Pursuing</option>
                                 <option value="No">No</option>
@@ -162,6 +163,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">D.El.Ed Status <span class="text-red-500">*</span></label>
                             <select data-no-search="true" name="d_el_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                <option value="">Select D.El.Ed Status</option>
                                 <option value="No">No</option>
                                 <option value="Yes">Yes (Completed)</option>
                                 <option value="Pursuing">Pursuing</option>
@@ -399,10 +401,10 @@ function schoolTeacherForm() {
         fieldErrors: {},
         standardSubjects: ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'],
         standardClasses: ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby'],
-        selectedSubjects: ['All Subjects'],
+        selectedSubjects: [],
         customSubjects: [],
         manualSubjectInput: '',
-        selectedClasses: ['Class 6-8', 'Class 9-10'],
+        selectedClasses: [],
         customClasses: [],
         manualClassInput: '',
         userLat: '',
