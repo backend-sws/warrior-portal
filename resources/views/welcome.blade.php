@@ -4,10 +4,10 @@
 @section('meta_description', 'Connect with 10,000+ verified home tutors and certified school faculty across India. Fast matching, quality educators, and premium career placements.')
 
 @section('content')
-    
-    <!-- Welcome Modal -->
+       <!-- Welcome Modal -->
     <div x-data="{ 
             showWelcomeModal: false,
+            modalTeacherDropdown: false,
             openTuitionRequirement() {
                 this.showWelcomeModal = false;
                 window.dispatchEvent(new CustomEvent('switch-requirement-tab', { detail: { tab: 'tuition' } }));
@@ -40,7 +40,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
          
-        <div class="bg-white rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] p-5 sm:p-7 md:p-8 max-w-5xl w-full relative border border-slate-100 my-auto overflow-hidden flex flex-col justify-between" 
+        <div class="bg-white rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] p-5 sm:p-7 md:p-8 max-w-5xl w-full relative border border-slate-100 my-auto overflow-visible flex flex-col justify-between" 
              @click.away="showWelcomeModal = false"
              x-show="showWelcomeModal"
              x-transition:enter="transition ease-out duration-400"
@@ -68,71 +68,144 @@
                 <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-[#031b4e] mb-1 tracking-tight">Welcome to Warriors Educare</h2>
                 <p class="text-slate-500 text-xs sm:text-sm max-w-md mx-auto font-medium">Please select what you are looking for to get instant matching.</p>
             </div>
-                       <!-- 3 Interactive Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 relative z-10">
+            
+            <!-- 3 Interactive Cards (Styled matching Image 2 Quick Action Buttons) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 relative z-20">
                 
-                <!-- Card 1: Tuition Post Requirement -->
+                <!-- Card 1: Need a Home Tutor (Tuition Requirement Form) -->
                 <a href="{{ route('forms.need-tutor') }}" 
-                        class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-blue-50/60 via-white to-blue-50/30 hover:from-blue-50/90 hover:to-white border-2 border-blue-100 hover:border-blue-500 shadow-xs hover:shadow-xl hover:shadow-blue-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
-                    <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
-                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-blue-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
-                            <i class="fas fa-graduation-cap"></i>
+                   title="Need a Home Tutor - Tuition Requirement Form"
+                   class="group relative bg-[#031b4e] hover:bg-[#021030] text-white p-5 sm:p-5.5 rounded-2xl sm:rounded-3xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-blue-950/40 hover:-translate-y-1.5 flex flex-col justify-between border border-blue-900/40 cursor-pointer min-h-[175px]">
+                    <div>
+                        <div class="flex items-center gap-3.5 sm:gap-4 mb-2.5">
+                            <div class="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-white/10 text-[#0ea5e9] flex items-center justify-center text-2xl sm:text-3xl shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="min-w-0 text-left">
+                                <h3 class="font-black text-base sm:text-lg text-white leading-tight">Need a Home Tutor</h3>
+                                <span class="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-cyan-300 font-bold mt-1 group-hover:text-cyan-200">
+                                    Tuition Requirement Form <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                                </span>
+                            </div>
                         </div>
-                        <div class="flex-grow text-left md:text-center">
-                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-blue-100/90 text-blue-800 group-hover:bg-blue-600 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Parents & Students</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-blue-600 mb-0.5 md:mb-1 transition-colors">Tuition Requirement Form</h3>
-                            <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Find verified & experienced home tutors for all classes & subjects.</p>
-                        </div>
+                        <p class="text-[11px] sm:text-xs text-blue-200/80 leading-relaxed font-normal text-left">Find verified & experienced home tutors for all classes & subjects.</p>
                     </div>
-                    <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 w-auto md:w-full flex items-center justify-end md:justify-center gap-2 text-xs font-extrabold text-blue-700 group-hover:text-blue-600 transition-colors shrink-0">
-                        <span class="hidden md:inline">Fill Requirement</span>
-                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-blue-700 transition-all shadow-xs group-hover:shadow-md group-hover:shadow-blue-500/30">
-                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
-                        </div>
+                    <div class="mt-3.5 pt-2.5 border-t border-white/10 flex items-center justify-between text-xs font-bold text-blue-200 group-hover:text-white transition-colors">
+                        <span class="text-[11px] font-semibold text-cyan-300/90">For Parents & Students</span>
+                        <span class="flex items-center gap-1.5">Fill Requirement <i class="fas fa-arrow-right text-[10px]"></i></span>
                     </div>
                 </a>
                 
-                <!-- Card 2: School Hiring Form -->
+                <!-- Card 2: Hire School Staff (School Hiring Form) -->
                 <a href="{{ route('forms.hire-teacher') }}" 
-                        class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-indigo-50/60 via-white to-purple-50/30 hover:from-indigo-50/90 hover:to-white border-2 border-indigo-100 hover:border-indigo-500 shadow-xs hover:shadow-xl hover:shadow-indigo-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
-                    <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
-                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-indigo-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
-                            <i class="fas fa-school"></i>
+                   title="Hire School Staff - School Hiring Form"
+                   class="group relative bg-[#0ea5e9] hover:bg-[#0284c7] text-white p-5 sm:p-5.5 rounded-2xl sm:rounded-3xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-sky-500/35 hover:-translate-y-1.5 flex flex-col justify-between border border-sky-400/40 cursor-pointer min-h-[175px]">
+                    <div>
+                        <div class="flex items-center gap-3.5 sm:gap-4 mb-2.5">
+                            <div class="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-white/20 text-white flex items-center justify-center text-2xl sm:text-3xl shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                                <i class="fas fa-school"></i>
+                            </div>
+                            <div class="min-w-0 text-left">
+                                <h3 class="font-black text-base sm:text-lg text-white leading-tight">Hire School Staff</h3>
+                                <span class="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-white/95 font-bold mt-1 group-hover:text-white">
+                                    School Hiring Form <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                                </span>
+                            </div>
                         </div>
-                        <div class="flex-grow text-left md:text-center">
-                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-indigo-100/90 text-indigo-800 group-hover:bg-indigo-600 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Schools & Institutes</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-indigo-600 mb-0.5 md:mb-1 transition-colors">School Hiring Form</h3>
-                            <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Access 10,000+ pre-verified PGT, TGT, PRT teachers & staff.</p>
-                        </div>
+                        <p class="text-[11px] sm:text-xs text-white/85 leading-relaxed font-normal text-left">Access 10,000+ pre-verified PGT, TGT, PRT teachers & staff.</p>
                     </div>
-                    <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 w-auto md:w-full flex items-center justify-end md:justify-center gap-2 text-xs font-extrabold text-indigo-700 group-hover:text-indigo-600 transition-colors shrink-0">
-                        <span class="hidden md:inline">Post Faculty Need</span>
-                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-100 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center text-indigo-700 transition-all shadow-xs group-hover:shadow-md group-hover:shadow-indigo-500/30">
-                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
-                        </div>
+                    <div class="mt-3.5 pt-2.5 border-t border-white/20 flex items-center justify-between text-xs font-bold text-white/90 group-hover:text-white transition-colors">
+                        <span class="text-[11px] font-semibold text-white/90">For Schools & Institutes</span>
+                        <span class="flex items-center gap-1.5">Post Faculty Need <i class="fas fa-arrow-right text-[10px]"></i></span>
                     </div>
                 </a>
                 
-                <!-- Card 3: Teacher Registration Form -->
-                <a href="{{ route('apply.both') }}" 
-                        class="group relative rounded-2xl p-4 sm:p-5 text-left md:text-center transition-all duration-300 bg-gradient-to-b from-amber-50/60 via-white to-orange-50/30 hover:from-amber-50/90 hover:to-white border-2 border-amber-100 hover:border-amber-500 shadow-xs hover:shadow-xl hover:shadow-amber-500/15 hover:-translate-y-1.5 flex flex-row md:flex-col items-center justify-between cursor-pointer w-full gap-3.5">
-                    <div class="flex flex-row md:flex-col items-center gap-3 md:gap-0 w-full">
-                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-2 transition-all duration-300 md:mb-3.5 shrink-0">
-                            <i class="fas fa-chalkboard-teacher"></i>
+                <!-- Card 3: Join as Teacher / Tutor / Staff (With Dropdown for 3 Forms) -->
+                <div class="relative" @click.outside="modalTeacherDropdown = false">
+                    <button type="button" 
+                            @click="modalTeacherDropdown = !modalTeacherDropdown"
+                            title="Join as Teacher / Tutor / Staff - Teacher Registration Form"
+                            class="group relative bg-white hover:bg-slate-50 text-[#031b4e] p-5 sm:p-5.5 rounded-2xl sm:rounded-3xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1.5 flex flex-col justify-between border-2 border-slate-200 hover:border-amber-400 cursor-pointer w-full text-left min-h-[175px]">
+                        <div>
+                            <div class="flex items-center gap-3.5 sm:gap-4 mb-2.5">
+                                <div class="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-2xl sm:text-3xl shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
+                                <div class="min-w-0 text-left">
+                                    <h3 class="font-black text-base sm:text-lg text-[#031b4e] leading-tight flex items-center gap-1.5">
+                                        <span>Join as Teacher / Tutor / Staff</span>
+                                    </h3>
+                                    <span class="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-slate-500 font-bold mt-1">
+                                        Teacher Registration Form <i class="fas fa-chevron-down text-[10px] text-amber-500 transition-transform duration-200" :class="modalTeacherDropdown ? 'rotate-180' : ''"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-[11px] sm:text-xs text-slate-500 leading-relaxed font-normal text-left">Find verified home tuitions & school teaching / staff jobs in your city.</p>
                         </div>
-                        <div class="flex-grow text-left md:text-center">
-                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-amber-100/90 text-amber-900 group-hover:bg-amber-500 group-hover:text-white px-2.5 py-0.5 rounded-full mb-1 transition-colors">For Teachers & Tutors</span>
-                            <h3 class="text-sm sm:text-base font-black text-[#031b4e] group-hover:text-amber-800 mb-0.5 md:mb-1 transition-colors">Teacher Registration Form</h3>
-                            <p class="text-[11px] sm:text-xs text-slate-500 group-hover:text-slate-700 leading-snug transition-colors hidden sm:block font-normal">Find verified home tuitions & school teaching jobs in your city.</p>
+                        <div class="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-black text-amber-600 group-hover:text-amber-700 transition-colors">
+                            <span class="text-[11px] font-semibold text-slate-400">For Teachers & Staff</span>
+                            <span class="flex items-center gap-1.5">Select 1 of 3 Forms <i class="fas fa-chevron-down text-[10px] transition-transform duration-200" :class="modalTeacherDropdown ? 'rotate-180' : ''"></i></span>
                         </div>
+                    </button>
+
+                    <!-- Dropdown Menu with all 3 Forms (Instant display on click) -->
+                    <div x-show="modalTeacherDropdown"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                         class="absolute left-0 right-0 md:right-0 md:left-auto w-full md:w-[350px] top-full mt-2 bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)] border-2 border-amber-400 p-2.5 z-50 text-left">
+                        <div class="px-3 py-1.5 mb-1.5 border-b border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-black uppercase tracking-wider text-slate-500">Choose Registration Form</span>
+                            <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60">3 Options</span>
+                        </div>
+                        
+                        <!-- Form 1: Home Tutor Registration -->
+                        <a href="{{ route('apply.home-tutor') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-emerald-50 transition-all group/opt mb-1 border border-transparent hover:border-emerald-200">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-base shrink-0 group-hover/opt:scale-110 transition-transform">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="min-w-0 flex-grow">
+                                <div class="flex items-center justify-between">
+                                    <span class="block text-xs font-black text-[#031b4e] group-hover/opt:text-emerald-700">Home Tutor Registration</span>
+                                    <i class="fas fa-arrow-right text-[10px] text-emerald-500 opacity-0 group-hover/opt:opacity-100 group-hover/opt:translate-x-0.5 transition-all"></i>
+                                </div>
+                                <span class="block text-[10px] text-slate-500 font-medium">Private home & online tuition jobs</span>
+                            </div>
+                        </a>
+
+                        <!-- Form 2: School Teacher / Staff Registration -->
+                        <a href="{{ route('apply.school-teacher') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-amber-50 transition-all group/opt mb-1 border border-transparent hover:border-amber-200">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-base shrink-0 group-hover/opt:scale-110 transition-transform">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="min-w-0 flex-grow">
+                                <div class="flex items-center justify-between">
+                                    <span class="block text-xs font-black text-[#031b4e] group-hover/opt:text-amber-800">School Teacher / Staff Registration</span>
+                                    <i class="fas fa-arrow-right text-[10px] text-amber-500 opacity-0 group-hover/opt:opacity-100 group-hover/opt:translate-x-0.5 transition-all"></i>
+                                </div>
+                                <span class="block text-[10px] text-slate-500 font-medium">CBSE & ICSE teaching & staff positions</span>
+                            </div>
+                        </a>
+
+                        <!-- Form 3: Both (Teacher + Tutor) -->
+                        <a href="{{ route('apply.both') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-indigo-50 transition-all group/opt border border-transparent hover:border-indigo-200">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-base shrink-0 group-hover/opt:scale-110 transition-transform">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="min-w-0 flex-grow">
+                                <div class="flex items-center justify-between">
+                                    <span class="block text-xs font-black text-[#031b4e] group-hover/opt:text-indigo-700">Both (Teacher + Home Tutor)</span>
+                                    <i class="fas fa-arrow-right text-[10px] text-indigo-500 opacity-0 group-hover/opt:opacity-100 group-hover/opt:translate-x-0.5 transition-all"></i>
+                                </div>
+                                <span class="block text-[10px] text-slate-500 font-medium">Dual profile for all opportunities</span>
+                            </div>
+                        </a>
                     </div>
-                    <div class="md:mt-3 md:pt-2.5 md:border-t md:border-slate-100 w-auto md:w-full flex items-center justify-end md:justify-center gap-2 text-xs font-extrabold text-amber-800 group-hover:text-amber-700 transition-colors shrink-0">
-                        <span class="hidden md:inline">Register Free</span>
-                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-100 group-hover:bg-amber-500 group-hover:text-white flex items-center justify-center text-amber-800 transition-all shadow-xs group-hover:shadow-md group-hover:shadow-amber-500/30">
-                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
-                        </div>
-                    </div>
-                </a>
+                </div>
 
             </div>
             
@@ -144,9 +217,11 @@
                 </button>
             </div>
             
-            <!-- Decorative blurred backdrop circles -->
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-100/40 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-indigo-100/40 rounded-full blur-3xl pointer-events-none"></div>
+            <!-- Decorative blurred backdrop circles clipped to modal boundary -->
+            <div class="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+                <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-100/40 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-indigo-100/40 rounded-full blur-3xl"></div>
+            </div>
         </div>
     </div>
     
@@ -309,7 +384,7 @@
                         </div>
                     </a>
 
-                    <!-- Button 3: Join as Teacher / Tutor (Teacher Registration Form with Dropdown) -->
+                    <!-- Button 3: Join as Teacher / Tutor / Staff (Teacher Registration Form with Dropdown) -->
                     @guest
                         <div class="relative" x-data="{ openHeroTeacher: false }" @click.away="openHeroTeacher = false">
                             <button type="button" 
@@ -320,7 +395,7 @@
                                 <i class="fas fa-chalkboard-teacher text-amber-500 text-base"></i>
                                 <div class="text-left">
                                     <span class="block font-black text-[13px] sm:text-[14px] leading-tight flex items-center gap-1.5">
-                                        <span>Join as Teacher / Tutor</span>
+                                        <span>Join as Teacher / Tutor / Staff</span>
                                         <i class="fas fa-chevron-down text-[10px] text-amber-500 transition-transform duration-200" :class="openHeroTeacher ? 'rotate-180' : ''"></i>
                                     </span>
                                     <span class="block text-[10px] text-slate-500 font-semibold tracking-wide mt-0.5">Teacher Registration Form ▾</span>
@@ -353,8 +428,8 @@
                                         <i class="fas fa-chalkboard-teacher"></i>
                                     </div>
                                     <div class="min-w-0">
-                                        <span class="block text-xs font-bold text-[#031b4e]">School Teacher Job</span>
-                                        <span class="block text-[10px] text-slate-500">CBSE & ICSE school vacancies</span>
+                                        <span class="block text-xs font-bold text-[#031b4e]">School Teacher / Staff Registration</span>
+                                        <span class="block text-[10px] text-slate-500">CBSE & ICSE teaching & staff positions</span>
                                     </div>
                                 </a>
                                 <a href="{{ route('apply.both') }}" class="flex items-center gap-3 p-2 rounded-xl hover:bg-indigo-50 transition-colors group">
@@ -362,7 +437,7 @@
                                         <i class="fas fa-layer-group"></i>
                                     </div>
                                     <div class="min-w-0">
-                                        <span class="block text-xs font-bold text-[#031b4e]">Both (Tutor + School)</span>
+                                        <span class="block text-xs font-bold text-[#031b4e]">Both (Teacher + Home Tutor)</span>
                                         <span class="block text-[10px] text-slate-500">Dual profile for all opportunities</span>
                                     </div>
                                 </a>

@@ -326,17 +326,17 @@
                         </span>
                     </a>
 
-                    {{-- 2. School Teacher --}}
+                    {{-- 2. School Teacher / Staff --}}
                     <a href="{{ route('apply.school-teacher') }}" 
                        class="p-3.5 rounded-2xl bg-white hover:bg-amber-50/90 border border-slate-200 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 transition-all group flex flex-col justify-between cursor-pointer">
                         <div>
                             <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-base font-bold mb-2 group-hover:scale-110 transition-transform">
                                 <i class="fas fa-school"></i>
                             </div>
-                            <div class="text-xs font-black text-[#031b4e] leading-snug">School Teacher Form</div>
+                            <div class="text-xs font-black text-[#031b4e] leading-snug">School Teacher / Staff Form</div>
                             <div class="text-[10px] text-amber-800 font-bold leading-tight mt-0.5">School / College Job</div>
                             <p class="text-[10.5px] text-slate-500 font-medium mt-1 leading-tight">
-                                Apply for PRT, TGT &amp; PGT teaching vacancies in schools
+                                Apply for PRT, TGT &amp; PGT teaching vacancies &amp; staff in schools
                             </p>
                         </div>
                         <span class="mt-3 text-[10px] font-bold text-amber-700 flex items-center gap-1">

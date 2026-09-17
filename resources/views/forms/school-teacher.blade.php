@@ -10,10 +10,10 @@
         {{-- Hero Header --}}
         <div class="text-center mb-8">
             <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-extrabold uppercase tracking-wider mb-3 shadow-2xs">
-                <i class="fas fa-school text-sm text-blue-600"></i> School Teacher Registration
+                <i class="fas fa-school text-sm text-blue-600"></i> School Teacher / Staff Registration
             </div>
             <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#031b4e] tracking-tight">
-                Apply for School Teaching Faculty Jobs
+                Apply for School Teaching &amp; Staff Faculty Jobs
             </h1>
             <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto mt-2">
                 Join our roster of pre-verified teachers and get recommended directly for CBSE, ICSE, and state board school vacancies.
@@ -128,15 +128,15 @@
                 <div class="pt-4 border-t border-slate-100 space-y-4">
                     <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
                         <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold">2</span>
-                        <h4 class="text-sm font-black text-[#031b4e]">School Teaching Profile</h4>
+                        <h4 class="text-sm font-black text-[#031b4e]">School Teaching / Staff Profile</h4>
                         <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 ml-auto">School Candidate Details</span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Teaching Post Applying For <span class="text-red-500">*</span></label>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Teaching / Staff Post Applying For <span class="text-red-500">*</span></label>
                             <select data-no-search="true" name="position_applying_for" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
-                                <option value="">Select Teaching Post</option>
+                                <option value="">Select Teaching / Staff Post</option>
                                 <option value="PRT (Primary Teacher)">PRT (Primary Teacher)</option>
                                 <option value="TGT (Trained Graduate Teacher)">TGT (Trained Graduate Teacher)</option>
                                 <option value="PGT (Post Graduate Teacher)">PGT (Post Graduate Teacher)</option>
@@ -154,6 +154,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">B.Ed Status <span class="text-red-500">*</span></label>
                             <select data-no-search="true" name="b_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                <option value="">Select B.Ed Status</option>
                                 <option value="Yes">Yes (Completed)</option>
                                 <option value="Pursuing">Pursuing</option>
                                 <option value="No">No</option>
@@ -162,6 +163,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">D.El.Ed Status <span class="text-red-500">*</span></label>
                             <select data-no-search="true" name="d_el_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                <option value="">Select D.El.Ed Status</option>
                                 <option value="No">No</option>
                                 <option value="Yes">Yes (Completed)</option>
                                 <option value="Pursuing">Pursuing</option>
@@ -362,7 +364,7 @@
                     <button type="submit" :disabled="submitting"
                             class="w-full py-4 rounded-2xl bg-[#031b4e] hover:bg-[#021338] text-white text-base font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
                         <span x-show="!submitting" class="flex items-center justify-center gap-2 text-white font-bold">
-                            <span>Submit School Teacher Application & Send OTP</span>
+                            <span>Submit School Teacher / Staff Application & Send OTP</span>
                             <i class="fas fa-arrow-right text-white text-sm"></i>
                         </span>
                         <span x-show="submitting" x-cloak class="flex items-center justify-center gap-2 text-white font-bold">
@@ -399,10 +401,10 @@ function schoolTeacherForm() {
         fieldErrors: {},
         standardSubjects: ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'],
         standardClasses: ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby'],
-        selectedSubjects: ['All Subjects'],
+        selectedSubjects: [],
         customSubjects: [],
         manualSubjectInput: '',
-        selectedClasses: ['Class 6-8', 'Class 9-10'],
+        selectedClasses: [],
         customClasses: [],
         manualClassInput: '',
         userLat: '',

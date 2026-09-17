@@ -515,8 +515,8 @@
                                 <i class="fas fa-chalkboard-teacher"></i>
                             </div>
                             <div class="min-w-0">
-                                <span class="block text-xs font-bold text-[#031b4e] group-hover:text-amber-600 transition-colors">Apply: School Teacher</span>
-                                <span class="block text-[10px] text-slate-500">CBSE & ICSE school jobs</span>
+                                <span class="block text-xs font-bold text-[#031b4e] group-hover:text-amber-600 transition-colors">Apply: School Teacher / Staff</span>
+                                <span class="block text-[10px] text-slate-500">CBSE & ICSE teaching & staff positions</span>
                             </div>
                         </a>
 
@@ -682,7 +682,7 @@
                             <i class="fas fa-home text-emerald-400 w-4"></i> Home Tutor Registration
                         </a>
                         <a href="{{ route('apply.school-teacher') }}" class="text-white/90 hover:text-[#fbc043] flex items-center gap-2 transition-colors">
-                            <i class="fas fa-chalkboard-teacher text-amber-300 w-4"></i> School Teacher Registration
+                            <i class="fas fa-chalkboard-teacher text-amber-300 w-4"></i> School Teacher / Staff Registration
                         </a>
                         <a href="{{ route('apply.both') }}" class="text-white/90 hover:text-[#fbc043] flex items-center gap-2 transition-colors">
                             <i class="fas fa-layer-group text-sky-300 w-4"></i> Both (Home Tutor + School)
@@ -782,7 +782,7 @@
                     <li><a href="{{ route('forms.need-tutor') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-graduation-cap text-[9px] text-emerald-600"></i> Request Home Tutor</a></li>
                     <li><a href="{{ route('forms.hire-teacher') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-school text-[9px] text-purple-600"></i> School Faculty Hiring</a></li>
                     <li><a href="{{ route('apply.home-tutor') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-chalkboard-teacher text-[9px] text-sky-600"></i> Apply as Home Tutor</a></li>
-                    <li><a href="{{ route('apply.school-teacher') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-briefcase text-[9px] text-amber-600"></i> School Teaching Jobs</a></li>
+                    <li><a href="{{ route('apply.school-teacher') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-briefcase text-[9px] text-amber-600"></i> School Teaching & Staff Jobs</a></li>
                     <li><a href="{{ route('apply.both') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-layer-group text-[9px] text-indigo-600"></i> Dual Profile (Both)</a></li>
                     <li><a href="{{ route('resume.builder') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-file-alt text-[9px] text-[#031b4e]/60"></i> Free Resume Builder</a></li>
                     <li><a href="{{ route('terms') }}" class="hover:text-[#031b4e] transition-colors flex items-center gap-2"><i class="fas fa-shield-alt text-[8px] text-[#031b4e]/60"></i> Terms & Conditions</a></li>

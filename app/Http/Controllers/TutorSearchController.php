@@ -12,30 +12,7 @@ class TutorSearchController extends Controller
 {
     public function search(Request $request)
     {
-        $subject = $request->input('subject');
-        $location = $request->input('location');
-
-        $query = User::where('role', 'candidate')
-            ->where('is_active', 1)
-            ->whereHas('profile', function ($q) use ($subject, $location) {
-                // If subject is provided, match by subject name or category
-                if ($subject) {
-                    $q->whereHas('subject', function($sq) use ($subject) {
-                        $sq->where('name', 'LIKE', '%' . $subject . '%');
-                    });
-                }
-                
-                // If location is provided, match by address
-                if ($location) {
-                    $q->where('address', 'LIKE', '%' . $location . '%');
-                }
-            })
-            ->with(['profile.subject']);
-
-        $tutors = $query->paginate(12);
-
-        // We return the same tuitions view, but with $tutors data and the search inputs preserved
-        return view('tuitions', compact('tutors', 'subject', 'location'));
+        return redirect()->route('tuitions', $request->all());
     }
 
     public function requestDemo(Request $request)
