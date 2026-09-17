@@ -125,11 +125,17 @@ class AuthController extends Controller
         $guestPaths = ['/', '/login', '/login/otp', '/register', '/register/verify-otp'];
         $path = $intended ? parse_url($intended, PHP_URL_PATH) : null;
 
+        // Admin / Super Admin: Always redirect directly to Admin Panel unless accessing an internal /admin page
+        if (in_array($user->role, ['admin', 'superadmin', 'super_admin'])) {
+            if ($intended && str_starts_with($path, '/admin')) {
+                return redirect()->to($intended);
+            }
+            return redirect()->route('admin.dashboard');
+        }
+
         // If intended URL is missing or points to a public/guest page, redirect directly to role dashboard
         if (!$intended || in_array($path, $guestPaths)) {
-            if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            } elseif ($user->role === 'employer') {
+            if ($user->role === 'employer') {
                 return \Illuminate\Support\Facades\Route::has('employer.dashboard')
                     ? redirect()->route('employer.dashboard')
                     : redirect()->route('candidate.dashboard');
