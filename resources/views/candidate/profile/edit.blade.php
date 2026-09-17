@@ -9,15 +9,79 @@
     $isOldOrBothData = empty($profile->candidate_category) || $profile->candidate_category === 'both' || $isTuitionUpgradeApproved;
     $activeCategory = $isTuitionUpgradeApproved ? 'both' : old('candidate_category', $candidateCategory);
     $curQual = $profile->highest_qualification_name ?: ($profile->highestQualification?->name ?? '');
+
+    $schoolSubjects = [
+        'Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 
+        'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'
+    ];
+    $schoolClasses = [
+        'Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby'
+    ];
+    $savedTuitionSubjects = (array)($profile->tuition_subjects ?? []);
+    $initialCustomSubjects = array_values(array_diff($savedTuitionSubjects, $schoolSubjects));
+    $savedClasses = (array)($profile->classes_interested ?? []);
+    $initialCustomClasses = array_values(array_diff($savedClasses, $schoolClasses));
 @endphp
 
 <div class="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8" x-data="{
     activeCategory: '{{ old('candidate_category', $activeCategory) }}',
     teachingMode: '{{ old('teaching_mode', $profile->teaching_mode ?? 'Offline') }}',
-    standardSubjects: ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'],
-    selectedTuitionSubjects: {{ json_encode(old('tuition_subjects', (array)($profile->tuition_subjects ?? []))) }},
-    selectedClasses: {{ json_encode(old('classes_interested', (array)($profile->classes_interested ?? []))) }},
+    standardSubjects: @json($schoolSubjects),
+    standardClasses: @json($schoolClasses),
+    selectedTuitionSubjects: @json(old('tuition_subjects', $savedTuitionSubjects)),
+    customSubjects: @json($initialCustomSubjects),
+    manualSubjectInput: '',
+    selectedClasses: @json(old('classes_interested', $savedClasses)),
+    customClasses: @json($initialCustomClasses),
+    manualClassInput: '',
     selectedLocations: {{ json_encode(old('preferred_locations', (array)($profile->preferred_locations ?? []))) }},
+    
+    addCustomSubject() {
+        let val = (this.manualSubjectInput || '').trim();
+        if (!val) return;
+        val.split(',').map(s => s.trim()).filter(Boolean).forEach(p => {
+            if (this.standardSubjects.includes(p)) {
+                if (!this.selectedTuitionSubjects.includes(p)) {
+                    this.selectedTuitionSubjects.push(p);
+                }
+            } else {
+                if (!this.customSubjects.includes(p)) {
+                    this.customSubjects.push(p);
+                }
+                if (!this.selectedTuitionSubjects.includes(p)) {
+                    this.selectedTuitionSubjects.push(p);
+                }
+            }
+        });
+        this.manualSubjectInput = '';
+    },
+    removeCustomSubject(subj) {
+        this.customSubjects = this.customSubjects.filter(s => s !== subj);
+        this.selectedTuitionSubjects = this.selectedTuitionSubjects.filter(s => s !== subj);
+    },
+    addCustomClass() {
+        let val = (this.manualClassInput || '').trim();
+        if (!val) return;
+        val.split(',').map(c => c.trim()).filter(Boolean).forEach(p => {
+            if (this.standardClasses.includes(p)) {
+                if (!this.selectedClasses.includes(p)) {
+                    this.selectedClasses.push(p);
+                }
+            } else {
+                if (!this.customClasses.includes(p)) {
+                    this.customClasses.push(p);
+                }
+                if (!this.selectedClasses.includes(p)) {
+                    this.selectedClasses.push(p);
+                }
+            }
+        });
+        this.manualClassInput = '';
+    },
+    removeCustomClass(cls) {
+        this.customClasses = this.customClasses.filter(c => c !== cls);
+        this.selectedClasses = this.selectedClasses.filter(c => c !== cls);
+    },
     toggleTuitionSubject(subj) {
         if (subj === 'All Subjects') {
             this.toggleAllSubjects();
@@ -34,7 +98,7 @@
         if (this.selectedTuitionSubjects.includes('All Subjects')) {
             this.selectedTuitionSubjects = [];
         } else {
-            this.selectedTuitionSubjects = [...this.standardSubjects];
+            this.selectedTuitionSubjects = [...this.standardSubjects, ...this.customSubjects];
         }
     },
     toggleSelectedClass(cls) {
@@ -164,7 +228,7 @@
 
     {{-- Profile Form --}}
     <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xl reveal">
-        <form action="{{ route('candidate.profile.update') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('candidate.profile.update') }}" method="POST" enctype="multipart/form-data" @submit="addCustomSubject(); addCustomClass();">
             @csrf
 
             @if($isOldOrBothData)
@@ -432,16 +496,8 @@
                         </button>
                     </div>
 
-                    @php
-                        $schoolSubjects = [
-                            'Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 
-                            'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'
-                        ];
-                        $allSubjectChips = array_values(array_unique(array_merge($schoolSubjects, (array)($profile->tuition_subjects ?? []))));
-                    @endphp
-
                     <div class="flex flex-wrap gap-1.5 sm:gap-2">
-                        @foreach($allSubjectChips as $subj)
+                        @foreach($schoolSubjects as $subj)
                             <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none"
                                    :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-amber-400'">
                                 <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}"
@@ -452,14 +508,35 @@
                                 <span>{{ $subj }}</span>
                             </label>
                         @endforeach
+
+                        {{-- Custom Added Subjects Chips (with Cut / Delete button only) --}}
+                        <template x-for="cSubj in customSubjects" :key="cSubj">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold bg-amber-500 text-white border-amber-600 shadow-sm transition-all select-none">
+                                <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-amber-100 px-1.5 py-0.5 rounded">Custom</span>
+                                <span x-text="cSubj"></span>
+                                <input type="checkbox" name="tuition_subjects[]" :value="cSubj" checked class="sr-only">
+                                <button type="button" @click.stop="removeCustomSubject(cSubj)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </template>
                     </div>
 
                     <div class="mt-3 pt-2.5 border-t border-amber-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <span class="text-[11px] font-bold text-amber-900 whitespace-nowrap flex items-center gap-1">
                             <i class="fas fa-edit text-amber-600"></i> Other / Manual Subjects:
                         </span>
-                        <input type="text" name="manual_tuition_subjects" value="{{ old('manual_tuition_subjects') }}" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
-                               class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                        <div class="flex-1 flex items-center gap-1.5">
+                            <input type="text" x-model="manualSubjectInput" 
+                                   @keydown.enter.prevent="addCustomSubject()" 
+                                   name="manual_tuition_subjects" 
+                                   placeholder="Type other subjects (e.g. Sanskrit, French, Coding...) & press Enter or Add"
+                                   class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs sm:text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                            <button type="button" @click="addCustomSubject()" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-plus text-[10px]"></i>
+                                <span>Add</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -469,15 +546,8 @@
                         <i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span>
                     </span>
 
-                    @php
-                        $schoolClasses = [
-                            'Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Languages / Hobby'
-                        ];
-                        $allClassChips = array_values(array_unique(array_merge($schoolClasses, (array)($profile->classes_interested ?? []))));
-                    @endphp
-
                     <div class="flex flex-wrap gap-2">
-                        @foreach($allClassChips as $cls)
+                        @foreach($schoolClasses as $cls)
                             <label class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none"
                                    :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400'">
                                 <input type="checkbox" name="classes_interested[]" value="{{ $cls }}"
@@ -488,14 +558,35 @@
                                 <span>{{ $cls }}</span>
                             </label>
                         @endforeach
+
+                        {{-- Custom Added Classes Chips (with Cut / Delete button only) --}}
+                        <template x-for="cCls in customClasses" :key="cCls">
+                            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-bold bg-blue-600 text-white border-blue-700 shadow-sm transition-all select-none">
+                                <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-blue-100 px-1.5 py-0.5 rounded">Custom</span>
+                                <span x-text="cCls"></span>
+                                <input type="checkbox" name="classes_interested[]" :value="cCls" checked class="sr-only">
+                                <button type="button" @click.stop="removeCustomClass(cCls)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </template>
                     </div>
 
                     <div class="mt-3 pt-2.5 border-t border-blue-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <span class="text-[11px] font-bold text-blue-900 whitespace-nowrap flex items-center gap-1">
                             <i class="fas fa-edit text-blue-600"></i> Other Classes / Exams:
                         </span>
-                        <input type="text" name="manual_classes" value="{{ old('manual_classes') }}" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
-                               class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                        <div class="flex-1 flex items-center gap-1.5">
+                            <input type="text" x-model="manualClassInput" 
+                                   @keydown.enter.prevent="addCustomClass()" 
+                                   name="manual_classes" 
+                                   placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce...) & press Enter or Add"
+                                   class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs sm:text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                            <button type="button" @click="addCustomClass()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-plus text-[10px]"></i>
+                                <span>Add</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

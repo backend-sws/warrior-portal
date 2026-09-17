@@ -202,20 +202,41 @@
                                     <span>{{ $subj }}</span>
                                 </label>
                             @endforeach
+
+                            {{-- Custom Added Subjects Chips (with Cut / Delete button only) --}}
+                            <template x-for="cSubj in customSubjects" :key="cSubj">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold bg-amber-500 text-white border-amber-600 shadow-sm transition-all select-none">
+                                    <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-amber-100 px-1.5 py-0.5 rounded">Custom</span>
+                                    <span x-text="cSubj"></span>
+                                    <input type="checkbox" name="tuition_subjects[]" :value="cSubj" checked class="sr-only">
+                                    <button type="button" @click.stop="removeCustomSubject(cSubj)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </span>
+                            </template>
                         </div>
                         <div class="mt-3 pt-2.5 border-t border-amber-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                             <span class="text-[11px] font-bold text-amber-900 whitespace-nowrap flex items-center gap-1">
                                 <i class="fas fa-edit text-amber-600"></i> Other / Manual Subjects:
                             </span>
-                            <input type="text" name="manual_tuition_subjects" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
-                                   class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                            <div class="flex-1 flex items-center gap-1.5">
+                                <input type="text" x-model="manualSubjectInput" 
+                                       @keydown.enter.prevent="addCustomSubject()" 
+                                       name="manual_tuition_subjects"
+                                       placeholder="Type other subjects (e.g. Sanskrit, French, Coding...) & press Enter or Add"
+                                       class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                                <button type="button" @click="addCustomSubject()" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                    <i class="fas fa-plus text-[10px]"></i>
+                                    <span>Add</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     {{-- Classes Card --}}
                     <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4">
                         <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span></span>
-                        @php $schoolClasses = ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Languages / Hobby']; @endphp
+                        @php $schoolClasses = ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby']; @endphp
                         <div class="flex flex-wrap gap-2">
                             @foreach($schoolClasses as $cls)
                                 <label class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-400'">
@@ -224,13 +245,34 @@
                                     <span>{{ $cls }}</span>
                                 </label>
                             @endforeach
+
+                            {{-- Custom Added Classes Chips (with Cut / Delete button only) --}}
+                            <template x-for="cCls in customClasses" :key="cCls">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-bold bg-blue-600 text-white border-blue-700 shadow-sm transition-all select-none">
+                                    <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-blue-100 px-1.5 py-0.5 rounded">Custom</span>
+                                    <span x-text="cCls"></span>
+                                    <input type="checkbox" name="classes_interested[]" :value="cCls" checked class="sr-only">
+                                    <button type="button" @click.stop="removeCustomClass(cCls)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </span>
+                            </template>
                         </div>
                         <div class="mt-3 pt-2.5 border-t border-blue-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                             <span class="text-[11px] font-bold text-blue-900 whitespace-nowrap flex items-center gap-1">
                                 <i class="fas fa-edit text-blue-600"></i> Other Classes / Exams:
                             </span>
-                            <input type="text" name="manual_classes" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
-                                   class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                            <div class="flex-1 flex items-center gap-1.5">
+                                <input type="text" x-model="manualClassInput" 
+                                       @keydown.enter.prevent="addCustomClass()" 
+                                       name="manual_classes"
+                                       placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce...) & press Enter or Add"
+                                       class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                                <button type="button" @click="addCustomClass()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                    <i class="fas fa-plus text-[10px]"></i>
+                                    <span>Add</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -355,8 +397,14 @@ function schoolTeacherForm() {
         successMessage: '',
         errorMessage: '',
         fieldErrors: {},
+        standardSubjects: ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'],
+        standardClasses: ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby'],
         selectedSubjects: ['All Subjects'],
+        customSubjects: [],
+        manualSubjectInput: '',
         selectedClasses: ['Class 6-8', 'Class 9-10'],
+        customClasses: [],
+        manualClassInput: '',
         userLat: '',
         userLng: '',
         locating: false,
@@ -376,12 +424,62 @@ function schoolTeacherForm() {
             }
         },
 
+        addCustomSubject() {
+            let val = (this.manualSubjectInput || '').trim();
+            if (!val) return;
+            val.split(',').map(s => s.trim()).filter(Boolean).forEach(p => {
+                if (this.standardSubjects.includes(p)) {
+                    if (!this.selectedSubjects.includes(p)) {
+                        this.selectedSubjects.push(p);
+                    }
+                } else {
+                    if (!this.customSubjects.includes(p)) {
+                        this.customSubjects.push(p);
+                    }
+                    if (!this.selectedSubjects.includes(p)) {
+                        this.selectedSubjects.push(p);
+                    }
+                }
+            });
+            this.manualSubjectInput = '';
+        },
+
+        removeCustomSubject(subj) {
+            this.customSubjects = this.customSubjects.filter(s => s !== subj);
+            this.selectedSubjects = this.selectedSubjects.filter(s => s !== subj);
+        },
+
+        addCustomClass() {
+            let val = (this.manualClassInput || '').trim();
+            if (!val) return;
+            val.split(',').map(c => c.trim()).filter(Boolean).forEach(p => {
+                if (this.standardClasses.includes(p)) {
+                    if (!this.selectedClasses.includes(p)) {
+                        this.selectedClasses.push(p);
+                    }
+                } else {
+                    if (!this.customClasses.includes(p)) {
+                        this.customClasses.push(p);
+                    }
+                    if (!this.selectedClasses.includes(p)) {
+                        this.selectedClasses.push(p);
+                    }
+                }
+            });
+            this.manualClassInput = '';
+        },
+
+        removeCustomClass(cls) {
+            this.customClasses = this.customClasses.filter(c => c !== cls);
+            this.selectedClasses = this.selectedClasses.filter(c => c !== cls);
+        },
+
         toggleSubject(subj) {
             if (subj === 'All Subjects') {
                 if (this.selectedSubjects.includes('All Subjects')) {
                     this.selectedSubjects = [];
                 } else {
-                    this.selectedSubjects = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'];
+                    this.selectedSubjects = [...this.standardSubjects, ...this.customSubjects];
                 }
                 return;
             }
@@ -396,7 +494,7 @@ function schoolTeacherForm() {
             if (this.selectedSubjects.length > 0) {
                 this.selectedSubjects = [];
             } else {
-                this.selectedSubjects = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'];
+                this.selectedSubjects = [...this.standardSubjects, ...this.customSubjects];
             }
         },
 
@@ -423,6 +521,8 @@ function schoolTeacherForm() {
         },
 
         async submitForm(e) {
+            this.addCustomSubject();
+            this.addCustomClass();
             const form = e.target;
             const formData = new FormData(form);
             if (this.userLat && !formData.get('latitude')) formData.set('latitude', this.userLat);
