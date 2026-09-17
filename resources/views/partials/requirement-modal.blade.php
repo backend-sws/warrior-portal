@@ -634,6 +634,29 @@ function globalRequirementModal() {
             const formData = new FormData(form);
             if (this.userLat && !formData.get('latitude')) formData.set('latitude', this.userLat);
             if (this.userLng && !formData.get('longitude')) formData.set('longitude', this.userLng);
+
+            // Ensure manual subjects are included in tuition_subjects[]
+            const manualSubjects = (formData.get('manual_tuition_subjects') || '').trim();
+            if (manualSubjects) {
+                const existingSubs = formData.getAll('tuition_subjects[]');
+                manualSubjects.split(',').map(s => s.trim()).filter(Boolean).forEach(s => {
+                    if (!existingSubs.includes(s)) {
+                        formData.append('tuition_subjects[]', s);
+                    }
+                });
+            }
+
+            // Ensure manual classes are included in classes_interested[]
+            const manualClasses = (formData.get('manual_classes') || '').trim();
+            if (manualClasses) {
+                const existingCls = formData.getAll('classes_interested[]');
+                manualClasses.split(',').map(c => c.trim()).filter(Boolean).forEach(c => {
+                    if (!existingCls.includes(c)) {
+                        formData.append('classes_interested[]', c);
+                    }
+                });
+            }
+
             this.submitting = true;
             this.successMessage = '';
             this.errorMessage = '';

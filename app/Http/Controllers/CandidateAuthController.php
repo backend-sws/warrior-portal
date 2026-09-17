@@ -43,6 +43,26 @@ class CandidateAuthController extends Controller
         $isFullRegistration = $request->filled('candidate_category') || $request->filled('gender');
 
         if ($isFullRegistration) {
+            // Pre-process manual tuition subjects and merge into tuition_subjects before validation
+            $tuitionSubjects = is_array($request->tuition_subjects) ? $request->tuition_subjects : [];
+            if ($request->filled('manual_tuition_subjects')) {
+                $manualSubs = array_filter(array_map('trim', explode(',', $request->manual_tuition_subjects)));
+                $tuitionSubjects = array_values(array_unique(array_merge($tuitionSubjects, $manualSubs)));
+            }
+            if (!empty($tuitionSubjects)) {
+                $request->merge(['tuition_subjects' => $tuitionSubjects]);
+            }
+
+            // Pre-process manual classes and merge into classes_interested before validation
+            $classesInterested = is_array($request->classes_interested) ? $request->classes_interested : [];
+            if ($request->filled('manual_classes')) {
+                $manualCls = array_filter(array_map('trim', explode(',', $request->manual_classes)));
+                $classesInterested = array_values(array_unique(array_merge($classesInterested, $manualCls)));
+            }
+            if (!empty($classesInterested)) {
+                $request->merge(['classes_interested' => $classesInterested]);
+            }
+
             $rules = [
                 'candidate_category'        => ['required', 'in:home_tutor,school_job,both'],
                 'name'                      => ['required', 'string', 'min:3', 'max:80', 'regex:/^[a-zA-Z\s\.\,\'\-]+$/'],
@@ -111,8 +131,10 @@ class CandidateAuthController extends Controller
             'date_of_birth.required'         => 'Please enter your date of birth.',
             'highest_qualification.required' => 'Please select your highest qualification.',
             'experience_range.required'      => 'Please enter your teaching experience.',
-            'tuition_subjects.required'      => 'Please select at least one tuition subject.',
-            'classes_interested.required'    => 'Please select at least one class you are interested to teach.',
+            'tuition_subjects.required'      => 'Please select or enter at least one subject you can teach.',
+            'tuition_subjects.min'           => 'Please select or enter at least one subject you can teach.',
+            'classes_interested.required'    => 'Please select or enter at least one class you can teach.',
+            'classes_interested.min'         => 'Please select or enter at least one class you can teach.',
             'teaching_mode.required'         => 'Please choose your teaching mode (Offline, Online, or Both).',
             'preferred_areas.required'       => 'Please write your preferred areas for home tuition (e.g. Kankarbagh, Boring Road).',
             'position_applying_for.required' => 'Please select the school job position you are applying for.',
