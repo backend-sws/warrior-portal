@@ -10,10 +10,10 @@
         {{-- Hero Header --}}
         <div class="text-center mb-8">
             <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-extrabold uppercase tracking-wider mb-3 shadow-2xs">
-                <i class="fas fa-school text-sm text-blue-600"></i> School Teacher Registration
+                <i class="fas fa-school text-sm text-blue-600"></i> School Teacher / Staff Registration
             </div>
             <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#031b4e] tracking-tight">
-                Apply for School Teaching Faculty Jobs
+                Apply for School Teaching &amp; Staff Faculty Jobs
             </h1>
             <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto mt-2">
                 Join our roster of pre-verified teachers and get recommended directly for CBSE, ICSE, and state board school vacancies.
@@ -362,7 +362,7 @@
                     <button type="submit" :disabled="submitting"
                             class="w-full py-4 rounded-2xl bg-[#031b4e] hover:bg-[#021338] text-white text-base font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
                         <span x-show="!submitting" class="flex items-center justify-center gap-2 text-white font-bold">
-                            <span>Submit School Teacher Application & Send OTP</span>
+                            <span>Submit School Teacher / Staff Application & Send OTP</span>
                             <i class="fas fa-arrow-right text-white text-sm"></i>
                         </span>
                         <span x-show="submitting" x-cloak class="flex items-center justify-center gap-2 text-white font-bold">
