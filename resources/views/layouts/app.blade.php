@@ -450,7 +450,8 @@
                        Home Tuition
                     </a>
                 </li>
-                <!-- Forms Dropdown (Standalone Pages) -->
+                @guest
+                <!-- Forms Dropdown (Standalone Pages) - Visible only to Guests -->
                 <li class="relative" x-data="{ openForms: false }" @click.away="openForms = false">
                     <button @click="openForms = !openForms"
                             type="button"
@@ -530,6 +531,7 @@
                         </a>
                     </div>
                 </li>
+                @endguest
                 <li>
                     <a href="{{ route('hiring') }}"
                        class="{{ request()->routeIs('hiring') ? 'text-[#031b4e] font-black bg-blue-50 border border-blue-100 shadow-xs' : 'text-slate-700 font-bold hover:text-[#031b4e] hover:bg-slate-100/80' }} whitespace-nowrap text-[12px] xl:text-[13px] 2xl:text-[14px] px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200">
@@ -658,6 +660,7 @@
                 <li><a href="{{ route('tuitions') }}"
                         class="{{ request()->routeIs('tuitions') ? 'text-[#fbc043]' : 'text-white/80 hover:text-white' }} transition-colors">Home Tuition</a>
                 </li>
+                @guest
                 <li x-data="{ openMobileForms: false }">
                     <button @click="openMobileForms = !openMobileForms" type="button" class="w-full flex items-center justify-between text-white/80 hover:text-white transition-colors cursor-pointer py-1">
                         <span class="flex items-center gap-2">
@@ -686,6 +689,7 @@
                         </a>
                     </div>
                 </li>
+                @endguest
                 <li><a href="{{ route('resume.builder') }}"
                         class="{{ request()->routeIs('resume.builder') ? 'text-[#fbc043]' : 'text-white/80 hover:text-white' }} transition-colors">Resume
                         Builder <span

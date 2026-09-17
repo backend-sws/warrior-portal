@@ -975,6 +975,28 @@
                                     </div>
                                 @endif
 
+                                @if(!empty($profile->tuition_subjects) && is_array($profile->tuition_subjects))
+                                    <div class="py-1">
+                                        <span class="text-[11px] text-slate-500 block mb-1">Subjects You Teach:</span>
+                                        <div class="flex flex-wrap gap-1">
+                                            @foreach($profile->tuition_subjects as $sub)
+                                                <span class="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-bold">{{ $sub }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if(!empty($profile->classes_interested) && is_array($profile->classes_interested))
+                                    <div class="py-1">
+                                        <span class="text-[11px] text-slate-500 block mb-1">Classes You Teach:</span>
+                                        <div class="flex flex-wrap gap-1">
+                                            @foreach($profile->classes_interested as $cls)
+                                                <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 border border-blue-200 text-[10px] font-bold">{{ $cls }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
                                 <div class="flex justify-between items-center py-1">
                                     <span class="text-slate-500">B.Ed / D.El.Ed</span>
                                     <span class="font-semibold text-slate-700 text-xs">

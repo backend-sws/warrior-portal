@@ -14,14 +14,27 @@
 <div class="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8" x-data="{
     activeCategory: '{{ old('candidate_category', $activeCategory) }}',
     teachingMode: '{{ old('teaching_mode', $profile->teaching_mode ?? 'Offline') }}',
-    selectedTuitionSubjects: {{ json_encode(old('tuition_subjects', $profile->tuition_subjects ?? [])) }},
-    selectedClasses: {{ json_encode(old('classes_interested', $profile->classes_interested ?? [])) }},
-    selectedLocations: {{ json_encode(old('preferred_locations', $profile->preferred_locations ?? [])) }},
+    standardSubjects: ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'],
+    selectedTuitionSubjects: {{ json_encode(old('tuition_subjects', (array)($profile->tuition_subjects ?? []))) }},
+    selectedClasses: {{ json_encode(old('classes_interested', (array)($profile->classes_interested ?? []))) }},
+    selectedLocations: {{ json_encode(old('preferred_locations', (array)($profile->preferred_locations ?? []))) }},
     toggleTuitionSubject(subj) {
+        if (subj === 'All Subjects') {
+            this.toggleAllSubjects();
+            return;
+        }
         if (this.selectedTuitionSubjects.includes(subj)) {
             this.selectedTuitionSubjects = this.selectedTuitionSubjects.filter(s => s !== subj);
+            this.selectedTuitionSubjects = this.selectedTuitionSubjects.filter(s => s !== 'All Subjects');
         } else {
             this.selectedTuitionSubjects.push(subj);
+        }
+    },
+    toggleAllSubjects() {
+        if (this.selectedTuitionSubjects.includes('All Subjects')) {
+            this.selectedTuitionSubjects = [];
+        } else {
+            this.selectedTuitionSubjects = [...this.standardSubjects];
         }
     },
     toggleSelectedClass(cls) {
@@ -393,38 +406,43 @@
                 </div>
             </div>
 
-            @if($candidateCategory === 'home_tutor' || $isOldOrBothData)
-            {{-- Section 2: Home Tuition Preferences --}}
-            <div x-show="activeCategory === 'home_tutor' || activeCategory === 'both'" 
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 transform -translate-y-2"
-                 x-transition:enter-end="opacity-100 transform translate-y-0"
-                 class="p-6 md:p-8 border-b border-slate-100 bg-amber-50/20 space-y-6">
+            {{-- Section 2: Teaching Subjects & Classes (Common to ALL: School Teacher, Home Tutor, Both) --}}
+            <div class="p-6 md:p-8 border-b border-slate-100 space-y-6">
                 <div class="flex items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
                         <span class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs font-black">2</span>
-                        <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">Home Tuition Preferences</h3>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">Teaching Subjects & Classes</h3>
+                            <p class="text-xs text-slate-500">Subjects and classes you are qualified and ready to teach</p>
+                        </div>
                     </div>
-                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 border border-amber-300">
-                        Home Tutor Details
+                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200">
+                        Teaching Profile
                     </span>
                 </div>
 
-                {{-- Subjects Multi-select --}}
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                        Subjects You Teach
-                    </label>
+                {{-- Subjects Card (Exact replica of registration form & user screenshot) --}}
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 space-y-3">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-black text-amber-800 uppercase tracking-wide flex items-center gap-1.5">
+                            <i class="fas fa-book-open text-amber-500"></i> Subjects You Can Teach <span class="text-red-500">*</span>
+                        </span>
+                        <button type="button" @click="toggleAllSubjects()" class="text-[11px] font-bold text-amber-700 bg-white border border-amber-300 px-3 py-1 rounded-lg cursor-pointer hover:bg-amber-100 transition-colors shadow-2xs">
+                            <span x-text="selectedTuitionSubjects.includes('All Subjects') ? 'Deselect All' : 'Select All'"></span>
+                        </button>
+                    </div>
+
                     @php
-                        $tuitionSubjectsList = [
+                        $schoolSubjects = [
                             'Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 
-                            'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 
-                            'Economics', 'Business Studies', 'Others'
+                            'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'
                         ];
+                        $allSubjectChips = array_values(array_unique(array_merge($schoolSubjects, (array)($profile->tuition_subjects ?? []))));
                     @endphp
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($tuitionSubjectsList as $subj)
-                            <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all select-none"
+
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                        @foreach($allSubjectChips as $subj)
+                            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none"
                                    :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-amber-400'">
                                 <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}"
                                        :checked="selectedTuitionSubjects.includes('{{ $subj }}')"
@@ -435,29 +453,32 @@
                             </label>
                         @endforeach
                     </div>
-                    <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
-                            <i class="fas fa-edit text-amber-500"></i> Other / Manual Subjects:
+
+                    <div class="mt-3 pt-2.5 border-t border-amber-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <span class="text-[11px] font-bold text-amber-900 whitespace-nowrap flex items-center gap-1">
+                            <i class="fas fa-edit text-amber-600"></i> Other / Manual Subjects:
                         </span>
                         <input type="text" name="manual_tuition_subjects" value="{{ old('manual_tuition_subjects') }}" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                               class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
                     </div>
                 </div>
 
-                {{-- Classes Interested --}}
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                        Classes Interested To Teach
-                    </label>
+                {{-- Classes Card (Exact replica of registration form & user screenshot) --}}
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-5 space-y-3">
+                    <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5 mb-1">
+                        <i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span>
+                    </span>
+
                     @php
-                        $classList = [
-                            'Pre-Primary', 'Nursery – UKG', 'Class nur – 5', 'Class 5 – 8', 'Class 6-10', 
-                            'Class 9 – 10', 'Class 11 – 12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Graduation Level'
+                        $schoolClasses = [
+                            'Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Languages / Hobby'
                         ];
+                        $allClassChips = array_values(array_unique(array_merge($schoolClasses, (array)($profile->classes_interested ?? []))));
                     @endphp
+
                     <div class="flex flex-wrap gap-2">
-                        @foreach($classList as $cls)
-                            <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all select-none"
+                        @foreach($allClassChips as $cls)
+                            <label class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none"
                                    :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400'">
                                 <input type="checkbox" name="classes_interested[]" value="{{ $cls }}"
                                        :checked="selectedClasses.includes('{{ $cls }}')"
@@ -468,13 +489,35 @@
                             </label>
                         @endforeach
                     </div>
-                    <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
-                            <i class="fas fa-edit text-blue-500"></i> Other Classes / Exams:
+
+                    <div class="mt-3 pt-2.5 border-t border-blue-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <span class="text-[11px] font-bold text-blue-900 whitespace-nowrap flex items-center gap-1">
+                            <i class="fas fa-edit text-blue-600"></i> Other Classes / Exams:
                         </span>
                         <input type="text" name="manual_classes" value="{{ old('manual_classes') }}" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                               class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
                     </div>
+                </div>
+            </div>
+
+            @if($candidateCategory === 'home_tutor' || $isOldOrBothData)
+            {{-- Section 3: Home Tuition Preferences --}}
+            <div x-show="activeCategory === 'home_tutor' || activeCategory === 'both'" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                 class="p-6 md:p-8 border-b border-slate-100 bg-amber-50/20 space-y-6">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs font-black">3</span>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">Home Tuition Logistics & Timing</h3>
+                            <p class="text-xs text-slate-500">Mode, timings, and preferred localities for private home tuitions</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 border border-amber-300">
+                        Home Tutor Details
+                    </span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
@@ -512,7 +555,7 @@
             @endif
             
             @if($candidateCategory === 'school_job' || $isOldOrBothData)
-            {{-- Section 3: School Job Details --}}
+            {{-- Section 4: School Job Details --}}
             <div x-show="activeCategory === 'school_job' || activeCategory === 'both'" 
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 transform -translate-y-2"
@@ -521,10 +564,13 @@
                 <div class="flex items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
                         <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-black"
-                              x-text="activeCategory === 'school_job' ? '2' : '3'">
-                            {{ $activeCategory === 'school_job' ? '2' : '3' }}
+                              x-text="activeCategory === 'school_job' ? '3' : '4'">
+                            {{ $activeCategory === 'school_job' ? '3' : '4' }}
                         </span>
-                        <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">School Teaching & Employment Details</h3>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-[#031b4e]">School Teaching & Employment Details</h3>
+                            <p class="text-xs text-slate-500">Qualifications, experience, position, and salary details for school hiring</p>
+                        </div>
                     </div>
                     <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-blue-100 text-blue-900 border border-blue-300">
                         School Job Credentials

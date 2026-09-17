@@ -150,22 +150,27 @@ class ProfileController extends Controller
             $activeCategory = 'both';
         }
 
-        // Home Tutor fields
-        if (in_array($activeCategory, ['home_tutor', 'both'])) {
-            $tuitionSubjs = (array) $request->input('tuition_subjects', []);
-            if ($request->filled('manual_tuition_subjects')) {
-                $manualSubs = array_filter(array_map('trim', explode(',', $request->input('manual_tuition_subjects'))));
-                $tuitionSubjs = array_values(array_unique(array_merge($tuitionSubjs, $manualSubs)));
-            }
+        // Teaching Subjects and Classes (Common to all candidates: School Teacher, Home Tutor, Both)
+        $tuitionSubjs = (array) $request->input('tuition_subjects', []);
+        if ($request->filled('manual_tuition_subjects')) {
+            $manualSubs = array_filter(array_map('trim', explode(',', $request->input('manual_tuition_subjects'))));
+            $tuitionSubjs = array_values(array_unique(array_merge($tuitionSubjs, $manualSubs)));
+        }
+        if (!empty($tuitionSubjs) || $request->has('tuition_subjects')) {
             $profile->tuition_subjects = $tuitionSubjs;
+        }
 
-            $classesInterested = (array) $request->input('classes_interested', []);
-            if ($request->filled('manual_classes')) {
-                $manualCls = array_filter(array_map('trim', explode(',', $request->input('manual_classes'))));
-                $classesInterested = array_values(array_unique(array_merge($classesInterested, $manualCls)));
-            }
+        $classesInterested = (array) $request->input('classes_interested', []);
+        if ($request->filled('manual_classes')) {
+            $manualCls = array_filter(array_map('trim', explode(',', $request->input('manual_classes'))));
+            $classesInterested = array_values(array_unique(array_merge($classesInterested, $manualCls)));
+        }
+        if (!empty($classesInterested) || $request->has('classes_interested')) {
             $profile->classes_interested = $classesInterested;
+        }
 
+        // Home Tutor Specific fields
+        if (in_array($activeCategory, ['home_tutor', 'both'])) {
             $profile->teaching_mode = $request->input('teaching_mode');
             $profile->preferred_areas = $request->input('preferred_areas');
             $profile->available_time_slot = $request->input('available_time_slot');
