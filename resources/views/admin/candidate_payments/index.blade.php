@@ -146,9 +146,12 @@
                         @else
                             @php
                                 $today = \Carbon\Carbon::today();
-                                $dueDate = \Carbon\Carbon::parse($account->next_due_date);
+                                $dueDate = $account->next_due_date ? \Carbon\Carbon::parse($account->next_due_date) : null;
                                 
-                                if ($dueDate->isPast() && !$dueDate->isToday()) {
+                                if (!$dueDate) {
+                                    $statusClass = 'bg-green-500/10 text-green-500 border-green-500/20';
+                                    $statusText = 'SETTLED ✅';
+                                } elseif ($dueDate->isPast() && !$dueDate->isToday()) {
                                     $statusClass = 'bg-red-500/10 text-red-500 border-red-500/20';
                                     $statusText = 'OVERDUE 🔴';
                                 } elseif ($dueDate->isToday() || $dueDate->isBetween($today, $today->copy()->addDays(3))) {
@@ -162,9 +165,9 @@
                             <span class="{{ $statusClass }} px-2.5 py-1 rounded-lg text-[10px] font-bold border uppercase tracking-wider inline-block mb-1">
                                 {{ $statusText }}
                             </span>
-                            <div class="text-xs font-bold {{ $dueDate->isPast() && !$dueDate->isToday() ? 'text-red-500' : 'text-text-main' }}">
-                                Due: {{ $dueDate->format('M d, Y') }}
-                                @if($dueDate->isToday()) <span class="ml-1 text-[10px] bg-orange-500/20 px-1 rounded text-orange-500">TODAY</span> @endif
+                            <div class="text-xs font-bold {{ $dueDate && $dueDate->isPast() && !$dueDate->isToday() ? 'text-red-500' : 'text-text-main' }}">
+                                Due: {{ $dueDate ? $dueDate->format('M d, Y') : 'N/A' }}
+                                @if($dueDate && $dueDate->isToday()) <span class="ml-1 text-[10px] bg-orange-500/20 px-1 rounded text-orange-500">TODAY</span> @endif
                             </div>
                         @endif
                     </td>
