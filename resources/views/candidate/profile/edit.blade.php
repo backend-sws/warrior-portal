@@ -23,99 +23,127 @@
     $initialCustomClasses = array_values(array_diff($savedClasses, $schoolClasses));
 @endphp
 
-<div class="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8" x-data="{
-    activeCategory: '{{ old('candidate_category', $activeCategory) }}',
-    teachingMode: '{{ old('teaching_mode', $profile->teaching_mode ?? 'Offline') }}',
-    standardSubjects: @json($schoolSubjects),
-    standardClasses: @json($schoolClasses),
-    selectedTuitionSubjects: @json(old('tuition_subjects', $savedTuitionSubjects)),
-    customSubjects: @json($initialCustomSubjects),
-    manualSubjectInput: '',
-    selectedClasses: @json(old('classes_interested', $savedClasses)),
-    customClasses: @json($initialCustomClasses),
-    manualClassInput: '',
-    selectedLocations: {{ json_encode(old('preferred_locations', (array)($profile->preferred_locations ?? []))) }},
-    
-    addCustomSubject() {
-        let val = (this.manualSubjectInput || '').trim();
-        if (!val) return;
-        val.split(',').map(s => s.trim()).filter(Boolean).forEach(p => {
-            if (this.standardSubjects.includes(p)) {
-                if (!this.selectedTuitionSubjects.includes(p)) {
-                    this.selectedTuitionSubjects.push(p);
-                }
-            } else {
-                if (!this.customSubjects.includes(p)) {
-                    this.customSubjects.push(p);
-                }
-                if (!this.selectedTuitionSubjects.includes(p)) {
-                    this.selectedTuitionSubjects.push(p);
-                }
-            }
-        });
-        this.manualSubjectInput = '';
-    },
-    removeCustomSubject(subj) {
-        this.customSubjects = this.customSubjects.filter(s => s !== subj);
-        this.selectedTuitionSubjects = this.selectedTuitionSubjects.filter(s => s !== subj);
-    },
-    addCustomClass() {
-        let val = (this.manualClassInput || '').trim();
-        if (!val) return;
-        val.split(',').map(c => c.trim()).filter(Boolean).forEach(p => {
-            if (this.standardClasses.includes(p)) {
-                if (!this.selectedClasses.includes(p)) {
-                    this.selectedClasses.push(p);
-                }
-            } else {
-                if (!this.customClasses.includes(p)) {
-                    this.customClasses.push(p);
-                }
-                if (!this.selectedClasses.includes(p)) {
-                    this.selectedClasses.push(p);
+<script>
+function candidateProfileEditor() {
+    return {
+        activeCategory: {!! json_encode(old('candidate_category', $activeCategory)) !!},
+        teachingMode: {!! json_encode(old('teaching_mode', $profile->teaching_mode ?? 'Offline')) !!},
+        standardSubjects: {!! json_encode($schoolSubjects) !!},
+        standardClasses: {!! json_encode($schoolClasses) !!},
+        selectedTuitionSubjects: {!! json_encode(old('tuition_subjects', $savedTuitionSubjects)) !!},
+        customSubjects: {!! json_encode($initialCustomSubjects) !!},
+        manualSubjectInput: '',
+        selectedClasses: {!! json_encode(old('classes_interested', $savedClasses)) !!},
+        customClasses: {!! json_encode($initialCustomClasses) !!},
+        manualClassInput: '',
+        selectedLocations: {!! json_encode(old('preferred_locations', (array)($profile->preferred_locations ?? []))) !!},
+
+        addCustomSubject: function() {
+            var val = (this.manualSubjectInput || '').trim();
+            if (!val) return;
+            var parts = val.split(',');
+            for (var i = 0; i < parts.length; i++) {
+                var p = parts[i].trim();
+                if (!p) continue;
+                if (this.standardSubjects.indexOf(p) !== -1) {
+                    if (this.selectedTuitionSubjects.indexOf(p) === -1) {
+                        this.selectedTuitionSubjects.push(p);
+                    }
+                } else {
+                    if (this.customSubjects.indexOf(p) === -1) {
+                        this.customSubjects.push(p);
+                    }
+                    if (this.selectedTuitionSubjects.indexOf(p) === -1) {
+                        this.selectedTuitionSubjects.push(p);
+                    }
                 }
             }
-        });
-        this.manualClassInput = '';
-    },
-    removeCustomClass(cls) {
-        this.customClasses = this.customClasses.filter(c => c !== cls);
-        this.selectedClasses = this.selectedClasses.filter(c => c !== cls);
-    },
-    toggleTuitionSubject(subj) {
-        if (subj === 'All Subjects') {
-            this.toggleAllSubjects();
-            return;
+            this.manualSubjectInput = '';
+        },
+        removeCustomSubject: function(subj) {
+            this.customSubjects = this.customSubjects.filter(function(s) { return s !== subj; });
+            this.selectedTuitionSubjects = this.selectedTuitionSubjects.filter(function(s) { return s !== subj; });
+        },
+        addCustomClass: function() {
+            var val = (this.manualClassInput || '').trim();
+            if (!val) return;
+            var parts = val.split(',');
+            for (var i = 0; i < parts.length; i++) {
+                var p = parts[i].trim();
+                if (!p) continue;
+                if (this.standardClasses.indexOf(p) !== -1) {
+                    if (this.selectedClasses.indexOf(p) === -1) {
+                        this.selectedClasses.push(p);
+                    }
+                } else {
+                    if (this.customClasses.indexOf(p) === -1) {
+                        this.customClasses.push(p);
+                    }
+                    if (this.selectedClasses.indexOf(p) === -1) {
+                        this.selectedClasses.push(p);
+                    }
+                }
+            }
+            this.manualClassInput = '';
+        },
+        removeCustomClass: function(cls) {
+            this.customClasses = this.customClasses.filter(function(c) { return c !== cls; });
+            this.selectedClasses = this.selectedClasses.filter(function(c) { return c !== cls; });
+        },
+        toggleTuitionSubject: function(subj) {
+            if (subj === 'All Subjects') {
+                this.toggleAllSubjects();
+                return;
+            }
+            var idx = this.selectedTuitionSubjects.indexOf(subj);
+            if (idx !== -1) {
+                this.selectedTuitionSubjects = this.selectedTuitionSubjects.filter(function(s) { return s !== subj && s !== 'All Subjects'; });
+            } else {
+                this.selectedTuitionSubjects.push(subj);
+            }
+        },
+        toggleAllSubjects: function() {
+            if (this.selectedTuitionSubjects.indexOf('All Subjects') !== -1) {
+                this.selectedTuitionSubjects = [];
+            } else {
+                this.selectedTuitionSubjects = this.standardSubjects.concat(this.customSubjects);
+            }
+        },
+        toggleSelectedClass: function(cls) {
+            var idx = this.selectedClasses.indexOf(cls);
+            if (idx !== -1) {
+                this.selectedClasses = this.selectedClasses.filter(function(c) { return c !== cls; });
+            } else {
+                this.selectedClasses.push(cls);
+            }
+        },
+        toggleAllClasses: function() {
+            var totalCount = this.standardClasses.length + this.customClasses.length;
+            if (this.selectedClasses.length >= totalCount && totalCount > 0) {
+                this.selectedClasses = [];
+            } else {
+                this.selectedClasses = this.standardClasses.concat(this.customClasses);
+            }
+        },
+        toggleLocation: function(loc) {
+            var idx = this.selectedLocations.indexOf(loc);
+            if (idx !== -1) {
+                this.selectedLocations = this.selectedLocations.filter(function(l) { return l !== loc; });
+            } else {
+                this.selectedLocations.push(loc);
+            }
         }
-        if (this.selectedTuitionSubjects.includes(subj)) {
-            this.selectedTuitionSubjects = this.selectedTuitionSubjects.filter(s => s !== subj);
-            this.selectedTuitionSubjects = this.selectedTuitionSubjects.filter(s => s !== 'All Subjects');
-        } else {
-            this.selectedTuitionSubjects.push(subj);
-        }
-    },
-    toggleAllSubjects() {
-        if (this.selectedTuitionSubjects.includes('All Subjects')) {
-            this.selectedTuitionSubjects = [];
-        } else {
-            this.selectedTuitionSubjects = [...this.standardSubjects, ...this.customSubjects];
-        }
-    },
-    toggleSelectedClass(cls) {
-        if (this.selectedClasses.includes(cls)) {
-            this.selectedClasses = this.selectedClasses.filter(c => c !== cls);
-        } else {
-            this.selectedClasses.push(cls);
-        }
-    },
-    toggleLocation(loc) {
-        if (this.selectedLocations.includes(loc)) {
-            this.selectedLocations = this.selectedLocations.filter(l => l !== loc);
-        } else {
-            this.selectedLocations.push(loc);
-        }
+    };
+}
+
+document.addEventListener('alpine:init', function() {
+    if (window.Alpine) {
+        window.Alpine.data('candidateProfileEditor', candidateProfileEditor);
     }
-}">
+});
+</script>
+
+<div class="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8" x-data="candidateProfileEditor()">
 
     {{-- Page Header --}}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8 reveal">
@@ -542,9 +570,14 @@
 
                 {{-- Classes Card (Exact replica of registration form & user screenshot) --}}
                 <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                    <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5 mb-1">
-                        <i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span>
-                    </span>
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5">
+                            <i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span>
+                        </span>
+                        <button type="button" @click="toggleAllClasses()" class="text-[11px] font-bold text-blue-700 bg-white border border-blue-300 px-3 py-1 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors shadow-2xs">
+                            <span x-text="selectedClasses.length >= (standardClasses.length + customClasses.length) && selectedClasses.length > 0 ? 'Deselect All' : 'Select All'"></span>
+                        </button>
+                    </div>
 
                     <div class="flex flex-wrap gap-2">
                         @foreach($schoolClasses as $cls)
@@ -591,7 +624,6 @@
                 </div>
             </div>
 
-            @if($candidateCategory === 'home_tutor' || $isOldOrBothData)
             {{-- Section 3: Home Tuition Preferences --}}
             <div x-show="activeCategory === 'home_tutor' || activeCategory === 'both'" 
                  x-transition:enter="transition ease-out duration-300"
@@ -643,9 +675,7 @@
                     </div>
                 </div>
             </div>
-            @endif
             
-            @if($candidateCategory === 'school_job' || $isOldOrBothData)
             {{-- Section 4: School Job Details --}}
             <div x-show="activeCategory === 'school_job' || activeCategory === 'both'" 
                  x-transition:enter="transition ease-out duration-300"
@@ -875,7 +905,6 @@
                     </div>
                 </div>
             </div>
-            @endif
 
             {{-- Save Button --}}
             <div class="p-6 md:p-8 bg-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">

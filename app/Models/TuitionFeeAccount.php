@@ -11,10 +11,13 @@ class TuitionFeeAccount extends Model
         'parent_name',
         'student_name',
         'mobile_number',
+        'parent_email',
         'address',
         'class',
         'subject',
         'teacher_name',
+        'teacher_phone',
+        'teacher_email',
         'teacher_joining_date',
         'monthly_fee',
         'status',
@@ -102,5 +105,41 @@ class TuitionFeeAccount extends Model
             return Carbon::parse($this->next_due_date)->diffInDays(Carbon::today());
         }
         return 0;
+    }
+
+    public function getDisplayTeacherPhoneAttribute()
+    {
+        if (!empty($this->teacher_phone)) {
+            return $this->teacher_phone;
+        }
+        if ($this->teacher_name) {
+            $user = User::where('name', $this->teacher_name)->first();
+            return $user?->phone ?? $user?->whatsapp_no ?? $user?->profile?->whatsapp_no;
+        }
+        return null;
+    }
+
+    public function getDisplayTeacherEmailAttribute()
+    {
+        if (!empty($this->teacher_email)) {
+            return $this->teacher_email;
+        }
+        if ($this->teacher_name) {
+            $user = User::where('name', $this->teacher_name)->first();
+            return $user?->email;
+        }
+        return null;
+    }
+
+    public function getDisplayParentEmailAttribute()
+    {
+        if (!empty($this->parent_email)) {
+            return $this->parent_email;
+        }
+        if ($this->mobile_number) {
+            $lead = HomeTuitionLead::where('parent_mobile', $this->mobile_number)->first();
+            return $lead?->email;
+        }
+        return null;
     }
 }

@@ -8,6 +8,7 @@ use App\Models\CandidateProfile;
 use App\Models\PaymentTransaction;
 use App\Models\CrmFollowUp;
 use App\Models\ServiceChargeInvoice;
+use App\Models\CandidateRefund;
 use App\Models\CandidateRating;
 use App\Models\HomeTuitionLead;
 use App\Models\TuitionApplication;
@@ -527,7 +528,11 @@ class CrmController extends Controller
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('whatsapp_no', 'like', "%{$search}%");
+                  ->orWhere('whatsapp_no', 'like', "%{$search}%")
+                  ->orWhereHas('profile', function($pq) use ($search) {
+                      $pq->where('subject_specialization', 'like', "%{$search}%")
+                         ->orWhere('tuition_subjects', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -761,6 +766,7 @@ class CrmController extends Controller
 
         $followUps = CrmFollowUp::where('candidate_id', $id)->with('admin')->orderBy('created_at', 'desc')->get();
         $invoices = ServiceChargeInvoice::where('candidate_id', $id)->with(['jobApplication.jobPost', 'tuitionLead'])->orderBy('created_at', 'desc')->get();
+        $refunds = CandidateRefund::where('candidate_id', $id)->with('admin')->orderBy('created_at', 'desc')->get();
         $rating = CandidateRating::where('candidate_id', $id)->first();
         $payments = PaymentTransaction::where('candidate_id', $id)->latest()->get();
 
@@ -828,6 +834,7 @@ class CrmController extends Controller
             'availableTuitionLeads',
             'followUps',
             'invoices',
+            'refunds',
             'rating',
             'payments',
             'history',
@@ -905,28 +912,50 @@ class CrmController extends Controller
                 $dueDate = now()->addDays(7)->toDateString();
                 $desc = "Service Charge for Home Tuition (Class {$lead->class} - {$lead->subjects})";
 
-                $invoice = ServiceChargeInvoice::create([
-                    'candidate_id'           => $candidate->id,
-                    'job_application_id'     => null,
-                    'home_tuition_lead_id'   => $lead->id,
-                    'tuition_application_id' => $tuitionApp->id,
-                    'amount'                 => $amount,
-                    'due_date'               => $dueDate,
-                    'status'                 => 'pending',
-                    'description'            => $desc,
-                ]);
+                // Prevent duplicate invoice creation for same candidate & tuition lead
+                $existingInvoice = ServiceChargeInvoice::where('candidate_id', $candidate->id)
+                    ->where('home_tuition_lead_id', $lead->id)
+                    ->where('status', '!=', 'cancelled')
+                    ->first();
 
-                if ($candidate->profile) {
-                    $candidate->profile->increment('pending_amount', $amount);
+                if (!$existingInvoice) {
+                    $invoice = ServiceChargeInvoice::create([
+                        'candidate_id'           => $candidate->id,
+                        'job_application_id'     => null,
+                        'home_tuition_lead_id'   => $lead->id,
+                        'tuition_application_id' => $tuitionApp->id,
+                        'amount'                 => $amount,
+                        'due_date'               => $dueDate,
+                        'status'                 => 'pending',
+                        'description'            => $desc,
+                    ]);
+
+                    if ($candidate->profile) {
+                        $candidate->profile->increment('pending_amount', $amount);
+                    }
+
+                    NotificationHelper::notifyUser(
+                        $candidate->id,
+                        'Tuition Service Charge Generated 🧾',
+                        "An invoice for ₹" . number_format($amount, 2) . " has been issued for your tuition placement.",
+                        route('candidate.serviceCharge.show'),
+                        'fas fa-file-invoice-dollar'
+                    );
+                } elseif ($existingInvoice->status === 'pending') {
+                    // Update existing pending invoice instead of duplicating
+                    $diff = $amount - (float)$existingInvoice->amount;
+                    $existingInvoice->update([
+                        'amount' => $amount,
+                        'description' => $desc,
+                    ]);
+                    if ($diff != 0 && $candidate->profile) {
+                        if ($diff > 0) {
+                            $candidate->profile->increment('pending_amount', $diff);
+                        } else {
+                            $candidate->profile->decrement('pending_amount', min(abs($diff), $candidate->profile->pending_amount));
+                        }
+                    }
                 }
-
-                NotificationHelper::notifyUser(
-                    $candidate->id,
-                    'Tuition Service Charge Generated 🧾',
-                    "An invoice for ₹" . number_format($amount, 2) . " has been issued for your tuition placement.",
-                    route('candidate.serviceCharge.show'),
-                    'fas fa-file-invoice-dollar'
-                );
             }
 
             NotificationHelper::notifyUser(
@@ -946,18 +975,35 @@ class CrmController extends Controller
         $request->validate([
             'notes'          => 'required|string',
             'follow_up_date' => 'nullable|date',
-            'status'         => 'required|in:pending,completed,cancelled'
+            'status'         => 'required|in:open,closed'
         ]);
 
         CrmFollowUp::create([
             'candidate_id'   => $id,
-            'admin_id'       => Auth::id(),
+            'created_by'     => Auth::id(),
             'notes'          => $request->notes,
             'follow_up_date' => $request->follow_up_date,
             'status'         => $request->status
         ]);
 
         return back()->with('success', 'Follow-up note logged successfully.');
+    }
+
+    public function storeRefund(Request $request, $id)
+    {
+        $request->validate([
+            'amount'      => 'required|numeric|min:1',
+            'description' => 'required|string|max:1000'
+        ]);
+
+        CandidateRefund::create([
+            'candidate_id' => $id,
+            'admin_id'     => Auth::id(),
+            'amount'       => $request->amount,
+            'description'  => $request->description
+        ]);
+
+        return back()->with('success', 'Refund recorded successfully.');
     }
 
     public function storeInvoice(Request $request, $id)
@@ -969,6 +1015,24 @@ class CrmController extends Controller
             'due_date'             => 'required|date',
             'description'          => 'nullable|string|max:255',
         ]);
+
+        // Check if an invoice already exists for this requirement
+        if ($request->job_application_id || $request->home_tuition_lead_id) {
+            $existing = ServiceChargeInvoice::where('candidate_id', $id)
+                ->where(function($q) use ($request) {
+                    if ($request->job_application_id) {
+                        $q->where('job_application_id', $request->job_application_id);
+                    } elseif ($request->home_tuition_lead_id) {
+                        $q->where('home_tuition_lead_id', $request->home_tuition_lead_id);
+                    }
+                })
+                ->where('status', '!=', 'cancelled')
+                ->first();
+
+            if ($existing) {
+                return back()->with('error', "An active or paid invoice (#{$existing->id} - ₹" . number_format($existing->amount, 2) . " [{$existing->status}]) already exists for this requirement. A new copy was not created.");
+            }
+        }
 
         $candidate = User::with('profile')->findOrFail($id);
 

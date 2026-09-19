@@ -34,7 +34,7 @@
                 <h3 class="text-sm font-black text-text-main uppercase tracking-wider">Student & Parent Information</h3>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
                 <div>
                     <label class="block text-xs font-bold text-text-main mb-1.5">Student Name <span class="text-red-500">*</span></label>
                     <input type="text" name="student_name" value="{{ old('student_name', request('student_name')) }}" required placeholder="e.g. Rahul Sharma"
@@ -50,6 +50,12 @@
                 <div>
                     <label class="block text-xs font-bold text-text-main mb-1.5">Mobile Number <span class="text-red-500">*</span></label>
                     <input type="text" name="mobile_number" value="{{ old('mobile_number', request('mobile_number')) }}" required placeholder="e.g. 9876543210"
+                        class="w-full px-4 py-2.5 bg-white border border-card-border rounded-xl text-sm focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-main mb-1.5">Parent Email (Optional)</label>
+                    <input type="email" name="parent_email" value="{{ old('parent_email', request('parent_email')) }}" placeholder="e.g. parent@gmail.com"
                         class="w-full px-4 py-2.5 bg-white border border-card-border rounded-xl text-sm focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-colors">
                 </div>
 
@@ -94,10 +100,22 @@
                 <h3 class="text-sm font-black text-text-main uppercase tracking-wider">Teacher Assignment & Fee Structure</h3>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div>
-                    <label class="block text-xs font-bold text-text-main mb-1.5">Assigned Teacher</label>
+                    <label class="block text-xs font-bold text-text-main mb-1.5">Assigned Teacher Name</label>
                     <input type="text" name="teacher_name" value="{{ old('teacher_name', request('teacher_name')) }}" placeholder="e.g. Amit Kumar"
+                        class="w-full px-4 py-2.5 bg-white border border-card-border rounded-xl text-sm focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-main mb-1.5">Teacher Mobile Number</label>
+                    <input type="text" name="teacher_phone" value="{{ old('teacher_phone', request('teacher_phone')) }}" placeholder="e.g. 9876543210"
+                        class="w-full px-4 py-2.5 bg-white border border-card-border rounded-xl text-sm focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-main mb-1.5">Teacher Email / Gmail</label>
+                    <input type="email" name="teacher_email" value="{{ old('teacher_email', request('teacher_email')) }}" placeholder="e.g. teacher@gmail.com"
                         class="w-full px-4 py-2.5 bg-white border border-card-border rounded-xl text-sm focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-colors">
                 </div>
 

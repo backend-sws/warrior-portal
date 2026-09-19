@@ -16,7 +16,7 @@ Your demo / interview session has been scheduled! Please review the date, time, 
 @elseif($application->status === 'hired')
 Congratulations! You have been selected and hired for this position! Please check your dashboard for further instructions and service charge details.
 @elseif($application->status === 'rejected_by_school')
-The school has decided to move forward with other candidates at this time. Keep your profile active for other openings!
+The school / institute has decided to move forward with other candidates at this time. Keep your profile active for other openings!
 @elseif($application->status === 'tutor_backed_out')
 Your application has been marked as backed out per your update.
 @elseif(in_array($application->status, ['rejected_by_admin', 'rejected']))

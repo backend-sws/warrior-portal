@@ -16,13 +16,15 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = auth()->user();
-        $profile = $user->profile;
+        $profile = $user->profile ?? $user->profile()->create([]);
         
         $categories = Category::where('is_active', true)->orderBy('name')->get();
         $subjects = Subject::where('is_active', true)->orderBy('name')->get();
         $qualifications = Qualification::where('is_active', true)->orderBy('id')->get();
         $states = State::where('is_active', true)->orderBy('name')->get();
-        $cities = City::where('state_id', $profile->preferred_state_id)->where('is_active', true)->orderBy('name')->get();
+        $cities = $profile->preferred_state_id 
+            ? City::where('state_id', $profile->preferred_state_id)->where('is_active', true)->orderBy('name')->get()
+            : collect();
 
         // Check readiness
         $isTuitionProfileReady = !empty($profile->gender) 
@@ -164,6 +166,9 @@ class ProfileController extends Controller
         if ($request->filled('manual_classes')) {
             $manualCls = array_filter(array_map('trim', explode(',', $request->input('manual_classes'))));
             $classesInterested = array_values(array_unique(array_merge($classesInterested, $manualCls)));
+        }
+        if (empty($classesInterested) && in_array('All Subjects', (array) $tuitionSubjs)) {
+            $classesInterested = ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12'];
         }
         if (!empty($classesInterested) || $request->has('classes_interested')) {
             $profile->classes_interested = $classesInterested;

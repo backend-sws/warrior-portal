@@ -165,7 +165,26 @@
                     </td>
                     <td class="px-5 py-3.5 align-top">
                         <div class="text-xs font-bold text-text-main">{{ $acct->class ?? 'N/A' }} • {{ $acct->subject ?? 'N/A' }}</div>
-                        <div class="text-[11px] text-text-dark/60 mt-1"><i class="fas fa-chalkboard-teacher text-[10px] mr-1"></i> {{ $acct->teacher_name ?? 'Not Assigned' }}</div>
+                        <div class="text-[11px] font-bold text-text-main mt-1 flex items-center gap-1.5">
+                            <i class="fas fa-chalkboard-teacher text-accent-blue text-[10px]"></i> 
+                            <span>{{ $acct->teacher_name ?? 'Not Assigned' }}</span>
+                        </div>
+                        @if($acct->display_teacher_phone || $acct->display_teacher_email)
+                            <div class="flex flex-col gap-0.5 mt-1 text-[11px] text-text-dark/70">
+                                @if($acct->display_teacher_phone)
+                                    <a href="tel:{{ $acct->display_teacher_phone }}" class="hover:text-accent-blue flex items-center gap-1.5 transition-colors font-medium">
+                                        <i class="fas fa-phone-alt text-[9px] text-emerald-600"></i>
+                                        <span>{{ $acct->display_teacher_phone }}</span>
+                                    </a>
+                                @endif
+                                @if($acct->display_teacher_email)
+                                    <a href="mailto:{{ $acct->display_teacher_email }}" class="hover:text-accent-blue flex items-center gap-1.5 transition-colors truncate max-w-[200px] font-medium" title="{{ $acct->display_teacher_email }}">
+                                        <i class="fas fa-envelope text-[9px] text-amber-500"></i>
+                                        <span class="truncate">{{ $acct->display_teacher_email }}</span>
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
                     </td>
                     <td class="px-5 py-3.5 align-top">
                         <span class="text-base font-black text-green-600">₹{{ number_format($acct->monthly_fee) }}</span>
@@ -279,6 +298,9 @@
                         <div class="text-xs text-text-dark/70 mt-0.5"><span class="text-text-dark/40">Parent:</span> {{ $account->parent_name }}</div>
                         <div class="flex items-center gap-3 text-[11px] text-text-dark/60 mt-1">
                             <span><i class="fas fa-phone-alt text-[10px] mr-1"></i>{{ $account->mobile_number }}</span>
+                            @if($account->display_parent_email)
+                                <a href="mailto:{{ $account->display_parent_email }}" class="hover:text-accent-blue truncate max-w-[140px]" title="{{ $account->display_parent_email }}"><i class="fas fa-envelope text-[10px] mr-1 text-amber-500"></i>{{ $account->display_parent_email }}</a>
+                            @endif
                             @if($account->address)
                                 <span class="max-w-[140px] truncate" title="{{ $account->address }}"><i class="fas fa-map-marker-alt text-[10px] mr-1"></i>{{ $account->address }}</span>
                             @endif
@@ -293,10 +315,26 @@
                         <div class="text-[11px] font-bold text-text-main mt-1">
                             Fee: <span class="text-green-600 font-extrabold">&#8377;{{ number_format($account->monthly_fee) }}/mo</span>
                         </div>
-                        <div class="text-xs text-text-dark/70 mt-1 flex items-center gap-1">
-                            <i class="fas fa-chalkboard-teacher text-[10px]"></i> 
-                            {{ $account->teacher_name ?? 'Not Assigned' }}
+                        <div class="text-xs font-bold text-text-main mt-1.5 flex items-center gap-1.5">
+                            <i class="fas fa-chalkboard-teacher text-accent-blue text-[11px]"></i> 
+                            <span>{{ $account->teacher_name ?? 'Not Assigned' }}</span>
                         </div>
+                        @if($account->display_teacher_phone || $account->display_teacher_email)
+                            <div class="flex flex-col gap-0.5 mt-1.5 text-[11px] text-text-dark/70">
+                                @if($account->display_teacher_phone)
+                                    <a href="tel:{{ $account->display_teacher_phone }}" class="hover:text-accent-blue flex items-center gap-1.5 transition-colors font-medium">
+                                        <i class="fas fa-phone-alt text-[10px] text-emerald-600"></i>
+                                        <span>{{ $account->display_teacher_phone }}</span>
+                                    </a>
+                                @endif
+                                @if($account->display_teacher_email)
+                                    <a href="mailto:{{ $account->display_teacher_email }}" class="hover:text-accent-blue flex items-center gap-1.5 transition-colors truncate max-w-[200px] font-medium" title="{{ $account->display_teacher_email }}">
+                                        <i class="fas fa-envelope text-[10px] text-amber-500"></i>
+                                        <span class="truncate">{{ $account->display_teacher_email }}</span>
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
                     </td>
                     <td class="px-5 py-3.5 align-top">
                         @if($account->status === 'inactive')

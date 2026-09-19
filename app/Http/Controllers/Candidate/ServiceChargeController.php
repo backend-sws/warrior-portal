@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Candidate;
 use App\Http\Controllers\Controller;
 use App\Helpers\NotificationHelper;
 use App\Models\ServiceChargeInvoice;
+use App\Models\CandidateRefund;
 use App\Models\PaymentTransaction;
 use App\Models\CandidatePaymentAccount;
 use App\Models\CandidatePaymentRecord;
@@ -55,10 +56,15 @@ class ServiceChargeController extends Controller
         }
         
         $paymentHistory = PaymentTransaction::where('candidate_id', $candidateId)
+            ->where('status', 'success')
+            ->latest()
+            ->get();
+
+        $refunds = CandidateRefund::where('candidate_id', $candidateId)
             ->latest()
             ->get();
             
-        return view('candidate.serviceCharge.show', compact('invoices', 'paymentHistory', 'profile'));
+        return view('candidate.serviceCharge.show', compact('invoices', 'paymentHistory', 'profile', 'refunds'));
     }
 
     public function checkout($id)
@@ -296,36 +302,42 @@ class ServiceChargeController extends Controller
     private function syncToAdminCandidatePayments($candidate, $invoice, $amount)
     {
         try {
-            $account = CandidatePaymentAccount::firstOrCreate(
-                ['candidate_id' => $candidate->id],
-                [
-                    'candidate_name' => $candidate->name,
-                    'mobile_number'  => $candidate->phone ?? 'N/A',
-                    'role'           => $invoice->jobApplication?->jobPost?->title ?? ($invoice->tuitionLead ? 'Home Tutor' : 'Teacher'),
-                    'school_name'    => $invoice->jobApplication?->jobPost?->school_name ?? ($invoice->tuitionLead ? 'Home Tuition' : 'Private Placement'),
-                    'total_service_charge' => $amount,
-                    'paid_amount'    => 0,
-                    'pending_amount' => $amount,
-                    'status'         => 'active',
-                ]
-            );
+            $phone = $candidate->phone ?? ($candidate->email ?? 'N/A');
+            $tuitionTitle = $invoice->jobApplication?->jobPost?->title ?? ($invoice->tuitionLead ? "Class {$invoice->tuitionLead->class} ({$invoice->tuitionLead->subjects})" : 'Tuition Service Charge');
 
-            $account->paid_amount += $amount;
-            $account->pending_amount = max(0, $account->pending_amount - $amount);
-            if ($account->pending_amount <= 0) {
-                $account->status = 'completed';
+            $account = CandidatePaymentAccount::where('mobile_number', $phone)
+                ->orWhere('candidate_name', $candidate->name)
+                ->first();
+
+            if (!$account) {
+                $account = CandidatePaymentAccount::create([
+                    'candidate_name'   => $candidate->name,
+                    'mobile_number'    => $phone,
+                    'address'          => $candidate->profile?->address ?? 'Online',
+                    'tuition_assigned' => $tuitionTitle,
+                    'joining_date'     => now()->toDateString(),
+                    'monthly_amount'   => $amount,
+                    'status'           => 'active',
+                    'next_due_date'    => null, // One-time fee, not a recurring monthly invoice
+                ]);
             }
-            $account->save();
 
-            CandidatePaymentRecord::create([
-                'candidate_payment_account_id' => $account->id,
-                'amount'         => $amount,
-                'payment_mode'   => 'PhonePe Online',
-                'transaction_id' => 'PP_' . time(),
-                'payment_date'   => now(),
-                'received_by'    => 'PhonePe Gateway',
-                'notes'          => 'Online payment for Invoice #' . $invoice->id,
-            ]);
+            // Prevent duplicate CandidatePaymentRecord
+            $alreadyRecorded = CandidatePaymentRecord::where('candidate_payment_account_id', $account->id)
+                ->where('remarks', 'like', "%Invoice #{$invoice->id}%")
+                ->exists();
+
+            if (!$alreadyRecorded) {
+                CandidatePaymentRecord::create([
+                    'candidate_payment_account_id' => $account->id,
+                    'payment_date'   => now()->toDateString(),
+                    'amount'         => $amount,
+                    'payment_mode'   => 'PhonePe Online',
+                    'type'           => 'Collected',
+                    'collected_by'   => 'PhonePe Gateway',
+                    'remarks'        => 'Online payment for Invoice #' . $invoice->id,
+                ]);
+            }
         } catch (\Exception $e) {
             Log::error('Sync to CandidatePaymentAccount failed: ' . $e->getMessage());
         }

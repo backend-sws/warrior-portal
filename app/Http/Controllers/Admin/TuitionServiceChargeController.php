@@ -104,6 +104,18 @@ class TuitionServiceChargeController extends Controller
             $desc = "Home Tuition Placement Service Charge";
         }
 
+        // Prevent duplicate invoice creation for same candidate & tuition lead
+        if ($lead) {
+            $existing = ServiceChargeInvoice::where('candidate_id', $candidate->id)
+                ->where('home_tuition_lead_id', $lead->id)
+                ->where('status', '!=', 'cancelled')
+                ->first();
+
+            if ($existing) {
+                return back()->with('error', "An invoice (#{$existing->id} - ₹" . number_format($existing->amount, 2) . " [{$existing->status}]) already exists for {$candidate->name} for this tuition lead. Duplicate invoice was not created.");
+            }
+        }
+
         $invoice = ServiceChargeInvoice::create([
             'candidate_id'         => $candidate->id,
             'job_application_id'   => null,
@@ -239,56 +251,67 @@ class TuitionServiceChargeController extends Controller
     private function recordTransactionAndAccount($invoice, $amount, $paymentMode = 'Manual / Direct Admin')
     {
         try {
-            // 1. PaymentTransaction for Online & Offline ledger
-            PaymentTransaction::create([
-                'candidate_id'   => $invoice->candidate_id,
-                'amount'         => $amount,
-                'currency'       => 'INR',
-                'order_id'       => 'ADM_SC_' . $invoice->id . '_' . time(),
-                'transaction_id' => 'MANUAL_' . $invoice->id . '_' . time(),
-                'payment_id'     => 'MANUAL_' . $invoice->id . '_' . time(),
-                'type'           => 'service_charge',
-                'status'         => 'success',
-                'gateway'        => 'manual_admin',
-                'payment_method' => $paymentMode,
-                'invoice_id'     => $invoice->id,
-                'tuition_lead_id'=> $invoice->home_tuition_lead_id,
-                'ip_address'     => request()->ip(),
-            ]);
+            // 1. PaymentTransaction for Online & Offline ledger (prevent duplicate creation)
+            $existingTxn = PaymentTransaction::where('invoice_id', $invoice->id)
+                ->where('status', 'success')
+                ->first();
+
+            if (!$existingTxn) {
+                PaymentTransaction::create([
+                    'candidate_id'   => $invoice->candidate_id,
+                    'amount'         => $amount,
+                    'currency'       => 'INR',
+                    'order_id'       => 'ADM_SC_' . $invoice->id . '_' . time(),
+                    'transaction_id' => 'MANUAL_' . $invoice->id . '_' . time(),
+                    'payment_id'     => 'MANUAL_' . $invoice->id . '_' . time(),
+                    'type'           => 'service_charge',
+                    'status'         => 'success',
+                    'gateway'        => 'manual_admin',
+                    'payment_method' => $paymentMode,
+                    'invoice_id'     => $invoice->id,
+                    'tuition_lead_id'=> $invoice->home_tuition_lead_id,
+                    'ip_address'     => request()->ip(),
+                ]);
+            }
 
             // 2. CandidatePaymentAccount & CandidatePaymentRecord for Admin Candidate Payments Ledger
             $candidate = $invoice->candidate ?? User::find($invoice->candidate_id);
             if ($candidate) {
-                $account = CandidatePaymentAccount::firstOrCreate(
-                    ['candidate_id' => $candidate->id],
-                    [
-                        'candidate_name' => $candidate->name,
-                        'mobile_number'  => $candidate->phone ?? 'N/A',
-                        'role'           => $invoice->jobApplication?->jobPost?->title ?? ($invoice->tuitionLead ? 'Home Tutor' : 'Teacher'),
-                        'school_name'    => $invoice->jobApplication?->jobPost?->school_name ?? ($invoice->tuitionLead ? 'Home Tuition' : 'Private Placement'),
-                        'total_service_charge' => $amount,
-                        'paid_amount'    => 0,
-                        'pending_amount' => $amount,
-                        'status'         => 'active',
-                    ]
-                );
+                $phone = $candidate->phone ?? ($candidate->email ?? 'N/A');
+                $tuitionTitle = $invoice->jobApplication?->jobPost?->title ?? ($invoice->tuitionLead ? "Class {$invoice->tuitionLead->class} ({$invoice->tuitionLead->subjects})" : 'Tuition Service Charge');
 
-                $account->paid_amount += $amount;
-                $account->pending_amount = max(0, $account->pending_amount - $amount);
-                if ($account->pending_amount <= 0) {
-                    $account->status = 'completed';
+                $account = CandidatePaymentAccount::where('mobile_number', $phone)
+                    ->orWhere('candidate_name', $candidate->name)
+                    ->first();
+
+                if (!$account) {
+                    $account = CandidatePaymentAccount::create([
+                        'candidate_name'   => $candidate->name,
+                        'mobile_number'    => $phone,
+                        'address'          => $candidate->profile?->address ?? 'Online',
+                        'tuition_assigned' => $tuitionTitle,
+                        'joining_date'     => now()->toDateString(),
+                        'monthly_amount'   => $amount,
+                        'status'           => 'active',
+                        'next_due_date'    => null,
+                    ]);
                 }
-                $account->save();
 
-                CandidatePaymentRecord::create([
-                    'candidate_payment_account_id' => $account->id,
-                    'amount'         => $amount,
-                    'payment_mode'   => $paymentMode,
-                    'transaction_id' => 'MANUAL_' . $invoice->id . '_' . time(),
-                    'payment_date'   => now(),
-                    'received_by'    => auth()->user()?->name ?? 'Super Admin',
-                    'notes'          => 'Service Charge Invoice #' . $invoice->id . ' marked as Paid (' . ($invoice->description ?: 'Placement Service Charge') . ')',
-                ]);
+                $alreadyRecorded = CandidatePaymentRecord::where('candidate_payment_account_id', $account->id)
+                    ->where('remarks', 'like', "%Invoice #{$invoice->id}%")
+                    ->exists();
+
+                if (!$alreadyRecorded) {
+                    CandidatePaymentRecord::create([
+                        'candidate_payment_account_id' => $account->id,
+                        'payment_date'   => now()->toDateString(),
+                        'amount'         => $amount,
+                        'payment_mode'   => $paymentMode,
+                        'type'           => 'Collected',
+                        'collected_by'   => \Illuminate\Support\Facades\Auth::user()?->name ?? 'Super Admin',
+                        'remarks'        => 'Service Charge Invoice #' . $invoice->id . ' marked as Paid (' . ($invoice->description ?: 'Placement Service Charge') . ')',
+                    ]);
+                }
             }
         } catch (\Exception $e) {
             Log::error('Error recording payment transaction for Invoice #' . $invoice->id . ': ' . $e->getMessage());

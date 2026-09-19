@@ -82,6 +82,22 @@
                             <i class="fas fa-chalkboard-teacher text-accent-blue text-xs"></i>
                             <span class="text-xs font-bold text-text-main">{{ $account->teacher_name ?? 'Not Assigned' }}</span>
                         </div>
+                        @if($account->display_teacher_phone)
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-text-dark/60">Teacher Phone:</span>
+                            <a href="tel:{{ $account->display_teacher_phone }}" class="font-bold text-emerald-600 hover:underline flex items-center gap-1">
+                                <i class="fas fa-phone-alt text-[10px]"></i> {{ $account->display_teacher_phone }}
+                            </a>
+                        </div>
+                        @endif
+                        @if($account->display_teacher_email)
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-text-dark/60">Teacher Email:</span>
+                            <a href="mailto:{{ $account->display_teacher_email }}" class="font-bold text-accent-blue hover:underline flex items-center gap-1 truncate max-w-[170px]" title="{{ $account->display_teacher_email }}">
+                                <i class="fas fa-envelope text-[10px] text-amber-500"></i> <span class="truncate">{{ $account->display_teacher_email }}</span>
+                            </a>
+                        </div>
+                        @endif
                         <div class="flex justify-between items-center text-xs">
                             <span class="text-text-dark/60">Joined Date:</span>
                             <span class="font-bold">{{ $account->teacher_joining_date ? $account->teacher_joining_date->format('d M, Y') : 'N/A' }}</span>

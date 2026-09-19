@@ -339,13 +339,24 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Subject *</label>
-                        <select name="subject_id" id="modal_subject_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-800 font-medium focus:bg-white focus:outline-none cursor-pointer">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Subject *</label>
+                            <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/80">Search or Manual</span>
+                        </div>
+                        <select name="subject_id" id="modal_subject_id" data-addable="true" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-800 font-medium focus:bg-white focus:outline-none cursor-pointer">
                             <option value="">Select Subject</option>
                             @foreach($subjects as $sub)
                                 <option value="{{ $sub->id }}">{{ $sub->name }}</option>
                             @endforeach
                         </select>
+                        <div class="mt-1.5 flex items-center bg-slate-50 border border-dashed border-blue-300 rounded-xl px-2.5 py-1 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                            <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-100/80 border border-blue-200 px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                <i class="fas fa-pen-nib text-[9px]"></i> OR MANUAL
+                            </span>
+                            <input type="text" name="manual_subject" id="modal_manual_subject"
+                                   placeholder="Type custom subject if not in list..."
+                                   class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0">
+                        </div>
                     </div>
                 </div>
 
@@ -356,13 +367,24 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Qualification *</label>
-                        <select name="qualification_id" id="modal_qualification_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-800 font-medium focus:bg-white focus:outline-none cursor-pointer">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Qualification *</label>
+                            <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/80">Search or Manual</span>
+                        </div>
+                        <select name="qualification_id" id="modal_qualification_id" data-addable="true" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-800 font-medium focus:bg-white focus:outline-none cursor-pointer">
                             <option value="">Select Qualification</option>
                             @foreach($qualifications as $qual)
                                 <option value="{{ $qual->id }}">{{ $qual->name }}</option>
                             @endforeach
                         </select>
+                        <div class="mt-1.5 flex items-center bg-slate-50 border border-dashed border-blue-300 rounded-xl px-2.5 py-1 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                            <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-100/80 border border-blue-200 px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0 select-none">
+                                <i class="fas fa-pen-nib text-[9px]"></i> OR MANUAL
+                            </span>
+                            <input type="text" name="manual_qualification" id="modal_manual_qualification"
+                                   placeholder="Type custom qualification if not in list..."
+                                   class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0">
+                        </div>
                     </div>
 
                     <div>
@@ -460,6 +482,12 @@
             });
             selectEl.innerHTML = html;
             selectEl.disabled = false;
+            if (selectEl.id === 'modal_subject_id') {
+                const manualSubEl = document.getElementById('modal_manual_subject');
+                if (manualSubEl && manualSubEl.value.trim()) {
+                    selectEl.required = false;
+                }
+            }
 
             if (selectEl._slimSelect) {
                 try {
@@ -596,6 +624,76 @@
         if (modalSubSelect) {
             modalSubSelect.addEventListener('change', function() {
                 loadModalSpecializations(this.value);
+            });
+        }
+
+        // Subject manual <-> dropdown sync
+        const modalManualSub = document.getElementById('modal_manual_subject');
+        if (modalSubSelect && modalManualSub) {
+            modalManualSub.addEventListener('input', function() {
+                const val = this.value.trim();
+                if (val) {
+                    modalSubSelect.required = false;
+                    if (modalSubSelect.value && modalSubSelect._slimSelect) {
+                        try { modalSubSelect._slimSelect.setSelected('', false); } catch(e) {}
+                    }
+                } else {
+                    if (!modalSubSelect.value) {
+                        modalSubSelect.required = true;
+                    }
+                }
+            });
+
+            modalSubSelect.addEventListener('change', function() {
+                if (this.value) {
+                    modalManualSub.value = '';
+                    modalSubSelect.required = true;
+                }
+            });
+        }
+
+        // Qualification manual <-> dropdown sync
+        const modalQualSelect = document.getElementById('modal_qualification_id');
+        const modalManualQual = document.getElementById('modal_manual_qualification');
+        if (modalQualSelect && modalManualQual) {
+            modalManualQual.addEventListener('input', function() {
+                const val = this.value.trim();
+                if (val) {
+                    modalQualSelect.required = false;
+                    if (modalQualSelect.value && modalQualSelect._slimSelect) {
+                        try { modalQualSelect._slimSelect.setSelected('', false); } catch(e) {}
+                    }
+                } else {
+                    if (!modalQualSelect.value) {
+                        modalQualSelect.required = true;
+                    }
+                }
+            });
+
+            modalQualSelect.addEventListener('change', function() {
+                if (this.value) {
+                    modalManualQual.value = '';
+                    modalQualSelect.required = true;
+                }
+            });
+        }
+
+        // Form Submit check to ensure either dropdown or manual is provided
+        const quickJobForm = document.querySelector('form[action*="post-job"]');
+        if (quickJobForm) {
+            quickJobForm.addEventListener('submit', function(e) {
+                if (modalSubSelect && modalManualSub && !modalSubSelect.value && !modalManualSub.value.trim()) {
+                    e.preventDefault();
+                    modalManualSub.focus();
+                    alert('Please select or type a Subject.');
+                    return false;
+                }
+                if (modalQualSelect && modalManualQual && !modalQualSelect.value && !modalManualQual.value.trim()) {
+                    e.preventDefault();
+                    modalManualQual.focus();
+                    alert('Please select or type a Qualification.');
+                    return false;
+                }
             });
         }
     });

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\JobPost;
 use App\Models\User;
+use App\Models\Subject;
+use App\Models\Qualification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
@@ -209,6 +211,38 @@ class JobController extends Controller
 
     public function store(Request $request)
     {
+        // Handle manual or custom subject
+        if ($request->filled('manual_subject')) {
+            $sub = Subject::firstOrCreate(
+                ['name' => trim($request->manual_subject)],
+                ['is_active' => true]
+            );
+            if ($request->filled('category_id') && !$sub->categories()->where('categories.id', $request->category_id)->exists()) {
+                $sub->categories()->attach($request->category_id);
+            }
+            $request->merge(['subject_id' => $sub->id]);
+        } elseif ($request->filled('subject_id') && !is_numeric($request->subject_id)) {
+            $cleanName = str_replace('__manual__', '', $request->subject_id);
+            $sub = Subject::firstOrCreate(['name' => trim($cleanName)], ['is_active' => true]);
+            if ($request->filled('category_id') && !$sub->categories()->where('categories.id', $request->category_id)->exists()) {
+                $sub->categories()->attach($request->category_id);
+            }
+            $request->merge(['subject_id' => $sub->id]);
+        }
+
+        // Handle manual or custom qualification
+        if ($request->filled('manual_qualification')) {
+            $qual = Qualification::firstOrCreate(
+                ['name' => trim($request->manual_qualification)],
+                ['is_active' => true]
+            );
+            $request->merge(['qualification_id' => $qual->id]);
+        } elseif ($request->filled('qualification_id') && !is_numeric($request->qualification_id)) {
+            $cleanName = str_replace('__manual__', '', $request->qualification_id);
+            $qual = Qualification::firstOrCreate(['name' => trim($cleanName)], ['is_active' => true]);
+            $request->merge(['qualification_id' => $qual->id]);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'school_name' => 'nullable|string|max:255',
@@ -251,6 +285,38 @@ class JobController extends Controller
 
     public function update(Request $request, JobPost $job)
     {
+        // Handle manual or custom subject
+        if ($request->filled('manual_subject')) {
+            $sub = Subject::firstOrCreate(
+                ['name' => trim($request->manual_subject)],
+                ['is_active' => true]
+            );
+            if ($request->filled('category_id') && !$sub->categories()->where('categories.id', $request->category_id)->exists()) {
+                $sub->categories()->attach($request->category_id);
+            }
+            $request->merge(['subject_id' => $sub->id]);
+        } elseif ($request->filled('subject_id') && !is_numeric($request->subject_id)) {
+            $cleanName = str_replace('__manual__', '', $request->subject_id);
+            $sub = Subject::firstOrCreate(['name' => trim($cleanName)], ['is_active' => true]);
+            if ($request->filled('category_id') && !$sub->categories()->where('categories.id', $request->category_id)->exists()) {
+                $sub->categories()->attach($request->category_id);
+            }
+            $request->merge(['subject_id' => $sub->id]);
+        }
+
+        // Handle manual or custom qualification
+        if ($request->filled('manual_qualification')) {
+            $qual = Qualification::firstOrCreate(
+                ['name' => trim($request->manual_qualification)],
+                ['is_active' => true]
+            );
+            $request->merge(['qualification_id' => $qual->id]);
+        } elseif ($request->filled('qualification_id') && !is_numeric($request->qualification_id)) {
+            $cleanName = str_replace('__manual__', '', $request->qualification_id);
+            $qual = Qualification::firstOrCreate(['name' => trim($cleanName)], ['is_active' => true]);
+            $request->merge(['qualification_id' => $qual->id]);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'school_name' => 'nullable|string|max:255',

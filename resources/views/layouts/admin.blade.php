@@ -20,6 +20,8 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
+        [x-cloak] { display: none !important; }
+        
         :root {
             /* Override Tailwind Theme Variables for Admin Light Mode */
             --theme-primary-bg: #f8fafc;

@@ -63,7 +63,7 @@
                 <option value="forwarded_to_school" {{ request('status') == 'forwarded_to_school' ? 'selected' : '' }}>Forwarded to school/institute</option>
                 <option value="demo_scheduled" {{ request('status') == 'demo_scheduled' ? 'selected' : '' }}>Demo scheduled</option>
                 <option value="hired" {{ request('status') == 'hired' ? 'selected' : '' }}>Selected/hired</option>
-                <option value="rejected_by_school" {{ request('status') == 'rejected_by_school' ? 'selected' : '' }}>Rejected by school</option>
+                <option value="rejected_by_school" {{ request('status') == 'rejected_by_school' ? 'selected' : '' }}>Rejected by school/institute</option>
                 <option value="tutor_backed_out" {{ request('status') == 'tutor_backed_out' ? 'selected' : '' }}>Tutor backed out</option>
                 <option value="rejected_by_admin" {{ request('status') == 'rejected_by_admin' ? 'selected' : '' }}>Rejected by admin</option>
             </select>
@@ -177,7 +177,7 @@
                             <option value="forwarded_to_school">Forwarded to school/institute</option>
                             <option value="demo_scheduled">Demo scheduled</option>
                             <option value="hired">Selected/hired</option>
-                            <option value="rejected_by_school">Rejected by school</option>
+                            <option value="rejected_by_school">Rejected by school/institute</option>
                             <option value="tutor_backed_out">Tutor backed out</option>
                             <option value="rejected_by_admin">Rejected by admin</option>
                         </select>

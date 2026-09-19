@@ -22,7 +22,7 @@
         
         <!-- Registration Form Body -->
         <div class="p-6 sm:p-7 bg-white max-h-[70vh] overflow-y-auto">
-            @if($errors->any())
+            @if(isset($errors) && $errors->any())
                 <div class="mb-4 bg-red-50 border border-red-200 p-3 rounded-xl">
                     <div class="flex items-start gap-2">
                         <i class="fas fa-exclamation-circle text-red-500 mt-0.5 shrink-0"></i>

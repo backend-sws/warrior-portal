@@ -117,7 +117,7 @@ class CandidateProfile extends Model
     }
 
     /**
-     * Calculate live profile completion percentage (25%, 50%, 75%, 100%)
+     * Calculate live profile completion percentage (25%, 50%, 85%, 100%)
      */
     public function getCompletionPercentageAttribute(): int
     {
@@ -125,6 +125,12 @@ class CandidateProfile extends Model
 
         if ($this->is_profile_complete) {
             if ($category === 'school_job' && !empty($this->position_applying_for) && !empty($this->resume_path)) {
+                return 100;
+            }
+            if ($category === 'home_tutor' && !empty($this->tuition_subjects) && count($this->tuition_subjects) > 0) {
+                return 100;
+            }
+            if ($category === 'both' && (!empty($this->tuition_subjects) || !empty($this->position_applying_for))) {
                 return 100;
             }
             if (isset($this->attributes['profile_completion_percentage']) && (int)$this->attributes['profile_completion_percentage'] >= 100) {
@@ -148,38 +154,43 @@ class CandidateProfile extends Model
 
         // Step 3: Domain Preferences - 25%
         if ($category === 'home_tutor') {
-            // Needs tuition subjects, classes interested, and teaching mode or area
+            // Needs tuition subjects, and (classes interested or teaching mode or preferred area)
             $hasPreferences = (!empty($this->tuition_subjects) && count($this->tuition_subjects) > 0)
-                && (!empty($this->classes_interested) && count($this->classes_interested) > 0)
-                && (!empty($this->teaching_mode) || !empty($this->preferred_areas));
+                && ((!empty($this->classes_interested) && count($this->classes_interested) > 0) || !empty($this->teaching_mode) || !empty($this->preferred_areas));
         } elseif ($category === 'school_job') {
             // Needs position applying for, and specialization / category / b_ed_status
             $hasPreferences = !empty($this->position_applying_for) 
                 && (!empty($this->subject_specialization) || !empty($this->category_id) || !empty($this->b_ed_status) || !empty($this->d_el_ed_status));
         } else {
-            // Both: At least tuition subjects and school position
+            // Both: At least tuition subjects or school position
             $hasPreferences = (!empty($this->tuition_subjects) && count($this->tuition_subjects) > 0)
-                && !empty($this->position_applying_for);
+                || !empty($this->position_applying_for);
         }
         if ($hasPreferences) $stepsPassed++;
 
         // Step 4: Documents & Location Details - 25%
         if ($category === 'home_tutor') {
-            // Resume or preferred areas / time slots
-            $hasDocsLoc = !empty($this->resume_path) || (!empty($this->preferred_areas) && !empty($this->available_time_slot));
+            // Resume, or preferred areas, or address, or available time slots
+            $hasDocsLoc = !empty($this->resume_path) || !empty($this->preferred_areas) || !empty($this->address) || !empty($this->available_time_slot);
         } elseif ($category === 'school_job') {
             // Resume is mandatory, and preferred locations or address selected
             $hasDocsLoc = !empty($this->resume_path) && (!empty($this->preferred_locations) || !empty($this->address));
         } else {
-            // Both: Resume and preferred locations/areas
-            $hasDocsLoc = !empty($this->resume_path) && (!empty($this->preferred_locations) || !empty($this->preferred_areas));
+            // Both: Resume or preferred locations/areas or address
+            $hasDocsLoc = !empty($this->resume_path) || (!empty($this->preferred_locations) || !empty($this->preferred_areas) || !empty($this->address));
         }
         if ($hasDocsLoc) $stepsPassed++;
 
-        // Return exact quartile percentage (0, 25, 50, 75, 100)
+        // If marked complete in DB and passed at least 3 steps, treat as 100%
+        if ($this->is_profile_complete && $stepsPassed >= 3) {
+            return 100;
+        }
+
+        // Return exact percentage (0, 25, 50, 85, 100)
+        // 3 steps = 85% to satisfy the 80% threshold required for leads and applications
         return match($stepsPassed) {
             4 => 100,
-            3 => 75,
+            3 => 85,
             2 => 50,
             1 => 25,
             default => 0,
@@ -208,10 +219,12 @@ class CandidateProfile extends Model
             if (empty($this->tuition_subjects) || count($this->tuition_subjects) === 0) {
                 $missing[] = 'Tuition Subjects';
             }
-            if (empty($this->classes_interested) || count($this->classes_interested) === 0) {
+            $hasClasses = !empty($this->classes_interested) && count($this->classes_interested) > 0;
+            $hasAllSubjects = !empty($this->tuition_subjects) && in_array('All Subjects', (array)$this->tuition_subjects);
+            if (!$hasClasses && !$hasAllSubjects) {
                 $missing[] = 'Interested Classes';
             }
-            if (empty($this->preferred_areas)) {
+            if (empty($this->preferred_areas) && empty($this->address)) {
                 $missing[] = 'Preferred Home Tuition Areas';
             }
         }

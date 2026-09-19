@@ -97,12 +97,17 @@
                         <div>
                             <p class="text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/60 mb-1 sm:mb-2">Total Payable</p>
                             @php
-                                $pendingAmount = ($invoice->amount ?? 0) + ($invoice->late_fee ?? 0) - ($invoice->paid_amount ?? 0);
+                                $isPaid = ($invoice->status === 'paid');
+                                $pendingAmount = $isPaid ? 0 : (($invoice->amount ?? 0) + ($invoice->late_fee ?? 0));
                             @endphp
-                            <div class="text-xl sm:text-2xl font-extrabold {{ $pendingAmount > 0 ? 'text-red-500' : 'text-green-500' }}">
-                                ₹{{ number_format(max(0, $pendingAmount), 2) }}
+                            <div class="text-xl sm:text-2xl font-extrabold {{ $isPaid ? 'text-green-600' : 'text-red-500' }}">
+                                ₹{{ number_format($pendingAmount, 2) }}
                             </div>
-                            @if(($invoice->late_fee ?? 0) > 0)
+                            @if($isPaid)
+                                <span class="inline-flex items-center gap-1 text-[11px] text-green-600 font-bold mt-1">
+                                    <i class="fas fa-check-circle"></i> Paid in Full (No Dues)
+                                </span>
+                            @elseif(($invoice->late_fee ?? 0) > 0)
                                 <span class="text-[10px] text-slate-500 block mt-0.5">Includes ₹{{ number_format($invoice->late_fee, 0) }} late fine</span>
                             @endif
                         </div>
@@ -164,9 +169,19 @@
                                         ₹{{ number_format($payment->amount, 2) }}
                                     </td>
                                     <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-green-100 text-green-700 border border-green-200">
-                                            <i class="fas fa-check-circle mr-1 text-[9px]"></i> Successful
-                                        </span>
+                                        @if($payment->status === 'success')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-green-100 text-green-700 border border-green-200">
+                                                <i class="fas fa-check-circle mr-1 text-[9px]"></i> Successful
+                                            </span>
+                                        @elseif($payment->status === 'pending')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                                                <i class="fas fa-clock mr-1 text-[9px]"></i> Pending
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-red-100 text-red-700 border border-red-200">
+                                                <i class="fas fa-times-circle mr-1 text-[9px]"></i> {{ ucfirst($payment->status) }}
+                                            </span>
+                                        @endif
                                     </td>
                                     <td class="px-4 sm:px-6 py-3.5 text-right whitespace-nowrap">
                                         <a href="{{ route('candidate.payment.invoice', $payment->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#0ea5e9]/10 text-[#0ea5e9] hover:bg-[#0ea5e9] hover:text-white transition-all shadow-sm" title="Download Invoice">
@@ -189,6 +204,54 @@
                     </tbody>
                 </table>
             </div>
+            </div>
         </div>
+
+        {{-- Refunds History --}}
+        @if(isset($refunds) && count($refunds) > 0)
+        <div class="light-metallic-blue-card rounded-2xl border border-[#031b4e]/10 overflow-hidden shadow-sm reveal reveal-delay-3 mt-6 sm:mt-8 bg-white">
+            <div class="p-4 sm:p-6 border-b border-[#031b4e]/5 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                    <i class="fas fa-undo-alt"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm sm:text-base font-bold text-[#031b4e]">Refunds History</h2>
+                    <p class="text-[10px] sm:text-xs text-[#031b4e]/60 mt-0.5">Records of refunds processed to you.</p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-[#031b4e]/10 bg-amber-50/30">
+                            <th class="px-4 sm:px-6 py-3.5 text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/70">Date</th>
+                            <th class="px-4 sm:px-6 py-3.5 text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/70">Amount</th>
+                            <th class="px-4 sm:px-6 py-3.5 text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/70">Reason</th>
+                            <th class="px-4 sm:px-6 py-3.5 text-[10px] font-bold uppercase tracking-widest text-[#031b4e]/70">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-xs sm:text-sm divide-y divide-slate-100">
+                        @foreach($refunds as $refund)
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-4 sm:px-6 py-3.5 text-slate-600 font-medium whitespace-nowrap">
+                                    {{ \Carbon\Carbon::parse($refund->created_at)->format('d M, Y') }}
+                                </td>
+                                <td class="px-4 sm:px-6 py-3.5 text-[#031b4e] font-bold whitespace-nowrap">
+                                    ₹{{ number_format($refund->amount, 2) }}
+                                </td>
+                                <td class="px-4 sm:px-6 py-3.5 text-[#031b4e] font-semibold">
+                                    {{ $refund->description }}
+                                </td>
+                                <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                                        <i class="fas fa-check-circle mr-1 text-[9px]"></i> Processed
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
     </div>
 @endsection

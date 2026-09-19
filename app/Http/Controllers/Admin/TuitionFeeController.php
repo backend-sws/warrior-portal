@@ -28,7 +28,10 @@ class TuitionFeeController extends Controller
                 $q->where('parent_name', 'like', "%{$search}%")
                   ->orWhere('student_name', 'like', "%{$search}%")
                   ->orWhere('mobile_number', 'like', "%{$search}%")
+                  ->orWhere('parent_email', 'like', "%{$search}%")
                   ->orWhere('teacher_name', 'like', "%{$search}%")
+                  ->orWhere('teacher_phone', 'like', "%{$search}%")
+                  ->orWhere('teacher_email', 'like', "%{$search}%")
                   ->orWhere('address', 'like', "%{$search}%")
                   ->orWhere('class', 'like', "%{$search}%")
                   ->orWhere('subject', 'like', "%{$search}%")
@@ -141,10 +144,13 @@ class TuitionFeeController extends Controller
             'parent_name' => 'required|string|max:255',
             'student_name' => 'required|string|max:255',
             'mobile_number' => 'required|string|max:20',
+            'parent_email' => 'nullable|string|max:255',
             'address' => 'nullable|string',
             'class' => 'nullable|string|max:255',
             'subject' => 'nullable|string|max:255',
             'teacher_name' => 'nullable|string|max:255',
+            'teacher_phone' => 'nullable|string|max:20',
+            'teacher_email' => 'nullable|string|max:255',
             'teacher_joining_date' => 'required|date',
             'monthly_fee' => 'required|numeric|min:0',
         ]);
@@ -184,10 +190,13 @@ class TuitionFeeController extends Controller
             'parent_name' => 'required|string|max:255',
             'student_name' => 'required|string|max:255',
             'mobile_number' => 'required|string|max:20',
+            'parent_email' => 'nullable|string|max:255',
             'address' => 'nullable|string',
             'class' => 'nullable|string|max:255',
             'subject' => 'nullable|string|max:255',
             'teacher_name' => 'nullable|string|max:255',
+            'teacher_phone' => 'nullable|string|max:20',
+            'teacher_email' => 'nullable|string|max:255',
             'teacher_joining_date' => 'required|date',
             'monthly_fee' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive',

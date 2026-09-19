@@ -137,6 +137,9 @@ class TuitionApplicationController extends Controller
                         'class'                => $lead->class ?: 'N/A',
                         'subject'              => $lead->subjects ?: 'All Subjects',
                         'teacher_name'         => $candidate->name,
+                        'teacher_phone'        => $candidate->phone ?? $candidate->whatsapp_no,
+                        'teacher_email'        => $candidate->email,
+                        'parent_email'         => $lead->email,
                         'teacher_joining_date' => now()->toDateString(),
                         'monthly_fee'          => $numericMonthlyFee,
                         'status'               => 'active',
@@ -152,35 +155,58 @@ class TuitionApplicationController extends Controller
                 $dueDate = $request->service_charge_due_date ?? now()->addDays(7)->toDateString();
                 $desc = $request->service_charge_description ?: "Service Charge for Home Tuition (Class {$lead->class} - {$lead->subjects})";
 
-                $invoice = ServiceChargeInvoice::create([
-                    'candidate_id'           => $candidate->id,
-                    'job_application_id'     => null,
-                    'home_tuition_lead_id'   => $lead->id,
-                    'tuition_application_id' => $application->id,
-                    'amount'                 => $amount,
-                    'due_date'               => $dueDate,
-                    'status'                 => 'pending',
-                    'description'            => $desc,
-                ]);
+                // Prevent duplicate invoice creation for same candidate & tuition lead
+                $existingInvoice = ServiceChargeInvoice::where('candidate_id', $candidate->id)
+                    ->where('home_tuition_lead_id', $lead->id)
+                    ->where('status', '!=', 'cancelled')
+                    ->first();
 
-                if ($candidate->profile) {
-                    $candidate->profile->increment('pending_amount', $amount);
-                }
+                if (!$existingInvoice) {
+                    $invoice = ServiceChargeInvoice::create([
+                        'candidate_id'           => $candidate->id,
+                        'job_application_id'     => null,
+                        'home_tuition_lead_id'   => $lead->id,
+                        'tuition_application_id' => $application->id,
+                        'amount'                 => $amount,
+                        'due_date'               => $dueDate,
+                        'status'                 => 'pending',
+                        'description'            => $desc,
+                    ]);
 
-                // Notify Candidate for invoice
-                NotificationHelper::notifyUser(
-                    $candidate->id,
-                    '🧾 Service Charge Invoice Generated',
-                    "An invoice for ₹" . number_format($amount, 2) . " is generated for your Home Tuition assignment. Due Date: " . Carbon::parse($dueDate)->format('d M Y') . ". Please pay on time to avoid late fees.",
-                    route('candidate.serviceCharge.show'),
-                    'fas fa-file-invoice-dollar'
-                );
+                    if ($candidate->profile) {
+                        $candidate->profile->increment('pending_amount', $amount);
+                    }
 
-                // Send invoice email
-                try {
-                    Mail::to($candidate->email)->send(new \App\Mail\ServiceChargeInvoiceMail($invoice));
-                } catch (\Throwable $e) {
-                    Log::error("Invoice email failed for {$candidate->email}: " . $e->getMessage());
+                    // Notify Candidate for invoice
+                    NotificationHelper::notifyUser(
+                        $candidate->id,
+                        '🧾 Service Charge Invoice Generated',
+                        "An invoice for ₹" . number_format($amount, 2) . " is generated for your Home Tuition assignment. Due Date: " . Carbon::parse($dueDate)->format('d M Y') . ". Please pay on time to avoid late fees.",
+                        route('candidate.serviceCharge.show'),
+                        'fas fa-file-invoice-dollar'
+                    );
+
+                    // Send invoice email
+                    try {
+                        Mail::to($candidate->email)->send(new \App\Mail\ServiceChargeInvoiceMail($invoice));
+                    } catch (\Throwable $e) {
+                        Log::error("Invoice email failed for {$candidate->email}: " . $e->getMessage());
+                    }
+                } elseif ($existingInvoice->status === 'pending') {
+                    // Update existing pending invoice instead of duplicating
+                    $diff = $amount - (float)$existingInvoice->amount;
+                    $existingInvoice->update([
+                        'amount' => $amount,
+                        'due_date' => $dueDate,
+                        'description' => $desc,
+                    ]);
+                    if ($diff != 0 && $candidate->profile) {
+                        if ($diff > 0) {
+                            $candidate->profile->increment('pending_amount', $diff);
+                        } else {
+                            $candidate->profile->decrement('pending_amount', min(abs($diff), $candidate->profile->pending_amount));
+                        }
+                    }
                 }
             }
 

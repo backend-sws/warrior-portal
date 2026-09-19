@@ -715,10 +715,10 @@ function bothCandidatesForm() {
                         window.location.href = data.redirect_url;
                         return;
                     }
-                    this.successMessage = data.message || 'Registration successful! Redirecting to your dual dashboard...';
+                    this.successMessage = data.message || 'Registration successful! Redirecting to your verified thank you page...';
                     setTimeout(() => {
-                        window.location.href = '{{ route("candidate.dashboard") }}';
-                    }, 1500);
+                        window.location.href = '{{ route("apply.both.thank-you") }}';
+                    }, 1000);
                 } else {
                     if (response.status === 419) {
                         this.errorMessage = 'Your session has expired. Please refresh the page (F5) and submit again.';
