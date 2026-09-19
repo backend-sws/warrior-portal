@@ -457,7 +457,16 @@ class CandidateAuthController extends Controller
             default      => 'Email verified successfully! Welcome to your Dashboard.',
         };
 
-        return redirect()->route('candidate.dashboard')->with('success', $categoryMsg);
+        $category = $profile->candidate_category ?? ($data['candidate_category'] ?? 'both');
+        session(['registered_category' => $category]);
+
+        $thankYouRoute = match($category) {
+            'school_job' => 'apply.school-teacher.thank-you',
+            'home_tutor' => 'apply.home-tutor.thank-you',
+            default      => 'apply.both.thank-you',
+        };
+
+        return redirect()->route($thankYouRoute)->with('success', $categoryMsg);
     }
 
     /**
@@ -502,5 +511,21 @@ class CandidateAuthController extends Controller
         }
 
         return redirect()->route('candidate.register')->withInput($data ?? []);
+    }
+
+    /**
+     * Display the Thank You page after successful OTP verification.
+     */
+    public function thankYou(Request $request, ?string $type = null)
+    {
+        $user = Auth::user();
+        $category = $type 
+            ?? $request->query('type') 
+            ?? $user?->profile?->candidate_category 
+            ?? session('registered_category', 'both');
+
+        $redirectUrl = Auth::check() ? route('candidate.dashboard') : route('login');
+
+        return view('forms.thank-you', compact('user', 'category', 'redirectUrl'));
     }
 }

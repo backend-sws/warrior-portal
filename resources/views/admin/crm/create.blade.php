@@ -25,6 +25,12 @@
          experience_range: '{{ old('experience_range', '') }}',
          selectedTuitionSubjects: {{ json_encode(old('tuition_subjects', [])) }},
          selectedClasses: {{ json_encode(old('classes_interested', [])) }},
+         customSubjects: [],
+         manualSubjectInput: '',
+         standardSubjects: ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'],
+         customClasses: [],
+         manualClassInput: '',
+         standardClasses: ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby'],
          userLat: '{{ old('latitude', '') }}',
          userLng: '{{ old('longitude', '') }}',
          detectLocation(silent = false) {
@@ -40,6 +46,16 @@
              if (!this.password_confirmation && this.password) {
                  this.password_confirmation = this.password;
              }
+             this.selectedTuitionSubjects.forEach(s => {
+                 if (!this.standardSubjects.includes(s) && !this.customSubjects.includes(s)) {
+                     this.customSubjects.push(s);
+                 }
+             });
+             this.selectedClasses.forEach(c => {
+                 if (!this.standardClasses.includes(c) && !this.customClasses.includes(c)) {
+                     this.customClasses.push(c);
+                 }
+             });
              window.addEventListener('gps-detected', (e) => {
                  if (e.detail && e.detail.lat && e.detail.lng) {
                      this.userLat = e.detail.lat;
@@ -50,12 +66,58 @@
          syncPassword() {
              this.password_confirmation = this.password;
          },
+         addCustomSubject() {
+             let val = (this.manualSubjectInput || '').trim();
+             if (!val) return;
+             val.split(',').map(s => s.trim()).filter(Boolean).forEach(p => {
+                 if (this.standardSubjects.includes(p)) {
+                     if (!this.selectedTuitionSubjects.includes(p)) {
+                         this.selectedTuitionSubjects.push(p);
+                     }
+                 } else {
+                     if (!this.customSubjects.includes(p)) {
+                         this.customSubjects.push(p);
+                     }
+                     if (!this.selectedTuitionSubjects.includes(p)) {
+                         this.selectedTuitionSubjects.push(p);
+                     }
+                 }
+             });
+             this.manualSubjectInput = '';
+         },
+         removeCustomSubject(subj) {
+             this.customSubjects = this.customSubjects.filter(s => s !== subj);
+             this.selectedTuitionSubjects = this.selectedTuitionSubjects.filter(s => s !== subj);
+         },
+         addCustomClass() {
+             let val = (this.manualClassInput || '').trim();
+             if (!val) return;
+             val.split(',').map(c => c.trim()).filter(Boolean).forEach(p => {
+                 if (this.standardClasses.includes(p)) {
+                     if (!this.selectedClasses.includes(p)) {
+                         this.selectedClasses.push(p);
+                     }
+                 } else {
+                     if (!this.customClasses.includes(p)) {
+                         this.customClasses.push(p);
+                     }
+                     if (!this.selectedClasses.includes(p)) {
+                         this.selectedClasses.push(p);
+                     }
+                 }
+             });
+             this.manualClassInput = '';
+         },
+         removeCustomClass(cls) {
+             this.customClasses = this.customClasses.filter(c => c !== cls);
+             this.selectedClasses = this.selectedClasses.filter(c => c !== cls);
+         },
          toggleTuitionSubject(subj) {
              if (subj === 'All Subjects') {
                  if (this.selectedTuitionSubjects.includes('All Subjects')) {
                      this.selectedTuitionSubjects = [];
                  } else {
-                     this.selectedTuitionSubjects = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'];
+                     this.selectedTuitionSubjects = [...this.standardSubjects, ...this.customSubjects];
                  }
                  return;
              }
@@ -69,7 +131,7 @@
              if (this.selectedTuitionSubjects.length > 0) {
                  this.selectedTuitionSubjects = [];
              } else {
-                 this.selectedTuitionSubjects = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies'];
+                 this.selectedTuitionSubjects = [...this.standardSubjects, ...this.customSubjects];
              }
          },
          toggleSelectedClass(cls) {
@@ -77,6 +139,13 @@
                  this.selectedClasses = this.selectedClasses.filter(c => c !== cls);
              } else {
                  this.selectedClasses.push(cls);
+             }
+         },
+         toggleAllClasses() {
+             if (this.selectedClasses.length >= (this.standardClasses.length + this.customClasses.length) && this.selectedClasses.length > 0) {
+                 this.selectedClasses = [];
+             } else {
+                 this.selectedClasses = [...this.standardClasses, ...this.customClasses];
              }
          },
          appendArea(area, elId) {
@@ -143,7 +212,7 @@
     {{-- 1. HOME TUTOR CANDIDATE REGISTRATION FORM                                 --}}
     {{-- ========================================================================= --}}
     <div x-show="candidateCategory === 'home_tutor'">
-        <form action="{{ route('admin.crm.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ route('admin.crm.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" @submit="addCustomSubject(); addCustomClass();">
             @csrf
             <input type="hidden" name="candidate_category" value="home_tutor">
 
@@ -247,7 +316,7 @@
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-xs font-black text-amber-800 uppercase tracking-wide flex items-center gap-1.5"><i class="fas fa-book-open text-amber-500"></i> Tuition Subjects Interested <span class="text-red-500">*</span></span>
                         <button type="button" @click="toggleAllTuitionSubjects()" class="text-[11px] font-bold text-amber-700 bg-white border border-amber-300 px-2.5 py-1 rounded-lg cursor-pointer hover:bg-amber-100">
-                            <span x-text="selectedTuitionSubjects.includes('All Subjects') ? 'Deselect All' : 'Select All'"></span>
+                            <span x-text="selectedTuitionSubjects.includes('All Subjects') || (selectedTuitionSubjects.length >= (standardSubjects.length + customSubjects.length) && selectedTuitionSubjects.length > 0) ? 'Deselect All' : 'Select All'"></span>
                         </button>
                     </div>
                     @php $modalTuitionSubs = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies']; @endphp
@@ -259,19 +328,45 @@
                                 <span>{{ $subj }}</span>
                             </label>
                         @endforeach
+
+                        {{-- Custom Added Subjects Chips (with Cut / Delete button only) --}}
+                        <template x-for="cSubj in customSubjects" :key="cSubj">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold bg-amber-500 text-white border-amber-600 shadow-sm transition-all select-none">
+                                <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-amber-100 px-1.5 py-0.5 rounded">Custom</span>
+                                <span x-text="cSubj"></span>
+                                <input type="checkbox" name="tuition_subjects[]" :value="cSubj" checked class="sr-only">
+                                <button type="button" @click.stop="removeCustomSubject(cSubj)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </template>
                     </div>
                     <div class="mt-3 pt-2.5 border-t border-amber-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <span class="text-[11px] font-bold text-amber-900 whitespace-nowrap flex items-center gap-1">
                             <i class="fas fa-edit text-amber-600"></i> Other / Manual Subjects:
                         </span>
-                        <input type="text" name="manual_tuition_subjects" value="{{ old('manual_tuition_subjects') }}" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
-                               class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                        <div class="flex-1 flex items-center gap-1.5">
+                            <input type="text" x-model="manualSubjectInput" 
+                                   @keydown.enter.prevent="addCustomSubject()" 
+                                   name="manual_tuition_subjects"
+                                   placeholder="Type other subjects (e.g. Sanskrit, French, Coding...) & press Enter or Add"
+                                   class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                            <button type="button" @click="addCustomSubject()" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-plus text-[10px]"></i>
+                                <span>Add</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {{-- Classes Card --}}
                 <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4">
-                    <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span></span>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5"><i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span></span>
+                        <button type="button" @click="toggleAllClasses()" class="text-[11px] font-bold text-blue-700 bg-white border border-blue-300 px-2.5 py-1 rounded-lg cursor-pointer hover:bg-blue-100">
+                            <span x-text="selectedClasses.length >= (standardClasses.length + customClasses.length) && selectedClasses.length > 0 ? 'Deselect All' : 'Select All'"></span>
+                        </button>
+                    </div>
                     @php $modalClassList = ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby']; @endphp
                     <div class="flex flex-wrap gap-2">
                         @foreach($modalClassList as $cls)
@@ -281,13 +376,34 @@
                                 <span>{{ $cls }}</span>
                             </label>
                         @endforeach
+
+                        {{-- Custom Added Classes Chips (with Cut / Delete button only) --}}
+                        <template x-for="cCls in customClasses" :key="cCls">
+                            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-bold bg-blue-600 text-white border-blue-700 shadow-sm transition-all select-none">
+                                <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-blue-100 px-1.5 py-0.5 rounded">Custom</span>
+                                <span x-text="cCls"></span>
+                                <input type="checkbox" name="classes_interested[]" :value="cCls" checked class="sr-only">
+                                <button type="button" @click.stop="removeCustomClass(cCls)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </template>
                     </div>
                     <div class="mt-3 pt-2.5 border-t border-blue-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <span class="text-[11px] font-bold text-blue-900 whitespace-nowrap flex items-center gap-1">
                             <i class="fas fa-edit text-blue-600"></i> Other Classes / Exams:
                         </span>
-                        <input type="text" name="manual_classes" value="{{ old('manual_classes') }}" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
-                               class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                        <div class="flex-1 flex items-center gap-1.5">
+                            <input type="text" x-model="manualClassInput" 
+                                   @keydown.enter.prevent="addCustomClass()" 
+                                   name="manual_classes" 
+                                   placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...) & press Enter or Add"
+                                   class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                            <button type="button" @click="addCustomClass()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-plus text-[10px]"></i>
+                                <span>Add</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -341,7 +457,7 @@
     {{-- 2. SCHOOL JOB CANDIDATE REGISTRATION FORM                                 --}}
     {{-- ========================================================================= --}}
     <div x-show="candidateCategory === 'school_job'">
-        <form action="{{ route('admin.crm.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ route('admin.crm.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" @submit="addCustomSubject(); addCustomClass();">
             @csrf
             <input type="hidden" name="candidate_category" value="school_job">
 
@@ -477,7 +593,7 @@
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-xs font-black text-amber-800 uppercase tracking-wide flex items-center gap-1.5"><i class="fas fa-book-open text-amber-500"></i> Subjects You Can Teach <span class="text-red-500">*</span></span>
                         <button type="button" @click="toggleAllTuitionSubjects()" class="text-[11px] font-bold text-amber-700 bg-white border border-amber-300 px-2.5 py-1 rounded-lg cursor-pointer hover:bg-amber-100">
-                            <span x-text="selectedTuitionSubjects.includes('All Subjects') ? 'Deselect All' : 'Select All'"></span>
+                            <span x-text="selectedTuitionSubjects.includes('All Subjects') || (selectedTuitionSubjects.length >= (standardSubjects.length + customSubjects.length) && selectedTuitionSubjects.length > 0) ? 'Deselect All' : 'Select All'"></span>
                         </button>
                     </div>
                     @php $modalSchoolSubs = ['Pre-Primary', 'All Subjects', 'Mathematics', 'Science', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi', 'SST', 'Computer', 'Spoken English', 'Accounts', 'Economics', 'Business Studies']; @endphp
@@ -489,18 +605,44 @@
                                 <span>{{ $subj }}</span>
                             </label>
                         @endforeach
+
+                        {{-- Custom Added Subjects Chips (with Cut / Delete button only) --}}
+                        <template x-for="cSubj in customSubjects" :key="cSubj">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold bg-amber-500 text-white border-amber-600 shadow-sm transition-all select-none">
+                                <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-amber-100 px-1.5 py-0.5 rounded">Custom</span>
+                                <span x-text="cSubj"></span>
+                                <input type="checkbox" name="tuition_subjects[]" :value="cSubj" checked class="sr-only">
+                                <button type="button" @click.stop="removeCustomSubject(cSubj)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </template>
                     </div>
                     <div class="mt-3 pt-2.5 border-t border-amber-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <span class="text-[11px] font-bold text-amber-900 whitespace-nowrap flex items-center gap-1">
                             <i class="fas fa-edit text-amber-600"></i> Other / Manual Subjects:
                         </span>
-                        <input type="text" name="manual_tuition_subjects" value="{{ old('manual_tuition_subjects') }}" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
-                               class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                        <div class="flex-1 flex items-center gap-1.5">
+                            <input type="text" x-model="manualSubjectInput" 
+                                   @keydown.enter.prevent="addCustomSubject()" 
+                                   name="manual_tuition_subjects"
+                                   placeholder="Type other subjects (e.g. Sanskrit, French, Coding...) & press Enter or Add"
+                                   class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                            <button type="button" @click="addCustomSubject()" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-plus text-[10px]"></i>
+                                <span>Add</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4">
-                    <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span></span>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-black text-blue-800 uppercase tracking-wide flex items-center gap-1.5"><i class="fas fa-chalkboard-teacher text-blue-500"></i> Classes You Can Teach <span class="text-red-500">*</span></span>
+                        <button type="button" @click="toggleAllClasses()" class="text-[11px] font-bold text-blue-700 bg-white border border-blue-300 px-2.5 py-1 rounded-lg cursor-pointer hover:bg-blue-100">
+                            <span x-text="selectedClasses.length >= (standardClasses.length + customClasses.length) && selectedClasses.length > 0 ? 'Deselect All' : 'Select All'"></span>
+                        </button>
+                    </div>
                     @php $modalSchoolClassList = ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Languages / Hobby']; @endphp
                     <div class="flex flex-wrap gap-2">
                         @foreach($modalSchoolClassList as $cls)
@@ -510,13 +652,34 @@
                                 <span>{{ $cls }}</span>
                             </label>
                         @endforeach
+
+                        {{-- Custom Added Classes Chips (with Cut / Delete button only) --}}
+                        <template x-for="cCls in customClasses" :key="cCls">
+                            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-bold bg-blue-600 text-white border-blue-700 shadow-sm transition-all select-none">
+                                <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-blue-100 px-1.5 py-0.5 rounded">Custom</span>
+                                <span x-text="cCls"></span>
+                                <input type="checkbox" name="classes_interested[]" :value="cCls" checked class="sr-only">
+                                <button type="button" @click.stop="removeCustomClass(cCls)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </template>
                     </div>
                     <div class="mt-3 pt-2.5 border-t border-blue-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <span class="text-[11px] font-bold text-blue-900 whitespace-nowrap flex items-center gap-1">
                             <i class="fas fa-edit text-blue-600"></i> Other Classes / Exams:
                         </span>
-                        <input type="text" name="manual_classes" value="{{ old('manual_classes') }}" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
-                               class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                        <div class="flex-1 flex items-center gap-1.5">
+                            <input type="text" x-model="manualClassInput" 
+                                   @keydown.enter.prevent="addCustomClass()" 
+                                   name="manual_classes" 
+                                   placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...) & press Enter or Add"
+                                   class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                            <button type="button" @click="addCustomClass()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-plus text-[10px]"></i>
+                                <span>Add</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -598,7 +761,7 @@
     {{-- 3. BOTH (DUAL PROFILE: HOME TUTOR + SCHOOL JOB)                          --}}
     {{-- ========================================================================= --}}
     <div x-show="candidateCategory === 'both'">
-        <form action="{{ route('admin.crm.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ route('admin.crm.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" @submit="addCustomSubject(); addCustomClass();">
             @csrf
             <input type="hidden" name="candidate_category" value="both">
 
@@ -681,7 +844,7 @@
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Tuition Subjects Interested <span class="text-red-500">*</span></label>
                         <button type="button" @click="toggleAllTuitionSubjects()" class="text-[11px] font-bold text-blue-600 hover:underline cursor-pointer">
-                            <span x-text="selectedTuitionSubjects.includes('All Subjects') ? 'Deselect All' : 'Select All Subjects'"></span>
+                            <span x-text="selectedTuitionSubjects.includes('All Subjects') || (selectedTuitionSubjects.length >= (standardSubjects.length + customSubjects.length) && selectedTuitionSubjects.length > 0) ? 'Deselect All' : 'Select All Subjects'"></span>
                         </button>
                     </div>
                     @php
@@ -699,19 +862,45 @@
                                 <span>{{ $subj }}</span>
                             </label>
                         @endforeach
+
+                        {{-- Custom Added Subjects Chips (with Cut / Delete button only) --}}
+                        <template x-for="cSubj in customSubjects" :key="cSubj">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold bg-amber-500 text-white border-amber-600 shadow-sm transition-all select-none">
+                                <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-amber-100 px-1.5 py-0.5 rounded">Custom</span>
+                                <span x-text="cSubj"></span>
+                                <input type="checkbox" name="tuition_subjects[]" :value="cSubj" checked class="sr-only">
+                                <button type="button" @click.stop="removeCustomSubject(cSubj)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </template>
                     </div>
                     <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
                             <i class="fas fa-edit text-amber-500"></i> Other / Manual Subjects:
                         </span>
-                        <input type="text" name="manual_tuition_subjects" value="{{ old('manual_tuition_subjects') }}" placeholder="Type other subjects here (e.g. Sanskrit, French, Coding...)"
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                        <div class="flex-1 flex items-center gap-1.5">
+                            <input type="text" x-model="manualSubjectInput" 
+                                   @keydown.enter.prevent="addCustomSubject()" 
+                                   name="manual_tuition_subjects" 
+                                   placeholder="Type other subjects (e.g. Sanskrit, French, Coding...) & press Enter or Add"
+                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                            <button type="button" @click="addCustomSubject()" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-plus text-[10px]"></i>
+                                <span>Add</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {{-- Classes --}}
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Classes You Can Teach <span class="text-red-500">*</span></label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Classes You Can Teach <span class="text-red-500">*</span></label>
+                        <button type="button" @click="toggleAllClasses()" class="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg cursor-pointer hover:bg-blue-100">
+                            <span x-text="selectedClasses.length >= (standardClasses.length + customClasses.length) && selectedClasses.length > 0 ? 'Deselect All' : 'Select All'"></span>
+                        </button>
+                    </div>
                     @php
                         $modalClassList = ['Pre-Primary', 'Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'IIT-JEE', 'NEET', 'Olympiad', 'Competitive / Olympiad', 'Languages / Hobby'];
                     @endphp
@@ -727,13 +916,34 @@
                                 <span>{{ $cls }}</span>
                             </label>
                         @endforeach
+
+                        {{-- Custom Added Classes Chips (with Cut / Delete button only) --}}
+                        <template x-for="cCls in customClasses" :key="cCls">
+                            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-bold bg-blue-600 text-white border-blue-700 shadow-sm transition-all select-none">
+                                <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-blue-100 px-1.5 py-0.5 rounded">Custom</span>
+                                <span x-text="cCls"></span>
+                                <input type="checkbox" name="classes_interested[]" :value="cCls" checked class="sr-only">
+                                <button type="button" @click.stop="removeCustomClass(cCls)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </template>
                     </div>
                     <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <span class="text-[11px] font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
                             <i class="fas fa-edit text-blue-500"></i> Other Classes / Exams:
                         </span>
-                        <input type="text" name="manual_classes" value="{{ old('manual_classes') }}" placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...)"
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                        <div class="flex-1 flex items-center gap-1.5">
+                            <input type="text" x-model="manualClassInput" 
+                                   @keydown.enter.prevent="addCustomClass()" 
+                                   name="manual_classes" 
+                                   placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce Foundation...) & press Enter or Add"
+                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                            <button type="button" @click="addCustomClass()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-plus text-[10px]"></i>
+                                <span>Add</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

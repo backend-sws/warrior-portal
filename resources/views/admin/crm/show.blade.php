@@ -938,7 +938,7 @@
                                             <option value="forwarded_to_school" {{ $app->status === 'forwarded_to_school' ? 'selected' : '' }}>Forwarded to school/institute</option>
                                             <option value="demo_scheduled" {{ $app->status === 'demo_scheduled' ? 'selected' : '' }}>Demo scheduled</option>
                                             <option value="hired" {{ $app->status === 'hired' ? 'selected' : '' }}>Selected/hired</option>
-                                            <option value="rejected_by_school" {{ $app->status === 'rejected_by_school' ? 'selected' : '' }}>Rejected by school</option>
+                                            <option value="rejected_by_school" {{ $app->status === 'rejected_by_school' ? 'selected' : '' }}>Rejected by school/institute</option>
                                             <option value="tutor_backed_out" {{ $app->status === 'tutor_backed_out' ? 'selected' : '' }}>Tutor backed out</option>
                                             <option value="rejected_by_admin" {{ in_array($app->status, ['rejected_by_admin', 'rejected']) ? 'selected' : '' }}>Rejected by admin</option>
                                         </select>
@@ -1023,7 +1023,7 @@
 
                         <div class="sm:col-span-2 bg-emerald-50/20 p-3 rounded-xl border border-emerald-200">
                             <label class="flex items-center gap-2 cursor-pointer mb-2">
-                                <input type="checkbox" name="create_service_charge" value="1" checked class="w-4 h-4 text-emerald-600 rounded">
+                                <input type="checkbox" name="create_service_charge" value="1" class="w-4 h-4 text-emerald-600 rounded">
                                 <span class="text-xs font-bold text-text-main">Generate Tuition Service Charge Invoice</span>
                             </label>
                             <div class="flex items-center gap-3">
@@ -1031,13 +1031,13 @@
                                     <input type="number" name="service_charge_amount" value="500" min="0" placeholder="Amount ₹" 
                                            class="w-full bg-card-bg border border-card-border rounded-xl text-xs py-1.5 px-3 text-text-main font-bold">
                                 </div>
-                                <span class="text-[10px] text-text-dark/60">Candidate will see this invoice under Tuition Service Charges.</span>
+                                <span class="text-[10px] text-text-dark/60">Candidate will see this invoice under Tuition Service Charges (only created if checked).</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="flex justify-end pt-1">
-                        <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                        <button type="submit" onclick="this.classList.add('opacity-50','pointer-events-none');" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
                             <i class="fas fa-user-check mr-1"></i> Confirm Tuition Assignment
                         </button>
                     </div>
@@ -1097,34 +1097,66 @@
 
         <!-- TAB 3: INVOICES -->
         <div x-show="tab === 'invoices'" class="space-y-6" style="display: none;">
-            <!-- Create Invoice Form -->
-            <div class="bg-card-bg rounded-2xl border border-card-border p-5 shadow-sm">
-                <h4 class="text-sm font-black text-text-main mb-3 flex items-center gap-2">
-                    <i class="fas fa-plus-circle text-accent-blue"></i> Issue Placement Service Charge Invoice
-                </h4>
-                <form action="{{ route('admin.crm.invoice.store', $candidate->id) }}" method="POST" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    @csrf
-                    <div>
-                        <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Invoice Amount (₹) <span class="text-red-500">*</span></label>
-                        <input type="number" name="amount" required min="1" placeholder="e.g. 1500" 
-                               class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Due Date <span class="text-red-500">*</span></label>
-                        <input type="date" name="due_date" value="{{ date('Y-m-d', strtotime('+7 days')) }}" required 
-                               class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Description</label>
-                        <input type="text" name="description" placeholder="e.g. Placement Service Charge" 
-                               class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                    </div>
-                    <div class="sm:col-span-3 flex justify-end">
-                        <button type="submit" class="px-5 py-2 bg-accent-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-                            Create Invoice
-                        </button>
-                    </div>
-                </form>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Issue Invoice Card -->
+                <div class="bg-card-bg rounded-2xl border border-card-border p-5 shadow-sm">
+                    <h4 class="text-sm font-black text-text-main mb-3 flex items-center gap-2">
+                        <i class="fas fa-plus-circle text-accent-blue"></i> Issue Placement Service Charge Invoice
+                    </h4>
+                    <form action="{{ route('admin.crm.invoice.store', $candidate->id) }}" method="POST" class="space-y-4">
+                        @csrf
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Invoice Amount (₹) <span class="text-red-500">*</span></label>
+                                <input type="number" step="0.01" name="amount" required placeholder="e.g. 1500" 
+                                       class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Due Date <span class="text-red-500">*</span></label>
+                                <input type="date" name="due_date" required 
+                                       class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Description</label>
+                                <input type="text" name="description" placeholder="e.g. Placement Service Charge" 
+                                       class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-5 py-2 bg-accent-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                                Create Invoice
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Issue Refund Card -->
+                <div class="bg-card-bg rounded-2xl border border-card-border p-5 shadow-sm">
+                    <h4 class="text-sm font-black text-text-main mb-3 flex items-center gap-2">
+                        <i class="fas fa-undo-alt text-amber-500"></i> Log a Refund
+                    </h4>
+                    <form action="{{ route('admin.crm.refund.store', $candidate->id) }}" method="POST" class="space-y-4">
+                        @csrf
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Refund Amount (₹) <span class="text-red-500">*</span></label>
+                                <input type="number" step="0.01" name="amount" required placeholder="e.g. 500" 
+                                       class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Reason / Description <span class="text-red-500">*</span></label>
+                                <input type="text" name="description" required placeholder="e.g. Refunded due to cancelled tuition" 
+                                       class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                                Send Refund
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <!-- Invoices List -->
@@ -1197,6 +1229,37 @@
                     @endforelse
                 </div>
             </div>
+
+            <!-- Refunds List -->
+            <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden mt-6">
+                <div class="p-4 border-b border-card-border bg-amber-50/50 flex justify-between items-center">
+                    <h4 class="text-sm font-black text-text-main uppercase tracking-wider">Refund History</h4>
+                    <span class="text-xs font-bold text-text-dark/50">{{ $refunds->count() }} Total</span>
+                </div>
+                <div class="divide-y divide-card-border">
+                    @forelse($refunds as $ref)
+                        <div class="p-4 hover:bg-secondary-bg/30 transition-colors flex items-center justify-between gap-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-bold text-sm text-text-main">₹{{ number_format($ref->amount, 2) }}</span>
+                                    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-bold">Refunded</span>
+                                </div>
+                                <p class="text-xs text-text-dark/60 mt-0.5">{{ $ref->description }}</p>
+                                <p class="text-[10px] text-text-dark/40 mt-1 flex items-center gap-1">
+                                    <i class="fas fa-user-shield text-[9px]"></i> By: {{ $ref->admin->name ?? 'Admin' }}
+                                    <span class="mx-1">•</span>
+                                    <i class="fas fa-clock text-[9px]"></i> {{ $ref->created_at->format('d M Y, h:i A') }}
+                                </p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center text-text-dark/50 text-xs">
+                            <i class="fas fa-undo-alt text-2xl mb-2 block text-text-dark/30"></i>
+                            No refunds recorded for this candidate.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
         </div>
 
         <!-- TAB 4: FOLLOW-UPS -->
@@ -1221,8 +1284,8 @@
                         <div>
                             <label class="block text-[10px] font-bold text-text-dark/60 uppercase mb-1">Status</label>
                             <select name="status" class="w-full bg-secondary-bg border border-card-border rounded-xl text-xs py-2 px-3 text-text-main focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue">
-                                <option value="completed">Completed</option>
-                                <option value="pending">Pending Next Call</option>
+                                <option value="open">Open / Pending Next Call</option>
+                                <option value="closed">Closed / Completed</option>
                             </select>
                         </div>
                     </div>

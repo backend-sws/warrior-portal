@@ -76,13 +76,24 @@
 
                 <!-- Subject (Dynamic based on Category) -->
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Subject *</label>
-                    <select name="subject_id" id="subject_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide">Subject *</label>
+                        <span class="text-[10px] font-bold text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">Search or Manual</span>
+                    </div>
+                    <select name="subject_id" id="subject_id" data-addable="true" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
                         <option value="">Select Subject</option>
                         @foreach($subjects as $subject)
                             <option value="{{ $subject->id }}" {{ old('subject_id', $job->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
                         @endforeach
                     </select>
+                    <div class="mt-2 flex items-center bg-secondary-bg border border-dashed border-card-border rounded-xl px-3 py-1.5 focus-within:border-accent-blue focus-within:ring-2 focus-within:ring-accent-blue/20 transition-all">
+                        <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-600 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0 select-none">
+                            <i class="fas fa-pen-nib text-[9px]"></i> OR MANUAL
+                        </span>
+                        <input type="text" name="manual_subject" id="manual_subject" value="{{ old('manual_subject') }}"
+                            placeholder="Type custom subject if not in list..." 
+                            class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-text-main placeholder-text-dark/40 focus:outline-none focus:ring-0">
+                    </div>
                     @error('subject_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -95,13 +106,24 @@
 
                 <!-- Qualification -->
                 <div>
-                    <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide mb-2">Required Qualification *</label>
-                    <select name="qualification_id" id="qualification_id" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold text-text-dark/70 uppercase tracking-wide">Required Qualification *</label>
+                        <span class="text-[10px] font-bold text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">Search or Manual</span>
+                    </div>
+                    <select name="qualification_id" id="qualification_id" data-addable="true" required class="w-full bg-secondary-bg border border-card-border text-text-main rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all cursor-pointer">
                         <option value="">Select Qualification</option>
                         @foreach($qualifications as $qualification)
                             <option value="{{ $qualification->id }}" {{ old('qualification_id', $job->qualification_id) == $qualification->id ? 'selected' : '' }}>{{ $qualification->name }}</option>
                         @endforeach
                     </select>
+                    <div class="mt-2 flex items-center bg-secondary-bg border border-dashed border-card-border rounded-xl px-3 py-1.5 focus-within:border-accent-blue focus-within:ring-2 focus-within:ring-accent-blue/20 transition-all">
+                        <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-600 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0 select-none">
+                            <i class="fas fa-pen-nib text-[9px]"></i> OR MANUAL
+                        </span>
+                        <input type="text" name="manual_qualification" id="manual_qualification" value="{{ old('manual_qualification') }}"
+                            placeholder="Type custom qualification if not in list..." 
+                            class="w-full bg-transparent border-0 px-2.5 py-1 text-xs font-medium text-text-main placeholder-text-dark/40 focus:outline-none focus:ring-0">
+                    </div>
                     @error('qualification_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -329,6 +351,76 @@
         if (subjectSelect.value && !defaultSpecId) {
             loadSubjectSpecializations(subjectSelect.value, null);
         }
+    }
+
+    // Subject manual <-> dropdown sync
+    const manualSub = document.getElementById('manual_subject');
+    if (subjectSelect && manualSub) {
+        manualSub.addEventListener('input', function() {
+            const val = this.value.trim();
+            if (val) {
+                subjectSelect.required = false;
+                if (subjectSelect.value && subjectSelect._slimSelect) {
+                    try { subjectSelect._slimSelect.setSelected('', false); } catch(e) {}
+                }
+            } else {
+                if (!subjectSelect.value) {
+                    subjectSelect.required = true;
+                }
+            }
+        });
+
+        subjectSelect.addEventListener('change', function() {
+            if (this.value) {
+                manualSub.value = '';
+                subjectSelect.required = true;
+            }
+        });
+    }
+
+    // Qualification manual <-> dropdown sync
+    const qualificationSelect = document.getElementById('qualification_id');
+    const manualQual = document.getElementById('manual_qualification');
+    if (qualificationSelect && manualQual) {
+        manualQual.addEventListener('input', function() {
+            const val = this.value.trim();
+            if (val) {
+                qualificationSelect.required = false;
+                if (qualificationSelect.value && qualificationSelect._slimSelect) {
+                    try { qualificationSelect._slimSelect.setSelected('', false); } catch(e) {}
+                }
+            } else {
+                if (!qualificationSelect.value) {
+                    qualificationSelect.required = true;
+                }
+            }
+        });
+
+        qualificationSelect.addEventListener('change', function() {
+            if (this.value) {
+                manualQual.value = '';
+                qualificationSelect.required = true;
+            }
+        });
+    }
+
+    // Form submit validation
+    const editJobForm = document.querySelector('form[action*="admin/jobs"]');
+    if (editJobForm) {
+        editJobForm.addEventListener('submit', function(e) {
+            if (subjectSelect && manualSub && !subjectSelect.value && !manualSub.value.trim()) {
+                e.preventDefault();
+                manualSub.focus();
+                alert('Please select or type a Subject.');
+                return false;
+            }
+            if (qualificationSelect && manualQual && !qualificationSelect.value && !manualQual.value.trim()) {
+                e.preventDefault();
+                manualQual.focus();
+                alert('Please select or type a Qualification.');
+                return false;
+            }
+        });
     }
 
     // State -> City

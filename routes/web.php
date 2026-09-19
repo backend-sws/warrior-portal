@@ -19,8 +19,20 @@ Route::redirect('/join-as-tutor', '/apply/home-tutor');
 Route::redirect('/join-as-teacher', '/apply/school-teacher');
 // Standalone Public Forms (Dedicated Shareable Pages)
 Route::get('/apply/home-tutor', [\App\Http\Controllers\PublicFormController::class, 'homeTutor'])->name('apply.home-tutor');
+Route::get('/apply/home-tutor/thank-you', function (\Illuminate\Http\Request $request) {
+    return app(\App\Http\Controllers\CandidateAuthController::class)->thankYou($request, 'home_tutor');
+})->name('apply.home-tutor.thank-you');
+
 Route::get('/apply/school-teacher', [\App\Http\Controllers\PublicFormController::class, 'schoolTeacher'])->name('apply.school-teacher');
+Route::get('/apply/school-teacher/thank-you', function (\Illuminate\Http\Request $request) {
+    return app(\App\Http\Controllers\CandidateAuthController::class)->thankYou($request, 'school_job');
+})->name('apply.school-teacher.thank-you');
+
 Route::get('/apply/both', [\App\Http\Controllers\PublicFormController::class, 'both'])->name('apply.both');
+Route::get('/apply/both/thank-you', function (\Illuminate\Http\Request $request) {
+    return app(\App\Http\Controllers\CandidateAuthController::class)->thankYou($request, 'both');
+})->name('apply.both.thank-you');
+
 Route::get('/need-tutor', [\App\Http\Controllers\PublicFormController::class, 'needTutor'])->name('forms.need-tutor');
 Route::get('/hire-teacher', [\App\Http\Controllers\PublicFormController::class, 'hireTeacher'])->name('forms.hire-teacher');
 
@@ -125,6 +137,7 @@ Route::get('/register/verify-otp', [\App\Http\Controllers\CandidateAuthControlle
 Route::post('/register/verify-otp', [\App\Http\Controllers\CandidateAuthController::class, 'verifyOtp'])->middleware('guest')->name('register.otp.verify');
 Route::post('/register/resend-otp', [\App\Http\Controllers\CandidateAuthController::class, 'resendOtp'])->middleware('guest')->name('register.otp.resend');
 Route::get('/register/cancel', [\App\Http\Controllers\CandidateAuthController::class, 'cancelRegistration'])->middleware('guest')->name('register.cancel');
+Route::get('/register/thank-you', [\App\Http\Controllers\CandidateAuthController::class, 'thankYou'])->name('register.thank-you');
 
 // Candidate Routes (Unverified but Auth Required)
 Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.')->group(function () {
@@ -281,6 +294,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/candidates', [\App\Http\Controllers\Admin\CrmController::class, 'index'])->name('crm.index');
     Route::get('/candidates/{id}', [\App\Http\Controllers\Admin\CrmController::class, 'show'])->name('crm.show');
     Route::post('/crm/candidate/{id}/follow-up', [\App\Http\Controllers\Admin\CrmController::class, 'storeFollowUp'])->name('crm.followup.store');
+    Route::post('/crm/candidate/{id}/refund', [\App\Http\Controllers\Admin\CrmController::class, 'storeRefund'])->name('crm.refund.store');
     Route::post('/crm/candidate/{id}/invoice', [\App\Http\Controllers\Admin\CrmController::class, 'storeInvoice'])->name('crm.invoice.store');
     Route::post('/crm/candidate/{id}/assign-job', [\App\Http\Controllers\Admin\CrmController::class, 'assignJob'])->name('crm.application.assign');
     Route::post('/crm/candidate/{id}/assign-tuition', [\App\Http\Controllers\Admin\CrmController::class, 'assignTuition'])->name('crm.tuition.assign');

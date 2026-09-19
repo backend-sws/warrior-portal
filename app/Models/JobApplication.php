@@ -32,7 +32,7 @@ class JobApplication extends Model
             self::STATUS_FORWARDED => 'Forwarded to school/institute',
             self::STATUS_DEMO_SCHEDULED => 'Demo scheduled',
             self::STATUS_HIRED => 'Selected/hired',
-            self::STATUS_REJECTED_BY_SCHOOL => 'Rejected by school',
+            self::STATUS_REJECTED_BY_SCHOOL => 'Rejected by school/institute',
             self::STATUS_TUTOR_BACKED_OUT => 'Tutor backed out',
             self::STATUS_REJECTED_BY_ADMIN => 'Rejected by admin',
         ];

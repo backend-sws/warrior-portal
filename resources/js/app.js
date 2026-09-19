@@ -37,7 +37,9 @@
                     (o) => o.value === ''
                 );
 
-                const slim = new SlimSelect({
+                const isAddable = select.dataset.addable === 'true' || select.hasAttribute('data-addable');
+
+                const slimConfig = {
                     select: select,
                     settings: {
                         showSearch: true,
@@ -54,7 +56,18 @@
                             select.dispatchEvent(new Event('input', { bubbles: true }));
                         },
                     },
-                });
+                };
+
+                if (isAddable) {
+                    slimConfig.events.addable = function (value) {
+                        return {
+                            text: value,
+                            value: value
+                        };
+                    };
+                }
+
+                const slim = new SlimSelect(slimConfig);
 
                 select.dataset.slimSelectInitialized = 'true';
                 select._slimSelect = slim;

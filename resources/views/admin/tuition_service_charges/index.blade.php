@@ -310,7 +310,7 @@
                 <button type="button" onclick="document.getElementById('createInvoiceModal').classList.add('hidden')" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition-colors">
                     Cancel
                 </button>
-                <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5">
+                <button type="submit" onclick="this.classList.add('opacity-50','pointer-events-none');" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5">
                     <i class="fas fa-save"></i> Create Invoice
                 </button>
             </div>

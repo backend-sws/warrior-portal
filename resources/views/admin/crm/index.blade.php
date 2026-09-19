@@ -69,7 +69,7 @@
     <form action="{{ route('admin.crm.index') }}" method="GET" class="space-y-4 mt-3">
         <div class="flex items-center relative">
             <i class="fas fa-search absolute left-3 text-text-dark/40 text-sm"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, email, phone, whatsapp number..." 
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, email, phone, whatsapp, subject..." 
                    class="w-full pl-9 pr-24 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
             @if(request()->anyFilled(['search', 'candidate_category', 'position', 'subject', 'qualification', 'experience', 'location', 'profile_completion', 'salary_range', 'subject_id', 'qualification_id', 'state_id', 'city_id', 'gender']))
                 <a href="{{ route('admin.crm.index') }}" class="absolute right-3 text-red-500 hover:text-red-700 transition-colors text-xs font-bold flex items-center gap-1 bg-red-50 px-2 py-1 rounded-lg border border-red-200">
@@ -228,8 +228,8 @@
                 $prof = $candidate->profile;
                 $pct = $prof?->completion_percentage ?? 0;
                 $category = $prof?->candidate_category ?: 'both';
-                $isTuitionReady = ($prof && $prof->date_of_birth && $prof->gender && $prof->address && $prof->preferred_state_id && $prof->preferred_city_id && $prof->highest_qualification_id && $prof->subject_id);
-                $isJobReady = ($isTuitionReady && $prof->category_id && $prof->resume_path);
+                $isTuitionReady = ($pct >= 80);
+                $isJobReady = ($pct >= 80);
             @endphp
             <tr class="group hover:bg-secondary-bg/50 transition-colors">
                 {{-- Candidate & Contact --}}
