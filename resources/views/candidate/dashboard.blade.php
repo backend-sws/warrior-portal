@@ -4,6 +4,8 @@
     @include('candidate.partials.nav')
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        @include('partials.whatsapp-banner')
+
 
         @if(session('error'))
             <div class="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 mb-6 shadow-sm flex items-center gap-3">
@@ -1102,6 +1104,8 @@
             scrollbar-width: none;
         }
     </style>
+
+    @include('partials.whatsapp-popup')
 @endsection
 
 
