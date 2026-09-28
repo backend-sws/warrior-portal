@@ -27,9 +27,19 @@ class TuitionApplicationController extends Controller
         ]);
 
         if ($search = $request->input('search')) {
-            $numericSearch = ltrim(preg_replace('/[^0-9]/', '', $search), '0');
-            $query->where(function ($q) use ($search, $numericSearch) {
-                $q->whereHas('candidate', function ($cq) use ($search, $numericSearch) {
+            $isNumeric = preg_match('/^[0-9]+$/', trim($search));
+            $numericSearch = $isNumeric ? ltrim(trim($search), '0') : null;
+            $tuiIdSearch = null;
+            if (preg_match('/^(?:tui-?)0*(\d+)$/i', trim($search), $m)) {
+                $tuiIdSearch = 'TUI-' . str_pad($m[1], 4, '0', STR_PAD_LEFT);
+            }
+
+            $query->where(function ($q) use ($search, $numericSearch, $tuiIdSearch) {
+                if ($numericSearch) {
+                    $q->where('id', $numericSearch);
+                }
+
+                $q->orWhereHas('candidate', function ($cq) use ($search, $numericSearch) {
                     $cq->where('name', 'like', "%{$search}%")
                        ->orWhere('phone', 'like', "%{$search}%")
                        ->orWhere('email', 'like', "%{$search}%")
@@ -39,17 +49,19 @@ class TuitionApplicationController extends Controller
                     if ($numericSearch) {
                         $cq->orWhere('id', $numericSearch);
                     }
-                })->orWhereHas('tuitionLead', function ($lq) use ($search, $numericSearch) {
+                })->orWhereHas('tuitionLead', function ($lq) use ($search, $numericSearch, $tuiIdSearch) {
                     $lq->where('parent_name', 'like', "%{$search}%")
                        ->orWhere('parent_mobile', 'like', "%{$search}%")
                        ->orWhere('subjects', 'like', "%{$search}%")
                        ->orWhere('class', 'like', "%{$search}%")
                        ->orWhere('location', 'like', "%{$search}%")
-                       ->orWhere('tuition_id', 'like', "%{$search}%")
-                       ->orWhere('tuition_id', 'like', "%" . str_replace('JOB-', 'TUI-', strtoupper($search)) . "%");
+                       ->orWhere('tuition_id', 'like', "%{$search}%");
                     
                     if ($numericSearch) {
                         $lq->orWhere('id', $numericSearch);
+                    }
+                    if ($tuiIdSearch) {
+                        $lq->orWhere('tuition_id', $tuiIdSearch);
                     }
                 });
             });

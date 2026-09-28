@@ -18,8 +18,14 @@ class ApplicationController extends Controller
         $query = JobApplication::with(['candidate', 'jobPost.user']);
 
         if ($search = $request->input('search')) {
-            $numericSearch = ltrim(preg_replace('/[^0-9]/', '', $search), '0');
-            $query->where(function ($q) use ($search, $numericSearch) {
+            $isNumeric = preg_match('/^[0-9]+$/', trim($search));
+            $numericSearch = $isNumeric ? ltrim(trim($search), '0') : null;
+            $jobIdSearch = null;
+            if (preg_match('/^(?:job-?)0*(\d+)$/i', trim($search), $m)) {
+                $jobIdSearch = 'JOB-' . str_pad($m[1], 4, '0', STR_PAD_LEFT);
+            }
+
+            $query->where(function ($q) use ($search, $numericSearch, $jobIdSearch) {
                 if ($numericSearch) {
                     $q->where('id', $numericSearch);
                 }
@@ -32,14 +38,16 @@ class ApplicationController extends Controller
                     if ($numericSearch) {
                         $cq->orWhere('id', $numericSearch);
                     }
-                })->orWhereHas('jobPost', function ($jq) use ($search, $numericSearch) {
+                })->orWhereHas('jobPost', function ($jq) use ($search, $numericSearch, $jobIdSearch) {
                     $jq->where('title', 'like', "%{$search}%")
                       ->orWhere('job_id', 'like', "%{$search}%")
                       ->orWhere('school_name', 'like', "%{$search}%");
                       
                     if ($numericSearch) {
-                        $jq->orWhere('id', $numericSearch)
-                           ->orWhere('job_id', 'like', "%" . str_pad($numericSearch, 4, '0', STR_PAD_LEFT) . "%");
+                        $jq->orWhere('id', $numericSearch);
+                    }
+                    if ($jobIdSearch) {
+                        $jq->orWhere('job_id', $jobIdSearch);
                     }
                 });
             });
@@ -60,8 +68,14 @@ class ApplicationController extends Controller
         // Base query for stats (reflecting search filter if present)
         $baseQuery = JobApplication::query();
         if ($search = $request->input('search')) {
-            $numericSearch = ltrim(preg_replace('/[^0-9]/', '', $search), '0');
-            $baseQuery->where(function ($q) use ($search, $numericSearch) {
+            $isNumeric = preg_match('/^[0-9]+$/', trim($search));
+            $numericSearch = $isNumeric ? ltrim(trim($search), '0') : null;
+            $jobIdSearch = null;
+            if (preg_match('/^(?:job-?)0*(\d+)$/i', trim($search), $m)) {
+                $jobIdSearch = 'JOB-' . str_pad($m[1], 4, '0', STR_PAD_LEFT);
+            }
+
+            $baseQuery->where(function ($q) use ($search, $numericSearch, $jobIdSearch) {
                 if ($numericSearch) {
                     $q->where('id', $numericSearch);
                 }
@@ -74,14 +88,16 @@ class ApplicationController extends Controller
                     if ($numericSearch) {
                         $cq->orWhere('id', $numericSearch);
                     }
-                })->orWhereHas('jobPost', function ($jq) use ($search, $numericSearch) {
+                })->orWhereHas('jobPost', function ($jq) use ($search, $numericSearch, $jobIdSearch) {
                     $jq->where('title', 'like', "%{$search}%")
                       ->orWhere('job_id', 'like', "%{$search}%")
                       ->orWhere('school_name', 'like', "%{$search}%");
                       
                     if ($numericSearch) {
-                        $jq->orWhere('id', $numericSearch)
-                           ->orWhere('job_id', 'like', "%" . str_pad($numericSearch, 4, '0', STR_PAD_LEFT) . "%");
+                        $jq->orWhere('id', $numericSearch);
+                    }
+                    if ($jobIdSearch) {
+                        $jq->orWhere('job_id', $jobIdSearch);
                     }
                 });
             });
