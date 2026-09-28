@@ -54,14 +54,15 @@ class TuitionApplicationController extends Controller
                        ->orWhere('parent_mobile', 'like', "%{$search}%")
                        ->orWhere('subjects', 'like', "%{$search}%")
                        ->orWhere('class', 'like', "%{$search}%")
-                       ->orWhere('location', 'like', "%{$search}%")
-                       ->orWhere('tuition_id', 'like', "%{$search}%");
+                       ->orWhere('location', 'like', "%{$search}%");
                     
                     if ($numericSearch) {
                         $lq->orWhere('id', $numericSearch);
                     }
                     if ($tuiIdSearch) {
                         $lq->orWhere('tuition_id', $tuiIdSearch);
+                    } else {
+                        $lq->orWhere('tuition_id', 'like', "%{$search}%");
                     }
                 });
             });

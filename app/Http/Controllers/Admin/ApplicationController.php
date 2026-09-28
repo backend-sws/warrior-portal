@@ -40,7 +40,6 @@ class ApplicationController extends Controller
                     }
                 })->orWhereHas('jobPost', function ($jq) use ($search, $numericSearch, $jobIdSearch) {
                     $jq->where('title', 'like', "%{$search}%")
-                      ->orWhere('job_id', 'like', "%{$search}%")
                       ->orWhere('school_name', 'like', "%{$search}%");
                       
                     if ($numericSearch) {
@@ -48,6 +47,8 @@ class ApplicationController extends Controller
                     }
                     if ($jobIdSearch) {
                         $jq->orWhere('job_id', $jobIdSearch);
+                    } else {
+                        $jq->orWhere('job_id', 'like', "%{$search}%");
                     }
                 });
             });
@@ -90,7 +91,6 @@ class ApplicationController extends Controller
                     }
                 })->orWhereHas('jobPost', function ($jq) use ($search, $numericSearch, $jobIdSearch) {
                     $jq->where('title', 'like', "%{$search}%")
-                      ->orWhere('job_id', 'like', "%{$search}%")
                       ->orWhere('school_name', 'like', "%{$search}%");
                       
                     if ($numericSearch) {
@@ -98,6 +98,8 @@ class ApplicationController extends Controller
                     }
                     if ($jobIdSearch) {
                         $jq->orWhere('job_id', $jobIdSearch);
+                    } else {
+                        $jq->orWhere('job_id', 'like', "%{$search}%");
                     }
                 });
             });
