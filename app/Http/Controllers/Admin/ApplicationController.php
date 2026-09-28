@@ -18,13 +18,29 @@ class ApplicationController extends Controller
         $query = JobApplication::with(['candidate', 'jobPost.user']);
 
         if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('candidate', function ($cq) use ($search) {
+            $numericSearch = ltrim(preg_replace('/[^0-9]/', '', $search), '0');
+            $query->where(function ($q) use ($search, $numericSearch) {
+                if ($numericSearch) {
+                    $q->where('id', $numericSearch);
+                }
+                
+                $q->orWhereHas('candidate', function ($cq) use ($search, $numericSearch) {
                     $cq->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-                })->orWhereHas('jobPost', function ($jq) use ($search) {
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
+                      
+                    if ($numericSearch) {
+                        $cq->orWhere('id', $numericSearch);
+                    }
+                })->orWhereHas('jobPost', function ($jq) use ($search, $numericSearch) {
                     $jq->where('title', 'like', "%{$search}%")
-                      ->orWhere('job_id', 'like', "%{$search}%");
+                      ->orWhere('job_id', 'like', "%{$search}%")
+                      ->orWhere('school_name', 'like', "%{$search}%");
+                      
+                    if ($numericSearch) {
+                        $jq->orWhere('id', $numericSearch)
+                           ->orWhere('job_id', 'like', "%" . str_pad($numericSearch, 4, '0', STR_PAD_LEFT) . "%");
+                    }
                 });
             });
         }
@@ -44,13 +60,29 @@ class ApplicationController extends Controller
         // Base query for stats (reflecting search filter if present)
         $baseQuery = JobApplication::query();
         if ($search = $request->input('search')) {
-            $baseQuery->where(function($q) use ($search) {
-                $q->whereHas('candidate', function ($cq) use ($search) {
+            $numericSearch = ltrim(preg_replace('/[^0-9]/', '', $search), '0');
+            $baseQuery->where(function ($q) use ($search, $numericSearch) {
+                if ($numericSearch) {
+                    $q->where('id', $numericSearch);
+                }
+                
+                $q->orWhereHas('candidate', function ($cq) use ($search, $numericSearch) {
                     $cq->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-                })->orWhereHas('jobPost', function ($jq) use ($search) {
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
+                      
+                    if ($numericSearch) {
+                        $cq->orWhere('id', $numericSearch);
+                    }
+                })->orWhereHas('jobPost', function ($jq) use ($search, $numericSearch) {
                     $jq->where('title', 'like', "%{$search}%")
-                      ->orWhere('job_id', 'like', "%{$search}%");
+                      ->orWhere('job_id', 'like', "%{$search}%")
+                      ->orWhere('school_name', 'like', "%{$search}%");
+                      
+                    if ($numericSearch) {
+                        $jq->orWhere('id', $numericSearch)
+                           ->orWhere('job_id', 'like', "%" . str_pad($numericSearch, 4, '0', STR_PAD_LEFT) . "%");
+                    }
                 });
             });
         }
