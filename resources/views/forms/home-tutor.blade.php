@@ -44,7 +44,7 @@
                 <span x-text="successMessage"></span>
             </div>
 
-            <form @submit.prevent="submitForm($event)" enctype="multipart/form-data" class="p-6 sm:p-8 lg:p-10 space-y-6">
+            <form @submit.prevent="submitForm($event)" novalidate enctype="multipart/form-data" class="p-6 sm:p-8 lg:p-10 space-y-6">
                 @csrf
                 <input type="hidden" name="candidate_category" value="home_tutor">
                 <input type="hidden" name="latitude" x-model="userLat">
@@ -62,40 +62,40 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Full Name <span class="text-red-500">*</span></label>
                             <input type="text" name="name" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" placeholder="e.g. Ramesh Kumar"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['name']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                             <span x-show="fieldErrors['name']" x-text="fieldErrors['name'] ? fieldErrors['name'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Email Address <span class="text-red-500">*</span></label>
                             <input type="email" name="email" required placeholder="e.g. rahul@example.com"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['email']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                             <span x-show="fieldErrors['email']" x-text="fieldErrors['email'] ? fieldErrors['email'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Mobile Number <span class="text-red-500">*</span></label>
                             <input type="tel" name="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" placeholder="e.g. 9876543210"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['phone']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                             <span x-show="fieldErrors['phone']" x-text="fieldErrors['phone'] ? fieldErrors['phone'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">WhatsApp Number <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional / Can be different)</span></label>
                             <input type="tel" name="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" placeholder="e.g. 9876543210"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['whatsapp_no']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Password <span class="text-red-500">*</span></label>
                             <input type="password" name="password" required minlength="8" placeholder="•••••••• (Min 8 chars)"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['password']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                             <span x-show="fieldErrors['password']" x-text="fieldErrors['password'] ? fieldErrors['password'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Confirm Password <span class="text-red-500">*</span></label>
                             <input type="password" name="password_confirmation" required minlength="8" placeholder="Re-enter password (Min 8 chars)"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['password_confirmation']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Gender <span class="text-red-500">*</span></label>
-                            <select data-no-search="true" name="gender" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                            <select data-no-search="true" name="gender" required :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['gender']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 <option value="">Select Gender</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -105,20 +105,20 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Date of Birth <span class="text-red-500">*</span></label>
                             <input type="date" name="date_of_birth" required max="{{ date('Y-m-d', strtotime('-18 years')) }}"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['date_of_birth']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                         </div>
                         {{-- Highest Qualification: MANUAL INPUT --}}
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Highest Qualification <span class="text-red-500">*</span></label>
                             <input type="text" name="highest_qualification" required maxlength="100" placeholder="e.g. B.Tech, M.Sc, B.Ed, M.A, BCA..."
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['highest_qualification']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                             <span x-show="fieldErrors['highest_qualification']" x-text="fieldErrors['highest_qualification'] ? fieldErrors['highest_qualification'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
                         {{-- Teaching Experience: MANUAL INPUT WITH SUGGESTIONS --}}
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Total Teaching Experience <span class="text-red-500">*</span></label>
                             <input type="text" name="experience_range" list="exp_suggestions" required placeholder="e.g. Fresher / 2 Years / 3.5 Years / 5+ Years"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['experience_range']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                             <span x-show="fieldErrors['experience_range']" x-text="fieldErrors['experience_range'] ? fieldErrors['experience_range'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
                     </div>
@@ -136,7 +136,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Teaching Mode <span class="text-red-500">*</span></label>
-                            <select data-no-search="true" name="teaching_mode" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                            <select data-no-search="true" name="teaching_mode" required :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['teaching_mode']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 <option value="">Select Teaching Mode</option>
                                 <option value="Offline">Offline (Student's Home)</option>
                                 <option value="Online">Online (Zoom / Google Meet)</option>
@@ -145,7 +145,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Available Time Slot</label>
-                            <select data-no-search="true" name="available_time_slot" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
+                            <select data-no-search="true" name="available_time_slot" :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['available_time_slot']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/40 focus:border-[#0ea5e9]">
                                 <option value="">Select Available Time Slot (Optional)</option>
                                 <option value="Flexible / Any Time">Flexible / Any Time</option>
                                 <option value="Morning (6 AM - 10 AM)">Morning (6 AM - 10 AM)</option>
@@ -167,7 +167,7 @@
                         <div class="flex flex-wrap gap-1.5">
                             @foreach($tuitionSubsList as $subj)
                                 <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-amber-400'">
-                                    <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}" :checked="selectedTuitionSubjects.includes('{{ $subj }}')" @change="toggleTuitionSubject('{{ $subj }}')" class="sr-only">
+                                    <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}" :checked="selectedTuitionSubjects.includes('{{ $subj }}')" @change="toggleTuitionSubject('{{ $subj }}')" :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['tuition_subjects']}" class="sr-only">
                                     <i class="fas fa-check text-[9px]" x-show="selectedTuitionSubjects.includes('{{ $subj }}')"></i>
                                     <span>{{ $subj }}</span>
                                 </label>
@@ -178,7 +178,7 @@
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold bg-amber-500 text-white border-amber-600 shadow-sm transition-all select-none">
                                     <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-amber-100 px-1.5 py-0.5 rounded">Custom</span>
                                     <span x-text="cSubj"></span>
-                                    <input type="checkbox" name="tuition_subjects[]" :value="cSubj" checked class="sr-only">
+                                    <input type="checkbox" name="tuition_subjects[]" :value="cSubj" checked :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['tuition_subjects']}" class="sr-only">
                                     <button type="button" @click.stop="removeCustomSubject(cSubj)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
                                         <i class="fas fa-times"></i>
                                     </button>
@@ -194,7 +194,7 @@
                                        @keydown.enter.prevent="addCustomSubject()" 
                                        name="manual_tuition_subjects"
                                        placeholder="Type other subjects (e.g. Sanskrit, French, Coding...) & press Enter or Add"
-                                       class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                                       :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['manual_tuition_subjects']}" class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
                                 <button type="button" @click="addCustomSubject()" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
                                     <i class="fas fa-plus text-[10px]"></i>
                                     <span>Add</span>
@@ -210,7 +210,7 @@
                         <div class="flex flex-wrap gap-2">
                             @foreach($classList as $cls)
                                 <label class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all select-none" :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-400'">
-                                    <input type="checkbox" name="classes_interested[]" value="{{ $cls }}" :checked="selectedClasses.includes('{{ $cls }}')" @change="toggleSelectedClass('{{ $cls }}')" class="sr-only">
+                                    <input type="checkbox" name="classes_interested[]" value="{{ $cls }}" :checked="selectedClasses.includes('{{ $cls }}')" @change="toggleSelectedClass('{{ $cls }}')" :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['classes_interested']}" class="sr-only">
                                     <i class="fas fa-check text-[9px]" x-show="selectedClasses.includes('{{ $cls }}')"></i>
                                     <span>{{ $cls }}</span>
                                 </label>
@@ -221,7 +221,7 @@
                                 <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-bold bg-blue-600 text-white border-blue-700 shadow-sm transition-all select-none">
                                     <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-blue-100 px-1.5 py-0.5 rounded">Custom</span>
                                     <span x-text="cCls"></span>
-                                    <input type="checkbox" name="classes_interested[]" :value="cCls" checked class="sr-only">
+                                    <input type="checkbox" name="classes_interested[]" :value="cCls" checked :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['classes_interested']}" class="sr-only">
                                     <button type="button" @click.stop="removeCustomClass(cCls)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
                                         <i class="fas fa-times"></i>
                                     </button>
@@ -237,7 +237,7 @@
                                        @keydown.enter.prevent="addCustomClass()" 
                                        name="manual_classes"
                                        placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce...) & press Enter or Add"
-                                       class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                                       :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['manual_classes']}" class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
                                 <button type="button" @click="addCustomClass()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
                                     <i class="fas fa-plus text-[10px]"></i>
                                     <span>Add</span>
@@ -254,7 +254,7 @@
                                 <i class="fas fa-location-crosshairs text-[10px] text-emerald-600"></i> Use Live GPS
                             </button>
                         </div>
-                        <textarea name="preferred_areas" id="ht_areas" rows="2" placeholder="e.g. Kankarbagh, Boring Road, Bailey Road, Rajendra Nagar..." class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-400"></textarea>
+                        <textarea name="preferred_areas" id="ht_areas" rows="2" placeholder="e.g. Kankarbagh, Boring Road, Bailey Road, Rajendra Nagar..." :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['preferred_areas']}" class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-400"></textarea>
                         <div class="mt-1.5" x-show="userLat && userLng" x-cloak>
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-[10px] font-bold">
                                 <i class="fas fa-check-circle text-emerald-600"></i> Live GPS Attached (<span x-text="Number(userLat).toFixed(4)"></span>, <span x-text="Number(userLng).toFixed(4)"></span>)
@@ -273,7 +273,7 @@
                     {{-- Optional Resume --}}
                     <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
                         <span class="text-xs font-black text-slate-700 uppercase tracking-wide flex items-center gap-1.5 mb-3"><i class="fas fa-file-alt text-slate-500"></i> Resume / CV <span class="text-slate-400 font-normal normal-case text-[11px]">(Optional)</span></span>
-                        <input type="file" name="tutor_resume" accept=".pdf,.doc,.docx" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-white hover:file:bg-amber-600 cursor-pointer">
+                        <input type="file" name="tutor_resume" accept=".pdf,.doc,.docx" :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['tutor_resume']}" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-white hover:file:bg-amber-600 cursor-pointer">
                         <p class="text-[11px] text-slate-400 mt-1.5">PDF, DOC, DOCX format. Max 2MB.</p>
                     </div>
                 </div>
@@ -516,7 +516,15 @@ function homeTutorForm() {
                     } else {
                         this.errorMessage = 'Registration could not be completed. Please check your inputs.';
                     }
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    this.$nextTick(() => {
+                        const firstError = document.querySelector('.text-rose-500');
+                        if (firstError) {
+                            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    });
                 }
             } catch (err) {
                 console.error('Home tutor form error:', err);

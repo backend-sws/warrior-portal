@@ -86,7 +86,7 @@
                                     <input type="text" x-model="formData.date_of_birth" required
                                         x-init="flatpickr($el, { dateFormat: 'Y-m-d', maxDate: 'today' })"
                                         placeholder="YYYY-MM-DD"
-                                        class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                        :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.date_of_birth}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.date_of_birth"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.date_of_birth[0]"></p></template>
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-[#031b4e]/50">
                                         <i class="far fa-calendar-alt"></i>
@@ -98,7 +98,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Gender *</label>
                                 <select x-model="formData.gender" required
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.gender}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -111,7 +111,7 @@
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Profile Photo (Optional)</label>
                                 <input type="file" accept="image/*" @change="handleProfilePhotoUpload"
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.profile_photo}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
                                 <template x-if="fieldErrors.profile_photo"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.profile_photo[0]"></p></template>
                                 <p class="text-xs text-[#031b4e]/60 mt-1">Format: JPG, PNG. Max size: 2MB.</p>
                                 <div x-show="profilePhotoPreview" class="mt-3">
@@ -123,7 +123,7 @@
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Resume / CV *</label>
                                 <input type="file" accept=".pdf,.doc,.docx" @change="handleResumeUpload" required
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.resume}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
                                 <template x-if="fieldErrors.resume"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.resume[0]"></p></template>
                                 <p class="text-xs text-[#031b4e]/60 mt-1">Format: PDF, DOC, DOCX. Max size: 2MB.</p>
                             </div>
@@ -132,7 +132,7 @@
                             <div class="md:col-span-1">
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Salary Slip (Optional)</label>
                                 <input type="file" accept=".pdf,.doc,.docx,.jpg,.png,.jpeg" @change="handleSalarySlipUpload"
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.salary_slip}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
                                 <template x-if="fieldErrors.salary_slip"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.salary_slip[0]"></p></template>
                             </div>
 
@@ -140,7 +140,7 @@
                             <div class="md:col-span-1">
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Offer Letter (Optional)</label>
                                 <input type="file" accept=".pdf,.doc,.docx,.jpg,.png,.jpeg" @change="handleOfferLetterUpload"
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.offer_letter}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-2 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0ea5e9] file:text-white hover:file:bg-[#0ea5e9]-hover cursor-pointer">
                                 <template x-if="fieldErrors.offer_letter"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.offer_letter[0]"></p></template>
                             </div>
 
@@ -148,7 +148,7 @@
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Full Address *</label>
                                 <textarea x-model="formData.address" required rows="2"
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all"
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.address}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all"
                                     placeholder="Enter your complete address"></textarea>
                                 <template x-if="fieldErrors.address"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.address[0]"></p></template>
                             </div>
@@ -157,7 +157,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Position Applied For *</label>
                                 <select x-model="formData.category_id" required
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.category_id}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Category</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -170,7 +170,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Subject *</label>
                                 <select x-model="formData.subject_id" required
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.subject_id}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Subject</option>
                                     <template x-for="subject in availableSubjects" :key="subject.id">
                                         <option :value="subject.id" x-text="subject.name" :selected="formData.subject_id == subject.id"></option>
@@ -196,7 +196,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Highest Qualification *</label>
                                 <select x-model="formData.highest_qualification_id" required
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.highest_qualification_id}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Qualification</option>
                                     @foreach($qualifications as $qualification)
                                         <option value="{{ $qualification->id }}">{{ $qualification->name }}</option>
@@ -209,7 +209,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Experience (Years) *</label>
                                 <input type="number" x-model="formData.experience_years" min="0" required
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.experience_years}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.experience_years"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.experience_years[0]"></p></template>
                             </div>
 
@@ -217,7 +217,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Preferred State *</label>
                                 <select x-model="formData.preferred_state_id" @change="fetchCities(formData.preferred_state_id)" required
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.preferred_state_id}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select State</option>
                                     @foreach($states as $state)
                                         <option value="{{ $state->id }}">{{ $state->name }}</option>
@@ -230,7 +230,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Preferred City *</label>
                                 <select x-model="formData.preferred_city_id" required
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.preferred_city_id}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select City</option>
                                     <template x-for="city in availableCities" :key="city.id">
                                         <option :value="city.id" x-text="city.name"></option>
@@ -243,7 +243,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Current School (Optional)</label>
                                 <input type="text" x-model="formData.current_school" placeholder="E.g., DPS Patna"
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.current_school}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.current_school"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.current_school[0]"></p></template>
                             </div>
 
@@ -251,7 +251,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">English Fluency (Optional)</label>
                                 <select x-model="formData.english_fluency"
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.english_fluency}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Fluency</option>
                                     <option value="beginner">Beginner</option>
                                     <option value="intermediate">Intermediate</option>
@@ -264,7 +264,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">School Type Preference (Optional)</label>
                                 <select x-model="formData.residential_preference"
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.residential_preference}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                     <option value="">Select Preference</option>
                                     <option value="day">Day School</option>
                                     <option value="residential">Residential/Boarding School</option>
@@ -277,13 +277,13 @@
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Current Salary (Optional)</label>
                                 <input type="text" x-model="formData.current_salary" placeholder="E.g., ₹25,000/month"
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.current_salary}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.current_salary"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.current_salary[0]"></p></template>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Expected Salary (Optional)</label>
                                 <input type="text" x-model="formData.expected_salary" placeholder="E.g., ₹35,000/month"
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.expected_salary}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.expected_salary"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.expected_salary[0]"></p></template>
                             </div>
                             
@@ -291,7 +291,7 @@
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-semibold text-[#031b4e]/70 mb-2 uppercase tracking-wider">Availability to Join (Optional)</label>
                                 <input type="text" x-model="formData.availability_to_join" placeholder="E.g., Immediate, 15 Days, 1 Month"
-                                    class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
+                                    :class="{'!border-red-500 !ring-2 !ring-red-500/50 !bg-red-50 text-red-900': fieldErrors.availability_to_join}" class="w-full bg-[#f4f7f5] border border-[#031b4e]/10 rounded-xl px-4 py-3 text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/50 focus:border-[#0ea5e9] transition-all">
                                 <template x-if="fieldErrors.availability_to_join"><p class="text-red-500 text-xs mt-1 font-medium" x-text="fieldErrors.availability_to_join[0]"></p></template>
                             </div>
                         </div>
@@ -964,6 +964,14 @@
                         this.fieldErrors = data.errors || {};
                         this.error = 'Please fix the errors below.';
                         this.loading = false;
+                        
+                        this.$nextTick(() => {
+                            const firstError = document.querySelector('.text-red-500');
+                            if (firstError) {
+                                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        });
+                        
                         return;
                     } else {
                         this.error = data.message || 'An error occurred on the server.';
