@@ -5,6 +5,8 @@
 @include('employer.partials.nav')
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        @include('partials.whatsapp-banner')
+
 
     {{-- Welcome Header --}}
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 reveal">
@@ -181,4 +183,6 @@
         </div>
     </div>
 </div>
+
+    @include('partials.whatsapp-popup')
 @endsection

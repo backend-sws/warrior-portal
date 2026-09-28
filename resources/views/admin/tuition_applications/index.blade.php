@@ -83,7 +83,7 @@
     <form action="{{ route('admin.tuition-applications.index') }}" method="GET" class="flex flex-col md:flex-row gap-3">
         <div class="flex-1 relative">
             <i class="fas fa-search absolute left-3.5 top-3.5 text-text-dark/40 text-sm"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search candidate, phone, subject, class or location..." 
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search candidate, job ID, phone, subject, class or location..." 
                    class="w-full pl-10 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
         </div>
         <div class="w-full md:w-52">
@@ -149,7 +149,8 @@
                             Class {{ $app->tuitionLead->class }}
                             <span class="text-xs font-normal text-slate-500">({{ $app->tuitionLead->board ?: 'General Board' }})</span>
                         </div>
-                        <div class="text-xs font-semibold text-accent-blue mt-0.5">{{ $app->tuitionLead->subjects }}</div>
+                        <div class="text-[11px] font-bold text-accent-blue mt-0.5">{{ $app->tuitionLead->tuition_id }}</div>
+                        <div class="text-xs font-semibold text-slate-600 mt-0.5">{{ $app->tuitionLead->subjects }}</div>
                         <div class="text-[11px] text-slate-500 mt-1">
                             <a href="{{ route('admin.tuition-leads.show', $app->tuitionLead->id) }}" target="_blank" class="text-purple-600 hover:underline font-bold">
                                 View Tuition Lead &rarr;

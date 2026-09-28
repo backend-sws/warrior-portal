@@ -301,6 +301,7 @@
                     <form action="{{ route('candidate.agreement.sign') }}" method="POST" id="signature-form" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     <input type="hidden" name="signature" id="signature-data">
+                    <input type="hidden" name="signature_type" id="signature-type" value="draw">
                     <input type="hidden" name="live_photo" id="livePhotoInput" value="">
                     <input type="hidden" name="latitude" id="latitudeInput" value="">
                     <input type="hidden" name="longitude" id="longitudeInput" value="">
@@ -409,22 +410,34 @@
 
                     <!-- Digital Signature Canvas -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <div class="flex items-center gap-3 mb-4">
-                            <span class="w-8 h-8 rounded-lg bg-accent-yellow/10 text-accent-yellow flex items-center justify-center text-xs"><i class="fas fa-pen-fancy"></i></span>
-                            <div>
-                                <h3 class="text-base font-bold text-[#031b4e]">3. Digital Signature</h3>
-                                <p class="text-xs text-[#031b4e]/60 mt-0.5">Use your mouse or touchscreen to draw your digital signature inside the box below.</p>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-accent-yellow/10 text-accent-yellow flex items-center justify-center text-xs"><i class="fas fa-pen-fancy"></i></span>
+                                <div>
+                                    <h3 class="text-base font-bold text-[#031b4e]">3. Digital Signature</h3>
+                                    <p class="text-xs text-[#031b4e]/60 mt-0.5">Draw or Type your signature to agree to the terms.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" id="tab-draw" class="px-4 py-2 bg-[#031b4e] text-white rounded-lg text-xs font-bold transition-colors">Draw</button>
+                                <button type="button" id="tab-type" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-[#031b4e] rounded-lg text-xs font-bold transition-colors">Type</button>
                             </div>
                         </div>
 
-                        <div class="border-2 border-dashed border-[#031b4e]/20 rounded-xl bg-[#f4f7f5]/40 relative overflow-hidden group hover:border-[#0ea5e9]/40 transition-colors" style="width: 100%; max-width: 500px;">
-                            <canvas id="signature-pad" class="w-full h-44 cursor-crosshair touch-none bg-white"></canvas>
-                            <div class="absolute bottom-2 right-2 text-[10px] text-slate-400 pointer-events-none">Sign here</div>
+                        <div id="draw-signature-container">
+                            <div class="border-2 border-dashed border-[#031b4e]/20 rounded-xl bg-[#f4f7f5]/40 relative overflow-hidden group hover:border-[#0ea5e9]/40 transition-colors w-full max-w-lg">
+                                <canvas id="signature-pad" class="w-full h-44 cursor-crosshair touch-none bg-white"></canvas>
+                                <div class="absolute bottom-2 right-2 text-[10px] text-slate-400 pointer-events-none">Sign here</div>
+                            </div>
+                            <div class="mt-2.5">
+                                <button type="button" id="clear-signature" class="text-xs text-red-500 hover:text-red-700 font-medium flex items-center gap-1.5 transition-colors">
+                                    <i class="fas fa-eraser"></i> Clear Signature
+                                </button>
+                            </div>
                         </div>
-                        <div class="mt-2.5">
-                            <button type="button" id="clear-signature" class="text-xs text-red-500 hover:text-red-700 font-medium flex items-center gap-1.5 transition-colors">
-                                <i class="fas fa-eraser"></i> Clear Signature
-                            </button>
+
+                        <div id="type-signature-container" class="hidden">
+                            <input type="text" id="typed-signature" class="w-full max-w-lg border border-slate-300 rounded-xl p-4 text-3xl text-blue-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" style="font-family: 'Brush Script MT', 'Dancing Script', cursive, Georgia, serif;" placeholder="Type your full name here">
                         </div>
                     </div>
 
@@ -621,10 +634,12 @@ function detectAgreementLocation() {
                 });
         },
         function(err) {
-            coordsText.textContent = 'Location Permission Skipped';
-            addrText.textContent = 'GPS permission not granted. IP address location will be recorded on signature.';
-            badge.textContent = 'IP Geo Used';
-            badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700';
+            coordsText.textContent = 'Location Permission Required';
+            addrText.textContent = 'GPS permission is mandatory to sign the agreement. Please allow location access and refresh.';
+            badge.textContent = 'Action Required';
+            badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-800';
+            
+            showAgreementInlineError('<strong>📍 Location Required:</strong> You must allow location access to sign this agreement.');
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -698,6 +713,33 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         hasDrawn = false;
     });
+    
+    // Tab Switching for Signature
+    const tabDraw = document.getElementById('tab-draw');
+    const tabType = document.getElementById('tab-type');
+    const drawContainer = document.getElementById('draw-signature-container');
+    const typeContainer = document.getElementById('type-signature-container');
+    const signatureTypeInput = document.getElementById('signature-type');
+    const typedSignatureInput = document.getElementById('typed-signature');
+
+    if (tabDraw && tabType) {
+        tabDraw.addEventListener('click', () => {
+            tabDraw.className = 'px-4 py-2 bg-[#031b4e] text-white rounded-lg text-xs font-bold transition-colors';
+            tabType.className = 'px-4 py-2 bg-slate-100 hover:bg-slate-200 text-[#031b4e] rounded-lg text-xs font-bold transition-colors';
+            drawContainer.classList.remove('hidden');
+            typeContainer.classList.add('hidden');
+            signatureTypeInput.value = 'draw';
+            resizeCanvas(); // Ensure canvas is sized correctly if unhidden
+        });
+
+        tabType.addEventListener('click', () => {
+            tabType.className = 'px-4 py-2 bg-[#031b4e] text-white rounded-lg text-xs font-bold transition-colors';
+            tabDraw.className = 'px-4 py-2 bg-slate-100 hover:bg-slate-200 text-[#031b4e] rounded-lg text-xs font-bold transition-colors';
+            typeContainer.classList.remove('hidden');
+            drawContainer.classList.add('hidden');
+            signatureTypeInput.value = 'type';
+        });
+    }
 
 function showAgreementInlineError(message, targetBoxId = null) {
     const banner = document.getElementById('agreementErrorBanner');
@@ -719,10 +761,21 @@ function showAgreementInlineError(message, targetBoxId = null) {
 }
 
     form.addEventListener('submit', (e) => {
-        // 1. Check Signature
-        if (!hasDrawn) {
+        const latInput = document.getElementById('latitudeInput');
+        if (!latInput || !latInput.value) {
             e.preventDefault();
-            showAgreementInlineError('<strong>✍️ Digital Signature Required:</strong> Please draw your signature inside the signature box before submitting.', 'signatureCanvas');
+            showAgreementInlineError('<strong>📍 Location Required:</strong> GPS Location is mandatory. Please allow location access and click "Refresh Location".');
+            return;
+        }
+
+        // 1. Check Signature
+        if (signatureTypeInput.value === 'draw' && !hasDrawn) {
+            e.preventDefault();
+            showAgreementInlineError('<strong>✍️ Digital Signature Required:</strong> Please draw your signature inside the signature box before submitting.', 'draw-signature-container');
+            return;
+        } else if (signatureTypeInput.value === 'type' && typedSignatureInput.value.trim() === '') {
+            e.preventDefault();
+            showAgreementInlineError('<strong>✍️ Typed Signature Required:</strong> Please type your name in the signature box.', 'type-signature-container');
             return;
         }
 
@@ -744,7 +797,11 @@ function showAgreementInlineError(message, targetBoxId = null) {
             return;
         }
 
-        signatureDataInput.value = canvas.toDataURL('image/png');
+        if (signatureTypeInput.value === 'draw') {
+            signatureDataInput.value = canvas.toDataURL('image/png');
+        } else {
+            signatureDataInput.value = typedSignatureInput.value.trim();
+        }
     });
 });
 </script>

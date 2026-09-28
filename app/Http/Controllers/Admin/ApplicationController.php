@@ -18,11 +18,14 @@ class ApplicationController extends Controller
         $query = JobApplication::with(['candidate', 'jobPost.user']);
 
         if ($search = $request->input('search')) {
-            $query->whereHas('candidate', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            })->orWhereHas('jobPost', function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('candidate', function ($cq) use ($search) {
+                    $cq->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                })->orWhereHas('jobPost', function ($jq) use ($search) {
+                    $jq->where('title', 'like', "%{$search}%")
+                      ->orWhere('job_id', 'like', "%{$search}%");
+                });
             });
         }
 
@@ -46,7 +49,8 @@ class ApplicationController extends Controller
                     $cq->where('name', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%");
                 })->orWhereHas('jobPost', function ($jq) use ($search) {
-                    $jq->where('title', 'like', "%{$search}%");
+                    $jq->where('title', 'like', "%{$search}%")
+                      ->orWhere('job_id', 'like', "%{$search}%");
                 });
             });
         }

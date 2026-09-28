@@ -52,7 +52,7 @@
     <form action="{{ route('admin.applications.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
         <div class="flex-1 relative">
             <i class="fas fa-search absolute left-3 top-3 text-text-dark/40 text-sm"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search candidate or job title..." 
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search candidate, job title, or job ID..." 
                    class="w-full pl-9 pr-4 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
         </div>
         <div class="w-full md:w-64">
@@ -103,7 +103,8 @@
                 </td>
                 <td>
                     <div class="font-semibold text-text-main truncate max-w-[200px]" title="{{ $app->jobPost->title }}">{{ $app->jobPost->title }}</div>
-                    <div class="text-xs text-text-dark/50">{{ $app->jobPost->user->name ?? $app->jobPost->school_name ?? 'School' }}</div>
+                    <div class="text-[11px] font-bold text-accent-blue mt-0.5">{{ $app->jobPost->job_id }}</div>
+                    <div class="text-xs text-text-dark/50">{{ !empty($app->jobPost->school_name) ? $app->jobPost->school_name : ($app->jobPost->user->name ?? 'School') }}</div>
                 </td>
                 <td>
                     <span class="{{ $app->status_badge_class }} px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider inline-block">

@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="py-6 sm:px-6 lg:px-8">
+    @include('partials.whatsapp-banner')
+
     <div class="mb-6 flex justify-between items-center">
         <h1 class="text-3xl font-bold text-gray-900">Parent Dashboard</h1>
         <a href="{{ route('parent.tuitions.create') }}" class="bg-[#1e3a8a] text-white px-4 py-2 rounded-lg font-bold hover:bg-[#1e3a8a]/90">
@@ -251,4 +253,6 @@
         </div>
     </div>
 </div>
+
+    @include('partials.whatsapp-popup')
 @endsection

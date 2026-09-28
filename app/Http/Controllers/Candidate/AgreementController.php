@@ -48,17 +48,29 @@ class AgreementController extends Controller
             return back()->with('error', 'Agreement signing is currently locked. Please request agreement activation from admin.');
         }
 
-        // Ensure signature is valid base64 image data
-        if (preg_match('/^data:image\/(\w+);base64,/', $request->signature, $type)) {
-            $signatureData = substr($request->signature, strpos($request->signature, ',') + 1);
-            $type = strtolower($type[1]); // jpg, png, gif
-        
-            if (!in_array($type, [ 'jpg', 'jpeg', 'gif', 'png' ])) {
-                return back()->with('error', 'Invalid signature image type');
+        // Check signature type
+        $signatureType = $request->input('signature_type', 'draw');
+        $signatureData = '';
+        $type = 'type';
+
+        if ($signatureType === 'draw') {
+            if (preg_match('/^data:image\/(\w+);base64,/', $request->signature, $matches)) {
+                $signatureData = substr($request->signature, strpos($request->signature, ',') + 1);
+                $type = strtolower($matches[1]); // jpg, png, gif
+            
+                if (!in_array($type, [ 'jpg', 'jpeg', 'gif', 'png' ])) {
+                    return back()->with('error', 'Invalid signature image type');
+                }
+                $signatureData = base64_decode($signatureData);
+            } else {
+                return back()->with('error', 'Did not match data URI with image data');
             }
-            $signatureData = base64_decode($signatureData);
         } else {
-            return back()->with('error', 'Did not match data URI with image data');
+            // Typed signature
+            $signatureData = $request->input('signature'); // The typed name
+            if (empty($signatureData)) {
+                return back()->with('error', 'Typed signature cannot be empty');
+            }
         }
 
         $photoPath = $profile->live_photo_path;
@@ -85,31 +97,37 @@ class AgreementController extends Controller
 
         $locationName = $request->input('location_name') ?: ($request->input('latitude') ? 'GPS: ' . $request->input('latitude') . ', ' . $request->input('longitude') : null);
 
-        $fileName = $this->generateStampedPdf($user, $profile, $signatureData, $type);
+        if (empty($request->input('latitude')) || empty($request->input('longitude'))) {
+            return back()->with('error', 'GPS Location is mandatory to sign this agreement. Please allow location access in your browser.');
+        }
 
-        // Update profile
+        // Prepare updated data so PDF generator can use the new values
         $updateData = [
             'is_agreement_signed' => true,
-            'agreement_pdf_path' => $fileName,
             'agreement_status' => 'signed',
             'signature_data' => $request->signature,
-            'signature_type' => 'draw',
+            'signature_type' => $signatureType,
             'signature_date_time' => now(),
             'signature_ip_address' => $request->ip(),
             'signature_device_info' => $request->userAgent(),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
         ];
+        
         if ($photoPath) {
             $updateData['live_photo_path'] = $photoPath;
-        }
-        if ($request->filled('latitude')) {
-            $updateData['latitude'] = $request->input('latitude');
-        }
-        if ($request->filled('longitude')) {
-            $updateData['longitude'] = $request->input('longitude');
         }
         if ($locationName) {
             $updateData['signature_location_name'] = $locationName;
         }
+
+        // We fill the model with the new data before passing it to generateStampedPdf
+        // so the PDF view can access the new values via $profile->...
+        $profile->fill($updateData);
+
+        $fileName = $this->generateStampedPdf($user, $profile, $signatureData, $type);
+
+        $updateData['agreement_pdf_path'] = $fileName;
         $profile->update($updateData);
 
         return redirect()->route('candidate.dashboard')->with('success', 'Agreement digitally signed successfully.');

@@ -27,17 +27,30 @@ class TuitionApplicationController extends Controller
         ]);
 
         if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('candidate', function ($cq) use ($search) {
+            $numericSearch = ltrim(preg_replace('/[^0-9]/', '', $search), '0');
+            $query->where(function ($q) use ($search, $numericSearch) {
+                $q->whereHas('candidate', function ($cq) use ($search, $numericSearch) {
                     $cq->where('name', 'like', "%{$search}%")
                        ->orWhere('phone', 'like', "%{$search}%")
-                       ->orWhere('email', 'like', "%{$search}%");
-                })->orWhereHas('tuitionLead', function ($lq) use ($search) {
+                       ->orWhere('email', 'like', "%{$search}%")
+                       ->orWhereHas('profile.preferredCity', function($cityQ) use ($search) {
+                           $cityQ->where('name', 'like', "%{$search}%");
+                       });
+                    if ($numericSearch) {
+                        $cq->orWhere('id', $numericSearch);
+                    }
+                })->orWhereHas('tuitionLead', function ($lq) use ($search, $numericSearch) {
                     $lq->where('parent_name', 'like', "%{$search}%")
                        ->orWhere('parent_mobile', 'like', "%{$search}%")
                        ->orWhere('subjects', 'like', "%{$search}%")
                        ->orWhere('class', 'like', "%{$search}%")
-                       ->orWhere('location', 'like', "%{$search}%");
+                       ->orWhere('location', 'like', "%{$search}%")
+                       ->orWhere('tuition_id', 'like', "%{$search}%")
+                       ->orWhere('tuition_id', 'like', "%" . str_replace('JOB-', 'TUI-', strtoupper($search)) . "%");
+                    
+                    if ($numericSearch) {
+                        $lq->orWhere('id', $numericSearch);
+                    }
                 });
             });
         }
@@ -51,14 +64,27 @@ class TuitionApplicationController extends Controller
         // Calculate counts based on search filter
         $baseQuery = TuitionApplication::query();
         if ($search) {
-            $baseQuery->where(function ($q) use ($search) {
-                $q->whereHas('candidate', function ($cq) use ($search) {
+            $numericSearch = ltrim(preg_replace('/[^0-9]/', '', $search), '0');
+            $baseQuery->where(function ($q) use ($search, $numericSearch) {
+                $q->whereHas('candidate', function ($cq) use ($search, $numericSearch) {
                     $cq->where('name', 'like', "%{$search}%")
-                       ->orWhere('phone', 'like', "%{$search}%");
-                })->orWhereHas('tuitionLead', function ($lq) use ($search) {
+                       ->orWhere('phone', 'like', "%{$search}%")
+                       ->orWhereHas('profile.preferredCity', function($cityQ) use ($search) {
+                           $cityQ->where('name', 'like', "%{$search}%");
+                       });
+                    if ($numericSearch) {
+                        $cq->orWhere('id', $numericSearch);
+                    }
+                })->orWhereHas('tuitionLead', function ($lq) use ($search, $numericSearch) {
                     $lq->where('parent_name', 'like', "%{$search}%")
                        ->orWhere('subjects', 'like', "%{$search}%")
-                       ->orWhere('location', 'like', "%{$search}%");
+                       ->orWhere('location', 'like', "%{$search}%")
+                       ->orWhere('tuition_id', 'like', "%{$search}%")
+                       ->orWhere('tuition_id', 'like', "%" . str_replace('JOB-', 'TUI-', strtoupper($search)) . "%");
+                       
+                    if ($numericSearch) {
+                        $lq->orWhere('id', $numericSearch);
+                    }
                 });
             });
         }

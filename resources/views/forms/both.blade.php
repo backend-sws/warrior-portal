@@ -45,7 +45,7 @@
                 <span x-text="successMessage"></span>
             </div>
 
-            <form @submit.prevent="submitForm($event)" enctype="multipart/form-data" class="p-6 sm:p-8 lg:p-10 space-y-8">
+            <form @submit.prevent="submitForm($event)" novalidate enctype="multipart/form-data" class="p-6 sm:p-8 lg:p-10 space-y-8">
                 @csrf
                 <input type="hidden" name="candidate_category" value="both">
                 <input type="hidden" name="latitude" x-model="userLat">
@@ -66,21 +66,21 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Full Name <span class="text-red-500">*</span></label>
                             <input type="text" name="name" x-model="name" required minlength="3" maxlength="80" pattern="^[a-zA-Z\s\.\,\'\-]+$" placeholder="e.g. Ramesh Kumar"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['name']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                             <span x-show="fieldErrors['name']" x-text="fieldErrors['name'] ? fieldErrors['name'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Email Address <span class="text-red-500">*</span></label>
                             <input type="email" name="email" x-model="email" required placeholder="e.g. rahul@example.com"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['email']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                             <span x-show="fieldErrors['email']" x-text="fieldErrors['email'] ? fieldErrors['email'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Calling Mobile Number <span class="text-red-500">*</span></label>
                             <input type="tel" name="phone" x-model="phone" required minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" placeholder="e.g. 9876543210"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['phone']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                             <span x-show="fieldErrors['phone']" x-text="fieldErrors['phone'] ? fieldErrors['phone'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
 
@@ -89,26 +89,26 @@
                                 WhatsApp Number <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional / Can be different)</span>
                             </label>
                             <input type="tel" name="whatsapp_no" x-model="whatsapp_no" minlength="10" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" placeholder="e.g. 9876543210"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['whatsapp_no']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                             <span x-show="fieldErrors['whatsapp_no']" x-text="fieldErrors['whatsapp_no'] ? fieldErrors['whatsapp_no'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Password <span class="text-red-500">*</span></label>
                             <input type="password" name="password" x-model="password" required minlength="8" placeholder="•••••••• (Min 8 chars)"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['password']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                             <span x-show="fieldErrors['password']" x-text="fieldErrors['password'] ? fieldErrors['password'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Confirm Password <span class="text-red-500">*</span></label>
                             <input type="password" name="password_confirmation" x-model="password_confirmation" required minlength="8" placeholder="Re-enter password"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['password_confirmation']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Gender <span class="text-red-500">*</span></label>
-                            <select data-no-search="true" name="gender" x-model="gender" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                            <select data-no-search="true" name="gender" x-model="gender" required :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['gender']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                                 <option value="">Select Gender</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -120,7 +120,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Date of Birth <span class="text-red-500">*</span></label>
                             <input type="date" name="date_of_birth" x-model="date_of_birth" required max="{{ date('Y-m-d', strtotime('-18 years')) }}"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['date_of_birth']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                             <span x-show="fieldErrors['date_of_birth']" x-text="fieldErrors['date_of_birth'] ? fieldErrors['date_of_birth'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
 
@@ -128,7 +128,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Highest Qualification <span class="text-red-500">*</span></label>
                             <input type="text" name="highest_qualification" required maxlength="100" placeholder="e.g. B.Tech, M.Sc, B.Ed, M.A, BCA..."
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['highest_qualification']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                             <span x-show="fieldErrors['highest_qualification']" x-text="fieldErrors['highest_qualification'] ? fieldErrors['highest_qualification'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
 
@@ -136,7 +136,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Total Teaching Experience <span class="text-red-500">*</span></label>
                             <input type="text" name="experience_range" list="both_exp_suggestions" required placeholder="e.g. Fresher / 2 Years / 3.5 Years / 5+ Years"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['experience_range']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                             <span x-show="fieldErrors['experience_range']" x-text="fieldErrors['experience_range'] ? fieldErrors['experience_range'][0] : ''" class="text-rose-500 text-[11px] font-bold mt-1 block"></span>
                         </div>
                     </div>
@@ -172,7 +172,7 @@
                                        :class="selectedTuitionSubjects.includes('{{ $subj }}') ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-amber-400'">
                                     <input type="checkbox" name="tuition_subjects[]" value="{{ $subj }}"
                                            :checked="selectedTuitionSubjects.includes('{{ $subj }}')"
-                                           @change="toggleTuitionSubject('{{ $subj }}')" class="sr-only">
+                                           @change="toggleTuitionSubject('{{ $subj }}')" :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['tuition_subjects']}" class="sr-only">
                                     <i class="fas fa-check text-[9px]" x-show="selectedTuitionSubjects.includes('{{ $subj }}')"></i>
                                     <span>{{ $subj }}</span>
                                 </label>
@@ -183,7 +183,7 @@
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold bg-amber-500 text-white border-amber-600 shadow-sm transition-all select-none">
                                     <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-amber-100 px-1.5 py-0.5 rounded">Custom</span>
                                     <span x-text="cSubj"></span>
-                                    <input type="checkbox" name="tuition_subjects[]" :value="cSubj" checked class="sr-only">
+                                    <input type="checkbox" name="tuition_subjects[]" :value="cSubj" checked :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['tuition_subjects']}" class="sr-only">
                                     <button type="button" @click.stop="removeCustomSubject(cSubj)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
                                         <i class="fas fa-times"></i>
                                     </button>
@@ -199,7 +199,7 @@
                                        @keydown.enter.prevent="addCustomSubject()" 
                                        name="manual_tuition_subjects"
                                        placeholder="Type other subjects (e.g. Sanskrit, French, Coding...) & press Enter or Add"
-                                       class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
+                                       :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['manual_tuition_subjects']}" class="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400">
                                 <button type="button" @click="addCustomSubject()" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
                                     <i class="fas fa-plus text-[10px]"></i>
                                     <span>Add</span>
@@ -222,7 +222,7 @@
                                        :class="selectedClasses.includes('{{ $cls }}') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400'">
                                     <input type="checkbox" name="classes_interested[]" value="{{ $cls }}"
                                            :checked="selectedClasses.includes('{{ $cls }}')"
-                                           @change="toggleSelectedClass('{{ $cls }}')" class="sr-only">
+                                           @change="toggleSelectedClass('{{ $cls }}')" :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['classes_interested']}" class="sr-only">
                                     <i class="fas fa-check text-[9px]" x-show="selectedClasses.includes('{{ $cls }}')"></i>
                                     <span>{{ $cls }}</span>
                                 </label>
@@ -233,7 +233,7 @@
                                 <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-bold bg-blue-600 text-white border-blue-700 shadow-sm transition-all select-none">
                                     <span class="text-[9px] uppercase font-black tracking-wider bg-black/25 text-blue-100 px-1.5 py-0.5 rounded">Custom</span>
                                     <span x-text="cCls"></span>
-                                    <input type="checkbox" name="classes_interested[]" :value="cCls" checked class="sr-only">
+                                    <input type="checkbox" name="classes_interested[]" :value="cCls" checked :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['classes_interested']}" class="sr-only">
                                     <button type="button" @click.stop="removeCustomClass(cCls)" class="ml-1 w-4 h-4 rounded-full bg-black/20 hover:bg-red-600 text-white flex items-center justify-center text-[10px] cursor-pointer transition-colors" title="Cut / Remove">
                                         <i class="fas fa-times"></i>
                                     </button>
@@ -249,7 +249,7 @@
                                        @keydown.enter.prevent="addCustomClass()" 
                                        name="manual_classes"
                                        placeholder="Type other classes / exams (e.g. NDA, CUET, Commerce...) & press Enter or Add"
-                                       class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
+                                       :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['manual_classes']}" class="w-full bg-white border border-blue-300 rounded-xl px-3.5 py-1.5 text-xs text-[#031b4e] font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
                                 <button type="button" @click="addCustomClass()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
                                     <i class="fas fa-plus text-[10px]"></i>
                                     <span>Add</span>
@@ -262,7 +262,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Teaching Mode <span class="text-red-500">*</span></label>
-                            <select data-no-search="true" name="teaching_mode" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                            <select data-no-search="true" name="teaching_mode" required :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['teaching_mode']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                                 <option value="">Select Teaching Mode</option>
                                 <option value="Offline">Offline (Student's Home)</option>
                                 <option value="Online">Online (Zoom / Google Meet)</option>
@@ -271,7 +271,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Available Time Slot</label>
-                            <select data-no-search="true" name="available_time_slot" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
+                            <select data-no-search="true" name="available_time_slot" :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['available_time_slot']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all">
                                 <option value="">Select Available Time Slot (Optional)</option>
                                 <option value="Flexible / Any Time">Flexible / Any Time</option>
                                 <option value="Morning (6 AM - 10 AM)">Morning (6 AM - 10 AM)</option>
@@ -292,7 +292,7 @@
                             </button>
                         </div>
                         <textarea name="preferred_areas" id="both_areas" rows="2" required placeholder="e.g. Kankarbagh, Boring Road, Bailey Road, Rajendra Nagar, Anisabad, Danapur..."
-                                  class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-400"></textarea>
+                                  :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['preferred_areas']}" class="w-full bg-white border border-emerald-200 rounded-xl px-3.5 py-2.5 text-sm text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-400"></textarea>
                         <div class="mt-2" x-show="userLat && userLng" x-cloak>
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] font-bold">
                                 <i class="fas fa-check-circle text-emerald-600"></i> Live GPS Attached (<span x-text="Number(userLat).toFixed(4)"></span>, <span x-text="Number(userLng).toFixed(4)"></span>)
@@ -326,7 +326,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Teaching / Staff Post Applying For <span class="text-red-500">*</span></label>
-                            <select data-no-search="true" name="position_applying_for" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
+                            <select data-no-search="true" name="position_applying_for" required :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['position_applying_for']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
                                 <option value="">Select Teaching / Staff Post</option>
                                 <option value="PRT (Primary Teacher)">PRT (Primary Teacher)</option>
                                 <option value="TGT (Trained Graduate Teacher)">TGT (Trained Graduate Teacher)</option>
@@ -341,12 +341,12 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Subject Specialization <span class="text-red-500">*</span></label>
                             <input type="text" name="subject_specialization" required placeholder="e.g. Mathematics, Physics, Chemistry, English, Social Studies..."
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['subject_specialization']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">B.Ed Degree Status <span class="text-red-500">*</span></label>
-                            <select data-no-search="true" name="b_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
+                            <select data-no-search="true" name="b_ed_status" required :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['b_ed_status']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
                                 <option value="">Select B.Ed Status</option>
                                 <option value="Yes">Yes (Completed)</option>
                                 <option value="Pursuing">Pursuing</option>
@@ -356,7 +356,7 @@
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">D.El.Ed Degree Status <span class="text-red-500">*</span></label>
-                            <select data-no-search="true" name="d_el_ed_status" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
+                            <select data-no-search="true" name="d_el_ed_status" required :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['d_el_ed_status']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
                                 <option value="">Select D.El.Ed Status</option>
                                 <option value="No">No</option>
                                 <option value="Yes">Yes (Completed)</option>
@@ -367,25 +367,25 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Current / Last School <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional)</span></label>
                             <input type="text" name="last_school_name" placeholder="e.g. DPS / DAV / St. Xavier's High School"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['last_school_name']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Last Designation / Role <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional)</span></label>
                             <input type="text" name="last_designation" placeholder="e.g. PGT Physics / TGT Maths / PRT Teacher"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['last_designation']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Last Drawn Monthly Salary (₹) <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional)</span></label>
                             <input type="number" name="last_drawn_salary" min="0" placeholder="e.g. 25000"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['last_drawn_salary']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Expected Monthly Salary (₹) <span class="text-slate-400 font-normal lowercase text-[11px]">(Optional)</span></label>
                             <input type="number" name="expected_salary" min="0" placeholder="e.g. 35000"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['expected_salary']}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#031b4e] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all">
                         </div>
                     </div>
 
@@ -421,7 +421,7 @@
                                 <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">Manual Address / Places <span class="text-red-500">*</span></label>
                                 <textarea name="preferred_locations_manual" id="both_school_manual_address" rows="2" required
                                           placeholder="Type your address or preferred locations (e.g. Boring Road, Kankarbagh, Patna, Hajipur, Muzaffarpur...)"
-                                          class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-xs text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-500"></textarea>
+                                          :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['preferred_locations_manual']}" class="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2 text-xs text-[#031b4e] font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-500"></textarea>
                             </div>
                         </div>
 
@@ -457,7 +457,7 @@
                                 <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Mandatory</span>
                             </label>
                             <input type="file" name="resume" required accept=".pdf,.doc,.docx"
-                                   class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['resume']}" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
                             <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5">
                                 <i class="fas fa-file-pdf text-rose-500"></i> PDF or DOC format (Max 5MB).
                             </p>
@@ -469,7 +469,7 @@
                                 <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Optional</span>
                             </label>
                             <input type="file" name="salary_slip" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                   class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
+                                   :class="{'!border-rose-500 !ring-2 !ring-rose-500/30 !bg-rose-50': fieldErrors['salary_slip']}" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
                             <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5">
                                 <i class="fas fa-receipt text-emerald-600"></i> PDF, JPG, PNG or DOC (Max 5MB).
                             </p>
@@ -730,7 +730,15 @@ function bothCandidatesForm() {
                     } else {
                         this.errorMessage = 'Something went wrong. Please check your details and try again.';
                     }
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    this.$nextTick(() => {
+                        const firstError = document.querySelector('.text-rose-500');
+                        if (firstError) {
+                            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    });
                 }
             } catch (err) {
                 console.error('Dual candidate form error:', err);
