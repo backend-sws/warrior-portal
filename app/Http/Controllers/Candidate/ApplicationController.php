@@ -38,7 +38,7 @@ class ApplicationController extends Controller
         return view('candidate.applications.index', compact('applications', 'tuitionApplications', 'activeTab', 'jobCount', 'tuitionCount'));
     }
 
-    public function available()
+    public function available(Request $request)
     {
         if ($redirect = $this->ensureRegistrationComplete()) return $redirect;
 
@@ -46,12 +46,37 @@ class ApplicationController extends Controller
         $profile = $user->profile;
 
         // Get approved jobs
-        $jobs = JobPost::with(['category', 'subject', 'city', 'state', 'qualification'])
+        $jobQuery = JobPost::with(['category', 'subject', 'city', 'state', 'qualification'])
             ->where('status', 'approved')
             ->whereDoesntHave('applications', function ($query) use ($user) {
                 $query->where('candidate_id', $user->id);
-            })
-            ->get();
+            });
+
+        if ($search = trim($request->input('search', ''))) {
+            $numericId = null;
+            if (is_numeric($search)) {
+                $numericId = (int) $search;
+            } elseif (preg_match('/^(?:job)[-_ ]*0*(\d+)$/i', $search, $m)) {
+                $numericId = (int) $m[1];
+            }
+
+            $jobQuery->where(function($q) use ($search, $numericId) {
+                $q->where('job_id', 'like', "%{$search}%")
+                  ->orWhere('title', 'like', "%{$search}%")
+                  ->orWhere('school_name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('subject', fn($sq) => $sq->where('name', 'like', "%{$search}%"))
+                  ->orWhereHas('category', fn($cq) => $cq->where('name', 'like', "%{$search}%"))
+                  ->orWhereHas('city', fn($cq) => $cq->where('name', 'like', "%{$search}%"));
+
+                if ($numericId) {
+                    $q->orWhere('id', $numericId)
+                      ->orWhere('job_id', 'JOB-' . str_pad($numericId, 4, '0', STR_PAD_LEFT));
+                }
+            });
+        }
+
+        $jobs = $jobQuery->get();
 
         // Calculate match scores (supporting both ID and text-based matching)
         $matchedJobs = $jobs->map(function ($job) use ($profile) {

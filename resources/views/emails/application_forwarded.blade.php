@@ -155,13 +155,45 @@
     </style>
 </head>
 <body>
+@php
+    $logoSrc = null;
+    $logoPath = public_path('adobe.png');
+    if (isset($message) && is_object($message) && method_exists($message, 'embed') && file_exists($logoPath)) {
+        try {
+            $logoSrc = $message->embed($logoPath);
+        } catch (\Throwable $e) {
+            $logoSrc = null;
+        }
+    }
+    if (!$logoSrc) {
+        if (file_exists($logoPath)) {
+            $logoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+        } else {
+            $logoSrc = asset('adobe.png');
+        }
+    }
+@endphp
     <div class="container">
         <div class="header">
-            <div class="brand-box">
-                <span class="logo-badge">W</span>
-                <span class="brand-title">WARRIORS <span style="color: #fbc043;">EDUCARE</span></span>
-            </div>
-            <span class="brand-subtitle">India's Trusted Education Network</span>
+            <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto;">
+                <tr>
+                    <td style="padding-right: 12px; vertical-align: middle;">
+                        <img src="{{ $logoSrc }}" 
+                             alt="Warriors Educare" 
+                             width="46" 
+                             height="46" 
+                             style="display: block; width: 46px; height: 46px; max-width: 46px; max-height: 46px; object-fit: contain; border-radius: 8px; border: 0; outline: none; text-decoration: none;" />
+                    </td>
+                    <td style="vertical-align: middle; text-align: left;">
+                        <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 1px; text-transform: uppercase; display: block; line-height: 1.2;">
+                            WARRIORS <span style="color: #fbc043;">EDUCARE</span>
+                        </span>
+                        <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; color: #93c5fd; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-top: 2px;">
+                            India's Trusted Education Network
+                        </span>
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <div class="content">

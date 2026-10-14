@@ -24,17 +24,33 @@
 
 
         @if($profile?->agreement_status === 'pending_signature')
-            {{-- ================= PENDING AGREEMENT BANNER ================= --}}
+            {{-- ================= PENDING SCHOOL AGREEMENT BANNER ================= --}}
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm reveal">
                 <div class="flex items-start sm:items-center gap-3">
                     <i class="fas fa-file-signature text-amber-500 text-xl mt-0.5 sm:mt-0 shrink-0"></i>
                     <div>
-                        <h3 class="font-bold text-amber-800 text-sm sm:text-base">Action Required: Sign Agreement</h3>
-                        <p class="text-xs sm:text-sm text-amber-700">Admin has requested you to sign the Candidate Agreement to proceed with your tuition/job assignment.</p>
+                        <h3 class="font-bold text-amber-800 text-sm sm:text-base">Action Required: Sign School Teacher Agreement</h3>
+                        <p class="text-xs sm:text-sm text-amber-700">Admin has requested you to sign the Candidate Agreement to proceed with your school job assignment.</p>
                     </div>
                 </div>
                 <a href="{{ route('candidate.agreement.show') }}" class="w-full sm:w-auto text-center px-5 py-2.5 bg-amber-600 text-white rounded-lg text-xs sm:text-sm font-bold shadow hover:bg-amber-700 transition-colors shrink-0">
                     Sign Now
+                </a>
+            </div>
+        @endif
+
+        @if(($profile?->tuition_agreement_status === 'pending_signature' || $profile?->tuition_agreement_status === 'request_pending') && !$profile?->is_tuition_agreement_signed)
+            {{-- ================= PENDING TUITION AGREEMENT BANNER ================= --}}
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm reveal">
+                <div class="flex items-start sm:items-center gap-3">
+                    <i class="fas fa-file-signature text-purple-600 text-xl mt-0.5 sm:mt-0 shrink-0"></i>
+                    <div>
+                        <h3 class="font-bold text-amber-800 text-sm sm:text-base">Action Required: Sign Home Tuition Agreement</h3>
+                        <p class="text-xs sm:text-sm text-amber-700">Please sign the Home Tuition Tutor Agreement to start accepting student assignments.</p>
+                    </div>
+                </div>
+                <a href="{{ route('candidate.tuitions.index', ['open_agreement' => 1]) }}" class="w-full sm:w-auto text-center px-5 py-2.5 bg-purple-600 text-white rounded-lg text-xs sm:text-sm font-bold shadow hover:bg-purple-700 transition-colors shrink-0">
+                    Sign Tuition Agreement
                 </a>
             </div>
         @endif
@@ -324,13 +340,16 @@
                         </a>
 
                         {{-- Home Tutor Stat 4: Agreement Status --}}
-                        <a href="{{ route('candidate.agreement.show') }}"
+                        @php
+                            $isTuitionSigned = ($profile->tuition_agreement_status === 'signed' || $profile->is_tuition_agreement_signed);
+                        @endphp
+                        <a href="{{ $isTuitionSigned ? route('candidate.tuitions.index') : route('candidate.tuitions.index', ['open_agreement' => 1]) }}"
                             class="light-metallic-blue-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:border-purple-500/30 transition-all shadow-sm cursor-pointer hover:bg-white bg-white">
                             <div class="w-11 h-11 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-lg mb-2">
                                 <i class="fas fa-file-signature"></i>
                             </div>
-                            <h3 class="text-base font-extrabold text-[#031b4e] mt-1">
-                                {{ $profile->is_agreement_signed ? 'Signed' : 'Pending' }}
+                            <h3 class="text-base font-extrabold {{ $isTuitionSigned ? 'text-emerald-600' : 'text-amber-600' }} mt-1">
+                                {{ $isTuitionSigned ? 'Signed' : 'Pending' }}
                             </h3>
                             <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Tuition Agreement</p>
                         </a>
@@ -1082,9 +1101,18 @@
                     </div>
 
                     <div class="mt-5 pt-4 border-t border-slate-100">
-                        <a href="{{ route('candidate.agreement.show') }}" class="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-[#031b4e] border border-slate-200 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2">
-                            <i class="fas fa-file-signature text-purple-600"></i> View Educator Agreement
-                        </a>
+                        @if($profile?->candidate_category === 'home_tutor')
+                            @php
+                                $isTuitionSigned = ($profile->tuition_agreement_status === 'signed' || $profile->is_tuition_agreement_signed);
+                            @endphp
+                            <a href="{{ $isTuitionSigned ? route('candidate.tuitions.index') : route('candidate.tuitions.index', ['open_agreement' => 1]) }}" class="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-[#031b4e] border border-slate-200 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2">
+                                <i class="fas fa-file-signature text-purple-600"></i> {{ $isTuitionSigned ? 'View Tuition Agreement' : 'Sign Tuition Agreement' }}
+                            </a>
+                        @else
+                            <a href="{{ route('candidate.agreement.show') }}" class="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-[#031b4e] border border-slate-200 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2">
+                                <i class="fas fa-file-signature text-purple-600"></i> View Educator Agreement
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>

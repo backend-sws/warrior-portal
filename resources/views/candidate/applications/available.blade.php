@@ -7,7 +7,7 @@
 
 <div class="bg-[#f8fafc] min-h-[calc(100vh-140px)] py-6 sm:py-8"
      x-data="{
-         searchQuery: '',
+         searchQuery: '{{ addslashes(request('search', '')) }}',
          filterMatch: 'all',
          filterSubject: 'all',
          selectedJob: null,
@@ -129,16 +129,22 @@
                 
                 {{-- Search Bar --}}
                 <div class="lg:col-span-6 relative">
-                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                        <i class="fas fa-search text-xs"></i>
-                    </span>
-                    <input type="text" x-model="searchQuery"
-                           placeholder="Search by title, subject, school name, or city..."
-                           class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#031b4e] focus:border-transparent transition-all">
-                    <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
-                        <i class="fas fa-times-circle"></i>
-                    </button>
+                    <form action="{{ route('candidate.applications.available') }}" method="GET" class="relative">
+                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <i class="fas fa-search text-xs"></i>
+                        </span>
+                        <input type="text" name="search" x-model="searchQuery"
+                               placeholder="Search by Job ID (e.g. JOB-0001 or 1), title, school, subject..."
+                               class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl pl-10 pr-20 py-2.5 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#031b4e] focus:border-transparent transition-all">
+                        <button type="button" x-show="searchQuery.length > 0" 
+                                @click="searchQuery = ''; if('{{ request('search') }}') { window.location.href = '{{ route('candidate.applications.available') }}'; }"
+                                class="absolute right-12 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs p-1" title="Clear">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                        <button type="submit" class="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-[#031b4e] hover:bg-[#0a2970] text-white rounded-lg text-xs font-bold transition shadow-xs" title="Search">
+                            <i class="fas fa-search text-[10px]"></i>
+                        </button>
+                    </form>
                 </div>
 
                 {{-- Match Filter --}}
@@ -160,6 +166,20 @@
                 </div>
 
             </div>
+
+            {{-- Quick Search Chips --}}
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-1.5 flex-wrap text-xs">
+                <span class="text-slate-400 text-[11px] font-bold">Quick Search:</span>
+                <button type="button" @click="searchQuery = 'TGT'" class="px-2 py-0.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-md text-[11px] transition">TGT</button>
+                <button type="button" @click="searchQuery = 'PGT'" class="px-2 py-0.5 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold rounded-md text-[11px] transition">PGT</button>
+                <button type="button" @click="searchQuery = 'PRT'" class="px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-md text-[11px] transition">PRT</button>
+                <button type="button" @click="searchQuery = 'JOB-0001'" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-mono font-bold transition">JOB-0001</button>
+                <button type="button" @click="searchQuery = '1'" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-mono font-bold transition">#1</button>
+                <button type="button" @click="searchQuery = 'Mathematics'" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-bold transition">Mathematics</button>
+                <button type="button" @click="searchQuery = 'English'" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-bold transition">English</button>
+                <button type="button" @click="searchQuery = 'Science'" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-bold transition">Science</button>
+                <button type="button" @click="searchQuery = 'Patna'" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-bold transition">Patna</button>
+            </div>
         </div>
 
         {{-- Job Cards Grid --}}
@@ -168,13 +188,20 @@
                 @foreach($matchedJobs as $job)
                     @php
                         $score = $job->match_score ?? 0;
-                        $salaryText = $job->salary_range ?: ($job->min_salary ? '₹' . number_format($job->min_salary) . ($job->max_salary ? ' - ₹' . number_format($job->max_salary) : '') . ' / mo' : 'Negotiable');
-                        $searchHaystack = strtolower($job->title . ' ' . ($job->subject?->name ?? '') . ' ' . ($job->city?->name ?? '') . ' ' . ($job->category?->name ?? ''));
+                        $minSal = !empty($job->min_salary) && is_numeric($job->min_salary) ? '₹' . number_format((float)$job->min_salary) : null;
+                        $maxSal = !empty($job->max_salary) && is_numeric($job->max_salary) ? '₹' . number_format((float)$job->max_salary) : null;
+                        $salaryText = $job->salary_range ?: ($minSal && $maxSal ? "{$minSal} - {$maxSal}" : ($minSal ?: 'Negotiable'));
+                        $jobCode = $job->job_id ?: ('JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT));
+                        $numericIdStr = (string)$job->id;
+                        $searchHaystack = strtolower($jobCode . ' ' . $numericIdStr . ' ' . $job->title . ' ' . $job->school_name . ' ' . ($job->subject?->name ?? '') . ' ' . ($job->city?->name ?? '') . ' ' . ($job->category?->name ?? ''));
                     @endphp
 
                     <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-[#0ea5e9]/40 hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden group"
                          x-show="
-                            (searchQuery === '' || '{{ addslashes($searchHaystack) }}'.includes(searchQuery.toLowerCase())) &&
+                            (searchQuery.trim() === '' || 
+                             '{{ addslashes($searchHaystack) }}'.includes(searchQuery.toLowerCase().trim()) || 
+                             searchQuery.toLowerCase().replace(/[^0-9]/g, '') === '{{ $numericIdStr }}' ||
+                             searchQuery.toLowerCase().replace(/[-_ ]/g, '') === '{{ strtolower(str_replace(['-', '_', ' '], '', $jobCode)) }}') &&
                             (filterMatch === 'all' || (filterMatch === 'high' && {{ $score }} >= 70) || (filterMatch === 'good' && {{ $score }} >= 40))
                          "
                          x-transition>
@@ -183,7 +210,7 @@
                             {{-- Top Row: Job ID & Match Score Badge --}}
                             <div class="flex items-center justify-between gap-2 mb-4">
                                 <span class="inline-flex items-center gap-1 font-mono text-[11px] font-extrabold text-[#031b4e] bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-lg">
-                                    <i class="fas fa-hashtag text-[9px] text-[#0ea5e9]"></i>{{ $job->job_id }}
+                                    <i class="fas fa-hashtag text-[9px] text-[#0ea5e9]"></i>{{ $jobCode }}
                                 </span>
 
                                 @if($score >= 70)
@@ -212,7 +239,7 @@
                                     </h3>
                                     <p class="text-xs font-semibold text-slate-500 mt-1 flex items-center gap-1.5 truncate">
                                         <i class="fas fa-shield-alt text-[11px] text-sky-500"></i>
-                                        <span>Verified Institution (Confidential)</span>
+                                        <span>{{ $job->school_name ?: 'Verified Institution (Confidential)' }}</span>
                                     </p>
                                 </div>
                             </div>

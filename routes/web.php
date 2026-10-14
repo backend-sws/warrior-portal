@@ -149,7 +149,7 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
     Route::post('/wizard/payment', [\App\Http\Controllers\Candidate\RegistrationWizardController::class, 'initiatePayment'])->name('wizard.payment');
     Route::match(['get', 'post'], '/wizard/callback', [\App\Http\Controllers\Candidate\RegistrationWizardController::class, 'callback'])->name('wizard.callback');
 
-    Route::get('/dashboard', function () {
+    Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
         $user = auth()->user();
         $profile = $user->profile()->with(['highestQualification', 'preferredState', 'preferredCity', 'subject', 'category'])->first()
             ?? $user->profile()->create([]);
@@ -169,8 +169,102 @@ Route::middleware(['auth', 'candidate'])->prefix('candidate')->name('candidate.'
             ->latest('updated_at')
             ->get();
 
-        return view('candidate.dashboard', compact('profile', 'activeJobInterviews', 'activeTuitionAssignments'));
+        return view('candidate.dashboard', compact(
+            'profile',
+            'activeJobInterviews',
+            'activeTuitionAssignments'
+        ));
     })->name('dashboard');
+
+    Route::get('/api/search-openings', function (\Illuminate\Http\Request $request) {
+        $q = trim($request->input('q', ''));
+        if (empty($q)) {
+            return response()->json(['jobs' => [], 'tuitions' => []]);
+        }
+
+        $user = auth()->user();
+        $appliedJobIds = $user ? $user->applications()->pluck('job_post_id')->toArray() : [];
+        $appliedTuitionIds = $user ? \App\Models\TuitionApplication::where('candidate_id', $user->id)->pluck('home_tuition_lead_id')->toArray() : [];
+
+        $numericId = null;
+        if (is_numeric($q)) {
+            $numericId = (int) $q;
+        } elseif (preg_match('/^(?:job|tui)[-_ ]*0*(\d+)$/i', $q, $m)) {
+            $numericId = (int) $m[1];
+        }
+
+        $jobs = \App\Models\JobPost::with(['subject', 'city'])
+            ->where('status', 'approved')
+            ->where(function($sq) use ($q, $numericId) {
+                $sq->where('job_id', 'like', "%{$q}%")
+                   ->orWhere('title', 'like', "%{$q}%")
+                   ->orWhere('school_name', 'like', "%{$q}%")
+                   ->orWhereHas('subject', fn($sub) => $sub->where('name', 'like', "%{$q}%"))
+                   ->orWhereHas('city', fn($city) => $city->where('name', 'like', "%{$q}%"));
+                if ($numericId) {
+                    $sq->orWhere('id', $numericId)
+                       ->orWhere('job_id', 'JOB-' . str_pad($numericId, 4, '0', STR_PAD_LEFT));
+                }
+            })
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(function($job) use ($appliedJobIds) {
+                $minSal = !empty($job->min_salary) && is_numeric($job->min_salary) ? '₹' . number_format((float)$job->min_salary) : null;
+                $maxSal = !empty($job->max_salary) && is_numeric($job->max_salary) ? '₹' . number_format((float)$job->max_salary) : null;
+                $salary = $job->salary_range ?: ($minSal && $maxSal ? "{$minSal} - {$maxSal}" : ($minSal ?: 'Best in Industry'));
+
+                return [
+                    'type' => 'job',
+                    'id' => $job->id,
+                    'code' => $job->job_id ?: ('JOB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT)),
+                    'title' => $job->title,
+                    'subtitle' => $job->school_name . ($job->city?->name ? ' • ' . $job->city->name : ''),
+                    'badge' => $job->subject?->name ?? 'Teaching Job',
+                    'salary' => $salary,
+                    'is_applied' => in_array($job->id, $appliedJobIds),
+                    'url' => route('jobs.show', $job->id),
+                ];
+            });
+
+        $tuitions = \App\Models\HomeTuitionLead::where('status', 'Approved')
+            ->where(function($sq) use ($q, $numericId) {
+                $sq->where('tuition_id', 'like', "%{$q}%")
+                   ->orWhere('class', 'like', "%{$q}%")
+                   ->orWhere('subjects', 'like', "%{$q}%")
+                   ->orWhere('location', 'like', "%{$q}%");
+                if ($numericId) {
+                    $sq->orWhere('id', $numericId)
+                       ->orWhere('tuition_id', 'TUI-' . str_pad($numericId, 4, '0', STR_PAD_LEFT));
+                }
+            })
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(function($tui) use ($appliedTuitionIds) {
+                $cleanFee = preg_replace('/[^0-9.]/', '', (string)($tui->fee ?? ''));
+                $feeStr = !empty($cleanFee) && is_numeric($cleanFee) ? '₹' . number_format((float) $cleanFee) . '/mo' : (!empty($tui->fee) ? $tui->fee : 'Discuss with parent');
+
+                return [
+                    'type' => 'tuition',
+                    'id' => $tui->id,
+                    'code' => $tui->tuition_id ?: ('TUI-' . str_pad($tui->id, 4, '0', STR_PAD_LEFT)),
+                    'title' => 'Class ' . $tui->class . ' (' . $tui->subjects . ')',
+                    'subtitle' => $tui->location,
+                    'badge' => 'Home Tuition',
+                    'fee' => $feeStr,
+                    'salary' => $feeStr,
+                    'is_applied' => in_array($tui->id, $appliedTuitionIds),
+                    'url' => route('candidate.tuitions.index', ['search' => $tui->tuition_id ?: $tui->id]),
+                ];
+            });
+
+        return response()->json([
+            'jobs' => $jobs,
+            'tuitions' => $tuitions,
+            'total' => $jobs->count() + $tuitions->count()
+        ]);
+    })->name('api.search-openings');
 });
 
 // Candidate Routes (Protected)

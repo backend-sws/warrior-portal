@@ -36,14 +36,24 @@ class TuitionController extends Controller
         } else {
             $query = HomeTuitionLead::where('status', 'Approved');
 
-            if ($search = $request->input('search')) {
-                $query->where(function($q) use ($search) {
+            if ($search = trim($request->input('search', ''))) {
+                $numericId = null;
+                if (is_numeric($search)) {
+                    $numericId = (int) $search;
+                } elseif (preg_match('/^(?:tui)[-_ ]*0*(\d+)$/i', $search, $m)) {
+                    $numericId = (int) $m[1];
+                }
+
+                $query->where(function($q) use ($search, $numericId) {
                     $q->where('tuition_id', 'like', "%{$search}%")
                       ->orWhere('class', 'like', "%{$search}%")
                       ->orWhere('subjects', 'like', "%{$search}%")
-                      ->orWhere('location', 'like', "%{$search}%");
-                    if (is_numeric($search)) {
-                        $q->orWhere('id', $search);
+                      ->orWhere('location', 'like', "%{$search}%")
+                      ->orWhere('pincode', 'like', "%{$search}%");
+
+                    if ($numericId) {
+                        $q->orWhere('id', $numericId)
+                          ->orWhere('tuition_id', 'TUI-' . str_pad($numericId, 4, '0', STR_PAD_LEFT));
                     }
                 });
             }

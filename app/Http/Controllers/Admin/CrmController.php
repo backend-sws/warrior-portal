@@ -522,18 +522,39 @@ class CrmController extends Controller
                 'applications.jobPost',
             ]);
 
-        // Search text (Name, Email, Phone, WhatsApp)
-        if ($search = $request->input('search')) {
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
+        // Search text (Position Applying, Name, Email, Phone, WhatsApp, Subject, Qualification, etc.)
+        $search = trim((string)$request->input('search'));
+        if ($search !== '') {
+            $isNumeric = preg_match('/^[#]?([0-9]+)$/', $search, $m);
+            $numericId = $isNumeric ? (int)$m[1] : null;
+            $searchNormalized = str_replace(' ', '_', $search);
+
+            $searchClosure = function($q) use ($search, $numericId, $searchNormalized) {
+                if ($numericId) {
+                    $q->where('id', $numericId);
+                }
+
+                $q->orWhere('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%")
                   ->orWhere('whatsapp_no', 'like', "%{$search}%")
-                  ->orWhereHas('profile', function($pq) use ($search) {
-                      $pq->where('subject_specialization', 'like', "%{$search}%")
-                         ->orWhere('tuition_subjects', 'like', "%{$search}%");
+                  ->orWhereHas('profile', function($pq) use ($search, $searchNormalized) {
+                      $pq->where('position_applying_for', 'like', "%{$search}%")
+                         ->orWhere('last_designation', 'like', "%{$search}%")
+                         ->orWhere('candidate_category', 'like', "%{$search}%")
+                         ->orWhere('candidate_category', 'like', "%{$searchNormalized}%")
+                         ->orWhere('subject_specialization', 'like', "%{$search}%")
+                         ->orWhere('tuition_subjects', 'like', "%{$search}%")
+                         ->orWhere('highest_qualification_name', 'like', "%{$search}%")
+                         ->orWhere('preferred_areas', 'like', "%{$search}%")
+                         ->orWhereHas('subject', fn($sq) => $sq->where('name', 'like', "%{$search}%"))
+                         ->orWhereHas('highestQualification', fn($hq) => $hq->where('name', 'like', "%{$search}%"))
+                         ->orWhereHas('preferredCity', fn($cq) => $cq->where('name', 'like', "%{$search}%"))
+                         ->orWhereHas('preferredState', fn($stq) => $stq->where('name', 'like', "%{$search}%"));
                   });
-            });
+            };
+
+            $query->where($searchClosure);
         }
 
         // 1. Candidate Category Filter (Home Tutor, School Job, Both, Tuition Upgrade Requested)
@@ -718,12 +739,28 @@ class CrmController extends Controller
 
         // Accurate Analytics based on search/base
         $baseQuery = User::where('role', 'candidate');
-        if ($search) {
-            $baseQuery->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('whatsapp_no', 'like', "%{$search}%");
+        if ($search !== '' && isset($searchClosure)) {
+            $baseQuery->where($searchClosure);
+        }
+        if ($category = $request->input('candidate_category')) {
+            $baseQuery->whereHas('profile', function($q) use ($category) {
+                if ($category === 'tuition_upgrade_requested') {
+                    $q->where('tuition_upgrade_status', 'requested');
+                } elseif ($category === 'both') {
+                    $q->where(function($sq) {
+                        $sq->where('candidate_category', 'both')
+                           ->orWhereNull('candidate_category')
+                           ->orWhere('candidate_category', '');
+                    });
+                } else {
+                    $q->where('candidate_category', $category);
+                }
+            });
+        }
+        if ($position = $request->input('position')) {
+            $baseQuery->whereHas('profile', function($q) use ($position) {
+                $q->where('position_applying_for', 'like', "%{$position}%")
+                  ->orWhere('last_designation', 'like', "%{$position}%");
             });
         }
 

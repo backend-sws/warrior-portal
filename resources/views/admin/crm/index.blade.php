@@ -51,7 +51,7 @@
 <div class="bg-card-bg rounded-t-2xl border-x border-t border-card-border p-4">
     <div class="flex justify-between items-center gap-4">
         <div class="text-sm text-text-dark/70 font-semibold flex items-center gap-2">
-            <span>Showing {{ $candidates->firstItem() ?? 0 }} to {{ $candidates->lastItem() ?? 0 }} of {{ $candidates->total() }} candidates</span>
+            <span id="showing-counter-text">Showing {{ $candidates->firstItem() ?? 0 }} to {{ $candidates->lastItem() ?? 0 }} of {{ $candidates->total() }} candidates</span>
             @if(request()->anyFilled(['search', 'candidate_category', 'position', 'subject', 'qualification', 'experience', 'location', 'profile_completion', 'salary_range', 'state_id', 'city_id', 'gender']))
                 <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent-blue/10 text-accent-blue border border-accent-blue/20">
                     <i class="fas fa-filter text-[9px]"></i> Filtered Results
@@ -66,16 +66,73 @@
         </button>
     </div>
 
-    <form action="{{ route('admin.crm.index') }}" method="GET" class="space-y-4 mt-3">
-        <div class="flex items-center relative">
-            <i class="fas fa-search absolute left-3 text-text-dark/40 text-sm"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, email, phone, whatsapp, subject..." 
-                   class="w-full pl-9 pr-24 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all">
-            @if(request()->anyFilled(['search', 'candidate_category', 'position', 'subject', 'qualification', 'experience', 'location', 'profile_completion', 'salary_range', 'subject_id', 'qualification_id', 'state_id', 'city_id', 'gender']))
-                <a href="{{ route('admin.crm.index') }}" class="absolute right-3 text-red-500 hover:text-red-700 transition-colors text-xs font-bold flex items-center gap-1 bg-red-50 px-2 py-1 rounded-lg border border-red-200">
-                    <i class="fas fa-times"></i> Clear All
+    <form action="{{ route('admin.crm.index') }}" method="GET" class="space-y-3 mt-3">
+        <div class="flex flex-col sm:flex-row gap-2">
+            <div class="relative flex-1">
+                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-text-dark/40 text-sm"></i>
+                <input type="text" 
+                       id="candidate-search-input"
+                       name="search" 
+                       value="{{ request('search') }}" 
+                       placeholder="Search Position (TGT, PGT, PRT...), Name, Phone, Email, Subject..." 
+                       class="w-full pl-10 pr-20 py-2.5 bg-secondary-bg border border-card-border rounded-xl text-sm text-text-main font-medium focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all placeholder:text-text-dark/40">
+                @if(request()->filled('search'))
+                    <a href="{{ route('admin.crm.index', request()->except('search', 'page')) }}" 
+                       class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-600 transition-colors text-xs font-semibold flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-gray-200 shadow-xs" title="Clear Search">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                @endif
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button type="submit" 
+                        class="px-5 py-2.5 bg-accent-blue hover:bg-accent-blue-hover text-white rounded-xl text-xs font-black shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </button>
+
+                @if(request()->anyFilled(['search', 'candidate_category', 'position', 'subject', 'qualification', 'experience', 'location', 'profile_completion', 'salary_range', 'subject_id', 'qualification_id', 'state_id', 'city_id', 'gender']))
+                    <a href="{{ route('admin.crm.index') }}" 
+                       class="px-3.5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0" title="Reset all filters">
+                        <i class="fas fa-rotate-left"></i> Reset
+                    </a>
+                @endif
+            </div>
+        </div>
+
+        {{-- Quick Position Applying Filter Chips --}}
+        <div class="flex flex-wrap items-center gap-1.5 pt-1">
+            <span class="text-[11px] font-bold text-text-dark/60 flex items-center gap-1 mr-1">
+                <i class="fas fa-bolt text-amber-500 text-[10px]"></i> Quick Position Search:
+            </span>
+            @php
+                $quickPositions = [
+                    'TGT' => 'TGT (Trained Graduate)',
+                    'PGT' => 'PGT (Post Graduate)',
+                    'PRT' => 'PRT (Primary Teacher)',
+                    'Mother Teacher' => 'Mother Teacher',
+                    'NTT' => 'NTT / Pre-Primary',
+                    'Coordinator' => 'Academic Coordinator',
+                    'Principal' => 'Principal',
+                    'School Job' => 'School Job',
+                    'Home Tutor' => 'Home Tutor',
+                ];
+                $currentSearch = trim(request('search', ''));
+                $currentPosition = trim(request('position', ''));
+            @endphp
+            @foreach($quickPositions as $posKey => $posLabel)
+                @php
+                    $isActive = (strcasecmp($currentSearch, $posKey) === 0 || strcasecmp($currentPosition, $posKey) === 0);
+                @endphp
+                <a href="{{ $isActive ? route('admin.crm.index', request()->except('search', 'position', 'page')) : route('admin.crm.index', array_merge(request()->query(), ['search' => $posKey, 'page' => 1])) }}"
+                   title="{{ $posLabel }}"
+                   class="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg font-bold border transition-all {{ $isActive ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-secondary-bg text-text-dark/80 border-card-border hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200' }}">
+                    <span>{{ $posKey }}</span>
+                    @if($isActive)
+                        <i class="fas fa-times text-[9px] ml-0.5 opacity-80"></i>
+                    @endif
                 </a>
-            @endif
+            @endforeach
         </div>
 
         <div id="advanced-filters" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-card-border {{ request()->anyFilled(['candidate_category', 'position', 'subject', 'qualification', 'experience', 'location', 'profile_completion', 'salary_range', 'state_id', 'city_id', 'gender']) ? '' : 'hidden' }}">
@@ -230,8 +287,31 @@
                 $category = $prof?->candidate_category ?: 'both';
                 $isTuitionReady = ($pct >= 80);
                 $isJobReady = ($pct >= 80);
+                $rowSearchText = strtolower(implode(' ', array_filter([
+                    $candidate->name,
+                    $candidate->email,
+                    $candidate->phone,
+                    $candidate->whatsapp_no,
+                    $candidate->id,
+                    '#' . $candidate->id,
+                    $prof?->position_applying_for,
+                    $prof?->last_designation,
+                    $prof?->subject_specialization,
+                    $prof?->highest_qualification_name,
+                    $prof?->highestQualification?->name,
+                    $category,
+                    str_replace('_', ' ', $category),
+                    is_array($prof?->tuition_subjects) ? implode(' ', $prof->tuition_subjects) : '',
+                    $prof?->preferred_areas,
+                    $prof?->preferredCity?->name,
+                    $prof?->preferredState?->name,
+                    $prof?->b_ed_status ? 'bed ' . $prof->b_ed_status : '',
+                    $prof?->last_school_name,
+                    $prof?->expected_salary,
+                    $prof?->teaching_mode
+                ])));
             @endphp
-            <tr class="group hover:bg-secondary-bg/50 transition-colors">
+            <tr class="group hover:bg-secondary-bg/50 transition-colors candidate-row" data-search="{{ $rowSearchText }}">
                 {{-- Candidate & Contact --}}
                 <td class="py-3.5 px-4">
                     <div class="font-bold text-sm text-text-main group-hover:text-accent-blue transition-colors flex items-center gap-1.5">
@@ -271,31 +351,54 @@
                 </td>
 
                 {{-- Applied Category & Preference --}}
-                <td class="py-3.5 px-4">
-                    <div class="mb-1.5">
+                <td class="py-3.5 px-4 min-w-[240px]">
+                    {{-- 1. Badges Row: Category + B.Ed + Direct Resume CV Link --}}
+                    <div class="flex items-center gap-1.5 flex-wrap mb-1.5">
                         @if($category === 'home_tutor')
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 <i class="fas fa-chalkboard-teacher text-[9px]"></i> Home Tutor
                             </span>
                         @elseif($category === 'school_job')
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
                                 <i class="fas fa-school text-[9px]"></i> School Job
                             </span>
                         @else
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200">
                                 <i class="fas fa-layer-group text-[9px]"></i> Both (Tutor + School)
                             </span>
                         @endif
+
+                        {{-- B.Ed Status Badge --}}
+                        @if(!empty($prof?->b_ed_status) && strtolower($prof->b_ed_status) !== 'no')
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold {{ strtolower($prof->b_ed_status) === 'yes' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}" title="B.Ed: {{ $prof->b_ed_status }}">
+                                <i class="fas fa-graduation-cap text-[8px]"></i> B.Ed: {{ ucfirst($prof->b_ed_status) }}
+                            </span>
+                        @elseif(!empty($prof?->d_el_ed_status) && strtolower($prof->d_el_ed_status) !== 'no')
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-sky-50 text-sky-700 border border-sky-200" title="D.El.Ed: {{ $prof->d_el_ed_status }}">
+                                <i class="fas fa-user-graduate text-[8px]"></i> D.El.Ed: {{ ucfirst($prof->d_el_ed_status) }}
+                            </span>
+                        @endif
+
+                        {{-- 1-Click Quick Resume Link --}}
+                        @if($prof?->resume_path)
+                            <a href="{{ Storage::url($prof->resume_path) }}" target="_blank" rel="noopener noreferrer" 
+                               class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors" 
+                               title="Click to view candidate CV / Resume">
+                                <i class="fas fa-file-pdf text-rose-600 text-[9px]"></i> CV
+                            </a>
+                        @endif
+
                         @if($prof?->tuition_upgrade_status === 'requested')
                             <div>
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800 border border-amber-300 animate-pulse mt-1 shadow-2xs">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
                                     <i class="fas fa-arrow-circle-up text-[9px]"></i> Tuition Request Pending
                                 </span>
                             </div>
                         @endif
                     </div>
 
-                    <div class="text-xs font-bold text-text-main">
+                    {{-- 2. Position Applying For / Primary Subject --}}
+                    <div class="text-xs font-black text-text-main">
                         @if($prof?->position_applying_for)
                             <span>{{ $prof->position_applying_for }}</span>
                         @elseif($prof?->subject?->name)
@@ -303,32 +406,78 @@
                         @elseif($prof?->subject_specialization)
                             <span>{{ $prof->subject_specialization }}</span>
                         @else
-                            <span class="text-text-dark/40">Not Specified</span>
+                            <span class="text-text-dark/40 font-normal italic">Not Specified</span>
                         @endif
                     </div>
 
-                    <div class="text-[11px] text-text-dark/60 mt-0.5">
-                        {{ $prof?->highest_qualification_name ?: ($prof?->highestQualification?->name ?? 'Qualification N/A') }} • 
-                        {{ $prof?->experience_range ?: (($prof?->experience_years ?? 0) . ' Yrs Exp') }}
+                    {{-- 3. Qualification, Experience & Expected Salary --}}
+                    <div class="text-[11px] text-text-dark/70 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                        <span class="font-medium text-text-dark/80">
+                            {{ $prof?->highest_qualification_name ?: ($prof?->highestQualification?->name ?? 'Qualification N/A') }}
+                        </span>
+                        <span class="text-text-dark/30">•</span>
+                        <span>{{ $prof?->experience_range ?: (($prof?->experience_years ?? 0) . ' Yrs Exp') }}</span>
+                        
+                        @if(!empty($prof?->expected_salary))
+                            <span class="text-text-dark/30">•</span>
+                            <span class="inline-flex items-center gap-0.5 font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200" title="Expected Salary">
+                                💰 ₹{{ is_numeric(str_replace(',', '', $prof->expected_salary)) ? number_format((float)str_replace(',', '', $prof->expected_salary)) : $prof->expected_salary }}{{ is_numeric(str_replace(',', '', $prof->expected_salary)) ? '/mo' : '' }}
+                            </span>
+                        @endif
                     </div>
 
-                    {{-- Tuition Subjects or Preferred Locations --}}
-                    <div class="mt-1 flex flex-wrap gap-1">
-                        @if(!empty($prof?->tuition_subjects) && is_array($prof->tuition_subjects))
+                    {{-- 4. Last School / Institute (if available) --}}
+                    @if(!empty($prof?->last_school_name))
+                        <div class="text-[10px] text-text-dark/60 mt-0.5 flex items-center gap-1 truncate" title="Last School: {{ $prof->last_school_name }}">
+                            <i class="fas fa-school text-indigo-400 text-[9px]"></i>
+                            <span class="truncate">Ex: <strong class="text-text-main font-semibold">{{ Str::limit($prof->last_school_name, 28) }}</strong></span>
+                            @if(!empty($prof?->last_designation))
+                                <span class="text-text-dark/40 font-normal">({{ Str::limit($prof->last_designation, 18) }})</span>
+                            @endif
+                        </div>
+                    @endif
+
+                    {{-- 5. Preferred Location (City + Areas) & Mode (Always shown if available!) --}}
+                    @if($prof?->preferredCity || $prof?->preferred_areas)
+                        <div class="text-[10px] text-text-dark/70 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                            <span class="inline-flex items-center gap-1 text-slate-700 font-semibold" title="Preferred Location">
+                                <i class="fas fa-map-marker-alt text-red-500 text-[9px]"></i>
+                                @if($prof?->preferredCity && $prof?->preferred_areas)
+                                    <span>{{ $prof->preferredCity->name }} <span class="text-text-dark/50 font-normal">({{ Str::limit($prof->preferred_areas, 24) }})</span></span>
+                                @elseif($prof?->preferredCity)
+                                    <span>{{ $prof->preferredCity->name }}</span>
+                                @else
+                                    <span>{{ Str::limit($prof->preferred_areas, 28) }}</span>
+                                @endif
+                            </span>
+
+                            @if(!empty($prof?->teaching_mode))
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-medium border border-slate-200">
+                                    {{ ucfirst($prof->teaching_mode) }}
+                                </span>
+                            @endif
+                        </div>
+                    @endif
+
+                    {{-- 6. Tuition Subjects / Specialization Chips --}}
+                    @if(!empty($prof?->tuition_subjects) && is_array($prof->tuition_subjects))
+                        <div class="mt-1 flex flex-wrap gap-1">
                             @foreach(array_slice($prof->tuition_subjects, 0, 3) as $subjItem)
                                 <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-secondary-bg text-text-dark/70 border border-card-border">
                                     {{ $subjItem }}
                                 </span>
                             @endforeach
                             @if(count($prof->tuition_subjects) > 3)
-                                <span class="text-[9px] text-text-dark/40">+{{ count($prof->tuition_subjects) - 3 }}</span>
+                                <span class="text-[9px] text-text-dark/40 font-bold">+{{ count($prof->tuition_subjects) - 3 }}</span>
                             @endif
-                        @elseif($prof?->preferred_areas)
-                            <span class="text-[10px] text-text-dark/50">📍 {{ Str::limit($prof->preferred_areas, 24) }}</span>
-                        @elseif($prof?->preferredCity)
-                            <span class="text-[10px] text-text-dark/50">📍 {{ $prof->preferredCity->name }}</span>
-                        @endif
-                    </div>
+                        </div>
+                    @elseif(!empty($prof?->subject_specialization))
+                        <div class="mt-1 flex flex-wrap gap-1">
+                            <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                                {{ $prof->subject_specialization }}
+                            </span>
+                        </div>
+                    @endif
                 </td>
 
                 {{-- Profile Completion Percentage --}}
@@ -352,7 +501,7 @@
                         </div>
                         <div class="w-full h-2 bg-secondary-bg rounded-full overflow-hidden border border-card-border">
                             <div class="h-full rounded-full transition-all duration-500 {{ $pct >= 80 ? 'bg-emerald-500' : ($pct >= 50 ? 'bg-amber-500' : 'bg-red-500') }}"
-                                 style="width: {{ $pct }}%"></div>
+                                 :style="'width: {{ (int)$pct }}%'"></div>
                         </div>
                         @if($pct < 80 && ($category === 'home_tutor' || $category === 'both'))
                             <span class="inline-flex items-center gap-1 text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
@@ -398,6 +547,15 @@
                             <span>Manage</span> <i class="fas fa-arrow-right text-[10px]"></i>
                         </a>
                     </div>
+                </td>
+            </tr>
+            <tr id="client-search-empty" style="display: none;">
+                <td colspan="6" class="py-12 text-center">
+                    <div class="w-12 h-12 bg-secondary-bg rounded-2xl flex items-center justify-center text-text-dark/30 text-xl mx-auto mb-2 border border-card-border">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <p class="text-text-main font-bold text-sm mb-1">No candidates match on this page</p>
+                    <p class="text-text-dark/50 text-xs">Press <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-[10px] font-mono">Enter</kbd> or click <strong>Search</strong> to query across all candidate records in the database.</p>
                 </td>
             </tr>
             @empty
@@ -493,5 +651,42 @@
         // Show modal
         document.getElementById('ratingModal').classList.remove('hidden');
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('candidate-search-input');
+        const rows = document.querySelectorAll('.candidate-row');
+        const emptyRow = document.getElementById('client-search-empty');
+        const counterEl = document.getElementById('showing-counter-text');
+        const originalCounterHtml = counterEl ? counterEl.innerHTML : '';
+
+        if (searchInput && rows.length > 0) {
+            searchInput.addEventListener('input', function () {
+                const term = this.value.trim().toLowerCase();
+                let visibleCount = 0;
+
+                rows.forEach(function (row) {
+                    const haystack = row.getAttribute('data-search') || '';
+                    if (!term || haystack.indexOf(term) !== -1) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                if (emptyRow) {
+                    emptyRow.style.display = (visibleCount === 0 && term !== '') ? '' : 'none';
+                }
+
+                if (counterEl) {
+                    if (term !== '') {
+                        counterEl.innerHTML = `Showing <strong class="text-accent-blue font-black">${visibleCount}</strong> of ${rows.length} candidates on this page`;
+                    } else {
+                        counterEl.innerHTML = originalCounterHtml;
+                    }
+                }
+            });
+        }
+    });
 </script>
 @endpush
