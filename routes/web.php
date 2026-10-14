@@ -398,6 +398,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/crm/candidate/{id}/rate', [\App\Http\Controllers\Admin\CrmController::class, 'rateCandidate'])->name('crm.candidate.rate');
     Route::get('/crm/candidate/{id}/magic-login', [\App\Http\Controllers\Admin\CrmController::class, 'magicLogin'])->name('crm.candidate.magic-login');
     Route::post('/crm/candidate/{id}/upload-agreement', [\App\Http\Controllers\Admin\CrmController::class, 'uploadAgreement'])->name('crm.candidate.upload-agreement');
+    Route::post('/crm/candidate/{id}/upload-document', [\App\Http\Controllers\Admin\CrmController::class, 'uploadDocument'])->name('crm.candidate.upload-document');
+    Route::delete('/crm/candidate/{id}/delete-document', [\App\Http\Controllers\Admin\CrmController::class, 'deleteDocument'])->name('crm.candidate.delete-document');
     Route::post('/crm/candidate/{id}/update-agreement-status', [\App\Http\Controllers\Admin\CrmController::class, 'updateAgreementStatus'])->name('crm.candidate.update-agreement-status');
     Route::post('/crm/candidate/{id}/approve-tuition-upgrade', [\App\Http\Controllers\Admin\CrmController::class, 'approveTuitionUpgrade'])->name('crm.candidate.approve-tuition-upgrade');
     Route::post('/crm/candidate/{id}/update-contact-numbers', [\App\Http\Controllers\Admin\CrmController::class, 'updateContactNumbers'])->name('crm.candidate.update-numbers');
