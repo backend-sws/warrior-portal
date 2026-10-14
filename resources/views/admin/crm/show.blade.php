@@ -522,41 +522,262 @@
                 </div>
                 @endif
 
-                <!-- Documents -->
-                <div class="pt-2 border-t border-card-border">
-                    <h4 class="text-[10px] font-bold text-text-dark/50 uppercase tracking-wider mb-2.5">Uploaded Documents</h4>
-                    <div class="grid grid-cols-2 gap-2">
-                        @if($profile?->resume_path)
-                            <a href="{{ Storage::url($profile->resume_path) }}" target="_blank" class="p-2.5 bg-blue-50/50 hover:bg-blue-100/60 border border-blue-200 text-accent-blue rounded-xl text-xs font-bold transition-all flex items-center gap-2">
-                                <i class="fas fa-file-pdf text-sm"></i> <span>Resume / CV</span>
-                            </a>
-                        @endif
-                        @if($profile?->salary_slip_path)
-                            <a href="{{ Storage::url($profile->salary_slip_path) }}" target="_blank" class="p-2.5 bg-amber-50/50 hover:bg-amber-100/60 border border-amber-200 text-amber-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
-                                <i class="fas fa-file-invoice text-sm"></i> <span>Salary Slip</span>
-                            </a>
-                        @endif
-                        @if($profile?->profile_photo_path)
-                            <a href="{{ Storage::url($profile->profile_photo_path) }}" target="_blank" class="p-2.5 bg-purple-50/50 hover:bg-purple-100/60 border border-purple-200 text-purple-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
-                                <i class="fas fa-image text-sm"></i> <span>Photo</span>
-                            </a>
-                        @endif
-                        @if($profile?->live_photo_path)
-                            <a href="{{ Storage::url($profile->live_photo_path) }}" target="_blank" class="p-2.5 bg-emerald-50/50 hover:bg-emerald-100/60 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
-                                <i class="fas fa-id-card text-sm"></i> <span>ID Card</span>
-                            </a>
-                        @endif
-                        @if($profile?->offer_letter_path)
-                            <a href="{{ Storage::url($profile->offer_letter_path) }}" target="_blank" class="p-2.5 bg-sky-50/50 hover:bg-sky-100/60 border border-sky-200 text-sky-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
-                                <i class="fas fa-file-contract text-sm"></i> <span>Offer Letter</span>
-                            </a>
-                        @endif
-                        @if($profile?->agreement_pdf_path)
-                            <a href="{{ Storage::url($profile->agreement_pdf_path) }}" target="_blank" class="p-2.5 bg-teal-50/50 hover:bg-teal-100/60 border border-teal-200 text-teal-700 rounded-xl text-xs font-bold transition-all flex items-center gap-2 col-span-2">
-                                <i class="fas fa-file-signature text-sm"></i> <span>Signed Agreement (PDF)</span>
-                            </a>
-                        @endif
+                <!-- Candidate Documents & Identity Files Repository -->
+                @php
+                    $rawDocs = [
+                        'resume' => [
+                            'key'         => 'resume',
+                            'title'       => 'Resume / CV',
+                            'category'    => 'Professional',
+                            'icon'        => 'fas fa-file-pdf',
+                            'color'       => 'blue',
+                            'bg_class'    => 'bg-blue-50/60',
+                            'border_class'=> 'border-blue-200',
+                            'text_class'  => 'text-blue-700',
+                            'icon_bg'     => 'bg-blue-100 text-blue-700',
+                            'path'        => $profile?->resume_path,
+                            'is_uploaded' => !empty($profile?->resume_path) && Storage::disk('public')->exists($profile->resume_path),
+                            'is_image'    => false,
+                            'accept'      => '.pdf,.doc,.docx',
+                            'hint'        => 'PDF, DOC, DOCX up to 10MB',
+                        ],
+                        'live_photo' => [
+                            'key'         => 'live_photo',
+                            'title'       => 'ID Card / Live Photo',
+                            'category'    => 'Verification',
+                            'icon'        => 'fas fa-id-card',
+                            'color'       => 'emerald',
+                            'bg_class'    => 'bg-emerald-50/60',
+                            'border_class'=> 'border-emerald-200',
+                            'text_class'  => 'text-emerald-700',
+                            'icon_bg'     => 'bg-emerald-100 text-emerald-700',
+                            'path'        => $profile?->live_photo_path ?: $profile?->tuition_live_photo_path,
+                            'is_uploaded' => (!empty($profile?->live_photo_path) && Storage::disk('public')->exists($profile->live_photo_path)) || (!empty($profile?->tuition_live_photo_path) && Storage::disk('public')->exists($profile->tuition_live_photo_path)),
+                            'is_image'    => true,
+                            'accept'      => 'image/*',
+                            'hint'        => 'Live selfie or Govt ID Card',
+                        ],
+                        'profile_photo' => [
+                            'key'         => 'profile_photo',
+                            'title'       => 'Profile / Passport Photo',
+                            'category'    => 'Identity',
+                            'icon'        => 'fas fa-user-circle',
+                            'color'       => 'purple',
+                            'bg_class'    => 'bg-purple-50/60',
+                            'border_class'=> 'border-purple-200',
+                            'text_class'  => 'text-purple-700',
+                            'icon_bg'     => 'bg-purple-100 text-purple-700',
+                            'path'        => $profile?->profile_photo_path ?: $profile?->passport_photo_path,
+                            'is_uploaded' => (!empty($profile?->profile_photo_path) && Storage::disk('public')->exists($profile->profile_photo_path)) || (!empty($profile?->passport_photo_path) && Storage::disk('public')->exists($profile->passport_photo_path)),
+                            'is_image'    => true,
+                            'accept'      => 'image/*',
+                            'hint'        => 'Passport size photo',
+                        ],
+                        'salary_slip' => [
+                            'key'         => 'salary_slip',
+                            'title'       => 'Salary Slip',
+                            'category'    => 'Financial',
+                            'icon'        => 'fas fa-file-invoice-dollar',
+                            'color'       => 'amber',
+                            'bg_class'    => 'bg-amber-50/60',
+                            'border_class'=> 'border-amber-200',
+                            'text_class'  => 'text-amber-700',
+                            'icon_bg'     => 'bg-amber-100 text-amber-700',
+                            'path'        => $profile?->salary_slip_path,
+                            'is_uploaded' => !empty($profile?->salary_slip_path) && Storage::disk('public')->exists($profile->salary_slip_path),
+                            'is_image'    => in_array(strtolower(pathinfo($profile?->salary_slip_path ?? '', PATHINFO_EXTENSION)), ['jpg','jpeg','png','webp']),
+                            'accept'      => '.pdf,image/*',
+                            'hint'        => 'Latest salary slip',
+                        ],
+                        'offer_letter' => [
+                            'key'         => 'offer_letter',
+                            'title'       => 'Offer / Experience Letter',
+                            'category'    => 'Experience',
+                            'icon'        => 'fas fa-file-contract',
+                            'color'       => 'sky',
+                            'bg_class'    => 'bg-sky-50/60',
+                            'border_class'=> 'border-sky-200',
+                            'text_class'  => 'text-sky-700',
+                            'icon_bg'     => 'bg-sky-100 text-sky-700',
+                            'path'        => $profile?->offer_letter_path,
+                            'is_uploaded' => !empty($profile?->offer_letter_path) && Storage::disk('public')->exists($profile->offer_letter_path),
+                            'is_image'    => in_array(strtolower(pathinfo($profile?->offer_letter_path ?? '', PATHINFO_EXTENSION)), ['jpg','jpeg','png','webp']),
+                            'accept'      => '.pdf,image/*',
+                            'hint'        => 'Experience / Relieving / Offer letter',
+                        ],
+                        'agreement_pdf' => [
+                            'key'         => 'agreement_pdf',
+                            'title'       => 'Physical Agreement (PDF)',
+                            'category'    => 'Legal',
+                            'icon'        => 'fas fa-file-signature',
+                            'color'       => 'teal',
+                            'bg_class'    => 'bg-teal-50/60',
+                            'border_class'=> 'border-teal-200',
+                            'text_class'  => 'text-teal-700',
+                            'icon_bg'     => 'bg-teal-100 text-teal-700',
+                            'path'        => $profile?->agreement_pdf_path,
+                            'is_uploaded' => !empty($profile?->agreement_pdf_path) && Storage::disk('public')->exists($profile->agreement_pdf_path),
+                            'is_image'    => false,
+                            'accept'      => '.pdf',
+                            'hint'        => 'Signed physical agreement PDF',
+                        ],
+                    ];
+
+                    $totalDocCount = count($rawDocs);
+                    $uploadedDocCount = collect($rawDocs)->where('is_uploaded', true)->count();
+                    $missingDocCount = $totalDocCount - $uploadedDocCount;
+                @endphp
+
+                <div class="pt-3 border-t border-card-border space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-xs font-black uppercase tracking-wider text-text-main flex items-center gap-1.5">
+                                <i class="fas fa-folder-open text-accent-blue"></i>
+                                <span>Uploaded Documents</span>
+                            </h4>
+                            <p class="text-[10px] text-text-dark/50">Candidate files & digital certificates</p>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full {{ $uploadedDocCount > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500' }}">
+                                {{ $uploadedDocCount }}/{{ $totalDocCount }} Uploaded
+                            </span>
+                            <button type="button" onclick="openUploadDocModal()" class="px-2.5 py-1 bg-accent-blue hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold transition-all shadow-2xs flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-upload text-[9px]"></i> Upload
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Document Cards List -->
+                    <div class="space-y-2">
+                        @foreach($rawDocs as $doc)
+                            @if($doc['is_uploaded'])
+                                <div class="p-2.5 {{ $doc['bg_class'] }} border {{ $doc['border_class'] }} rounded-xl transition-all hover:shadow-xs flex items-center justify-between gap-2.5">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        @if($doc['is_image'])
+                                            <div class="relative group cursor-pointer shrink-0" data-img-url="{{ Storage::url($doc['path']) }}" data-img-title="{{ $doc['title'] }}" onclick="openImagePreviewModal(this.dataset.imgUrl, this.dataset.imgTitle)">
+                                                <img src="{{ Storage::url($doc['path']) }}" alt="{{ $doc['title'] }}" class="w-10 h-10 rounded-lg object-cover border border-emerald-300 shadow-2xs">
+                                                <div class="absolute inset-0 bg-black/40 rounded-lg opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-[9px]">
+                                                    <i class="fas fa-search-plus"></i>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="w-10 h-10 rounded-lg {{ $doc['icon_bg'] }} border {{ $doc['border_class'] }} flex items-center justify-center text-base shrink-0 shadow-2xs">
+                                                <i class="{{ $doc['icon'] }}"></i>
+                                            </div>
+                                        @endif
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="text-xs font-bold text-text-main truncate">{{ $doc['title'] }}</span>
+                                                <span class="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">
+                                                    Uploaded
+                                                </span>
+                                            </div>
+                                            <p class="text-[10px] text-text-dark/50 truncate">{{ strtoupper(pathinfo($doc['path'], PATHINFO_EXTENSION)) }} Document &bull; Verified</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <a href="{{ Storage::url($doc['path']) }}" target="_blank" class="px-2 py-1 bg-white hover:bg-slate-50 border border-card-border rounded-lg text-[10px] font-bold text-text-main transition-colors flex items-center gap-1 shadow-2xs">
+                                            <i class="fas fa-external-link-alt text-[9px] text-accent-blue"></i>
+                                            <span>View</span>
+                                        </a>
+                                        <button type="button" data-doc-key="{{ $doc['key'] }}" onclick="openUploadDocModal(this.dataset.docKey)" title="Replace Document" class="w-6 h-6 rounded-lg bg-white hover:bg-slate-100 border border-card-border text-text-dark/60 hover:text-text-main flex items-center justify-center text-[10px] transition-colors cursor-pointer">
+                                            <i class="fas fa-sync-alt text-[9px]"></i>
+                                        </button>
+                                        <button type="button" data-doc-key="{{ $doc['key'] }}" data-doc-title="{{ $doc['title'] }}" onclick="confirmDeleteDocument(this.dataset.docKey, this.dataset.docTitle)" title="Delete Document" class="w-6 h-6 rounded-lg bg-white hover:bg-red-50 border border-card-border hover:border-red-200 text-text-dark/40 hover:text-red-600 flex items-center justify-center text-[10px] transition-colors cursor-pointer">
+                                            <i class="fas fa-trash-alt text-[9px]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="p-2.5 bg-slate-50/60 border border-dashed border-slate-300 rounded-xl flex items-center justify-between gap-2.5 hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-10 h-10 rounded-lg bg-slate-200/60 text-slate-400 border border-slate-200 flex items-center justify-center text-base shrink-0">
+                                            <i class="{{ $doc['icon'] }}"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="text-xs font-bold text-slate-600 truncate">{{ $doc['title'] }}</span>
+                                                <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                                                    Missing
+                                                </span>
+                                            </div>
+                                            <p class="text-[10px] text-slate-400 truncate">{{ $doc['hint'] }}</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" data-doc-key="{{ $doc['key'] }}" onclick="openUploadDocModal(this.dataset.docKey)" class="px-2.5 py-1 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 rounded-lg text-[10px] font-bold transition-all shadow-2xs flex items-center gap-1 shrink-0 cursor-pointer">
+                                        <i class="fas fa-plus text-[9px]"></i>
+                                        <span>Upload</span>
+                                    </button>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+
+                    {{-- Digital Agreements Quick Links within Documents Section --}}
+                    @php
+                        $hasTuitionAgreement = ($profile?->tuition_agreement_status === 'signed' || $profile?->is_tuition_agreement_signed);
+                        $hasSchoolAgreement = ($profile?->is_agreement_signed || $profile?->agreement_status === 'signed');
+                    @endphp
+
+                    @if($hasTuitionAgreement || $hasSchoolAgreement)
+                        <div class="pt-2 border-t border-card-border space-y-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-text-dark/50 block">Signed Digital Agreements</span>
+                            
+                            @if($hasTuitionAgreement)
+                                <div class="p-2.5 bg-teal-50/80 border border-teal-200 rounded-xl flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <div class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center text-xs shrink-0 shadow-2xs">
+                                            <i class="fas fa-chalkboard-teacher"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-xs font-bold text-teal-900 truncate">Home Tuition Agreement</span>
+                                                <span class="text-[8px] font-black uppercase px-1.5 py-0.2 bg-teal-200/80 text-teal-900 rounded">Signed</span>
+                                            </div>
+                                            <p class="text-[9px] text-teal-700 truncate">
+                                                @if($profile?->tuition_agreement_signed_at)
+                                                    {{ \Carbon\Carbon::parse($profile->tuition_agreement_signed_at)->format('d M Y, h:i A') }}
+                                                @else
+                                                    Verified Digital Signature
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="openTuitionAgreementModal()" class="px-2 py-1 bg-white hover:bg-teal-100/60 border border-teal-300 text-teal-800 rounded-lg text-[10px] font-bold transition-all shadow-2xs flex items-center gap-1 shrink-0 cursor-pointer">
+                                        <i class="fas fa-file-contract text-teal-600 text-[9px]"></i>
+                                        <span>View</span>
+                                    </button>
+                                </div>
+                            @endif
+
+                            @if($hasSchoolAgreement)
+                                <div class="p-2.5 bg-indigo-50/80 border border-indigo-200 rounded-xl flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs shrink-0 shadow-2xs">
+                                            <i class="fas fa-school"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-xs font-bold text-indigo-900 truncate">School Job Placement Agreement</span>
+                                                <span class="text-[8px] font-black uppercase px-1.5 py-0.2 bg-indigo-200/80 text-indigo-900 rounded">Signed</span>
+                                            </div>
+                                            <p class="text-[9px] text-indigo-700 truncate">
+                                                @if($profile?->signature_date_time)
+                                                    {{ \Carbon\Carbon::parse($profile->signature_date_time)->format('d M Y, h:i A') }}
+                                                @else
+                                                    Verified Digital Signature
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="openSchoolAgreementModal()" class="px-2 py-1 bg-white hover:bg-indigo-100/60 border border-indigo-300 text-indigo-800 rounded-lg text-[10px] font-bold transition-all shadow-2xs flex items-center gap-1 shrink-0 cursor-pointer">
+                                        <i class="fas fa-file-contract text-indigo-600 text-[9px]"></i>
+                                        <span>View</span>
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Agreement Management Section -->
@@ -858,7 +1079,7 @@
     </div>
 
     <!-- Right Column: Tabs for Jobs, Tuitions, Invoices, CRM Followups, and Ratings -->
-    <div class="lg:col-span-2 space-y-6" x-data="{ tab: 'jobs' }">
+    <div class="lg:col-span-2 space-y-6" x-data="{ tab: '{{ request('tab', 'jobs') }}' }">
         <!-- Tab Navigation -->
         <div class="bg-card-bg border border-card-border rounded-2xl p-1.5 flex gap-1 shadow-sm overflow-x-auto">
             <button @click="tab = 'jobs'" :class="tab === 'jobs' ? 'bg-accent-blue text-white shadow-sm' : 'text-text-dark/60 hover:text-text-main'" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
@@ -866,6 +1087,9 @@
             </button>
             <button @click="tab = 'tuitions'" :class="tab === 'tuitions' ? 'bg-accent-blue text-white shadow-sm' : 'text-text-dark/60 hover:text-text-main'" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
                 <i class="fas fa-chalkboard-teacher"></i> <span>Home Tuitions ({{ $tuitionApplications->count() }})</span>
+            </button>
+            <button @click="tab = 'documents'" :class="tab === 'documents' ? 'bg-accent-blue text-white shadow-sm' : 'text-text-dark/60 hover:text-text-main'" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
+                <i class="fas fa-folder-open"></i> <span>Documents & Files ({{ $uploadedDocCount }})</span>
             </button>
             <button @click="tab = 'invoices'" :class="tab === 'invoices' ? 'bg-accent-blue text-white shadow-sm' : 'text-text-dark/60 hover:text-text-main'" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
                 <i class="fas fa-file-invoice-dollar"></i> <span>Invoices ({{ $invoices->count() }})</span>
@@ -1372,6 +1596,232 @@
                 </div>
             </div>
         </div>
+
+        <!-- TAB 6: DOCUMENTS & VERIFICATION AUDIT -->
+        <div x-show="tab === 'documents'" class="space-y-6" style="display: none;">
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-card-bg p-3.5 rounded-2xl border border-card-border shadow-2xs">
+                    <span class="text-[10px] font-bold uppercase text-text-dark/50 block">Total Files</span>
+                    <h4 class="text-xl font-black text-text-main mt-0.5">{{ $totalDocCount }}</h4>
+                    <span class="text-[10px] text-text-dark/60">Candidate Repository</span>
+                </div>
+                <div class="bg-card-bg p-3.5 rounded-2xl border border-card-border shadow-2xs">
+                    <span class="text-[10px] font-bold uppercase text-text-dark/50 block">Uploaded & Valid</span>
+                    <h4 class="text-xl font-black text-emerald-600 mt-0.5">{{ $uploadedDocCount }}</h4>
+                    <span class="text-[10px] text-emerald-700/80 font-bold">Verified on system</span>
+                </div>
+                <div class="bg-card-bg p-3.5 rounded-2xl border border-card-border shadow-2xs">
+                    <span class="text-[10px] font-bold uppercase text-text-dark/50 block">Missing Documents</span>
+                    <h4 class="text-xl font-black {{ $missingDocCount > 0 ? 'text-amber-500' : 'text-slate-400' }} mt-0.5">{{ $missingDocCount }}</h4>
+                    <span class="text-[10px] text-text-dark/60">{{ $missingDocCount > 0 ? 'Action required' : 'All clear' }}</span>
+                </div>
+                <div class="bg-card-bg p-3.5 rounded-2xl border border-card-border shadow-2xs">
+                    <span class="text-[10px] font-bold uppercase text-text-dark/50 block">Agreements Signed</span>
+                    <h4 class="text-xl font-black text-blue-600 mt-0.5">{{ ($hasTuitionAgreement ? 1 : 0) + ($hasSchoolAgreement ? 1 : 0) }}</h4>
+                    <span class="text-[10px] text-blue-700/80 font-bold">Digital Contracts</span>
+                </div>
+            </div>
+
+            <!-- Full Document Management Grid -->
+            <div class="bg-card-bg rounded-2xl border border-card-border shadow-sm overflow-hidden">
+                <div class="p-4 sm:p-5 border-b border-card-border bg-secondary-bg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-accent-blue/10 text-accent-blue flex items-center justify-center text-sm font-bold shadow-2xs">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-black text-text-main">Candidate Document Dossier</h3>
+                            <p class="text-xs text-text-dark/50">Direct preview, download and instant file upload/replacement.</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="openUploadDocModal()" class="px-3.5 py-2 bg-accent-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Upload Any Document</span>
+                    </button>
+                </div>
+
+                <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach($rawDocs as $doc)
+                        <div class="p-4 rounded-2xl border {{ $doc['is_uploaded'] ? $doc['border_class'] . ' ' . $doc['bg_class'] : 'border-dashed border-card-border bg-secondary-bg/50' }} flex flex-col justify-between gap-3 transition-all">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-start gap-3 min-w-0">
+                                    @if($doc['is_uploaded'] && $doc['is_image'])
+                                        <div class="relative group cursor-pointer shrink-0" data-img-url="{{ Storage::url($doc['path']) }}" data-img-title="{{ $doc['title'] }}" onclick="openImagePreviewModal(this.dataset.imgUrl, this.dataset.imgTitle)">
+                                            <img src="{{ Storage::url($doc['path']) }}" alt="{{ $doc['title'] }}" class="w-14 h-14 rounded-xl object-cover border-2 border-white shadow-sm">
+                                            <div class="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity">
+                                                <i class="fas fa-search-plus"></i>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="w-12 h-12 rounded-xl {{ $doc['is_uploaded'] ? $doc['icon_bg'] : 'bg-card-border/40 text-text-dark/40' }} flex items-center justify-center text-xl shrink-0 shadow-2xs">
+                                            <i class="{{ $doc['icon'] }}"></i>
+                                        </div>
+                                    @endif
+
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <h5 class="text-xs font-black text-text-main truncate">{{ $doc['title'] }}</h5>
+                                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full {{ $doc['is_uploaded'] ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
+                                                {{ $doc['is_uploaded'] ? 'Verified & On File' : 'Not Uploaded' }}
+                                            </span>
+                                        </div>
+                                        <p class="text-[11px] text-text-dark/60 mt-1 leading-snug">{{ $doc['hint'] }}</p>
+                                        @if($doc['is_uploaded'])
+                                            <p class="text-[10px] font-mono text-text-dark/40 mt-1 truncate">
+                                                Path: {{ $doc['path'] }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t {{ $doc['is_uploaded'] ? 'border-card-border/60' : 'border-card-border' }} flex items-center justify-between gap-2">
+                                @if($doc['is_uploaded'])
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ Storage::url($doc['path']) }}" target="_blank" class="px-3 py-1.5 bg-white hover:bg-slate-50 border border-card-border text-text-main rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5">
+                                            <i class="fas fa-external-link-alt text-accent-blue text-[10px]"></i>
+                                            <span>Open File</span>
+                                        </a>
+                                        <a href="{{ Storage::url($doc['path']) }}" download class="px-3 py-1.5 bg-white hover:bg-slate-50 border border-card-border text-text-dark/70 rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5">
+                                            <i class="fas fa-download text-[10px]"></i>
+                                            <span>Download</span>
+                                        </a>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <button type="button" data-doc-key="{{ $doc['key'] }}" onclick="openUploadDocModal(this.dataset.docKey)" class="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-card-border text-text-dark/70 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1">
+                                            <i class="fas fa-sync-alt text-[10px]"></i>
+                                            <span>Replace</span>
+                                        </button>
+                                        <button type="button" data-doc-key="{{ $doc['key'] }}" data-doc-title="{{ $doc['title'] }}" onclick="confirmDeleteDocument(this.dataset.docKey, this.dataset.docTitle)" class="p-1.5 bg-white hover:bg-red-50 border border-card-border hover:border-red-200 text-text-dark/40 hover:text-red-600 rounded-xl transition-colors cursor-pointer" title="Delete">
+                                            <i class="fas fa-trash-alt text-xs"></i>
+                                        </button>
+                                    </div>
+                                @else
+                                    <span class="text-[11px] text-amber-700/80 font-medium italic">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i> Document pending
+                                    </span>
+                                    <button type="button" data-doc-key="{{ $doc['key'] }}" onclick="openUploadDocModal(this.dataset.docKey)" class="px-3.5 py-1.5 bg-accent-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                                        <i class="fas fa-plus"></i>
+                                        <span>Upload Now</span>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Digital Agreements & E-Signatures Dossier -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Home Tuition Agreement Card -->
+                <div class="bg-card-bg rounded-2xl border {{ $hasTuitionAgreement ? 'border-teal-300 bg-teal-50/20' : 'border-card-border' }} p-5 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center text-base shadow-2xs">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-black text-text-main">Home Tuition Agreement</h4>
+                                <span class="text-[10px] text-text-dark/50">Tutor Service Terms & Conditions</span>
+                            </div>
+                        </div>
+                        @if($hasTuitionAgreement)
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-teal-100 text-teal-800 border border-teal-200">
+                                <i class="fas fa-check-circle mr-0.5"></i> Signed & Valid
+                            </span>
+                        @else
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold text-text-dark/50 bg-slate-100">
+                                Not Signed
+                            </span>
+                        @endif
+                    </div>
+                    
+                    @if($hasTuitionAgreement)
+                        <div class="p-3 bg-white rounded-xl border border-teal-200 text-xs space-y-1">
+                            <p class="font-bold text-teal-900 flex items-center gap-1.5">
+                                <i class="fas fa-signature text-teal-600"></i> Digitally Signed by {{ $candidate->name }}
+                            </p>
+                            @if($profile?->tuition_agreement_signed_at)
+                                <p class="text-[11px] text-text-dark/60">Date: {{ \Carbon\Carbon::parse($profile->tuition_agreement_signed_at)->format('d M Y, h:i A') }}</p>
+                            @endif
+                            @if(!empty($profile?->tuition_location_name) || !empty($tuitionMeta['location']))
+                                <p class="text-[11px] text-text-dark/70">📍 Location: {{ $profile?->tuition_location_name ?? ($tuitionMeta['location'] ?? 'Captured') }}</p>
+                            @endif
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <button type="button" onclick="openTuitionAgreementModal()" class="flex-1 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
+                                <i class="fas fa-eye text-xs"></i>
+                                <span>View Agreement Sheet</span>
+                            </button>
+                            <button type="button" onclick="printTuitionAgreement()" class="px-3 py-2 bg-white hover:bg-teal-50 border border-teal-300 text-teal-800 rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-print"></i>
+                                <span>Print</span>
+                            </button>
+                        </div>
+                    @else
+                        <p class="text-xs text-text-dark/60">Candidate has not signed the Home Tuition agreement yet. You can unlock signing in the signing control card on the left column.</p>
+                    @endif
+                </div>
+
+                <!-- School Placement Agreement Card -->
+                <div class="bg-card-bg rounded-2xl border {{ $hasSchoolAgreement ? 'border-indigo-300 bg-indigo-50/20' : 'border-card-border' }} p-5 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-base shadow-2xs">
+                                <i class="fas fa-school"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-black text-text-main">Teacher Placement Agreement</h4>
+                                <span class="text-[10px] text-text-dark/50">School Recruitment Terms</span>
+                            </div>
+                        </div>
+                        @if($hasSchoolAgreement)
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                <i class="fas fa-check-circle mr-0.5"></i> Signed & Valid
+                            </span>
+                        @else
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold text-text-dark/50 bg-slate-100">
+                                Not Signed
+                            </span>
+                        @endif
+                    </div>
+
+                    @if($hasSchoolAgreement)
+                        <div class="p-3 bg-white rounded-xl border border-indigo-200 text-xs space-y-1">
+                            <p class="font-bold text-indigo-900 flex items-center gap-1.5">
+                                <i class="fas fa-signature text-indigo-600"></i> Digitally Signed by {{ $candidate->name }}
+                            </p>
+                            @if($profile?->signature_date_time)
+                                <p class="text-[11px] text-text-dark/60">Date: {{ \Carbon\Carbon::parse($profile->signature_date_time)->format('d M Y, h:i A') }}</p>
+                            @endif
+                            @if($profile?->agreement_pdf_path)
+                                <p class="text-[11px] text-emerald-700 font-bold">📄 Physical Signed Copy Attached (PDF)</p>
+                            @endif
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            @if($profile?->agreement_pdf_path)
+                                <a href="{{ Storage::url($profile->agreement_pdf_path) }}" target="_blank" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>View Uploaded PDF Copy</span>
+                                </a>
+                            @else
+                                <button type="button" onclick="openSchoolAgreementModal()" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <i class="fas fa-eye text-xs"></i>
+                                    <span>View Agreement Sheet</span>
+                                </button>
+                                <button type="button" onclick="printSchoolAgreement()" class="px-3 py-2 bg-white hover:bg-indigo-50 border border-indigo-300 text-indigo-800 rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                                    <i class="fas fa-print"></i>
+                                    <span>Print</span>
+                                </button>
+                            @endif
+                        </div>
+                    @else
+                        <p class="text-xs text-text-dark/60">School job placement agreement is not signed yet.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -1457,6 +1907,334 @@
     </div>
 </div>
 
+{{-- Hidden Delete Document Form --}}
+<form id="deleteDocumentForm" action="{{ route('admin.crm.candidate.delete-document', $candidate->id) }}" method="POST" class="hidden">
+    @csrf
+    @method('DELETE')
+    <input type="hidden" name="document_type" id="deleteDocTypeInput">
+</form>
+
+{{-- Upload Candidate Document Modal --}}
+<div id="uploadDocumentModal" class="fixed inset-0 z-[99999] hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200">
+        <!-- Header -->
+        <div class="bg-[#031b4e] p-5 sm:p-6 text-white flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-accent-blue">
+                    <i class="fas fa-file-upload text-base"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-sky-400 block">Candidate Dossier</span>
+                    <h3 class="text-base font-bold text-white tracking-tight" id="uploadModalTitle">Upload Candidate Document</h3>
+                </div>
+            </div>
+            <button type="button" onclick="closeUploadDocModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer">
+                <i class="fas fa-times text-xs"></i>
+            </button>
+        </div>
+
+        <!-- Form Body -->
+        <form action="{{ route('admin.crm.candidate.upload-document', $candidate->id) }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-4 bg-white">
+            @csrf
+
+            <!-- Document Type Selection -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    Select Document Type <span class="text-red-500">*</span>
+                </label>
+                <select name="document_type" id="uploadDocTypeSelect" required
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer">
+                    <option value="resume">Resume / Curriculum Vitae (PDF, DOCX)</option>
+                    <option value="live_photo">Government ID Card / Verification Photo (JPG, PNG)</option>
+                    <option value="profile_photo">Profile / Passport Photo (JPG, PNG)</option>
+                    <option value="salary_slip">Salary Slip / Proof of Income (PDF, Image)</option>
+                    <option value="offer_letter">Offer Letter / Experience Letter (PDF, Image)</option>
+                    <option value="agreement_pdf">Signed Physical Agreement Copy (PDF)</option>
+                </select>
+            </div>
+
+            <!-- File Input Area -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    Choose File <span class="text-red-500">*</span>
+                </label>
+                <div class="relative border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-blue-50/20 rounded-2xl p-6 text-center transition-all cursor-pointer">
+                    <input type="file" name="document_file" id="uploadDocFileInput" required
+                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                           onchange="handleDocFileChange(this)">
+                    <div id="uploadDocDropzoneContent" class="space-y-1.5 pointer-events-none">
+                        <i class="fas fa-cloud-upload-alt text-3xl text-blue-500 mb-1"></i>
+                        <p class="text-xs font-bold text-slate-700" id="uploadDocFileName">Click or drag & drop file to upload</p>
+                        <p class="text-[10px] text-slate-400">PDF, DOC, DOCX, JPG, PNG up to 10MB</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 bg-blue-50/70 rounded-xl border border-blue-200/60 text-xs text-blue-900 space-y-1">
+                <p class="font-bold flex items-center gap-1.5"><i class="fas fa-shield-alt text-blue-600"></i> Instant Profile Synchronization</p>
+                <p class="text-[11px] text-blue-800/80">The document will be securely saved into the candidate profile and made available immediately across all administrative workflows.</p>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                <button type="button" onclick="closeUploadDocModal()"
+                        class="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-accent-blue hover:bg-blue-700 shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Upload Document</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Image Preview Lightbox Modal --}}
+<div id="imagePreviewModal" class="fixed inset-0 z-[99999] hidden bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImagePreviewModal()">
+    <div class="relative max-w-3xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-200" onclick="event.stopPropagation()">
+        <div class="bg-[#031b4e] p-4 text-white flex items-center justify-between">
+            <h4 id="imagePreviewTitle" class="text-sm font-bold text-white">Document Preview</h4>
+            <button type="button" onclick="closeImagePreviewModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer">
+                <i class="fas fa-times text-xs"></i>
+            </button>
+        </div>
+        <div class="p-4 flex items-center justify-center max-h-[75vh] overflow-auto bg-slate-100">
+            <img id="imagePreviewSrc" src="" alt="Preview" class="max-h-[70vh] w-auto rounded-xl shadow-md border border-slate-200 object-contain">
+        </div>
+        <div class="p-3 border-t border-slate-100 flex items-center justify-end gap-2 bg-white">
+            <a id="imagePreviewDownload" href="" target="_blank" class="px-4 py-2 bg-accent-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
+                <i class="fas fa-external-link-alt text-[10px]"></i> Open Full Image
+            </a>
+        </div>
+    </div>
+</div>
+
+{{-- Home Tuition Agreement Viewer Modal --}}
+<div id="tuitionAgreementModal" class="fixed inset-0 z-[99999] hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[92vh] shadow-2xl flex flex-col overflow-hidden border border-slate-200">
+        <!-- Header -->
+        <div class="bg-[#031b4e] p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-teal-300">
+                    <i class="fas fa-chalkboard-teacher text-base"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-teal-300 block">Digital Legal Document</span>
+                    <h3 class="text-base font-bold text-white tracking-tight">Home Tuition – Tutor Service Agreement</h3>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="printTuitionAgreement()" class="px-3.5 py-1.5 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-print"></i>
+                    <span>Print Agreement</span>
+                </button>
+                <button type="button" onclick="closeTuitionAgreementModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable Printable Agreement Body -->
+        <div id="printableTuitionAgreement" class="p-4 sm:p-8 overflow-y-auto custom-scrollbar text-[#031b4e]/90 text-xs sm:text-sm space-y-4 bg-white flex-1">
+            <div class="text-center border-b-2 border-[#031b4e] pb-4">
+                <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" alt="Warriors Educare Logo" style="max-height: 70px; margin: 0 auto 10px auto;">
+                <h2 class="text-xl sm:text-2xl font-bold text-[#031b4e]">WARRIORS EDUCARE</h2>
+                <h3 class="text-base sm:text-lg font-semibold text-[#031b4e]">HOME TUITION – TUTOR SERVICE AGREEMENT</h3>
+            </div>
+
+            <!-- Candidate Details & Live Verification Photo -->
+            <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start gap-4">
+                <div class="space-y-1.5 text-xs sm:text-sm">
+                    <p><strong>Candidate Name:</strong> {{ $candidate->name }}</p>
+                    <p><strong>Email:</strong> {{ $candidate->email }}</p>
+                    <p><strong>Phone:</strong> {{ $candidate->phone }}</p>
+                    <p><strong>Address:</strong> {{ $profile?->address ?? 'Not specified' }}</p>
+                    @if(!empty($profile?->tuition_location_name) || !empty($tuitionMeta['location']))
+                        <p class="text-teal-800 font-medium"><strong>Signing Location:</strong> 📍 {{ $profile?->tuition_location_name ?? ($tuitionMeta['location'] ?? 'Captured') }}</p>
+                    @endif
+                    @if($profile?->tuition_agreement_signed_at)
+                        <p class="text-slate-600"><strong>Signed At:</strong> {{ \Carbon\Carbon::parse($profile->tuition_agreement_signed_at)->format('d M Y, h:i:s A') }}</p>
+                    @endif
+                </div>
+
+                @php
+                    $tPhoto = $profile?->tuition_live_photo_path ?? $profile?->live_photo_path;
+                @endphp
+                @if($tPhoto && Storage::disk('public')->exists($tPhoto))
+                    <div class="shrink-0 text-center self-center sm:self-auto">
+                        <img src="{{ Storage::url($tPhoto) }}" alt="Candidate Live Verification" class="w-20 h-24 object-cover border-2 border-emerald-500 rounded-xl shadow-sm">
+                        <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full">
+                            Live Photo Verified
+                        </span>
+                    </div>
+                @endif
+            </div>
+
+            <p class="text-slate-700">This Agreement is entered into voluntarily between <strong>Warriors Educare</strong> ("Agency") and the undersigned Candidate ("Tutor").</p>
+
+            <div class="space-y-3 text-slate-700 leading-relaxed text-xs">
+                <div>
+                    <h5 class="font-bold text-[#031b4e]">1. Purpose of Agreement</h5>
+                    <p>This Agreement confirms that the Candidate voluntarily authorizes Warriors Educare to provide home tuition opportunities and to begin the tutor placement process.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-[#031b4e]">2. Candidate Declaration</h5>
+                    <p>The Candidate declares that all information and documents provided are true and genuine. Any false information or forged documents may result in immediate cancellation of registration without any refund.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-[#031b4e]">3. Registration Fee & Validity</h5>
+                    <p>The Candidate agrees to pay the prescribed registration fee. Registration shall remain valid for 1 (One) Year from the date of registration.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-[#031b4e]">4. Placement & Service Charge</h5>
+                    <p>The Candidate agrees to pay the agreed placement service charge upon confirmation of tuition leads as per agency terms.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-[#031b4e]">5. Code of Conduct & Safety</h5>
+                    <p>The Candidate agrees to maintain the highest standards of professionalism, integrity, and safety while teaching students at their residences.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-[#031b4e]">6. Legal Jurisdiction</h5>
+                    <p>Any dispute arising out of this Agreement shall be subject to the exclusive jurisdiction of the competent courts in Patna, Bihar.</p>
+                </div>
+            </div>
+
+            <!-- Verification Signature Footer -->
+            <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-center sm:text-left">
+                    <span class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Candidate E-Signature</span>
+                    <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl min-w-[160px] text-center">
+                        @if(!empty($adminSig) && str_starts_with($adminSig, 'data:image'))
+                            <img src="{{ $adminSig }}" alt="Signature" class="max-h-12 mx-auto">
+                        @elseif(!empty($adminSig) && Storage::disk('public')->exists($adminSig))
+                            <img src="{{ asset('storage/' . $adminSig) }}" alt="Signature" class="max-h-12 mx-auto">
+                        @elseif(!empty($adminSig))
+                            <span class="text-lg font-serif italic text-blue-900 font-bold" style="font-family: 'Brush Script MT', 'Dancing Script', cursive;">{{ $adminSig }}</span>
+                        @else
+                            <span class="text-xs font-bold text-slate-400">Digitally Verified</span>
+                        @endif
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-semibold block mt-1">{{ $candidate->name }}</span>
+                </div>
+
+                <div class="text-center sm:text-right">
+                    <span class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Authorized Agency Seal</span>
+                    <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl min-w-[160px] text-center">
+                        <span class="text-xs font-black uppercase text-blue-900 tracking-wider">Warriors Educare</span>
+                        <span class="text-[9px] text-emerald-700 block font-bold">Verified Administrator</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-semibold block mt-1">Official Verification Stamp</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- School Placement Agreement Viewer Modal --}}
+<div id="schoolAgreementModal" class="fixed inset-0 z-[99999] hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[92vh] shadow-2xl flex flex-col overflow-hidden border border-slate-200">
+        <!-- Header -->
+        <div class="bg-[#031b4e] p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-indigo-300">
+                    <i class="fas fa-school text-base"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-indigo-300 block">Digital Legal Document</span>
+                    <h3 class="text-base font-bold text-white tracking-tight">Teacher Placement Service Agreement</h3>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="printSchoolAgreement()" class="px-3.5 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-print"></i>
+                    <span>Print Agreement</span>
+                </button>
+                <button type="button" onclick="closeSchoolAgreementModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable Printable Agreement Body -->
+        <div id="printableSchoolAgreement" class="p-4 sm:p-8 overflow-y-auto custom-scrollbar text-[#031b4e]/90 text-xs sm:text-sm space-y-4 bg-white flex-1">
+            <div class="text-center border-b-2 border-[#031b4e] pb-4">
+                <img src="{{ asset('WhatsApp Image 2026-08-05 at 12.56.09 PM.jpeg') }}" alt="Warriors Educare Logo" style="max-height: 70px; margin: 0 auto 10px auto;">
+                <h2 class="text-xl sm:text-2xl font-bold text-[#031b4e]">WARRIORS EDUCARE</h2>
+                <h3 class="text-base sm:text-lg font-semibold text-[#031b4e]">TEACHER PLACEMENT SERVICE AGREEMENT</h3>
+            </div>
+
+            <!-- Candidate Details -->
+            <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start gap-4">
+                <div class="space-y-1.5 text-xs sm:text-sm">
+                    <p><strong>Candidate Name:</strong> {{ $candidate->name }}</p>
+                    <p><strong>Email:</strong> {{ $candidate->email }}</p>
+                    <p><strong>Phone:</strong> {{ $candidate->phone }}</p>
+                    <p><strong>Address:</strong> {{ $profile?->address ?? 'Not specified' }}</p>
+                    @if($profile?->signature_date_time)
+                        <p class="text-slate-600"><strong>Signed At:</strong> {{ \Carbon\Carbon::parse($profile->signature_date_time)->format('d M Y, h:i:s A') }}</p>
+                    @endif
+                </div>
+
+                @if($profile?->live_photo_path && Storage::disk('public')->exists($profile->live_photo_path))
+                    <div class="shrink-0 text-center self-center sm:self-auto">
+                        <img src="{{ Storage::url($profile->live_photo_path) }}" alt="Candidate Live Verification" class="w-20 h-24 object-cover border-2 border-indigo-500 rounded-xl shadow-sm">
+                        <span class="inline-block mt-1 px-2 py-0.5 bg-indigo-100 text-indigo-800 text-[10px] font-bold rounded-full">
+                            Identity Verified
+                        </span>
+                    </div>
+                @endif
+            </div>
+
+            <p class="text-slate-700">This Agreement is entered into voluntarily between <strong>Warriors Educare</strong> ("Agency") and the undersigned Candidate ("Teacher").</p>
+
+            <div class="space-y-3 text-slate-700 leading-relaxed text-xs">
+                <div>
+                    <h5 class="font-bold text-[#031b4e]">1. Purpose of Agreement</h5>
+                    <p>This Agreement confirms that the Candidate willingly authorizes Warriors Educare to begin the recruitment and placement process for suitable teaching opportunities in schools and colleges.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-[#031b4e]">2. Placement Service Charge</h5>
+                    <p>Upon final appointment or joining a school/institution through Warriors Educare, the Candidate agrees to pay the stipulated placement service fee.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-[#031b4e]">3. Accuracy of Credentials</h5>
+                    <p>The Candidate affirms that all qualifications, degrees, experience certificates, and documents provided are authentic.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-[#031b4e]">4. Legal Jurisdiction</h5>
+                    <p>Any dispute arising out of this Agreement shall be subject to the exclusive jurisdiction of the competent courts in Patna, Bihar.</p>
+                </div>
+            </div>
+
+            <!-- Signatures -->
+            <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-center sm:text-left">
+                    <span class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Candidate E-Signature</span>
+                    <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl min-w-[160px] text-center">
+                        @if(!empty($profile?->signature_data))
+                            <span class="text-lg font-serif italic text-blue-900 font-bold" style="font-family: 'Brush Script MT', 'Dancing Script', cursive;">{{ $profile->signature_data }}</span>
+                        @else
+                            <span class="text-xs font-bold text-slate-400">Digitally Verified</span>
+                        @endif
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-semibold block mt-1">{{ $candidate->name }}</span>
+                </div>
+
+                <div class="text-center sm:text-right">
+                    <span class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Authorized Agency Seal</span>
+                    <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl min-w-[160px] text-center">
+                        <span class="text-xs font-black uppercase text-blue-900 tracking-wider">Warriors Educare</span>
+                        <span class="text-[9px] text-emerald-700 block font-bold">Verified Administrator</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-semibold block mt-1">Official Verification Stamp</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function openEditInvoiceModal(invId, amount, dueDate, description, status) {
     const modal = document.getElementById('editInvoiceModal');
@@ -1474,6 +2252,112 @@ function openEditInvoiceModal(invId, amount, dueDate, description, status) {
 
 function closeEditInvoiceModal() {
     document.getElementById('editInvoiceModal').classList.add('hidden');
+}
+
+function openUploadDocModal(docKey) {
+    const modal = document.getElementById('uploadDocumentModal');
+    if (modal && modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+    }
+    if (docKey) {
+        const select = document.getElementById('uploadDocTypeSelect');
+        if (select) select.value = docKey;
+    }
+    document.getElementById('uploadDocFileInput').value = '';
+    document.getElementById('uploadDocFileName').innerText = 'Click or drag & drop file to upload';
+    modal.classList.remove('hidden');
+}
+
+function closeUploadDocModal() {
+    const modal = document.getElementById('uploadDocumentModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function handleDocFileChange(input) {
+    if (input.files && input.files[0]) {
+        document.getElementById('uploadDocFileName').innerText = input.files[0].name + ' (' + (input.files[0].size / 1024 / 1024).toFixed(2) + ' MB)';
+    }
+}
+
+function confirmDeleteDocument(docKey, docTitle) {
+    if (confirm('Are you sure you want to delete ' + docTitle + '? This action cannot be undone.')) {
+        document.getElementById('deleteDocTypeInput').value = docKey;
+        document.getElementById('deleteDocumentForm').submit();
+    }
+}
+
+function openImagePreviewModal(url, title) {
+    const modal = document.getElementById('imagePreviewModal');
+    if (modal && modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+    }
+    document.getElementById('imagePreviewSrc').src = url;
+    document.getElementById('imagePreviewTitle').innerText = title || 'Document Preview';
+    document.getElementById('imagePreviewDownload').href = url;
+    modal.classList.remove('hidden');
+}
+
+function closeImagePreviewModal() {
+    const modal = document.getElementById('imagePreviewModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function openTuitionAgreementModal() {
+    const modal = document.getElementById('tuitionAgreementModal');
+    if (modal && modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+    }
+    modal.classList.remove('hidden');
+}
+
+function closeTuitionAgreementModal() {
+    const modal = document.getElementById('tuitionAgreementModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function printTuitionAgreement() {
+    const printContent = document.getElementById('printableTuitionAgreement').innerHTML;
+    const printWindow = window.open('', '', 'width=900,height=700');
+    printWindow.document.write('<html><head><title>Home Tuition Agreement - Warriors Educare</title>');
+    printWindow.document.write('<style>body{font-family:sans-serif;padding:30px;color:#1e293b;line-height:1.5;} table{width:100%;border-collapse:collapse;} img{max-width:100%;}</style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(printContent);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 400);
+}
+
+function openSchoolAgreementModal() {
+    const modal = document.getElementById('schoolAgreementModal');
+    if (modal && modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+    }
+    modal.classList.remove('hidden');
+}
+
+function closeSchoolAgreementModal() {
+    const modal = document.getElementById('schoolAgreementModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function printSchoolAgreement() {
+    const printContent = document.getElementById('printableSchoolAgreement').innerHTML;
+    const printWindow = window.open('', '', 'width=900,height=700');
+    printWindow.document.write('<html><head><title>Teacher Placement Agreement - Warriors Educare</title>');
+    printWindow.document.write('<style>body{font-family:sans-serif;padding:30px;color:#1e293b;line-height:1.5;} table{width:100%;border-collapse:collapse;} img{max-width:100%;}</style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(printContent);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 400);
 }
 
 document.addEventListener('DOMContentLoaded', function() {

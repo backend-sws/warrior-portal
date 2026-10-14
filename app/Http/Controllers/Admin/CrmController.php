@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -1138,6 +1139,103 @@ class CrmController extends Controller
         }
 
         return back()->with('error', 'Candidate profile not found.');
+    }
+
+    public function uploadDocument(Request $request, $id)
+    {
+        $request->validate([
+            'document_type' => 'required|in:resume,profile_photo,live_photo,salary_slip,offer_letter,agreement_pdf',
+            'document_file' => 'required|file|max:10240',
+        ]);
+
+        $user = User::with('profile')->findOrFail($id);
+        if (!$user->profile) {
+            $user->profile()->create(['user_id' => $user->id]);
+            $user->load('profile');
+        }
+
+        $type = $request->document_type;
+        $file = $request->file('document_file');
+        $fieldMap = [
+            'resume'        => ['col' => 'resume_path', 'dir' => 'resumes', 'label' => 'Resume / CV'],
+            'profile_photo' => ['col' => 'profile_photo_path', 'dir' => 'profile_photos', 'label' => 'Profile Photo'],
+            'live_photo'    => ['col' => 'live_photo_path', 'dir' => 'live_photos', 'label' => 'Government ID / Verification Photo'],
+            'salary_slip'   => ['col' => 'salary_slip_path', 'dir' => 'salary_slips', 'label' => 'Salary Slip'],
+            'offer_letter'  => ['col' => 'offer_letter_path', 'dir' => 'offer_letters', 'label' => 'Offer Letter'],
+            'agreement_pdf' => ['col' => 'agreement_pdf_path', 'dir' => 'agreements', 'label' => 'Signed Physical Agreement (PDF)'],
+        ];
+
+        if (!isset($fieldMap[$type])) {
+            return back()->with('error', 'Invalid document type selected.');
+        }
+
+        $config = $fieldMap[$type];
+        $col = $config['col'];
+        $dir = $config['dir'];
+
+        if (!empty($user->profile->$col) && Storage::disk('public')->exists($user->profile->$col)) {
+            Storage::disk('public')->delete($user->profile->$col);
+        }
+
+        $path = $file->store($dir, 'public');
+        $updates = [$col => $path];
+
+        if ($type === 'agreement_pdf') {
+            $updates['is_agreement_signed'] = true;
+            $updates['agreement_status'] = 'signed';
+            $updates['signature_date_time'] = now();
+        }
+
+        $user->profile->update($updates);
+        $user->profile->profile_completion_percentage = $user->profile->completion_percentage;
+        $user->profile->save();
+
+        return back()->with('success', $config['label'] . ' uploaded successfully.');
+    }
+
+    public function deleteDocument(Request $request, $id)
+    {
+        $request->validate([
+            'document_type' => 'required|in:resume,profile_photo,live_photo,salary_slip,offer_letter,agreement_pdf',
+        ]);
+
+        $user = User::with('profile')->findOrFail($id);
+        if (!$user->profile) {
+            return back()->with('error', 'Profile not found.');
+        }
+
+        $fieldMap = [
+            'resume'        => ['col' => 'resume_path', 'label' => 'Resume / CV'],
+            'profile_photo' => ['col' => 'profile_photo_path', 'label' => 'Profile Photo'],
+            'live_photo'    => ['col' => 'live_photo_path', 'label' => 'Government ID / Verification Photo'],
+            'salary_slip'   => ['col' => 'salary_slip_path', 'label' => 'Salary Slip'],
+            'offer_letter'  => ['col' => 'offer_letter_path', 'label' => 'Offer Letter'],
+            'agreement_pdf' => ['col' => 'agreement_pdf_path', 'label' => 'Signed Agreement Copy'],
+        ];
+
+        $type = $request->document_type;
+        if (!isset($fieldMap[$type])) {
+            return back()->with('error', 'Invalid document type.');
+        }
+
+        $col = $fieldMap[$type]['col'];
+        if (!empty($user->profile->$col) && Storage::disk('public')->exists($user->profile->$col)) {
+            Storage::disk('public')->delete($user->profile->$col);
+        }
+
+        $updates = [$col => null];
+        if ($type === 'agreement_pdf') {
+            if (!$user->profile->signature_data) {
+                $updates['is_agreement_signed'] = false;
+                $updates['agreement_status'] = 'not_required';
+            }
+        }
+
+        $user->profile->update($updates);
+        $user->profile->profile_completion_percentage = $user->profile->completion_percentage;
+        $user->profile->save();
+
+        return back()->with('success', $fieldMap[$type]['label'] . ' deleted successfully.');
     }
 
     public function updateAgreementStatus(Request $request, $id)
