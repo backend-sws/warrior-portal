@@ -33,6 +33,36 @@
 <body>
     <div class="container">
         <div class="header">
+@php
+    $logoSrc = null;
+    $logoPath = public_path('adobe.png');
+    if (isset($message) && is_object($message) && method_exists($message, 'embed') && file_exists($logoPath)) {
+        try {
+            $logoSrc = $message->embed($logoPath);
+        } catch (\Throwable $e) {
+            $logoSrc = null;
+        }
+    }
+    if (!$logoSrc) {
+        if (file_exists($logoPath)) {
+            $logoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+        } else {
+            $logoSrc = asset('adobe.png');
+        }
+    }
+@endphp
+            <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 12px;">
+                <tr>
+                    <td style="padding-right: 12px; vertical-align: middle;">
+                        <img src="{{ $logoSrc }}" alt="Warriors Educare" width="40" height="40" style="display:block; width:40px; height:40px; border-radius:8px; border:0;" />
+                    </td>
+                    <td style="vertical-align: middle;">
+                        <span style="font-size: 16px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; text-transform: uppercase;">
+                            WARRIORS <span style="color: #fbc043;">EDUCARE</span>
+                        </span>
+                    </td>
+                </tr>
+            </table>
             <h1>📋 Daily Payment Collection Summary</h1>
             <p>{{ \Carbon\Carbon::today()->format('l, d F Y') }} — Warriors Educare Admin</p>
         </div>

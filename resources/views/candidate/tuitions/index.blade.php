@@ -1023,25 +1023,47 @@ function printTuitionAgreement() {
     </div>
 @else
     <!-- Search / Filter Bar -->
-    <div class="bg-white rounded-2xl border border-[#031b4e]/10 p-4 mb-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="text-xs sm:text-sm font-bold text-[#031b4e]">
-            Found {{ $tuitions->total() }} Tuition Requirements
-        </div>
-        <form action="{{ route('candidate.tuitions.index') }}" method="GET" class="w-full sm:w-auto flex items-center gap-2">
-            <div class="relative w-full sm:w-72">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Tuition ID (e.g. TUI-0001), subject, area..." 
-                       class="w-full pl-8 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <div class="bg-white rounded-2xl border border-[#031b4e]/10 p-4 mb-6 shadow-sm">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs sm:text-sm font-bold text-[#031b4e]">
+                    Found {{ $tuitions->total() }} Tuition Requirements
+                </span>
                 @if(request('search'))
-                    <a href="{{ route('candidate.tuitions.index') }}" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
-                        <i class="fas fa-times text-xs"></i>
-                    </a>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 rounded-lg text-xs font-bold">
+                        <span>Search: "<strong class="font-mono">{{ request('search') }}</strong>"</span>
+                        <a href="{{ route('candidate.tuitions.index') }}" class="text-amber-700 hover:text-red-600 transition" title="Clear filter">
+                            <i class="fas fa-times-circle"></i>
+                        </a>
+                    </span>
                 @endif
             </div>
-            <button type="submit" class="px-4 py-2 bg-[#031b4e] text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-blue-900 transition-colors">
-                Search
-            </button>
-        </form>
+            <form action="{{ route('candidate.tuitions.index') }}" method="GET" class="w-full sm:w-auto flex items-center gap-2">
+                <div class="relative w-full sm:w-80">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Tuition ID (e.g. TUI-0033 or 33), subject, area..." 
+                           class="w-full pl-8 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-[#031b4e] focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    @if(request('search'))
+                        <a href="{{ route('candidate.tuitions.index') }}" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                            <i class="fas fa-times text-xs"></i>
+                        </a>
+                    @endif
+                </div>
+                <button type="submit" class="px-4 py-2 bg-[#031b4e] text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-blue-900 transition-colors shadow-sm shrink-0">
+                    Search
+                </button>
+            </form>
+        </div>
+
+        {{-- Quick Search Chips --}}
+        <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-1.5 flex-wrap text-xs">
+            <span class="text-[#031b4e]/60 text-[11px] font-bold">Quick Search:</span>
+            <a href="{{ route('candidate.tuitions.index', ['search' => 'TUI-0033']) }}" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-mono font-bold transition">TUI-0033</a>
+            <a href="{{ route('candidate.tuitions.index', ['search' => '33']) }}" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-mono font-bold transition">#33</a>
+            <a href="{{ route('candidate.tuitions.index', ['search' => 'TUI-0032']) }}" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-mono font-bold transition">TUI-0032</a>
+            <a href="{{ route('candidate.tuitions.index', ['search' => 'Math']) }}" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-bold transition">Math</a>
+            <a href="{{ route('candidate.tuitions.index', ['search' => 'Patna']) }}" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-bold transition">Patna</a>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -1139,8 +1161,16 @@ function printTuitionAgreement() {
                 <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                     <i class="fas fa-book-reader text-[#031b4e]/50 text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-base sm:text-lg font-bold text-[#031b4e] mb-1">No Tuitions Available</h3>
-                <p class="text-xs sm:text-sm text-[#031b4e]/80">There are currently no active tuitions to apply for. Please check back later.</p>
+                @if(request('search'))
+                    <h3 class="text-base sm:text-lg font-bold text-[#031b4e] mb-1">No Tuitions Found for "{{ request('search') }}"</h3>
+                    <p class="text-xs sm:text-sm text-[#031b4e]/80 mb-4">No approved tuition requirements match your search query. Try searching with numeric ID (e.g. 33) or subject name.</p>
+                    <a href="{{ route('candidate.tuitions.index') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#031b4e] text-white text-xs font-bold rounded-xl hover:bg-blue-900 transition-colors">
+                        <i class="fas fa-times"></i> Clear Search
+                    </a>
+                @else
+                    <h3 class="text-base sm:text-lg font-bold text-[#031b4e] mb-1">No Tuitions Available</h3>
+                    <p class="text-xs sm:text-sm text-[#031b4e]/80">There are currently no active tuitions to apply for. Please check back later.</p>
+                @endif
             </div>
         @endforelse
     </div>

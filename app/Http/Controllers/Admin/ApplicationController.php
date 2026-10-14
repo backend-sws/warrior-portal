@@ -33,14 +33,20 @@ class ApplicationController extends Controller
                 $q->orWhereHas('candidate', function ($cq) use ($search, $numericSearch) {
                     $cq->where('name', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('phone', 'like', "%{$search}%");
+                      ->orWhere('phone', 'like', "%{$search}%")
+                      ->orWhereHas('profile', function($pq) use ($search) {
+                          $pq->where('position_applying_for', 'like', "%{$search}%")
+                             ->orWhere('last_designation', 'like', "%{$search}%")
+                             ->orWhere('subject_specialization', 'like', "%{$search}%");
+                      });
                       
                     if ($numericSearch) {
                         $cq->orWhere('id', $numericSearch);
                     }
                 })->orWhereHas('jobPost', function ($jq) use ($search, $numericSearch, $jobIdSearch) {
                     $jq->where('title', 'like', "%{$search}%")
-                      ->orWhere('school_name', 'like', "%{$search}%");
+                      ->orWhere('school_name', 'like', "%{$search}%")
+                      ->orWhereHas('category', fn($cq) => $cq->where('name', 'like', "%{$search}%"));
                       
                     if ($numericSearch) {
                         $jq->orWhere('id', $numericSearch);
