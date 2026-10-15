@@ -25,7 +25,7 @@
                     ['route' => 'candidate.tuitions.index', 'routeIs' => 'candidate.tuitions.*', 'icon' => 'fa-book-reader', 'label' => 'Home Tuitions', 'show' => in_array($userCat, ['home_tutor', 'both'])],
                     ['route' => 'candidate.applications.index', 'routeIs' => 'candidate.applications.index', 'icon' => 'fa-paper-plane', 'label' => 'My Applications', 'badge' => ($userCat === 'home_tutor' ? $tuitionCount : ($userCat === 'school_job' ? $appCount : ($appCount + $tuitionCount))), 'show' => true],
                     ['route' => 'candidate.profile.edit', 'routeIs' => 'candidate.profile.*', 'icon' => 'fa-user-circle', 'label' => 'My Profile', 'show' => true],
-                    ['route' => 'candidate.agreement.show', 'routeIs' => 'candidate.agreement.*', 'icon' => 'fa-file-signature', 'label' => 'My Agreement', 'show' => true],
+                    ['route' => 'candidate.agreement.show', 'routeIs' => 'candidate.agreement.*', 'icon' => 'fa-file-signature', 'label' => 'School Job Agreement', 'show' => true],
                     ['route' => 'candidate.serviceCharge.show', 'routeIs' => 'candidate.servicecharge.*', 'icon' => 'fa-file-invoice-dollar', 'label' => 'Service Charge', 'show' => true],
                 ];
 

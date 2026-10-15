@@ -126,20 +126,82 @@
             @forelse($applications as $app)
             <tr class="group hover:bg-slate-50/60 transition-colors">
                 {{-- Candidate Info --}}
-                <td>
-                    <div class="font-bold text-text-main flex items-center gap-2">
-                        <span>{{ $app->candidate->name }}</span>
-                    </div>
-                    <div class="text-xs text-text-dark/70 font-mono mt-0.5">{{ $app->candidate->phone }}</div>
-                    <div class="text-[11px] text-text-dark/50">{{ $app->candidate->email }}</div>
-                    <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-2">
-                        <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-bold">
-                            {{ $app->candidate->profile?->highestQualification?->name ?? 'N/A' }}
-                        </span>
-                        <a href="{{ route('admin.crm.show', $app->candidate->id) }}" target="_blank" class="text-accent-blue hover:underline font-bold">
-                            Profile &rarr;
-                        </a>
-                    </div>
+                <td class="align-top py-3.5">
+                    @php
+                        $candidate = $app->candidate;
+                        $prof = $candidate?->profile;
+                        $rawWa = $candidate?->whatsapp_no ?: ($prof?->whatsapp_no ?: $candidate?->phone);
+                        $waClean = preg_replace('/[^0-9]/', '', (string)$rawWa);
+                        if (!empty($waClean)) {
+                            $waDigits = (strlen($waClean) === 10) ? '91' . $waClean : $waClean;
+                            $tuiClass = $app->tuitionLead ? 'Class ' . $app->tuitionLead->class : 'tuition requirement';
+                            $tuiId = $app->tuitionLead?->tuition_id ? ' (' . $app->tuitionLead->tuition_id . ')' : '';
+                            $candName = $candidate?->name ?? 'Candidate';
+                            $waMsg = "Hello {$candName}, Warriors Educare regarding your home tuition application for {$tuiClass}{$tuiId}.";
+                            $waUrl = "https://wa.me/{$waDigits}?text=" . urlencode($waMsg);
+                        } else {
+                            $waUrl = null;
+                        }
+                    @endphp
+                    @if($candidate)
+                        <div class="space-y-1 min-w-[240px]">
+                            <div class="font-bold text-text-main flex items-center gap-2">
+                                <a href="{{ route('admin.crm.show', $candidate->id) }}" target="_blank" class="hover:text-accent-blue transition-colors">
+                                    {{ $candidate->name }}
+                                </a>
+                                @if($prof && $prof->is_verified)
+                                    <i class="fas fa-check-circle text-emerald-500 text-xs" title="Verified Candidate"></i>
+                                @endif
+                                <span class="text-[10px] font-mono text-text-dark/40 bg-secondary-bg px-1.5 py-0.2 rounded border border-card-border">#{{ $candidate->id }}</span>
+                            </div>
+
+                            <div class="flex items-center gap-2 flex-wrap pt-0.5">
+                                @if($candidate->phone)
+                                    <a href="tel:{{ $candidate->phone }}" class="text-xs text-text-dark/80 font-mono hover:text-accent-blue inline-flex items-center gap-1" title="Call">
+                                        <i class="fas fa-phone-alt text-[9px] text-text-dark/40"></i>
+                                        <span>{{ $candidate->phone }}</span>
+                                    </a>
+                                @endif
+                                @if($waUrl)
+                                    <a href="{{ $waUrl }}" target="_blank" rel="noopener noreferrer" 
+                                       class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 border border-emerald-300 text-xs font-bold transition-all shadow-xs" 
+                                       title="Chat on WhatsApp ({{ $rawWa }})">
+                                        <i class="fab fa-whatsapp text-emerald-600 text-xs"></i>
+                                        <span>WhatsApp</span>
+                                    </a>
+                                @endif
+                            </div>
+
+                            @if($candidate->email)
+                                <div class="text-[11px] text-text-dark/50 truncate max-w-[220px]">
+                                    <a href="mailto:{{ $candidate->email }}" class="hover:text-accent-blue">
+                                        {{ $candidate->email }}
+                                    </a>
+                                </div>
+                            @endif
+
+                            <div class="text-[11px] text-slate-500 pt-1 flex items-center gap-2 flex-wrap">
+                                @php
+                                    $qual = $prof?->highestQualification?->name ?: $prof?->highest_qualification_name;
+                                @endphp
+                                @if($qual)
+                                    <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-bold border border-blue-200 text-[10px]">
+                                        {{ $qual }}
+                                    </span>
+                                @endif
+                                @if(!empty($prof?->resume_path))
+                                    <a href="{{ Storage::url($prof->resume_path) }}" target="_blank" class="text-rose-600 hover:underline font-bold text-[10px] inline-flex items-center gap-1">
+                                        <i class="fas fa-file-pdf"></i> Resume
+                                    </a>
+                                @endif
+                                <a href="{{ route('admin.crm.show', $candidate->id) }}" target="_blank" class="text-accent-blue hover:underline font-bold text-[10px]">
+                                    Profile &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    @else
+                        <span class="text-xs text-red-500 italic">Candidate Deleted</span>
+                    @endif
                 </td>
 
                 {{-- Tuition Details --}}
@@ -240,7 +302,16 @@
                         </a>
 
                         {{-- Quick Update Status Modal Trigger --}}
-                        <button onclick="openStatusModal({{ $app->id }}, '{{ $app->status }}', '{{ addslashes($app->remarks ?? '') }}', '{{ $app->demo_date ? $app->demo_date->format('Y-m-d\TH:i') : '' }}', '{{ addslashes($app->candidate->name) }}', '{{ addslashes($app->tuitionLead?->class ?? '') }}', '{{ addslashes($app->tuitionLead?->subjects ?? '') }}')" class="px-3 py-1.5 bg-[#031b4e] hover:bg-[#021338] text-white rounded-xl text-xs font-bold transition-all shadow flex items-center gap-1.5">
+                        <button type="button"
+                                data-id="{{ $app->id }}"
+                                data-status="{{ $app->status }}"
+                                data-remarks="{{ $app->remarks ?? '' }}"
+                                data-demo-date="{{ $app->demo_date ? $app->demo_date->format('Y-m-d\TH:i') : '' }}"
+                                data-candidate-name="{{ $app->candidate?->name ?? 'Candidate' }}"
+                                data-class-name="{{ $app->tuitionLead?->class ?? '' }}"
+                                data-subjects="{{ $app->tuitionLead?->subjects ?? '' }}"
+                                onclick="handleTuitionStatusModalBtn(this)"
+                                class="px-3 py-1.5 bg-[#031b4e] hover:bg-[#021338] text-white rounded-xl text-xs font-bold transition-all shadow flex items-center gap-1.5">
                             <i class="fas fa-edit text-[10px]"></i> <span>Status</span>
                         </button>
                     </div>
@@ -424,6 +495,11 @@ function updateModalFieldsForStatus(status) {
         createChargeCheckbox.checked = false;
     }
     toggleServiceChargeFields();
+}
+
+function handleTuitionStatusModalBtn(btn) {
+    const ds = btn.dataset;
+    openStatusModal(ds.id, ds.status, ds.remarks, ds.demoDate, ds.candidateName, ds.className, ds.subjects);
 }
 
 function openStatusModal(appId, status, remarks, demoDate, candidateName, className, subjects) {
