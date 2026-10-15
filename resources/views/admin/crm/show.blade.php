@@ -1772,7 +1772,7 @@
                                 <i class="fas fa-school"></i>
                             </div>
                             <div>
-                                <h4 class="text-xs font-black text-text-main">Teacher Placement Agreement</h4>
+                                <h4 class="text-xs font-black text-text-main">School Job Agreement</h4>
                                 <span class="text-[10px] text-text-dark/50">School Recruitment Terms</span>
                             </div>
                         </div>
@@ -2347,7 +2347,7 @@ function closeSchoolAgreementModal() {
 function printSchoolAgreement() {
     const printContent = document.getElementById('printableSchoolAgreement').innerHTML;
     const printWindow = window.open('', '', 'width=900,height=700');
-    printWindow.document.write('<html><head><title>Teacher Placement Agreement - Warriors Educare</title>');
+    printWindow.document.write('<html><head><title>School Job Agreement - Warriors Educare</title>');
     printWindow.document.write('<style>body{font-family:sans-serif;padding:30px;color:#1e293b;line-height:1.5;} table{width:100%;border-collapse:collapse;} img{max-width:100%;}</style>');
     printWindow.document.write('</head><body>');
     printWindow.document.write(printContent);

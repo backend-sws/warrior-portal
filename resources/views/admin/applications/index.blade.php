@@ -83,8 +83,8 @@
     <table class="w-full text-left border-collapse admin-table">
         <thead>
             <tr>
-                <th>Candidate</th>
-                <th>Job Post (School)</th>
+                <th class="min-w-[270px]">Candidate Details</th>
+                <th class="min-w-[190px]">Job Post (School)</th>
                 <th>Status</th>
                 <th>Remarks</th>
                 <th>Date Applied</th>
@@ -93,40 +93,189 @@
         </thead>
         <tbody class="divide-y divide-card-border">
             @forelse($applications as $app)
-            <tr class="group">
-                <td>
-                    <div class="font-semibold text-text-main group-hover:text-accent-blue transition-colors">{{ $app->candidate->name }}</div>
-                    <div class="text-xs text-text-dark/50">{{ $app->candidate->email }}</div>
-                    <div class="text-[10px] text-text-dark/40 mt-1">
-                        <a href="{{ route('admin.crm.show', $app->candidate->id) }}" class="text-accent-blue hover:underline">View Profile</a>
+            @php
+                $candidate = $app->candidate;
+                $prof = $candidate?->profile;
+
+                // Determine WhatsApp number:
+                $rawWa = $candidate?->whatsapp_no ?: ($prof?->whatsapp_no ?: $candidate?->phone);
+                $waClean = preg_replace('/[^0-9]/', '', (string)$rawWa);
+                if (!empty($waClean)) {
+                    $waDigits = (strlen($waClean) === 10) ? '91' . $waClean : $waClean;
+                    $jobTitle = $app->jobPost->title ?? 'Teacher Position';
+                    $schoolName = !empty($app->jobPost->school_name) ? $app->jobPost->school_name : ($app->jobPost->user->name ?? '');
+                    $schoolPart = $schoolName ? " at {$schoolName}" : '';
+                    $candName = $candidate?->name ?? 'Candidate';
+                    $waMsg = "Hello {$candName}, Warriors Educare regarding your application for {$jobTitle}{$schoolPart}.";
+                    $waUrl = "https://wa.me/{$waDigits}?text=" . urlencode($waMsg);
+                } else {
+                    $waUrl = null;
+                }
+
+                $qual = $prof?->highestQualification?->name ?: $prof?->highest_qualification_name;
+                $subject = $prof?->subject_specialization ?: ($prof?->subject?->name ?: null);
+                $exp = $prof?->experience_range ?: ($prof?->experience_years ? $prof->experience_years . ' yrs' : null);
+                $city = $prof?->preferredCity?->name ?: ($prof?->address ? \Illuminate\Support\Str::limit($prof->address, 20) : null);
+            @endphp
+            <tr class="group hover:bg-secondary-bg/40 transition-colors">
+                <td class="align-top py-3.5">
+                    @if($candidate)
+                        <div class="space-y-1.5 min-w-[270px] max-w-[340px]">
+                            {{-- Name & Verified Status --}}
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <a href="{{ route('admin.crm.show', $candidate->id) }}" target="_blank" class="font-bold text-sm text-text-main hover:text-accent-blue transition-colors">
+                                    {{ $candidate->name }}
+                                </a>
+                                @if($prof && $prof->is_verified)
+                                    <span class="inline-flex items-center text-accent-blue text-xs" title="Verified Candidate">
+                                        <i class="fas fa-check-circle"></i>
+                                    </span>
+                                @endif
+                                <span class="text-[10px] font-mono text-text-dark/50 bg-secondary-bg px-1.5 py-0.5 rounded border border-card-border" title="Candidate ID">
+                                    #{{ $candidate->id }}
+                                </span>
+                            </div>
+
+                            {{-- Contact Numbers & WhatsApp --}}
+                            <div class="flex items-center gap-2 flex-wrap">
+                                @if($candidate->phone)
+                                    <a href="tel:{{ $candidate->phone }}" 
+                                       class="inline-flex items-center gap-1 text-[11px] font-semibold text-text-main hover:text-accent-blue bg-secondary-bg px-2 py-0.5 rounded border border-card-border transition-colors" 
+                                       title="Call {{ $candidate->phone }}">
+                                        <i class="fas fa-phone-alt text-[9px] text-text-dark/40"></i>
+                                        <span>{{ $candidate->phone }}</span>
+                                    </a>
+                                @endif
+
+                                @if($waUrl)
+                                    <a href="{{ $waUrl }}" target="_blank" rel="noopener noreferrer" 
+                                       class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 border border-emerald-300 text-xs font-bold transition-all shadow-xs group/wa cursor-pointer" 
+                                       title="Open WhatsApp chat with {{ $candidate->name }} ({{ $rawWa }})">
+                                        <i class="fab fa-whatsapp text-emerald-600 text-sm group-hover/wa:scale-110 transition-transform"></i>
+                                        <span>WhatsApp</span>
+                                        @if($rawWa !== $candidate->phone)
+                                            <span class="text-[10px] font-mono text-emerald-800 font-normal">({{ $rawWa }})</span>
+                                        @endif
+                                    </a>
+                                @endif
+                            </div>
+
+                            {{-- Email --}}
+                            @if($candidate->email)
+                                <div>
+                                    <a href="mailto:{{ $candidate->email }}" class="inline-flex items-center gap-1 text-[11px] text-text-dark/60 hover:text-accent-blue truncate max-w-[280px]" title="{{ $candidate->email }}">
+                                        <i class="fas fa-envelope text-[9px] text-text-dark/40"></i>
+                                        <span class="truncate">{{ $candidate->email }}</span>
+                                    </a>
+                                </div>
+                            @endif
+
+                            {{-- Professional / Academic Badges --}}
+                            <div class="flex items-center gap-1 flex-wrap pt-0.5">
+                                @if(!empty($prof?->position_applying_for))
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200" title="Target Position">
+                                        <i class="fas fa-user-tie text-[9px] text-blue-500"></i> {{ $prof->position_applying_for }}
+                                    </span>
+                                @endif
+
+                                @if($subject)
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200" title="Subject Specialization">
+                                        <i class="fas fa-book text-[9px] text-purple-500"></i> {{ $subject }}
+                                    </span>
+                                @endif
+
+                                @if($qual)
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200" title="Highest Qualification">
+                                        <i class="fas fa-graduation-cap text-[9px] text-amber-500"></i> {{ $qual }}
+                                    </span>
+                                @endif
+
+                                @if(!empty($prof?->b_ed_status) && !in_array(strtolower($prof->b_ed_status), ['no', 'none']))
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200" title="B.Ed Status">
+                                        <i class="fas fa-certificate text-[9px] text-teal-500"></i> B.Ed ({{ $prof->b_ed_status }})
+                                    </span>
+                                @endif
+
+                                @if($exp)
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200" title="Teaching Experience">
+                                        <i class="fas fa-briefcase text-[9px] text-slate-500"></i> {{ $exp }}
+                                    </span>
+                                @endif
+
+                                @if($city)
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200" title="Location: {{ $prof?->address ?: $city }}">
+                                        <i class="fas fa-map-marker-alt text-[9px] text-slate-400"></i> {{ $city }}
+                                    </span>
+                                @endif
+
+                                @if($prof?->expected_salary)
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200" title="Expected Salary">
+                                        <i class="fas fa-rupee-sign text-[8px] text-emerald-500"></i> {{ $prof->expected_salary }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            {{-- Bottom Action Links: Resume & Full Profile --}}
+                            <div class="flex items-center gap-2.5 pt-1 border-t border-card-border/40 text-[11px]">
+                                @if(!empty($prof?->resume_path))
+                                    <a href="{{ Storage::url($prof->resume_path) }}" target="_blank" rel="noopener noreferrer" 
+                                       class="inline-flex items-center gap-1 font-bold text-rose-600 hover:text-rose-700 hover:underline bg-rose-50 px-2 py-0.5 rounded border border-rose-200 transition-colors">
+                                        <i class="fas fa-file-pdf text-[10px]"></i> Resume
+                                    </a>
+                                    <span class="text-text-dark/20">•</span>
+                                @endif
+                                <a href="{{ route('admin.crm.show', $candidate->id) }}" target="_blank" 
+                                   class="inline-flex items-center gap-1 font-bold text-accent-blue hover:underline">
+                                    <span>View Full Profile</span>
+                                    <i class="fas fa-arrow-up-right-from-square text-[9px]"></i>
+                                </a>
+                            </div>
+                        </div>
+                    @else
+                        <span class="text-xs text-red-500 italic">Candidate Deleted</span>
+                    @endif
+                </td>
+                <td class="align-top py-3.5">
+                    <div class="font-semibold text-text-main truncate max-w-[220px]" title="{{ $app->jobPost->title ?? 'N/A' }}">{{ $app->jobPost->title ?? 'N/A' }}</div>
+                    <div class="text-[11px] font-bold text-accent-blue mt-0.5">{{ $app->jobPost->job_id ?? '' }}</div>
+                    <div class="text-xs text-text-dark/60 mt-0.5 flex items-center gap-1">
+                        <i class="fas fa-school text-[10px] text-text-dark/40"></i>
+                        <span>{{ !empty($app->jobPost->school_name) ? $app->jobPost->school_name : ($app->jobPost->user->name ?? 'School') }}</span>
                     </div>
+                    @if(!empty($app->jobPost->location))
+                        <div class="text-[11px] text-text-dark/50 mt-0.5 flex items-center gap-1">
+                            <i class="fas fa-map-marker-alt text-[9px] text-text-dark/40"></i>
+                            <span>{{ $app->jobPost->location }}</span>
+                        </div>
+                    @endif
                 </td>
-                <td>
-                    <div class="font-semibold text-text-main truncate max-w-[200px]" title="{{ $app->jobPost->title }}">{{ $app->jobPost->title }}</div>
-                    <div class="text-[11px] font-bold text-accent-blue mt-0.5">{{ $app->jobPost->job_id }}</div>
-                    <div class="text-xs text-text-dark/50">{{ !empty($app->jobPost->school_name) ? $app->jobPost->school_name : ($app->jobPost->user->name ?? 'School') }}</div>
-                </td>
-                <td>
+                <td class="align-top py-3.5 whitespace-nowrap">
                     <span class="{{ $app->status_badge_class }} px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider inline-block">
                         {{ $app->status_label }}
                     </span>
                     @if($app->interview_date)
-                        <div class="text-[10px] text-purple-600 font-semibold mt-1 flex items-center gap-1">
-                            <i class="fas fa-calendar-alt"></i> {{ $app->interview_date->format('d M, h:i A') }}
+                        <div class="text-[11px] text-purple-600 font-semibold mt-1.5 flex items-center gap-1">
+                            <i class="fas fa-calendar-alt text-[10px]"></i> {{ $app->interview_date->format('d M, h:i A') }}
                         </div>
                     @endif
                 </td>
-                <td class="max-w-[200px]">
+                <td class="align-top py-3.5 max-w-[200px]">
                     @if($app->remarks)
-                        <p class="text-xs text-text-dark/70 truncate" title="{{ $app->remarks }}">{{ $app->remarks }}</p>
+                        <p class="text-xs text-text-dark/70" title="{{ $app->remarks }}">{{ $app->remarks }}</p>
                     @else
                         <span class="text-text-dark/30 text-xs italic">No remarks</span>
                     @endif
+                    @if($app->cover_letter)
+                        <div class="mt-1 text-[11px] text-slate-500 italic bg-secondary-bg p-1.5 rounded border border-card-border/60" title="{{ $app->cover_letter }}">
+                            "{{ \Illuminate\Support\Str::limit($app->cover_letter, 60) }}"
+                        </div>
+                    @endif
                 </td>
-                <td class="text-text-dark/60 text-sm">
-                    {{ $app->created_at->format('M d, Y') }}
+                <td class="align-top py-3.5 text-text-dark/60 text-xs whitespace-nowrap">
+                    <div class="font-medium text-text-main">{{ $app->created_at->format('M d, Y') }}</div>
+                    <div class="text-[10px] text-text-dark/40">{{ $app->created_at->diffForHumans() }}</div>
                 </td>
-                <td class="text-right">
+                <td class="align-top py-3.5 text-right whitespace-nowrap">
                     <button type="button" 
                             data-id="{{ $app->id }}"
                             data-status="{{ $app->status }}"
@@ -134,8 +283,8 @@
                             data-interview-date="{{ $app->interview_date ? $app->interview_date->format('Y-m-d\TH:i') : '' }}"
                             data-interview-link="{{ $app->interview_link ?? '' }}"
                             onclick="handleStatusModalBtn(this)" 
-                            class="px-3 py-1.5 rounded-lg bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue hover:text-accent-blue text-xs font-semibold transition-colors">
-                        Update Status
+                            class="px-3 py-1.5 rounded-lg bg-secondary-bg text-text-main border border-card-border hover:border-accent-blue hover:text-accent-blue text-xs font-semibold transition-colors shadow-xs">
+                        <i class="fas fa-edit mr-1"></i> Update Status
                     </button>
                 </td>
             </tr>

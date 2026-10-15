@@ -10,7 +10,7 @@
         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-xl sm:text-2xl mx-auto mb-3 sm:mb-4">
             <i class="fas fa-file-contract"></i>
         </div>
-        <h1 class="text-xl sm:text-2xl font-bold text-[#031b4e]">Candidate Agreement</h1>
+        <h1 class="text-xl sm:text-2xl font-bold text-[#031b4e]">School Job Agreement</h1>
         <p class="text-xs sm:text-sm text-[#031b4e]/70 mt-1.5 max-w-md mx-auto">Please read the terms and conditions carefully and provide your digital signature below.</p>
         
         {{-- Agreement Type Tabs --}}
@@ -23,7 +23,7 @@
             <div class="inline-flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl mt-4 border border-slate-200 shadow-inner">
                 <a href="{{ route('candidate.agreement.show') }}" class="px-4 py-2 bg-[#031b4e] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5">
                     <i class="fas fa-school text-xs text-sky-400"></i>
-                    <span>Teacher Placement Agreement</span>
+                    <span>School Job Agreement</span>
                 </a>
                 <a href="{{ route('candidate.tuitions.index', ['open_agreement' => 1]) }}" class="px-4 py-2 text-slate-600 hover:text-[#031b4e] font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5">
                     <i class="fas fa-chalkboard-teacher text-xs text-amber-500"></i>
@@ -33,7 +33,7 @@
         @else
             <div class="inline-flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-xl mt-4 border border-slate-200 text-xs font-bold text-[#031b4e]">
                 <i class="fas fa-school text-sky-500"></i>
-                <span>Teacher Placement Agreement</span>
+                <span>School Job Agreement</span>
             </div>
         @endif
     </div>
@@ -81,7 +81,7 @@
             <div class="h-96 sm:h-[480px] overflow-y-auto pr-2 sm:pr-4 text-xs sm:text-sm text-[#031b4e]/80 space-y-3 sm:space-y-4 custom-scrollbar bg-slate-50 rounded-xl p-4 sm:p-6 border border-slate-200">
                     <div class="text-center mb-6">
                         <h3 class="text-base sm:text-lg font-black text-[#031b4e]">WARRIORS EDUCARE</h3>
-                        <h4 class="font-bold text-sm text-[#0ea5e9] tracking-wider uppercase">TEACHER PLACEMENT SERVICE AGREEMENT</h4>
+                        <h4 class="font-bold text-sm text-[#0ea5e9] tracking-wider uppercase">SCHOOL JOB SERVICE AGREEMENT</h4>
                         <p class="text-xs text-slate-500 mt-1">This Agreement is entered into voluntarily between Warriors Educare ("Agency") and the undersigned Candidate ("Teacher").</p>
                     </div>
 
@@ -249,7 +249,7 @@
                                             @if(!empty($profile->signature_ip_address))
                                                 <i>IP Address : 💻 {{ $profile->signature_ip_address }}</i><br>
                                             @endif
-                                            <i>Reason: Candidate Teacher Placement Agreement</i><br>
+                                            <i>Reason: School Job Agreement</i><br>
                                             <i>Date : {{ $profile->signature_date_time ? \Carbon\Carbon::parse($profile->signature_date_time)->format('D M d H:i:s T Y') : now()->format('D M d H:i:s T Y') }}</i><br>
                                             <i>Identity Verification : {{ $profile->live_photo_path ? 'Live Camera Snapshot Verified ✅' : 'Verified Digital Signature ✅' }}</i>
                                         </div>

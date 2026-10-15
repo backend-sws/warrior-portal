@@ -29,8 +29,8 @@
                 <div class="flex items-start sm:items-center gap-3">
                     <i class="fas fa-file-signature text-amber-500 text-xl mt-0.5 sm:mt-0 shrink-0"></i>
                     <div>
-                        <h3 class="font-bold text-amber-800 text-sm sm:text-base">Action Required: Sign School Teacher Agreement</h3>
-                        <p class="text-xs sm:text-sm text-amber-700">Admin has requested you to sign the Candidate Agreement to proceed with your school job assignment.</p>
+                        <h3 class="font-bold text-amber-800 text-sm sm:text-base">Action Required: Sign School Job Agreement</h3>
+                        <p class="text-xs sm:text-sm text-amber-700">Admin has requested you to sign the School Job Agreement to proceed with your school job assignment.</p>
                     </div>
                 </div>
                 <a href="{{ route('candidate.agreement.show') }}" class="w-full sm:w-auto text-center px-5 py-2.5 bg-amber-600 text-white rounded-lg text-xs sm:text-sm font-bold shadow hover:bg-amber-700 transition-colors shrink-0">
@@ -399,7 +399,7 @@
                             <h3 class="text-base font-extrabold text-[#031b4e] mt-1">
                                 {{ $profile->is_agreement_signed ? 'Signed' : 'Pending' }}
                             </h3>
-                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">Candidate Agreement</p>
+                            <p class="text-[11px] font-bold text-[#031b4e]/70 uppercase tracking-wider mt-1">School Job Agreement</p>
                         </a>
                     @else
                         {{-- Both Category --}}

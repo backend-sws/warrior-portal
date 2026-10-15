@@ -15,7 +15,12 @@ class ApplicationController extends Controller
 {
     public function index(Request $request)
     {
-        $query = JobApplication::with(['candidate', 'jobPost.user']);
+        $query = JobApplication::with([
+            'candidate.profile.highestQualification',
+            'candidate.profile.subject',
+            'candidate.profile.preferredCity',
+            'jobPost.user'
+        ]);
 
         if ($search = $request->input('search')) {
             $isNumeric = preg_match('/^[0-9]+$/', trim($search));
@@ -34,10 +39,12 @@ class ApplicationController extends Controller
                     $cq->where('name', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%")
                       ->orWhere('phone', 'like', "%{$search}%")
+                      ->orWhere('whatsapp_no', 'like', "%{$search}%")
                       ->orWhereHas('profile', function($pq) use ($search) {
                           $pq->where('position_applying_for', 'like', "%{$search}%")
                              ->orWhere('last_designation', 'like', "%{$search}%")
-                             ->orWhere('subject_specialization', 'like', "%{$search}%");
+                             ->orWhere('subject_specialization', 'like', "%{$search}%")
+                             ->orWhere('whatsapp_no', 'like', "%{$search}%");
                       });
                       
                     if ($numericSearch) {
@@ -90,7 +97,14 @@ class ApplicationController extends Controller
                 $q->orWhereHas('candidate', function ($cq) use ($search, $numericSearch) {
                     $cq->where('name', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('phone', 'like', "%{$search}%");
+                      ->orWhere('phone', 'like', "%{$search}%")
+                      ->orWhere('whatsapp_no', 'like', "%{$search}%")
+                      ->orWhereHas('profile', function($pq) use ($search) {
+                          $pq->where('position_applying_for', 'like', "%{$search}%")
+                             ->orWhere('last_designation', 'like', "%{$search}%")
+                             ->orWhere('subject_specialization', 'like', "%{$search}%")
+                             ->orWhere('whatsapp_no', 'like', "%{$search}%");
+                      });
                       
                     if ($numericSearch) {
                         $cq->orWhere('id', $numericSearch);
